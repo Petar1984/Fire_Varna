@@ -1173,15 +1173,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     50%      { box-shadow: 0 0 0 2px rgba(196,30,58,0.6), 0 0 0 14px rgba(196,30,58,0); }
   }
 
-  /* ===== Popup report button ===== */
-  .leaflet-popup-content .popup-report-btn {
-    margin-top: 6px; padding: 8px 12px; min-height: 36px;
-    width: 100%; border: none; border-radius: 6px;
-    background: #ff5722; color: white;
-    font-weight: 700; font-size: 13px; cursor: pointer;
-  }
-  .leaflet-popup-content .popup-report-btn:active { background: #d84315; }
-
   /* ===== Map markers ===== */
   .h-pin {
     width: 28px; height: 28px; border-radius: 50% 50% 50% 0;
@@ -1496,8 +1487,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
       });
       HYDRANTS.forEach(h => {
         const m = L.marker([h.c[1], h.c[0]], { icon: dimPin() });
-        const d = haversine(lastFix.lat, lastFix.lon, h.c[1], h.c[0]);
-        m.bindPopup(buildPopup(h, d));
+        m.on('click', () => {
+          if (placementActive) return;
+          showReportTypePicker(h);
+        });
         allClusterLayer.addLayer(m);
       });
       map.addLayer(allClusterLayer);
@@ -1507,7 +1500,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
         const m = L.marker([r0.h.c[1], r0.h.c[0]], {
           icon: makePin(activeTargetIdx + 1, 'first'), zIndexOffset: 800
         });
-        m.bindPopup(buildPopup(r0.h, r0.d));
+        m.on('click', () => {
+          if (placementActive) return;
+          showReportTypePicker(r0.h);
+        });
         m.addTo(map);
         visibleMarkers.push(m);
       }
@@ -1519,8 +1515,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
           icon: makePin(i + 1, isActive ? 'first' : ''),
           zIndexOffset: isActive ? 800 : 600 - i
         });
-        m.bindPopup(buildPopup(r.h, r.d));
-        m.on('click', () => setActiveTarget(i));
+        m.on('click', () => {
+          if (placementActive) return;
+          setActiveTarget(i);
+          showReportTypePicker(r.h);
+        });
         m.addTo(map);
         visibleMarkers.push(m);
       });
@@ -1549,33 +1548,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     updateCard();
   }
 
-  function buildPopup(h, dist) {
-    const lines = [
-      '<b>' + formatDist(dist) + '</b>',
-      h.a ? escapeHtml(h.a) : '',
-      'Район: ' + escapeHtml(h.s),
-      h.r ? escapeHtml(h.r) : '',
-      'ID: ' + escapeHtml(h.i),
-      '<button class="popup-report-btn" data-action="report" data-id="' + escapeHtml(h.i) + '">🚨 Докладвай хидрант</button>'
-    ].filter(Boolean);
-    return lines.join('<br>');
-  }
-
-  // Delegated popup handler — popups are recreated on every refresh, so per-popup
-  // listeners would leak. One listener on the map handles all of them.
-  map.on('popupopen', (e) => {
-    const node = e.popup.getElement();
-    if (!node) return;
-    const btn = node.querySelector('.popup-report-btn[data-action="report"]');
-    if (!btn || btn.dataset.wired === '1') return;
-    btn.dataset.wired = '1';
-    btn.addEventListener('click', () => {
-      const h = HYDRANTS_BY_ID[btn.dataset.id];
-      if (h) showReportTypePicker(h);
-    });
-  });
-
-  // ===== List ===== 
+  // ===== List =====
   function renderList() {
     const list = document.getElementById('sheetList');
     list.innerHTML = '';
