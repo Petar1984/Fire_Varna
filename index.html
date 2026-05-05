@@ -1227,7 +1227,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <button class="ctrl-btn" id="addHydrantBtn" title="Добави хидрант" aria-label="Добави хидрант">+</button>
 </div>
 
-<div class="placement-banner" id="placementBanner" hidden>Задръж пръст върху картата където е хидрантът</div>
+<div class="placement-banner" id="placementBanner" hidden>Постави pin на хидранта. „📍 Тук съм" ако си до него. Влечи за корекция.</div>
 
 <div class="placement-actions" id="placementActions" hidden>
   <button class="placement-btn clear" id="placementClear" disabled>Изчисти</button>
@@ -1946,15 +1946,20 @@ svg.leaflet-image-layer.leaflet-interactive path {
     });
   }
 
-  // ----- Type picker (entry point from existing hydrants) -----
+  // ----- Type picker -----
+  // hydrant === null  → global "+" entry, shows all 5 types incl. new_hydrant
+  // hydrant === <obj> → per-hydrant 🚨 entry, shows the 4 existing-hydrant types
   function showReportTypePicker(hydrant) {
     reportDraft = { hydrant: hydrant, type: null };
-    openModal('🚨 Сигнал за хидрант');
+    openModal(hydrant ? '🚨 Сигнал за хидрант' : 'Какво да докладваш?');
+    const newOption = hydrant ? '' :
+      '<button type="button" class="type-btn new" data-type="new_hydrant">Нов хидрант</button>';
     modalBody.innerHTML =
       reporterBarHTML(getReporterName()) +
       targetCardHTML(null, hydrant, null) +
       '<div class="field"><label>Какво има да се докладва?</label>' +
         '<div class="type-picker">' +
+          newOption +
           '<button type="button" class="type-btn exists"  data-type="exists_confirmed">Хидрантът е там</button>' +
           '<button type="button" class="type-btn missing" data-type="missing">Хидрант липсва</button>' +
           '<button type="button" class="type-btn wrong"   data-type="wrong_location">Грешна локация</button>' +
@@ -1966,7 +1971,24 @@ svg.leaflet-image-layer.leaflet-interactive path {
     wireReporterBar();
     modalBody.querySelectorAll('.type-btn').forEach(b => {
       b.addEventListener('click', () => {
-        showReportModal(hydrant, b.dataset.type);
+        const t = b.dataset.type;
+        if (hydrant) {
+          showReportModal(hydrant, t);
+          return;
+        }
+        // No-hydrant context (global "+" entry).
+        if (t === 'new_hydrant') {
+          closeReportModal();
+          const draft = { reporter: getReporterName() || '' };
+          enterLocationPlacementMode(lastFix ? [lastFix.lon, lastFix.lat] : null, (coord) => {
+            if (!coord) return;
+            draft.placedCoord = coord;
+            showReportModal(null, 'new_hydrant', draft);
+          });
+        } else {
+          closeReportModal();
+          flashStatus('Тапни хидрант на картата, за да докладваш', 4000);
+        }
       });
     });
     modalFooter.querySelector('[data-act="cancel"]').addEventListener('click', closeReportModal);
@@ -2577,14 +2599,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
   placementCancelBtn.addEventListener('click', () => exitLocationPlacementMode(null));
   placementConfirmBtn.addEventListener('click', () => exitLocationPlacementMode(placementCoord));
 
-  // ----- "Добави хидрант" entry point -----
+  // ----- "+" button entry point: open report-type picker -----
   document.getElementById('addHydrantBtn').addEventListener('click', () => {
-    const draft = { reporter: getReporterName() || '' };
-    enterLocationPlacementMode(lastFix ? [lastFix.lon, lastFix.lat] : null, (coord) => {
-      if (!coord) return;
-      draft.placedCoord = coord;
-      showReportModal(null, 'new_hydrant', draft);
-    });
+    showReportTypePicker(null);
   });
 
   // ----- Boot: retry any queued reports from previous session -----
@@ -2689,7 +2706,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   const WELCOME_COPY = [
     'Хидранти Варна — карта на пожарни хидранти за пожарникари и доброволци',
     'Разреши локация, за да видиш най-близките хидранти. Бутон 🚨 отваря сигнал.',
-    'За нов хидрант — ползвай „📍 Тук съм" или влечи pin-а за корекция. Zoom-ни за по-точно поставяне.'
+    'За нов хидрант натисни +. Постави на картата с „📍 Тук съм" (когато си до хидранта) или влечи pin-а за корекция.'
   ];
   let welcomeShownThisSession = false;
 
