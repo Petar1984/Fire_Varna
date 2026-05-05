@@ -6,10 +6,10 @@
     "r": "",
     "z": "",
     "st": "",
-    "t": "",
+    "t": "надземен",
     "c": [
-      27.847459,
-      43.250244
+      27.847417,
+      43.250208
     ],
     "o": "field_report",
     "report_id": "ba91e3ff-f28a-4499-82ba-61d850a051a4",
@@ -65,6 +65,125 @@
     "o": "field_report",
     "report_id": "228b7518-bf56-465b-bdda-2f8e2681e8cb",
     "reported_at": "2026-05-05T13:22:16Z",
+    "status": "verified"
+  },
+  {
+    "i": "field_a641fc26",
+    "s": "",
+    "a": "Пред бл 17 вх 1",
+    "r": "",
+    "z": "",
+    "st": "",
+    "t": "надземен",
+    "c": [
+      27.875344,
+      43.239089
+    ],
+    "o": "field_report",
+    "report_id": "a641fc26-7c60-404d-9a51-844a0b9af3e7",
+    "reported_at": "2026-05-05T16:40:45Z",
+    "status": "verified"
+  },
+  {
+    "i": "field_79c7d4b5",
+    "s": "",
+    "a": "На велоалеята",
+    "r": "",
+    "z": "",
+    "st": "",
+    "t": "надземен",
+    "c": [
+      27.877168,
+      43.239038
+    ],
+    "o": "field_report",
+    "report_id": "79c7d4b5-9b46-442b-8b0d-d80b11a4ca9a",
+    "reported_at": "2026-05-05T16:43:07Z",
+    "status": "verified"
+  },
+  {
+    "i": "field_9e4cbe81",
+    "s": "",
+    "a": "Срещу каса на easypay до дърво",
+    "r": "",
+    "z": "",
+    "st": "",
+    "t": "надземен",
+    "c": [
+      27.880378,
+      43.239405
+    ],
+    "o": "field_report",
+    "report_id": "9e4cbe81-f755-42a3-987b-11acf5d8d31e",
+    "reported_at": "2026-05-05T16:46:17Z",
+    "status": "verified"
+  },
+  {
+    "i": "field_2e92297a",
+    "s": "",
+    "a": "В парка до велоалеята",
+    "r": "",
+    "z": "",
+    "st": "",
+    "t": "надземен",
+    "c": [
+      27.881519,
+      43.239128
+    ],
+    "o": "field_report",
+    "report_id": "2e92297a-c426-4ded-beef-c257fa61dc50",
+    "reported_at": "2026-05-05T16:47:50Z",
+    "status": "verified"
+  },
+  {
+    "i": "field_eec742fe",
+    "s": "",
+    "a": "До магазин бурлекс",
+    "r": "",
+    "z": "",
+    "st": "",
+    "t": "надземен",
+    "c": [
+      27.882429,
+      43.232609
+    ],
+    "o": "field_report",
+    "report_id": "eec742fe-94de-409f-902e-02f68deee26d",
+    "reported_at": "2026-05-05T16:52:42Z",
+    "status": "verified"
+  },
+  {
+    "i": "field_c1eff605",
+    "s": "",
+    "a": "До входа на подземният паркинг",
+    "r": "",
+    "z": "",
+    "st": "",
+    "t": "надземен",
+    "c": [
+      27.889152,
+      43.227634
+    ],
+    "o": "field_report",
+    "report_id": "c1eff605-1934-40ac-8bb0-98834e53bbf8",
+    "reported_at": "2026-05-05T16:58:39Z",
+    "status": "verified"
+  },
+  {
+    "i": "field_35aeaca9",
+    "s": "",
+    "a": "Срещу магазин Тръпкови и diad clima, до трафопост 2313",
+    "r": "",
+    "z": "",
+    "st": "",
+    "t": "надземен",
+    "c": [
+      27.896106,
+      43.222344
+    ],
+    "o": "field_report",
+    "report_id": "35aeaca9-cdb0-4b0a-97ec-0d7aaa96cfde",
+    "reported_at": "2026-05-05T17:03:22Z",
     "status": "verified"
   }
 ]
