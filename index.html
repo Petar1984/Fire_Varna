@@ -888,8 +888,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .card-btn.nav { background: #1976d2; }
   .card-btn.nav:active { background: #0d5cb5; }
-  .card-btn.report { background: #ff5722; }
-  .card-btn.report:active { background: #d84315; }
   .compass-perm-card-btn {
     background: #ff9800; color: white; border: none;
     padding: 4px 10px; border-radius: 6px; font-weight: 600;
@@ -1252,7 +1250,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     </div>
     <div class="card-actions">
       <button class="card-btn nav" id="cardNav" title="Навигация">🧭</button>
-      <button class="card-btn report" id="cardReport" title="Сигнал">🚨</button>
     </div>
   </div>
 
@@ -1546,7 +1543,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       'Район: ' + escapeHtml(h.s),
       h.r ? escapeHtml(h.r) : '',
       'ID: ' + escapeHtml(h.i),
-      '<button class="popup-report-btn" data-action="report" data-id="' + escapeHtml(h.i) + '">🚨 Докладвай</button>'
+      '<button class="popup-report-btn" data-action="report" data-id="' + escapeHtml(h.i) + '">🚨 Докладвай хидрант</button>'
     ].filter(Boolean);
     return lines.join('<br>');
   }
@@ -1663,17 +1660,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
       '</div>' +
       '<div class="card-actions">' +
         '<button class="card-btn nav" id="cardNav" title="Навигация">🧭</button>' +
-        '<button class="card-btn report" id="cardReport" title="Сигнал">🚨</button>' +
       '</div>';
 
     // Wire actions
     document.getElementById('cardNav').addEventListener('click', () => {
       const r = currentRanked[activeTargetIdx];
       if (r) navigateTo(r);
-    });
-    document.getElementById('cardReport').addEventListener('click', () => {
-      const r = currentRanked[activeTargetIdx];
-      if (r) showReportTypePicker(r.h);
     });
 
     // Show compass permission button if needed
