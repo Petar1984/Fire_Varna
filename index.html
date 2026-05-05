@@ -1155,6 +1155,19 @@ svg.leaflet-image-layer.leaflet-interactive path {
     border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(196,30,58,0.6);
     animation: placement-pulse 1.4s infinite ease-in-out;
   }
+  /* DB reference marker — non-interactive, shown in wrong_location flow
+     so user sees where the database thinks the hydrant is. */
+  .placement-db-ref {
+    width: 28px; height: 28px; border-radius: 50% 50% 50% 0;
+    background: transparent; transform: rotate(-45deg);
+    border: 3px dashed #888; box-sizing: border-box;
+    opacity: 0.75;
+  }
+  /* 44px touch target wrapper — pin visual stays 28px, hit area is 44x44.
+     iconSize is 44 in JS; this centers the visual inside it. */
+  .placement-marker {
+    display: flex; align-items: center; justify-content: center;
+  }
   @keyframes placement-pulse {
     0%, 100% { box-shadow: 0 0 0 2px rgba(196,30,58,0.6), 0 0 0 0 rgba(196,30,58,0.5); }
     50%      { box-shadow: 0 0 0 2px rgba(196,30,58,0.6), 0 0 0 14px rgba(196,30,58,0); }
@@ -1966,15 +1979,17 @@ svg.leaflet-image-layer.leaflet-interactive path {
         const t = b.dataset.type;
         if (hydrant) {
           if (t === 'wrong_location') {
-            // Auto-enter placement mode with hydrant's current DB coords
-            // as the initial pin so the user can drag it to the real spot.
+            // Show DB coord as a non-interactive dashed reference; the user
+            // must explicitly tap/long-press/drag elsewhere to place the
+            // actual pin. Confirm stays disabled until a real placement is
+            // made — prevents silent no-op submissions of unchanged coords.
             closeReportModal();
             const draft = { reporter: getReporterName() || '' };
             enterLocationPlacementMode([hydrant.c[0], hydrant.c[1]], (coord) => {
               if (!coord) return;
               draft.placedCoord = coord;
               showReportModal(hydrant, 'wrong_location', draft);
-            });
+            }, { showAsReference: true });
             return;
           }
           showReportModal(hydrant, t);
@@ -2494,6 +2509,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   // ----- Long-press placement mode -----
   let placementActive = false;
   let placementMarker = null;
+  let placementRefMarker = null;      // non-interactive DB-coord reference (wrong_location flow)
   let placementCoord = null;          // [lon, lat]
   let placementDoneCb = null;
   let pendingTouchTimer = null;
@@ -2509,7 +2525,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     const icon = L.divIcon({
       className: 'placement-marker',
       html: '<div class="placement-pin"></div>',
-      iconSize: [28, 28], iconAnchor: [14, 28]
+      iconSize: [44, 44], iconAnchor: [22, 36]
     });
     placementMarker = L.marker(latlng, { icon: icon, draggable: true, zIndexOffset: 2000 }).addTo(map);
     placementMarker.on('dragend', (ev) => {
@@ -2565,17 +2581,32 @@ svg.leaflet-image-layer.leaflet-interactive path {
     pendingTouchStart = null;
   }
 
-  function enterLocationPlacementMode(initialCoord, callback) {
+  function enterLocationPlacementMode(initialCoord, callback, opts) {
+    opts = opts || {};
+    const showAsReference = !!opts.showAsReference;
     placementActive = true;
     placementDoneCb = (typeof callback === 'function') ? callback : null;
     clearPlacementMarker();
+    if (placementRefMarker) { map.removeLayer(placementRefMarker); placementRefMarker = null; }
     placementBanner.hidden = false;
     placementActionsEl.hidden = false;
     placementConfirmBtn.disabled = true;
     placementClearBtn.disabled = true;
     if (initialCoord) {
       const ll = L.latLng(initialCoord[1], initialCoord[0]);
-      setPlacementMarker(ll);
+      if (showAsReference) {
+        // Show DB coord as a non-interactive visual reference. The user must
+        // explicitly tap/long-press/drag elsewhere to place the actual pin —
+        // prevents silent no-op submissions of the unchanged coord.
+        const refIcon = L.divIcon({
+          className: 'placement-ref-marker',
+          html: '<div class="placement-db-ref"></div>',
+          iconSize: [28, 28], iconAnchor: [14, 28]
+        });
+        placementRefMarker = L.marker(ll, { icon: refIcon, interactive: false, zIndexOffset: 1000 }).addTo(map);
+      } else {
+        setPlacementMarker(ll);
+      }
       map.setView(ll, Math.max(map.getZoom(), 17));
     }
     map.on('contextmenu', onMapContextMenu);
@@ -2590,6 +2621,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     placementBanner.hidden = true;
     placementActionsEl.hidden = true;
     if (placementMarker) { map.removeLayer(placementMarker); placementMarker = null; }
+    if (placementRefMarker) { map.removeLayer(placementRefMarker); placementRefMarker = null; }
     map.off('contextmenu', onMapContextMenu);
     const c = map.getContainer();
     c.removeEventListener('touchstart',  onMapTouchStart);
@@ -2627,6 +2659,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   manualPinBtn.addEventListener('click', () => manualMode ? exitManualMode() : enterManualMode());
   map.on('click', (e) => {
+    // Placement mode wins: tap-to-place / tap-to-move the placement pin.
+    if (placementActive) {
+      setPlacementMarker(e.latlng);
+      return;
+    }
     if (!manualMode) return;
     if (watchId !== null) {
       navigator.geolocation.clearWatch(watchId);
