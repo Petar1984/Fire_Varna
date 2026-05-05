@@ -1030,6 +1030,42 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .modal-btn.submit:disabled { background: #ccc; cursor: not-allowed; }
   .modal-btn.secondary { background: #1976d2; color: white; }
 
+  /* ===== Welcome modal (first-launch onboarding) ===== */
+  .modal.welcome-mode .modal-header,
+  .modal.welcome-mode .modal-footer { display: none; }
+  .modal.welcome-mode .modal-body { padding: 24px 20px 20px; }
+
+  .welcome-flow {
+    display: flex; flex-direction: column; gap: 18px;
+    min-height: 240px;
+  }
+  .welcome-progress {
+    display: flex; gap: 8px; justify-content: center;
+  }
+  .welcome-progress .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #ddd; transition: background 0.2s;
+  }
+  .welcome-progress .dot.active { background: #c41e3a; }
+  .welcome-step {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 8px 4px;
+  }
+  .welcome-copy {
+    font-size: 16px; line-height: 1.5; color: #333;
+  }
+  .welcome-actions {
+    display: flex; gap: 10px;
+  }
+  .welcome-btn {
+    flex: 1; padding: 14px 12px; border-radius: 10px;
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    border: none; min-height: 48px;
+    font-family: inherit;
+  }
+  .welcome-btn.skip { background: #eee; color: #555; }
+  .welcome-btn.next { background: #c41e3a; color: white; }
+
   /* ===== Report flow extras ===== */
   .reporter-bar {
     display: flex; align-items: center; justify-content: space-between;
@@ -1849,6 +1885,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   // ----- Modal scaffolding -----
   const modalBackdrop = document.getElementById('modalBackdrop');
+  const modalEl       = document.getElementById('modal');
   const modalTitle    = document.getElementById('modalTitle');
   const modalBody     = document.getElementById('modalBody');
   const modalFooter   = document.getElementById('modalFooter');
@@ -1871,7 +1908,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   document.getElementById('modalClose').addEventListener('click', closeReportModal);
   modalBackdrop.addEventListener('click', (ev) => {
-    if (ev.target === modalBackdrop) closeReportModal();
+    if (ev.target !== modalBackdrop) return;
+    // Welcome flow can be dismissed only via Скип / Готов.
+    if (modalEl.classList.contains('welcome-mode')) return;
+    closeReportModal();
   });
 
   // ----- Reporter identity bar -----
@@ -2642,8 +2682,76 @@ svg.leaflet-image-layer.leaflet-interactive path {
     statusTimer = setTimeout(() => el.classList.remove('show'), ms || 2500);
   }
 
+  // ===== Welcome flow (first-launch onboarding) =====
+  const WELCOME_SEEN_KEY = 'welcome_seen';
+  const WELCOME_FORCE_HASH = '#welcome';
+  const WELCOME_SKIP_HASH = '#skip-welcome';
+  const WELCOME_COPY = [
+    'Хидранти Варна — карта на пожарни хидранти за пожарникари и доброволци',
+    'Разреши локация, за да видиш най-близките хидранти. Бутон 🚨 отваря сигнал.',
+    'За нов хидрант — ползвай „📍 Тук съм" или влечи pin-а за корекция. Zoom-ни за по-точно поставяне.'
+  ];
+  let welcomeShownThisSession = false;
+
+  function welcomeSeenRead() {
+    try { return localStorage.getItem(WELCOME_SEEN_KEY) === '1'; }
+    catch (e) { return false; }
+  }
+  function welcomeSeenWrite() {
+    try { localStorage.setItem(WELCOME_SEEN_KEY, '1'); } catch (e) {}
+  }
+
+  function showWelcome(onDone) {
+    let step = 0;
+    modalEl.classList.add('welcome-mode');
+    modalBackdrop.classList.add('show');
+
+    function render() {
+      const isLast = step === WELCOME_COPY.length - 1;
+      const dots = WELCOME_COPY.map((_, i) =>
+        '<span class="dot' + (i === step ? ' active' : '') + '"></span>').join('');
+      modalBody.innerHTML =
+        '<div class="welcome-flow">' +
+          '<div class="welcome-progress">' + dots + '</div>' +
+          '<div class="welcome-step"><div class="welcome-copy">' +
+            escapeHtml(WELCOME_COPY[step]) +
+          '</div></div>' +
+          '<div class="welcome-actions">' +
+            '<button class="welcome-btn skip" id="welcomeSkip">Скип</button>' +
+            '<button class="welcome-btn next" id="welcomeNext">' +
+              (isLast ? 'Готов' : 'Напред →') +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      document.getElementById('welcomeSkip').addEventListener('click', finish);
+      document.getElementById('welcomeNext').addEventListener('click', () => {
+        if (isLast) { finish(); } else { step++; render(); }
+      });
+    }
+    function finish() {
+      welcomeSeenWrite();
+      welcomeShownThisSession = true;
+      modalEl.classList.remove('welcome-mode');
+      modalBackdrop.classList.remove('show');
+      modalBody.innerHTML = '';
+      onDone();
+    }
+    render();
+  }
+
+  function bootApp() {
+    const hash = location.hash;
+    let shouldShow;
+    if (hash === WELCOME_FORCE_HASH)      shouldShow = true;
+    else if (hash === WELCOME_SKIP_HASH)  shouldShow = false;
+    else shouldShow = !welcomeShownThisSession && !welcomeSeenRead();
+
+    if (shouldShow) showWelcome(startTracking);
+    else            startTracking();
+  }
+
   // ===== Auto-start =====
-  startTracking();
+  bootApp();
 })();
 </script>
 
