@@ -13,7 +13,8 @@
     ],
     "o": "field_report",
     "report_id": "ba91e3ff-f28a-4499-82ba-61d850a051a4",
-    "reported_at": "2026-05-05T11:06:15Z"
+    "reported_at": "2026-05-05T11:06:15Z",
+    "status": "verified"
   },
   {
     "i": "field_3326a776",
@@ -29,7 +30,8 @@
     ],
     "o": "field_report",
     "report_id": "3326a776-516a-4e34-8e34-efd4773c5e80",
-    "reported_at": "2026-05-05T11:05:14Z"
+    "reported_at": "2026-05-05T11:05:14Z",
+    "status": "verified"
   },
   {
     "i": "field_1a6e6d56",
@@ -45,7 +47,8 @@
     ],
     "o": "field_report",
     "report_id": "1a6e6d56-f977-46b9-8a96-2adf698d133a",
-    "reported_at": "2026-05-05T11:04:11Z"
+    "reported_at": "2026-05-05T11:04:11Z",
+    "status": "verified"
   },
   {
     "i": "field_228b7518",
@@ -61,6 +64,7 @@
     ],
     "o": "field_report",
     "report_id": "228b7518-bf56-465b-bdda-2f8e2681e8cb",
-    "reported_at": "2026-05-05T13:22:16Z"
+    "reported_at": "2026-05-05T13:22:16Z",
+    "status": "verified"
   }
 ]

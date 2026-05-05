@@ -70,6 +70,22 @@ The national dataset is **less complete and less reliable** for the Varna scope.
 
 Coordinates are 100% present. Other metadata fields are sparse — do not rely on them.
 
+### Optional `status` field (added Sprint 1)
+
+Records may carry an additional optional field `status` representing app-level visual state:
+
+| Value | Meaning | Render |
+|---|---|---|
+| `verified` | Hydrant physically confirmed on-site by a volunteer/firefighter | SVG hydrant icon |
+| `reported` | Reported as damaged / missing / needs attention | Yellow numbered pin |
+| _absent_ | Canonical record from KMZ, not yet field-verified | Red numbered pin (default) |
+
+**Forward-compatible.** Additional values may be added later. Older app builds and unknown values fall back to canonical (default) render — absence of the field is the canonical state.
+
+**`status` is unrelated to `st`.** The compact `st` field above is the **source raw status string** from the original KMZ (mostly empty, e.g. operational/decommissioned tags from ВиК). `status` is **app-level visual state** added at field-verification time. They are not renamed, merged, or interchangeable.
+
+`status` lives in `field_reports.json` and the embedded `hydrantData` JSON inside `index.html`. It is **not** added to `hydrants_varna.json` (canonical dataset stays clean — see § Canonical dataset rule).
+
 ### National dataset role
 
 Kept in repo as **archive / reference only**. Not loaded at runtime.
