@@ -1452,6 +1452,84 @@ svg.leaflet-image-layer.leaflet-interactive path {
     c.addEventListener('click', () => setMode(c.dataset.mode));
   });
 
+  // ===== Marker long-press =====
+  // Tap = setActiveTarget (where applicable). Long-press (500ms with <12px
+  // movement) = open report menu. Module-level state — only one press is
+  // realistic at a time. Document-level move/end listeners detect cancel
+  // even when the finger leaves the marker bounds.
+  const LONG_PRESS_MS = 500;
+  const LONG_PRESS_MOVE_PX_SQ = 144;
+  let _lpStart = null;
+  let _lpTimer = null;
+  let _lpFired = false;
+  let _lpCleanup = null;
+  function _lpClear() {
+    if (_lpTimer) clearTimeout(_lpTimer);
+    _lpTimer = null;
+    _lpStart = null;
+    if (_lpCleanup) { _lpCleanup(); _lpCleanup = null; }
+  }
+  function _lpPoint(oe) {
+    if (oe && oe.touches && oe.touches[0]) {
+      return { x: oe.touches[0].clientX, y: oe.touches[0].clientY };
+    }
+    if (oe && typeof oe.clientX === 'number') {
+      return { x: oe.clientX, y: oe.clientY };
+    }
+    return null;
+  }
+  function attachMarkerLongPress(m, onTap, onLongPress) {
+    m.on('mousedown', (e) => {
+      _lpClear();
+      _lpFired = false;
+      if (placementActive) return;
+      const pt = _lpPoint(e.originalEvent);
+      if (!pt) return;
+      _lpStart = pt;
+      const onMove = (me) => {
+        if (!_lpStart) return;
+        const cur = _lpPoint(me);
+        if (!cur) return;
+        const dx = cur.x - _lpStart.x;
+        const dy = cur.y - _lpStart.y;
+        if (dx*dx + dy*dy > LONG_PRESS_MOVE_PX_SQ) _lpClear();
+      };
+      const onEnd = () => _lpClear();
+      document.addEventListener('touchmove',  onMove, { passive: true });
+      document.addEventListener('mousemove',  onMove);
+      document.addEventListener('touchend',   onEnd,  { passive: true });
+      document.addEventListener('mouseup',    onEnd);
+      document.addEventListener('touchcancel', onEnd, { passive: true });
+      _lpCleanup = () => {
+        document.removeEventListener('touchmove',  onMove);
+        document.removeEventListener('mousemove',  onMove);
+        document.removeEventListener('touchend',   onEnd);
+        document.removeEventListener('mouseup',    onEnd);
+        document.removeEventListener('touchcancel', onEnd);
+      };
+      _lpTimer = setTimeout(() => {
+        _lpTimer = null;
+        _lpStart = null;
+        if (_lpCleanup) { _lpCleanup(); _lpCleanup = null; }
+        if (placementActive) return;
+        _lpFired = true;
+        if (onLongPress) onLongPress();
+      }, LONG_PRESS_MS);
+    });
+    m.on('click', () => {
+      if (placementActive) { _lpFired = false; return; }
+      if (_lpFired) { _lpFired = false; return; }
+      if (onTap) onTap();
+    });
+    m.on('contextmenu', (e) => {
+      // Suppress browser native contextmenu (Android long-press) — our
+      // 500ms timer is the cross-platform source of truth.
+      if (e.originalEvent && e.originalEvent.preventDefault) {
+        e.originalEvent.preventDefault();
+      }
+    });
+  }
+
   // ===== Refresh / render =====
   function refresh(autoFit) {
     if (!lastFix) return;
@@ -1487,10 +1565,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
       });
       HYDRANTS.forEach(h => {
         const m = L.marker([h.c[1], h.c[0]], { icon: dimPin() });
-        m.on('click', () => {
-          if (placementActive) return;
-          showReportTypePicker(h);
-        });
+        attachMarkerLongPress(
+          m,
+          null,
+          () => showReportTypePicker(h)
+        );
         allClusterLayer.addLayer(m);
       });
       map.addLayer(allClusterLayer);
@@ -1500,10 +1579,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
         const m = L.marker([r0.h.c[1], r0.h.c[0]], {
           icon: makePin(activeTargetIdx + 1, 'first'), zIndexOffset: 800
         });
-        m.on('click', () => {
-          if (placementActive) return;
-          showReportTypePicker(r0.h);
-        });
+        attachMarkerLongPress(
+          m,
+          null,
+          () => showReportTypePicker(r0.h)
+        );
         m.addTo(map);
         visibleMarkers.push(m);
       }
@@ -1515,11 +1595,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
           icon: makePin(i + 1, isActive ? 'first' : ''),
           zIndexOffset: isActive ? 800 : 600 - i
         });
-        m.on('click', () => {
-          if (placementActive) return;
-          setActiveTarget(i);
-          showReportTypePicker(r.h);
-        });
+        attachMarkerLongPress(
+          m,
+          () => setActiveTarget(i),
+          () => { setActiveTarget(i); showReportTypePicker(r.h); }
+        );
         m.addTo(map);
         visibleMarkers.push(m);
       });
