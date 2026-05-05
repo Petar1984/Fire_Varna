@@ -1,0 +1,37 @@
+# Secrets
+*.token
+*.secret
+token_*.txt
+.env
+.env.*
+
+# IDE / OS state
+.claude/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+__pycache__/
+*.pyc
+*.bak
+*.bak.*
+
+# Audit folder — plans and tests, not production data
+audit/
+
+# Source data — too large, regeneratable from external sources
+geo_fire_hydrants.*
+*.kmz
+*.kml
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cst
+wfsrequest.txt
+
+# Stray files
+New Text Document.txt
+hydrants_varna (7).html
+hydrants_varna (7).html.bak.*
