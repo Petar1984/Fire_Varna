@@ -1965,6 +1965,18 @@ svg.leaflet-image-layer.leaflet-interactive path {
       b.addEventListener('click', () => {
         const t = b.dataset.type;
         if (hydrant) {
+          if (t === 'wrong_location') {
+            // Auto-enter placement mode with hydrant's current DB coords
+            // as the initial pin so the user can drag it to the real spot.
+            closeReportModal();
+            const draft = { reporter: getReporterName() || '' };
+            enterLocationPlacementMode([hydrant.c[0], hydrant.c[1]], (coord) => {
+              if (!coord) return;
+              draft.placedCoord = coord;
+              showReportModal(hydrant, 'wrong_location', draft);
+            });
+            return;
+          }
           showReportModal(hydrant, t);
           return;
         }
