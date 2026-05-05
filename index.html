@@ -1256,6 +1256,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   const NEAR_THRESHOLD_M = 100;
   const TOP_K = 5;
   const HEADING_SMOOTHING = 0.10;  // EMA alpha (0..1, lower = smoother)
+  const ABSOLUTE_ORIENTATION_STALE_MS = 1500;
+  const WEBKIT_COMPASS_MAX_ACCURACY_DEG = 45;
 
   // ===== Data =====
   const HYDRANTS = JSON.parse(document.getElementById('hydrantData').textContent);
@@ -1298,6 +1300,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   let userHeading = null;
   let smoothedHeading = null;
   let pendingHeading = null;     // raw heading awaiting rAF smoothing
+  let lastAbsoluteHeadingTs = 0;
+  let lastHeadingSourceUsed = null;
   let activeTargetIdx = 0;
   let currentRanked = [];
   let mode = 'top';
@@ -1714,22 +1718,52 @@ svg.leaflet-image-layer.leaflet-interactive path {
   // ===== Compass init / smoothing =====
   let needsCompassPerm = false;
 
+  function readOrientationHeading(event) {
+    // Priority 1: iOS webkitCompassHeading (true-north, hardware-fused)
+    if (typeof event.webkitCompassHeading === 'number' &&
+        !isNaN(event.webkitCompassHeading)) {
+      const acc = event.webkitCompassAccuracy;
+      const recentAbsolute = (Date.now() - lastAbsoluteHeadingTs)
+        < ABSOLUTE_ORIENTATION_STALE_MS;
+      if (typeof acc === 'number' && acc > WEBKIT_COMPASS_MAX_ACCURACY_DEG
+          && recentAbsolute) {
+        return null; // Skip poor iOS sample, better data is recent
+      }
+      return { deg: event.webkitCompassHeading, source: 'webkit' };
+    }
+    // Priority 2: absolute deviceorientation (true-north on Android)
+    if (event.absolute === true && typeof event.alpha === 'number'
+        && !isNaN(event.alpha)) {
+      return { deg: (360 - event.alpha) % 360, source: 'absolute' };
+    }
+    // Priority 3: relative deviceorientation — only if no recent absolute
+    if (typeof event.alpha === 'number' && !isNaN(event.alpha)) {
+      const recentAbsolute = (Date.now() - lastAbsoluteHeadingTs)
+        < ABSOLUTE_ORIENTATION_STALE_MS;
+      if (recentAbsolute) {
+        return null; // Don't let relative overwrite recent absolute
+      }
+      return { deg: (360 - event.alpha) % 360, source: 'relative' };
+    }
+    return null;
+  }
+
+  function handleCompassHeading(sample) {
+    if (!sample) return;
+    if (sample.source === 'webkit' || sample.source === 'absolute') {
+      lastAbsoluteHeadingTs = Date.now();
+    }
+    lastHeadingSourceUsed = sample.source;
+    pendingHeading = sample.deg;
+    scheduleArrowUpdate();
+  }
+
   function attachOrientation() {
     needsCompassPerm = false;
-    const handler = (e) => {
-      let raw = null;
-      if (typeof e.webkitCompassHeading === 'number') {
-        raw = e.webkitCompassHeading;
-      } else if (typeof e.alpha === 'number') {
-        raw = (360 - e.alpha) % 360;
-      }
-      if (raw == null) return;
-      userHeading = raw;
-      pendingHeading = raw;        // store latest, smooth in rAF
-      scheduleArrowUpdate();
-    };
-    window.addEventListener('deviceorientationabsolute', handler);
-    window.addEventListener('deviceorientation', handler);
+    const orientationListener = (event) =>
+      handleCompassHeading(readOrientationHeading(event));
+    window.addEventListener('deviceorientationabsolute', orientationListener);
+    window.addEventListener('deviceorientation', orientationListener);
   }
   function requestCompassPerm() {
     if (typeof DeviceOrientationEvent === 'undefined') return;
