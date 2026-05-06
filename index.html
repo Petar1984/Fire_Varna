@@ -1196,18 +1196,25 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* ===== Map markers ===== */
   .h-pin {
     width: 28px; height: 28px; border-radius: 50% 50% 50% 0;
-    background: #c41e3a; transform: rotate(-45deg);
+    transform: rotate(-45deg);
     border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     display:flex; align-items:center; justify-content:center;
-    color:white; font-weight:700; font-size:13px;
+    font-weight:700; font-size:13px;
   }
   .h-pin span { transform: rotate(45deg); }
+  .h-pin.canonical { background:#757575; color:white; }
+  .h-pin.verified  { background:#c41e3a; color:white; }
+  .h-pin.reported  { background:#fdd835; color:#333;  }
   .h-pin.first {
-    width: 38px; height: 38px; background:#ff9800;
-    box-shadow: 0 0 0 5px rgba(255,152,0,0.35), 0 2px 6px rgba(0,0,0,0.4);
-    font-size: 16px;
+    box-shadow: 0 0 0 5px rgba(255,152,0,0.55), 0 2px 6px rgba(0,0,0,0.4);
   }
-  .h-pin.dim { background:#999; opacity:0.7; }
+  .h-pin.dim { opacity:0.7; }
+  .status-legend {
+    text-align: center; font-size: 14px; line-height: 1.2;
+    padding: 6px 8px; background: #fafafa;
+    border-bottom: 1px solid #eee; color: #444;
+    user-select: none; pointer-events: none;
+  }
   /* User marker: blue dot + heading cone */
   .user-marker-wrap { position: relative; width: 100px; height: 100px; pointer-events: none; }
   .user-cone {
@@ -1288,6 +1295,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <button class="mode-chip" data-mode="all">Всички</button>
   </div>
 
+  <div class="status-legend">🔴 Проверен  🟡 Обработва се  ⚫ Непроверен</div>
+
   <div class="sheet-list collapsed" id="sheetList"></div>
 </div>
 
@@ -1337,18 +1346,26 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .addAttribution('© OpenStreetMap').addTo(map);
 
   // ===== Icons =====
-  function makePin(rank, cls) {
+  function hydrantStatusClass(h) {
+    const s = h && h.status;
+    if (s === 'verified') return 'verified';
+    if (s === 'reported') return 'reported';
+    return 'canonical';
+  }
+  function makePin(rank, hydrant, isActive) {
+    const status = hydrantStatusClass(hydrant);
+    const cls = 'h-pin ' + status + (isActive ? ' first' : '');
     return L.divIcon({
       className: 'h-pin-wrapper',
-      html: '<div class="h-pin ' + (cls||'') + '"><span>' + rank + '</span></div>',
-      iconSize: cls === 'first' ? [38,38] : [28,28],
-      iconAnchor: cls === 'first' ? [19,38] : [14,28]
+      html: '<div class="' + cls + '"><span>' + rank + '</span></div>',
+      iconSize: [28,28], iconAnchor: [14,28]
     });
   }
-  function dimPin() {
+  function dimPin(hydrant) {
+    const status = hydrantStatusClass(hydrant);
     return L.divIcon({
       className: 'h-pin-wrapper',
-      html: '<div class="h-pin dim"><span>·</span></div>',
+      html: '<div class="h-pin dim ' + status + '"><span>·</span></div>',
       iconSize:[22,22], iconAnchor:[11,22]
     });
   }
@@ -1602,7 +1619,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         maxClusterRadius: 60, showCoverageOnHover: false, spiderfyOnMaxZoom: true
       });
       HYDRANTS.forEach(h => {
-        const m = L.marker([h.c[1], h.c[0]], { icon: dimPin() });
+        const m = L.marker([h.c[1], h.c[0]], { icon: dimPin(h) });
         attachMarkerLongPress(
           m,
           () => { consumePrepickForHydrant(h); },
@@ -1615,7 +1632,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       if (currentRanked.length) {
         const r0 = currentRanked[activeTargetIdx];
         const m = L.marker([r0.h.c[1], r0.h.c[0]], {
-          icon: makePin(activeTargetIdx + 1, 'first'), zIndexOffset: 800
+          icon: makePin(activeTargetIdx + 1, r0.h, true), zIndexOffset: 800
         });
         attachMarkerLongPress(
           m,
@@ -1630,7 +1647,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       currentRanked.forEach((r, i) => {
         const isActive = i === activeTargetIdx;
         const m = L.marker([r.h.c[1], r.h.c[0]], {
-          icon: makePin(i + 1, isActive ? 'first' : ''),
+          icon: makePin(i + 1, r.h, isActive),
           zIndexOffset: isActive ? 800 : 600 - i
         });
         attachMarkerLongPress(
