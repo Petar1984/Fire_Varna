@@ -746,6 +746,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* Defensive: HTML "hidden" attribute means "don't show this". Without
+     !important, any later rule with display:flex/grid silently overrides
+     the UA stylesheet's [hidden]{display:none}. */
+  [hidden] { display: none !important; }
   html, body { margin:0; padding:0; height:100%; width:100%; overflow:hidden;
                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                background: #f0f0f0; }
