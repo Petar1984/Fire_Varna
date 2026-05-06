@@ -16,9 +16,18 @@ __pycache__/
 *.pyc
 *.bak
 *.bak.*
+*.old
+*.old.*
+*_old.*
+*_backup.*
+*.log
+node_modules/
+scratch.*
+tmp.*
+temp_*
 
-# Audit folder — plans and tests, not production data
-audit/
+# Generated audit runs
+audit/run_*/
 
 # Source data — too large, regeneratable from external sources
 geo_fire_hydrants.*
