@@ -86,6 +86,19 @@ Records may carry an additional optional field `status` representing app-level v
 
 `status` lives in `field_reports.json` and the embedded `hydrantData` JSON inside `index.html`. It is **not** added to `hydrants_varna.json` (canonical dataset stays clean — see § Canonical dataset rule).
 
+### Wrong-location ingest rule
+
+For `wrong_location` reports, **always update the existing record's coordinate field (`c`) in place. Never create a new `field_*` record for `wrong_location`.**
+
+| Target ID type | Action |
+|---|---|
+| Canonical IDs (`NAT-`, `VIK-`, `877-ZP`, etc.) | update `c` in embedded JSON only |
+| `field_*` IDs | update `c` in **both** `field_reports.json` and embedded JSON |
+
+After the coord update, set `status` to `"verified"`. Old coords go in the commit message for audit trail.
+
+New `field_*` records are created **only** for `new_hydrant` reports.
+
 ### National dataset role
 
 Kept in repo as **archive / reference only**. Not loaded at runtime.

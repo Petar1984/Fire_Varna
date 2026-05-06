@@ -54,6 +54,15 @@ This codebase is read primarily by **AI agents and a non-CS-trained owner**.
 
 ---
 
+## Field report ingest rules
+
+- **`wrong_location` reports**: update the existing record's `c` (coordinate) field in place. Do **not** create a new `field_*` record. Set `status` to `"verified"` after the coord update. For canonical IDs, edit embedded JSON only; for `field_*` IDs, edit both `field_reports.json` and embedded JSON. Log old coords in the commit message for audit trail.
+- **`new_hydrant` reports**: only these create new `field_*` records.
+
+See `AGENTS.md` § Wrong-location ingest rule for the full table.
+
+---
+
 ## Verification (no CI, no tests)
 
 Manual mobile verification is the only gate. Before reporting "done":
