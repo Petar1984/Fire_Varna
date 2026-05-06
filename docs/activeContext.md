@@ -1,6 +1,6 @@
 # Active context - Fire_Varna
 
-Last updated: 2026-05-06 at commit 0488185
+Last updated: 2026-05-06 at commit 2535920
 Sprint: 1 (60-volunteer launch in 3-5 days)
 
 ## Current State
@@ -28,7 +28,7 @@ Sprint: 1 (60-volunteer launch in 3-5 days)
 
 ## Last Known Good Commit
 
-0488185
+2535920
 
 ## Known Dev Environment Quirks
 
