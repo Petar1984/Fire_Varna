@@ -1134,6 +1134,22 @@ svg.leaflet-image-layer.leaflet-interactive path {
     max-width: 92%; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     pointer-events: none;
   }
+  /* Pre-pick banner — same look as placement-banner, but interactive
+     (cancel button must be tappable). Shown after user picks a report type
+     from the global "+" menu and is now waiting to tap a hydrant. */
+  .prepick-banner {
+    position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+    z-index: 1500; background: rgba(196,30,58,0.95); color: white;
+    padding: 6px 6px 6px 16px; border-radius: 22px; font-size: 13px;
+    max-width: 92%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .prepick-cancel {
+    background: rgba(255,255,255,0.22); color: white;
+    border: none; border-radius: 50%; width: 32px; height: 32px;
+    font-size: 14px; line-height: 1; cursor: pointer; flex-shrink: 0;
+  }
+  .prepick-cancel:active { background: rgba(255,255,255,0.42); }
   .placement-actions {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 4000;
     background: white; border-top: 1px solid #ddd;
@@ -1229,7 +1245,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <button class="ctrl-btn" id="addHydrantBtn" title="Добави хидрант" aria-label="Добави хидрант">+</button>
 </div>
 
-<div class="placement-banner" id="placementBanner" hidden>Постави pin на хидранта. „📍 Тук съм" ако си до него. Влечи за корекция.</div>
+<div class="placement-banner" id="placementBanner" hidden>Постави pin-а на мястото на хидранта.</div>
+
+<div class="prepick-banner" id="prepickBanner" hidden>
+  <span id="prepickBannerText"></span>
+  <button class="prepick-cancel" id="prepickCancel" aria-label="Отказ">✕</button>
+</div>
 
 <div class="placement-actions" id="placementActions" hidden>
   <button class="placement-btn clear" id="placementClear" disabled>Изчисти</button>
@@ -1580,8 +1601,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
         const m = L.marker([h.c[1], h.c[0]], { icon: dimPin() });
         attachMarkerLongPress(
           m,
-          null,
-          () => showReportTypePicker(h)
+          () => { consumePrepickForHydrant(h); },
+          () => { if (consumePrepickForHydrant(h)) return; showReportTypePicker(h); }
         );
         allClusterLayer.addLayer(m);
       });
@@ -1594,8 +1615,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
         });
         attachMarkerLongPress(
           m,
-          null,
-          () => showReportTypePicker(r0.h)
+          () => { consumePrepickForHydrant(r0.h); },
+          () => { if (consumePrepickForHydrant(r0.h)) return; showReportTypePicker(r0.h); }
         );
         m.addTo(map);
         visibleMarkers.push(m);
@@ -1610,8 +1631,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
         });
         attachMarkerLongPress(
           m,
-          () => setActiveTarget(i),
-          () => { setActiveTarget(i); showReportTypePicker(r.h); }
+          () => { if (consumePrepickForHydrant(r.h)) return; setActiveTarget(i); },
+          () => { if (consumePrepickForHydrant(r.h)) return; setActiveTarget(i); showReportTypePicker(r.h); }
         );
         m.addTo(map);
         visibleMarkers.push(m);
@@ -2021,6 +2042,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   // hydrant === null  → global "+" entry, shows all 5 types incl. new_hydrant
   // hydrant === <obj> → per-hydrant 🚨 entry, shows the 4 existing-hydrant types
   function showReportTypePicker(hydrant) {
+    // Clear any prior pre-pick state — opening the menu starts a fresh choice.
+    hidePrepickBanner();
     reportDraft = { hydrant: hydrant, type: null };
     openModal(hydrant ? '🚨 Сигнал за хидрант' : 'Какво да докладваш?');
     const newOption = hydrant ? '' :
@@ -2045,17 +2068,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
         const t = b.dataset.type;
         if (hydrant) {
           if (t === 'wrong_location') {
-            // Show DB coord as a non-interactive dashed reference; the user
-            // must explicitly tap/long-press/drag elsewhere to place the
-            // actual pin. Confirm stays disabled until a real placement is
-            // made — prevents silent no-op submissions of unchanged coords.
             closeReportModal();
-            const draft = { reporter: getReporterName() || '' };
-            enterLocationPlacementMode([hydrant.c[0], hydrant.c[1]], (coord) => {
-              if (!coord) return;
-              draft.placedCoord = coord;
-              showReportModal(hydrant, 'wrong_location', draft);
-            }, { showAsReference: true });
+            beginWrongLocationPlacement(hydrant);
             return;
           }
           showReportModal(hydrant, t);
@@ -2071,8 +2085,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
             showReportModal(null, 'new_hydrant', draft);
           });
         } else {
+          // Pre-pick: remember the chosen type, show banner, wait for the
+          // user's next hydrant tap to consume and route into the flow.
           closeReportModal();
-          flashStatus('Тапни хидрант на картата, за да докладваш', 4000);
+          showPrepickBanner(t);
         }
       });
     });
@@ -2585,6 +2601,57 @@ svg.leaflet-image-layer.leaflet-interactive path {
   const placementClearBtn  = document.getElementById('placementClear');
   const placementCancelBtn = document.getElementById('placementCancel');
   const placementConfirmBtn= document.getElementById('placementConfirm');
+
+  // ----- Pre-pick mode (global "+" → choose type → tap hydrant) -----
+  // Eliminates the prior double-pick flow: user picked type at "+", got a
+  // toast, tapped hydrant, was shown the same menu again. Now: pick type
+  // at "+", banner appears, next hydrant tap routes directly into that
+  // report's flow. Cancel button on the banner clears pending state.
+  let pendingReportType = null;
+  const PREPICK_LABELS = {
+    exists_confirmed: 'потвърждение',
+    missing:          'маркиране липсващ',
+    damaged:          'докладване повреда',
+    wrong_location:   'корекция на локация',
+  };
+  const prepickBanner     = document.getElementById('prepickBanner');
+  const prepickBannerText = document.getElementById('prepickBannerText');
+  const prepickCancelBtn  = document.getElementById('prepickCancel');
+  function showPrepickBanner(type) {
+    pendingReportType = type;
+    prepickBannerText.textContent = 'Тапни хидрант за ' + (PREPICK_LABELS[type] || '');
+    prepickBanner.hidden = false;
+  }
+  function hidePrepickBanner() {
+    pendingReportType = null;
+    prepickBanner.hidden = true;
+  }
+  prepickCancelBtn.addEventListener('click', hidePrepickBanner);
+
+  // Routes a hydrant tap into the pending report flow. Returns true if the
+  // pre-pick was consumed (caller should suppress its default tap behavior).
+  function consumePrepickForHydrant(hydrant) {
+    if (!pendingReportType) return false;
+    if (placementActive) return false;
+    const t = pendingReportType;
+    hidePrepickBanner();
+    if (t === 'wrong_location') {
+      beginWrongLocationPlacement(hydrant);
+    } else {
+      showReportModal(hydrant, t);
+    }
+    return true;
+  }
+
+  // Extracted from showReportTypePicker so pre-pick + per-hydrant menu share it.
+  function beginWrongLocationPlacement(hydrant) {
+    const draft = { reporter: getReporterName() || '' };
+    enterLocationPlacementMode([hydrant.c[0], hydrant.c[1]], (coord) => {
+      if (!coord) return;
+      draft.placedCoord = coord;
+      showReportModal(hydrant, 'wrong_location', draft);
+    }, { showAsReference: true });
+  }
 
   function setPlacementMarker(latlng) {
     if (placementMarker) { map.removeLayer(placementMarker); placementMarker = null; }
