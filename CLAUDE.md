@@ -1,12 +1,13 @@
 # CLAUDE.md
 
+> **Canonical current state:** see `docs/activeContext.md` (last updated commit hash and sprint status). If this file conflicts with `activeContext.md`, the latter wins.
+>
 > Instructions for **Claude Code** working in this repo.
-> **Read `AGENTS.md` first** for project context, canonical dataset decision, and constraints.
-> This file adds Claude-Code-specific operational rules on top of `AGENTS.md`.
+> Read `AGENTS.md` first for project context, dataset rules, and constraints.
 
 ---
 
-## Your role
+## Your Role
 
 You are the **executor** in a tri-agent workflow. See `AGENTS.md` § Tri-agent workflow.
 
@@ -14,73 +15,117 @@ You are the **executor** in a tri-agent workflow. See `AGENTS.md` § Tri-agent w
 |---|---|---|---|
 | Decides | yes | no | **no** |
 | Plans | yes | yes | **no** |
-| Edits files | no | no | **yes** |
+| Edits files | no | yes after handoff | **yes** |
 
-If you receive a task without an **approved plan** (from Codex, or signed off by Petar in chat), stop and ask. Do not improvise architecture.
-
----
-
-## Hard rules
-
-1. **Do not change the canonical dataset.** `hydrants_varna.json` is decided. See `AGENTS.md` § Canonical dataset. Touching it requires a fresh Codex analysis and explicit Petar approval.
-2. **Do not change Bulgarian UI labels** without explicit permission. Petar reviews wording.
-3. **Do not introduce dependencies** (runtime or build-time) without Petar approval. No new CDNs, no new npm packages, no new fonts loaded over the network.
-4. **Preserve the single-deployable-artifact constraint.** GitHub Pages serves one HTML file from the repo root. Whatever the build produces, the served file must remain self-contained and offline-loadable for the static assets it inlines.
-5. **Stay under the size budget.** Currently ~672 KB. Ideal ≤ 1 MB, hard cap 2 MB. Report the file size after every change that touches the deployable.
-6. **Mobile-first.** Touch targets ≥ 44px. Test layouts at 375px viewport width. No hover-dependent interactions.
-7. **HTTPS-required APIs are non-negotiable.** Geolocation, DeviceOrientation, Web Share — these must keep working. Don't break them with refactoring.
+If you receive a task without an approved plan from Codex, or signed off by Petar in chat, stop and ask. Do not improvise architecture.
 
 ---
 
-## Code style
+## Hard Rules
 
-This codebase is read primarily by **AI agents and a non-CS-trained owner**.
+1. **Do not change the runtime dataset casually.** `data/hydrants.json` is the app data file; `hydrants_varna.json` is the original KMZ-derived reference. Dataset/source changes require fresh Codex analysis and explicit Petar approval.
+2. **Do not change Bulgarian UI labels** without explicit permission.
+3. **Do not introduce dependencies** without Petar approval. No new CDNs, npm packages, or remote fonts.
+4. **Preserve static hosting.** GitHub Pages serves `index.html` plus `data/hydrants.json`; no runtime build step.
+5. **Stay under the size budget.** Current frontend first load is ~1,259,811 bytes (`index.html` 292,281 + `data/hydrants.json` 967,530). Hard cap is 2 MB.
+6. **Mobile-first.** Touch targets >= 44px. Test at 375px viewport width. No hover-dependent workflows.
+7. **HTTPS-required APIs are non-negotiable.** Geolocation, DeviceOrientation, and Worker `fetch` report submission must keep working.
 
-- Clear names over short names. `nearestHydrantIndex` not `nhi`.
-- Comments explain **why**, not **what**. The code shows the what.
+---
+
+## Code Style
+
+This codebase is read primarily by AI agents and a non-CS-trained owner.
+
+- Clear names over short names.
+- Comments explain **why**, not **what**.
 - No clever one-liners. No premature abstraction.
-- One concern per function. If a function does GPS + DOM + math, split it.
+- One concern per function.
 - No dead code. If you replace something, delete the old version.
 
 ---
 
-## Specific gotchas (do not re-discover these)
+## Specific Gotchas
 
-- **`deviceorientation` fires at 100–200Hz on Android.** EMA must run on `requestAnimationFrame` (~60Hz), reading the latest stored raw heading. Do not EMA inside the event handler. `HEADING_SMOOTHING = 0.10`.
-- **All map markers use `L.divIcon`**, never `L.icon`. `L.icon` requires external marker image files which break the single-file build.
-- **`L.markerClusterGroup` is used only in "Всички" mode.** Other modes use plain numbered pins. Don't "unify" this — it's intentional.
-- **Map auto-fit happens only twice:** first GPS lock and mode change. Never on routine GPS updates. Jarring otherwise.
-- **`updateCard()` currently rebuilds the entire card HTML on every refresh.** This is known tech debt. If you touch this code, be aware that listeners are re-attached after `innerHTML` assignment — preserve that pattern unless a refactor explicitly addresses it.
-
----
-
-## Field report ingest rules
-
-- **`wrong_location` reports**: update the existing record's `c` (coordinate) field in place. Do **not** create a new `field_*` record. Set `status` to `"verified"` after the coord update. For canonical IDs, edit embedded JSON only; for `field_*` IDs, edit both `field_reports.json` and embedded JSON. Log old coords in the commit message for audit trail.
-- **`new_hydrant` reports**: only these create new `field_*` records.
-
-See `AGENTS.md` § Wrong-location ingest rule for the full table.
+- **`deviceorientation` fires at 100-200Hz on Android.** EMA must run on `requestAnimationFrame`, reading the latest stored raw heading. Do not EMA inside the event handler. `HEADING_SMOOTHING = 0.10`.
+- **All map markers use `L.divIcon`**, never `L.icon`.
+- **`L.markerClusterGroup` is used only in "Всички" mode.** Other modes use plain numbered pins. Do not unify this.
+- **Map auto-fit happens only twice:** first GPS lock and mode change. Never on routine GPS updates.
+- **Tap and long-press differ intentionally.** Tap selects/activates a hydrant; long-press opens the report menu.
+- **`updateCard()` rebuilds the card HTML on every refresh.** Listeners are re-attached after `innerHTML`; preserve that unless a refactor explicitly changes it.
 
 ---
 
-## Verification (no CI, no tests)
+## Field Report Ingest Rules
 
-Manual mobile verification is the only gate. Before reporting "done":
+- **`wrong_location` reports:** update the existing record's `c` coordinate in place. Do **not** create a new `field_*` record. Set `status` to `"verified"` after the coord update.
+- For canonical IDs, edit `data/hydrants.json` only.
+- For `field_*` IDs, edit both `field_reports.json` and `data/hydrants.json`.
+- Log old coords in the commit message for audit trail.
+- **`new_hydrant` reports:** only these create new `field_*` records.
 
-1. Open the deployable in a browser at 375px viewport width.
-2. Check that:
-   - GPS lock happens (or graceful error pill with retry)
-   - All 3 view modes render correctly ("Близо", "Топ 5", "Всички")
-   - Bottom sheet expands and collapses
-   - Compass cone rotates with simulated `deviceorientation` events
-   - Report modal opens, all 7 categories render, free text works, submit triggers `navigator.share()`
-   - Follow mode (📍) recenters; user pan exits follow mode
-   - Manual position mode (📌) accepts a map click
-3. **Report the file size** of the deployable after the change.
+See `AGENTS.md` § Wrong-Location Ingest Rule for the full table.
 
 ---
 
-## What requires going back to humans
+## Report Flow
+
+Reports are submitted via `fetch` POST to Cloudflare Worker `varna-hydrants-proxy.petar-dikov2019.workers.dev`. Worker creates a labeled GitHub issue in this repo. Reports queue locally if offline.
+
+Worker source currently lives only in Cloudflare dashboard. TODO commit 17: extract it to `worker/` with deploy notes. Until then, treat the live Worker as canonical.
+
+---
+
+## Verification
+
+No CI yet. Before reporting done:
+
+1. Serve locally over HTTP:
+
+   ```powershell
+   python -m http.server 8000
+   ```
+
+2. Open at 375px viewport width and check:
+   - Map renders within 3 seconds.
+   - Browser console has no runtime errors.
+   - `data/hydrants.json` loads with HTTP 200.
+   - `JSON.parse(document.getElementById('hydrantData').textContent).length === 6079`.
+   - GPS lock works, or graceful error pill with retry/manual controls appears.
+   - All 3 view modes render correctly: "Близо", "Топ 5", "Всички".
+   - Cluster mode shows clusters when zoomed out.
+   - Bottom sheet expands/collapses.
+   - Compass cone rotates with simulated `deviceorientation` events.
+   - FAB `+` opens the report-type menu.
+   - Long-press on a verified pin opens the report menu.
+   - Follow mode recenters; user pan exits follow mode.
+   - Manual position mode accepts a map click.
+   - Report submit uses Worker `fetch` POST and queues locally if offline.
+
+3. Report `index.html` and `data/hydrants.json` sizes after changes.
+
+---
+
+## Windows Dev Environment
+
+Defender exclusions applied (2026-05-06):
+
+- ExclusionPath: `C:\Projects\Varna_hydrants`, `C:\Users\Petar\Desktop\Fire_Varna_deploy2`
+- ExclusionProcess: `git.exe`, `git-remote-https.exe`, `node.exe`
+
+Primary workflow: edit + commit + push from `C:\Projects\Varna_hydrants` directly. Deploy clone `Fire_Varna_deploy2` is deprecated.
+
+Fallback, only if exclusions fail: Python pre-place blob recovery technique. See git history for full procedure, search "blob corruption".
+
+Verify exclusions monthly:
+
+```powershell
+Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
+```
+
+---
+
+## What Requires Going Back To Humans
 
 | Situation | Go to |
 |---|---|
@@ -89,18 +134,16 @@ Manual mobile verification is the only gate. Before reporting "done":
 | Build pushes past 2 MB cap | Petar |
 | Bulgarian wording change | Petar |
 | New dependency proposal | Petar |
-| Anything that feels load-bearing and you're unsure | Petar |
+| Anything load-bearing and unclear | Petar |
 
 Asking is cheap. Reverting commits is not.
 
 ---
 
-## Workflow expectations
+## Workflow Expectations
 
-- **One logical change per commit.** Don't bundle refactors with feature work.
-- **Commit messages in English.** Code comments in English. UI strings in Bulgarian.
-- **Before refactoring**, confirm there is an approved Codex plan describing the target structure. The current loose-files layout is intentional until that plan exists.
-- **After any change to the deployable**, state in your response:
-  - Files changed
-  - File size of the deployable
-  - Any constraint that came close to being violated
+- **One logical change per commit.**
+- **Commit messages in English.**
+- Code comments in English. UI strings in Bulgarian.
+- Before refactoring, confirm there is an approved Codex plan describing the target structure.
+- After any change to the deployable, state files changed, file sizes, and any constraint that came close to being violated.

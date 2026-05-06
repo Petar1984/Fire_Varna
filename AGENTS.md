@@ -1,239 +1,247 @@
 # AGENTS.md
 
+> **Canonical current state:** see `docs/activeContext.md` (last updated commit hash and sprint status). If this file conflicts with `activeContext.md`, the latter wins.
+>
 > Read this **before** making any changes to this repo.
-> Project owner: **Petar** — solo developer in Bulgaria, AI-assisted workflow, no formal CS background.
-> If anything here conflicts with a user request in chat, raise the conflict — do not silently override.
+> Project owner: **Petar** - solo developer in Bulgaria, AI-assisted workflow, no formal CS background.
+> If anything here conflicts with a user request in chat, raise the conflict; do not silently override.
 
 ---
 
-## What this project is
+## What This Project Is
 
-Mobile-first **PWA for Varna fire department and a volunteer rescue squad** — locates the nearest fire hydrant via GPS.
+Mobile-first **PWA for Varna fire department and a volunteer rescue squad** - locates the nearest fire hydrant via GPS.
 
-- **Primary users:** Varna firefighters (~30–50). Emergency use, on phones, often with gloves.
-- **Secondary users:** Volunteer rescue squad (Viber group). Verification and feedback only — **NOT for emergency use.**
-- **Distribution:** GitHub Pages (free static hosting, HTTPS required for Geolocation API).
+- **Primary users:** Varna firefighters (~30-50). Emergency use, on phones, often with gloves.
+- **Secondary users:** volunteer rescue squad. Verification and feedback only; **NOT for emergency use.**
+- **Distribution:** GitHub Pages from `main`, HTTPS required.
 - **Language:** Bulgarian only. No localization layer. UI labels are precise and reviewed by Petar.
 
 The app loads a static hydrant dataset, shows the user's GPS position, and guides them to the nearest hydrant.
 
 ---
 
-## Stack
+## Runtime Architecture
 
-Single self-contained HTML file. Everything inlined.
+Static GitHub Pages frontend. No backend in the repo and no runtime build step.
 
-| Component | Library | Size |
+| Component | Current State | Size |
 |---|---|---:|
-| Map | Leaflet 1.9.4 | ~147 KB |
-| Clustering | MarkerCluster 1.5.3 | ~34 KB |
-| Hydrant data | Inline JSON | ~430 KB |
-| App logic + CSS | Vanilla JS / CSS | ~60 KB |
-| **Total** | | **~672 KB** |
+| App shell | `index.html` with inlined Leaflet, MarkerCluster, CSS, and app logic | 292,281 bytes |
+| Hydrant data | `data/hydrants.json`, loaded by `fetch` on app init | 967,530 bytes |
+| Report submission | Cloudflare Worker proxy | external |
+| **Frontend first load** | `index.html` + `data/hydrants.json` | **1,259,811 bytes** |
 
-No build system at runtime. No backend. No npm packages at runtime. No external CDN dependencies (everything inlined).
+Hydrant data lives in `data/hydrants.json` (**6,079 records (verified at runtime)**, `vik` + `national` + `field_report` origins). Loaded via fetch on app init. `index.html` contains UI shell, Leaflet, MarkerCluster, app logic, and an empty `<script id="hydrantData">` placeholder populated at runtime.
+
+Local testing requires HTTP, not `file://`:
+
+```powershell
+python -m http.server 8000
+```
 
 ---
 
-## Canonical dataset (decided)
+## Data Model
 
-**Source: regional KMZ files from ВиК Варна (the local water utility).**
-Parsed file: `hydrants_varna.json` — **3,934 records, 433 KB**.
+`data/hydrants.json` is the runtime dataset. The original KMZ-derived `hydrants_varna.json` remains as a reference/source artifact, not the full runtime dataset.
 
-### Why this and not the national GeoJSON
+Runtime compact schema:
 
-Codex compared `hydrants_varna.json` against `geo_fire_hydrants.json` (national, ~17,962 records). Findings:
-
-| Metric | Result |
-|---|---|
-| KMZ → local JSON parse loss | 0 (per-region counts match exactly) |
-| National points inside Varna bbox | 2,366 (vs 3,934 local — **40% fewer**) |
-| Local records matching any national within 25m | **10.7%** |
-| Local records with no national counterpart within 25m | **89.3%** |
-| National records with mixed/invalid EPSG:3857 coordinates | 428 |
-
-The national dataset is **less complete and less reliable** for the Varna scope. It is owned by a fire-safety aggregator, not the maintainer of the hydrants.
-
-### Compact JSON schema
-
-```
-{ i, s, a, r, z, t, st, c }
-  │  │  │  │  │  │  │  └── [lon, lat]   (WGS84, always present)
-  │  │  │  │  │  │  └───── status        (mostly empty)
-  │  │  │  │  │  └──────── type          (mostly empty)
-  │  │  │  │  └─────────── notes         (mostly empty)
-  │  │  │  └────────────── district      (mostly empty)
-  │  │  └───────────────── address       (~16% populated)
-  │  └──────────────────── region        (one of 5 KMZ regions)
-  └─────────────────────── id
+```text
+{ i, s, a, r, z, t, st, c, o, status? }
 ```
 
-Coordinates are 100% present. Other metadata fields are sparse — do not rely on them.
+- `c` is `[lon, lat]` in WGS84 and is always present.
+- `o` is the origin: `vik`, `national`, or `field_report`.
+- `st` is the source raw status string from source data.
+- `status` is app-level visual state and is unrelated to `st`.
 
-### Optional `status` field (added Sprint 1)
-
-Records may carry an additional optional field `status` representing app-level visual state:
+App-level `status` values:
 
 | Value | Meaning | Render |
 |---|---|---|
-| `verified` | Hydrant physically confirmed on-site by a volunteer/firefighter | SVG hydrant icon |
-| `reported` | Reported as damaged / missing / needs attention | Yellow numbered pin |
-| _absent_ | Canonical record from KMZ, not yet field-verified | Red numbered pin (default) |
+| `verified` | Hydrant physically confirmed on-site | Red pin |
+| `reported` | Reported damaged / missing / needs attention | Yellow pin |
+| absent/unknown | Canonical unverified record | Gray pin |
 
-**Forward-compatible.** Additional values may be added later. Older app builds and unknown values fall back to canonical (default) render — absence of the field is the canonical state.
+Older app builds and unknown status values must fall back to canonical/unverified behavior.
 
-**`status` is unrelated to `st`.** The compact `st` field above is the **source raw status string** from the original KMZ (mostly empty, e.g. operational/decommissioned tags from ВиК). `status` is **app-level visual state** added at field-verification time. They are not renamed, merged, or interchangeable.
-
-`status` lives in `field_reports.json` and the embedded `hydrantData` JSON inside `index.html`. It is **not** added to `hydrants_varna.json` (canonical dataset stays clean — see § Canonical dataset rule).
-
-### Wrong-location ingest rule
+### Wrong-Location Ingest Rule
 
 For `wrong_location` reports, **always update the existing record's coordinate field (`c`) in place. Never create a new `field_*` record for `wrong_location`.**
 
 | Target ID type | Action |
 |---|---|
-| Canonical IDs (`NAT-`, `VIK-`, `877-ZP`, etc.) | update `c` in embedded JSON only |
-| `field_*` IDs | update `c` in **both** `field_reports.json` and embedded JSON |
+| Canonical IDs (`NAT-`, `VIK-`, `877-ZP`, etc.) | update `c` in `data/hydrants.json` only |
+| `field_*` IDs | update `c` in **both** `field_reports.json` and `data/hydrants.json` |
 
-After the coord update, set `status` to `"verified"`. Old coords go in the commit message for audit trail.
+After the coord update, set `status` to `"verified"`. Old coords go in the commit message for audit trail. New `field_*` records are created **only** for `new_hydrant` reports.
 
-New `field_*` records are created **only** for `new_hydrant` reports.
+### National Dataset Role
 
-### National dataset role
+The national source files are kept as archive/reference only. They are not loaded directly at runtime.
 
-Kept in repo as **archive / reference only**. Not loaded at runtime.
-
-Future option (not implemented): build-time enrichment of `hydrants_varna.json` with national `notes`/`name`/`status` fields **only** where spatial match is ≤5m. Defer until there is concrete user demand.
+Future option, not implemented: build-time enrichment of runtime data with national metadata only where spatial match is <=5m. Defer until there is concrete user demand.
 
 ---
 
-## Hard constraints (do not violate)
+## Report Flow
+
+Reports are submitted via `fetch` POST to Cloudflare Worker `varna-hydrants-proxy.petar-dikov2019.workers.dev`. Worker creates a labeled GitHub issue in this repo. Reports queue locally if offline.
+
+Worker source currently lives only in Cloudflare dashboard. TODO commit 17: extract it to a `worker/` directory in this repo with deploy notes. Until then, treat the live Worker as the canonical source.
+
+---
+
+## Hard Constraints
 
 | Constraint | Reason |
 |---|---|
-| Static hosting only (GitHub Pages free tier) | Budget = 0 лв |
-| Single deployable artifact at repo root (currently `index.html`) | GitHub Pages serves it |
-| First load ≤ 1 MB ideal, **2 MB hard cap** | Mobile data, emergency use |
+| Static hosting only (GitHub Pages free tier) | Budget = 0 BGN |
+| App shell at repo root (`index.html`) plus static `data/hydrants.json` | GitHub Pages serves it |
+| First load <= 1 MB ideal, **2 MB hard cap** | Mobile data, emergency use |
 | Bulgarian UI labels preserved verbatim | Users speak Bulgarian only; wording is reviewed |
-| Mobile-first: touch targets ≥ 44px, no hover-dependent UX | Field use, gloves, sweat |
-| HTTPS-required APIs must work: Geolocation, DeviceOrientation, Web Share | Core features depend on these |
+| Mobile-first: touch targets >= 44px, no hover-dependent UX | Field use, gloves, sweat |
+| HTTPS-required APIs must work: Geolocation, DeviceOrientation, Worker `fetch` | Core features depend on these |
 | **Scope: Varna oblast only** | National scope explicitly out of v1 |
-| No new runtime dependencies without Petar approval | Single-file architecture |
+| No new runtime or build-time dependencies without Petar approval | Keep static architecture simple |
 
 ---
 
-## Tri-agent workflow
+## Tri-Agent Workflow
 
 | Agent | Role | What it can do | What it cannot do |
 |---|---|---|---|
 | **Claude (chat)** | Architect / planner / auditor | Discuss, plan, draft, audit | Touch the repo |
-| **Codex** | Repo-aware planner | Read files, produce concrete plans, run read-only analyses | Modify code without an explicit, separate execution handoff |
+| **Codex** | Repo-aware planner | Read files, produce concrete plans, run analyses, execute after explicit handoff | Make architectural decisions silently |
 | **Claude Code** | Executor | Implement approved plans, edit files | Make architectural decisions independently |
 
-**Petar = orchestrator.** All architectural and data decisions go through him. He reviews Codex plans before approving execution and reviews Claude Code output before commit.
+**Petar = orchestrator.** All architectural and data decisions go through him.
 
-### Approval gates
+Approval gates:
 
-- **Architecture changes** (file layout, module split, new patterns) → Claude (chat) discussion first.
-- **Data source changes** → fresh Codex analysis required.
-- **UI label / wording changes** → Petar approval (Bulgarian wording is sensitive).
-- **New runtime or build-time dependencies** → Petar approval.
-- **Refactoring scope** → Codex plan + Petar approval before Claude Code edits files.
+- **Architecture changes** (file layout, module split, new patterns) -> Claude (chat) discussion first.
+- **Data source changes** -> fresh Codex analysis required.
+- **UI label / wording changes** -> Petar approval.
+- **New runtime or build-time dependencies** -> Petar approval.
+- **Refactoring scope** -> Codex plan + Petar approval before edits.
 
 ---
 
-## Current repo state
+## Current Repo State
 
-**Loose files, no organized structure yet.** Refactoring is planned but not started.
+Loose files, no organized source structure yet.
 
-```
+```text
 C:\Projects\Varna_hydrants\
-├── hydrants_varna (7).html        ← current app, ~672 KB, all features inlined
-├── hydrants_varna.json            ← canonical dataset (3,934 records)
-├── VARNA_IZTOK.kmz                ← source data
+├── index.html                     <- current app shell, 292,281 bytes
+├── data/hydrants.json             <- runtime hydrant data, 6,079 records
+├── extract_hydrants.py            <- extracts embedded hydrant JSON from older index builds
+├── field_reports.json             <- canonical field report state
+├── hydrants_varna.json            <- original KMZ-derived reference dataset
+├── VARNA_IZTOK.kmz                <- source data
 ├── VARNA_ZAPAD.kmz
 ├── DEVNIa.kmz
 ├── DOLNI_ChIFLIK.kmz
 ├── PROVADIIa.kmz
-├── geo_fire_hydrants.json         ← national archive (reference only)
-├── geo_fire_hydrants.kml          ← same data, KML format
-├── geo_fire_hydrants.zip          ← same data, shapefile
-└── wfsrequest.txt                 ← record of the WFS endpoint the national export came from
+├── geo_fire_hydrants.json         <- national archive/reference
+├── geo_fire_hydrants.kml          <- same data, KML format
+└── wfsrequest.txt                 <- WFS endpoint record
 ```
 
-**No** `src/`, `dist/`, `scripts/`, `data/`, `package.json`, `.gitignore` yet.
-
-A future refactoring task will introduce a proper structure. Until then, do not assume any of those paths exist.
+No `src/`, `dist/`, `scripts/`, `package.json`, or CI yet.
 
 ---
 
-## Implemented features
+## Implemented Features
 
 All working, tested on mobile.
 
-1. **Auto-start GPS** on page load (no splash screen, no button press).
-2. **Loading pill** during GPS acquisition; switches to error pill with retry / manual buttons on failure.
-3. **Three view modes** (chips at bottom of sheet):
-   - "Близо <100м" — only hydrants within 100m radius
-   - "Топ 5" (default) — 5 nearest by Haversine
-   - "Всички" — full clustered overlay of all 3,934
-4. **Bottom sheet** — compact card always visible (active target arrow, distance, name, nav/report buttons); list expands on tap of the handle.
-5. **Compass arrow + heading cone** on user marker. User dot has translucent cone showing phone heading; bottom card has small directional arrow pointing at active target.
-6. **Hybrid navigation** (🧭 button): distance > 100m opens Google Maps (driving); ≤ 100m switches in-app compass target and zooms.
-7. **Follow mode** (📍 button): centers on user, auto-recenters on GPS updates. User pan exits follow mode.
-8. **Manual position mode** (📌 button): next map click sets user position manually. For indoor / no-GPS use.
-9. **Report modal** (🚨 button): physical-state categories (`ВИДИМ_ОК`, `ИЗКРИВЕН`, `ПОВРЕДЕН`, `БЛОКИРАН`, `ЗАРАСЪЛ`, `ЛИПСВАЩ`, `ГРЕШЕН_АДРЕС`) + free text → `navigator.share()` → user picks channel (Viber/Telegram/SMS).
+1. **Auto-start GPS** on page load.
+2. **Loading pill** during GPS acquisition; retry/manual controls on failure.
+3. **Three view modes**:
+   - "Близо <100м" - hydrants within 100m radius
+   - "Топ 5" - default, 5 nearest by Haversine
+   - "Всички" - full clustered overlay of all 6,079 records (verified at runtime)
+4. **Bottom sheet** - compact card always visible; list expands from handle.
+5. **Compass arrow + heading cone** on user marker.
+6. **Hybrid navigation** - distance >100m opens Google Maps, <=100m uses in-app compass target.
+7. **Follow mode** - centers on user; user pan exits follow mode.
+8. **Manual position mode** - next map click sets user position manually.
+9. **Report flow** - `🚨`, long-press, or `+` opens structured report flow; submit goes to Cloudflare Worker.
+
+Tap on a pin selects/activates it. Long-press on a pin opens the report menu. This is intentional and verified on the live site.
 
 ---
 
-## Implementation gotchas (learned the hard way)
+## Implementation Gotchas
 
-- **`deviceorientation` fires at 100–200Hz on Android.** Don't EMA on every event — it over-converges and provides no smoothing. Solution: store latest raw heading, run EMA once per `requestAnimationFrame` (60Hz cap). `HEADING_SMOOTHING = 0.10`.
-- **Use `L.divIcon` for all markers**, never `L.icon`. `L.icon` requires external marker images that fail in self-contained builds.
-- **MarkerCluster is only used in "Всички" mode.** "Близо" and "Топ" render plain numbered pins — clustering adds no value for small sets.
-- **Auto-fit only twice:** on first GPS lock and on mode change. Never on routine GPS updates (jarring).
-- **No service worker yet.** Tiles are fetched live from OSM. Offline tile cache is the highest-priority gap for actual emergency use.
-
----
-
-## Known tech debt
-
-1. **HTML has accumulated patches.** Rewritten cleanly twice, then patched 4–5 more times. Duplicated CSS, `updateCard()` rebuilds full HTML on every refresh, button wiring after `innerHTML` assignment.
-2. **No build system.** Diffs are hard to read. Refactoring is the next major task.
-3. **Data hardcoded inline.** Updating hydrants requires regenerating the entire HTML.
-4. **Reports go to user-picked channel.** No central collection. Volunteer reports scatter across Viber/Telegram/SMS.
-5. **No offline tile cache.** App fails in basements, tunnels, large concrete buildings — exactly where firefighters need it.
-6. **No PWA manifest.** "Add to Home Screen" works but it's not a real PWA install.
-7. **No tests, no CI.** Acceptable at current size.
-8. **Bulgarian-only UI.** No localization layer (acceptable for v1).
+- **`deviceorientation` fires at 100-200Hz on Android.** Store latest raw heading, run EMA once per `requestAnimationFrame`. `HEADING_SMOOTHING = 0.10`.
+- **Use `L.divIcon` for all markers**, never `L.icon`.
+- **MarkerCluster is only used in "Всички" mode.** "Близо" and "Топ" render plain numbered pins.
+- **Auto-fit only twice:** on first GPS lock and on mode change.
+- **No service worker yet.** Tiles are fetched live from OSM.
+- `index.html` now depends on `data/hydrants.json`; serve over HTTP locally so fetch works.
 
 ---
 
-## Glossary (Bulgarian terms in code/UI)
+## Known Tech Debt
+
+1. **HTML has accumulated patches.** `updateCard()` rebuilds full HTML on every refresh and rewires buttons after `innerHTML`.
+2. **No build system.** Diffs are hard to read. Refactoring is post-launch.
+3. **Data is static JSON.** Updating hydrants requires regenerating/reviewing `data/hydrants.json`.
+4. **Worker source not yet in repo.** Live Worker is canonical until commit 17 extracts it.
+5. **No offline tile cache.** App fails where live OSM tiles cannot load.
+6. **No PWA manifest.**
+7. **No tests, no CI.**
+8. **Bulgarian-only UI.** No localization layer.
+
+---
+
+## Windows Dev Environment
+
+Defender exclusions applied (2026-05-06):
+
+- ExclusionPath: `C:\Projects\Varna_hydrants`, `C:\Users\Petar\Desktop\Fire_Varna_deploy2`
+- ExclusionProcess: `git.exe`, `git-remote-https.exe`, `node.exe`
+
+Primary workflow: edit + commit + push from `C:\Projects\Varna_hydrants` directly. Deploy clone `Fire_Varna_deploy2` is deprecated post-fix.
+
+Fallback, only if exclusions fail: Python pre-place blob recovery technique. See git history for full procedure, search "blob corruption".
+
+Verify exclusions monthly:
+
+```powershell
+Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
+```
+
+---
+
+## Glossary
 
 | Bulgarian | English |
 |---|---|
 | Хидрант | Hydrant |
 | Близо | Near |
 | Всички | All |
-| Точки | Points (markers) |
+| Точки | Points / markers |
 | Сигнал | Signal / report |
-| ВиК | Water utility (Водоснабдяване и Канализация) |
+| ВиК | Water utility |
 | Район | District |
 | Подрайон | Sub-district |
 | Подател | Sender |
-| ГДПБЗН | Fire safety / civil protection directorate (national) |
-| Спешност | Urgency (removed from form, term kept here for reference) |
+| ГДПБЗН | Fire safety / civil protection directorate |
 
 ---
 
-## When you (the agent) should stop and ask
+## When To Stop And Ask
 
 - The user requests a change that contradicts a hard constraint above.
-- The user requests a change to the canonical dataset.
+- The user requests a change to the canonical/runtime dataset.
 - A planned change would push the build past the 2 MB hard cap.
 - You are about to introduce a runtime or build-time dependency.
 - You are about to change Bulgarian UI text.
-- You don't have an approved Codex plan and the task is non-trivial.
+- You do not have an approved plan and the task is non-trivial.
 
 When in doubt, ask. Petar would rather review a question than revert a commit.
