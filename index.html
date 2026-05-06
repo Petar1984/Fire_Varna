@@ -1479,43 +1479,56 @@ svg.leaflet-image-layer.leaflet-interactive path {
     return null;
   }
   function attachMarkerLongPress(m, onTap, onLongPress) {
-    m.on('mousedown', (e) => {
-      _lpClear();
-      _lpFired = false;
-      if (placementActive) return;
-      const pt = _lpPoint(e.originalEvent);
-      if (!pt) return;
-      _lpStart = pt;
-      const onMove = (me) => {
-        if (!_lpStart) return;
-        const cur = _lpPoint(me);
-        if (!cur) return;
-        const dx = cur.x - _lpStart.x;
-        const dy = cur.y - _lpStart.y;
-        if (dx*dx + dy*dy > LONG_PRESS_MOVE_PX_SQ) _lpClear();
-      };
-      const onEnd = () => _lpClear();
-      document.addEventListener('touchmove',  onMove, { passive: true });
-      document.addEventListener('mousemove',  onMove);
-      document.addEventListener('touchend',   onEnd,  { passive: true });
-      document.addEventListener('mouseup',    onEnd);
-      document.addEventListener('touchcancel', onEnd, { passive: true });
-      _lpCleanup = () => {
-        document.removeEventListener('touchmove',  onMove);
-        document.removeEventListener('mousemove',  onMove);
-        document.removeEventListener('touchend',   onEnd);
-        document.removeEventListener('mouseup',    onEnd);
-        document.removeEventListener('touchcancel', onEnd);
-      };
-      _lpTimer = setTimeout(() => {
-        _lpTimer = null;
-        _lpStart = null;
-        if (_lpCleanup) { _lpCleanup(); _lpCleanup = null; }
+    // Bind native pointer/touch events on the marker's DOM icon. Leaflet's
+    // 'mousedown' on Android fires only AFTER touchend (synthesized), so the
+    // 500ms timer was cancelled by mouseup ~1ms later and never fired. Native
+    // pointerdown/touchstart fires immediately when the finger touches down.
+    function bindNative() {
+      const el = m._icon;
+      if (!el || el._lpBound) return;
+      el._lpBound = true;
+      const supportsPointer = (typeof window.PointerEvent === 'function');
+      const hasTouch = ('ontouchstart' in window);
+      const startEvt  = supportsPointer ? 'pointerdown'   : (hasTouch ? 'touchstart'  : 'mousedown');
+      const moveEvt   = supportsPointer ? 'pointermove'   : (hasTouch ? 'touchmove'   : 'mousemove');
+      const endEvt    = supportsPointer ? 'pointerup'     : (hasTouch ? 'touchend'    : 'mouseup');
+      const cancelEvt = supportsPointer ? 'pointercancel' : (hasTouch ? 'touchcancel' : null);
+      el.addEventListener(startEvt, (oe) => {
+        _lpClear();
+        _lpFired = false;
         if (placementActive) return;
-        _lpFired = true;
-        if (onLongPress) onLongPress();
-      }, LONG_PRESS_MS);
-    });
+        const pt = _lpPoint(oe);
+        if (!pt) return;
+        _lpStart = pt;
+        const onMove = (me) => {
+          if (!_lpStart) return;
+          const cur = _lpPoint(me);
+          if (!cur) return;
+          const dx = cur.x - _lpStart.x;
+          const dy = cur.y - _lpStart.y;
+          if (dx*dx + dy*dy > LONG_PRESS_MOVE_PX_SQ) _lpClear();
+        };
+        const onEnd = () => _lpClear();
+        document.addEventListener(moveEvt, onMove, { passive: true });
+        document.addEventListener(endEvt,  onEnd,  { passive: true });
+        if (cancelEvt) document.addEventListener(cancelEvt, onEnd, { passive: true });
+        _lpCleanup = () => {
+          document.removeEventListener(moveEvt, onMove);
+          document.removeEventListener(endEvt,  onEnd);
+          if (cancelEvt) document.removeEventListener(cancelEvt, onEnd);
+        };
+        _lpTimer = setTimeout(() => {
+          _lpTimer = null;
+          _lpStart = null;
+          if (_lpCleanup) { _lpCleanup(); _lpCleanup = null; }
+          if (placementActive) return;
+          _lpFired = true;
+          if (onLongPress) onLongPress();
+        }, LONG_PRESS_MS);
+      }, { passive: true });
+    }
+    m.on('add', bindNative);
+    if (m._icon) bindNative();
     m.on('click', () => {
       if (placementActive) { _lpFired = false; return; }
       if (_lpFired) { _lpFired = false; return; }
