@@ -1397,6 +1397,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let visibleMarkers = [];
   let markersById = {};         // hydrant id -> array of L.marker (cluster member + active overlay can coexist in 'all' mode)
   let allClusterLayer = null;
+  let allClusterInteractionOpen = false; // true while a cluster is spiderfied; suppresses routine refresh() during GPS updates
+  let allModeActiveOverlay = null;       // single all-mode active overlay marker; tracked separately from visibleMarkers so updateAllModeActiveOverlay can replace it without a full refresh
   let lastFix = null;
   let userHeading = null;
   let smoothedHeading = null;
@@ -1404,6 +1406,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let lastAbsoluteHeadingTs = 0;
   let lastHeadingSourceUsed = null;
   let activeTargetIdx = 0;
+  let activeTargetId = null;     // source of truth for the selected hydrant; activeTargetIdx is derived for in-list cases
   let currentRanked = [];
   let mode = 'top';
   let followMode = false;
@@ -1460,12 +1463,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (isInitialFix) {
       isInitialFix = false;
       refresh(true);  // one-time auto-fit on first GPS lock
-    } else {
-      refresh(false); // recompute hydrants without moving the map
-      if (followMode) {
-        map.setView([lastFix.lat, lastFix.lon], map.getZoom(),
-                    { animate: true, duration: 0.3 });
-      }
+      return;
+    }
+    // Cluster guard: a spiderfy is open in all-mode. Skip refresh() so child
+    // markers survive the GPS tick; update user-dependent visuals only.
+    if (mode === 'all' && allClusterInteractionOpen) onUserMovedLightweight();
+    else refresh(false);
+    if (followMode) {
+      map.setView([lastFix.lat, lastFix.lon], map.getZoom(),
+                  { animate: true, duration: 0.3 });
     }
   }
   function placeUser() {
@@ -1628,6 +1634,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     if (activeTargetIdx >= currentRanked.length) activeTargetIdx = 0;
+    activeTargetId = currentRanked.length ? currentRanked[activeTargetIdx].h.i : null;
 
     // Clear existing markers/line
     visibleMarkers.forEach(m => map.removeLayer(m));
@@ -1638,13 +1645,23 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // which is the only way the active flag is allowed to transition.
     markersById = {};
     if (lineToTarget) { map.removeLayer(lineToTarget); lineToTarget = null; }
+    // Standalone overlay (added directly to map, not to allClusterLayer or
+    // visibleMarkers) is tracked separately so updateAllModeActiveOverlay can
+    // replace it without rebuilding the cluster. Tear it down here too.
+    if (allModeActiveOverlay) { map.removeLayer(allModeActiveOverlay); allModeActiveOverlay = null; }
     if (allClusterLayer) { map.removeLayer(allClusterLayer); allClusterLayer = null; }
+    allClusterInteractionOpen = false;
 
     if (mode === 'all') {
       // Render full cluster + a single highlighted nearest
       allClusterLayer = L.markerClusterGroup({
         maxClusterRadius: 60, showCoverageOnHover: false, spiderfyOnMaxZoom: true
       });
+      // Cluster guard: track spiderfy state so routine GPS refresh() is skipped
+      // while child markers are open (otherwise refresh() rebuilds the cluster
+      // and dismisses the spiderfy mid-interaction).
+      allClusterLayer.on('spiderfied',   () => { allClusterInteractionOpen = true;  });
+      allClusterLayer.on('unspiderfied', () => { allClusterInteractionOpen = false; });
       HYDRANTS.forEach(h => {
         const m = L.marker([h.c[1], h.c[0]], { icon: dimPin(h) });
         m._hydrantId = h.i;
@@ -1653,30 +1670,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
         (markersById[h.i] = markersById[h.i] || []).push(m);
         attachMarkerLongPress(
           m,
-          () => { consumePrepickForHydrant(h); },
-          () => { if (consumePrepickForHydrant(h)) return; showReportTypePicker(h); }
+          () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); },
+          () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); showReportTypePicker(h); }
         );
         allClusterLayer.addLayer(m);
       });
       map.addLayer(allClusterLayer);
-      // Add only the active target as a numbered pin on top
+      // Add only the active target as a numbered pin on top.
+      // Tracked via allModeActiveOverlay (not visibleMarkers) so the lightweight
+      // overlay-update path can replace it without going through refresh().
       if (currentRanked.length) {
         const r0 = currentRanked[activeTargetIdx];
-        const m = L.marker([r0.h.c[1], r0.h.c[0]], {
-          icon: makePin(activeTargetIdx + 1, r0.h, true), zIndexOffset: 800
-        });
-        m._hydrantId = r0.h.i;
-        m._pinKind = 'numbered';
-        m._rank = activeTargetIdx + 1;
-        m._isActivePin = true;
-        (markersById[r0.h.i] = markersById[r0.h.i] || []).push(m);
-        attachMarkerLongPress(
-          m,
-          () => { consumePrepickForHydrant(r0.h); },
-          () => { if (consumePrepickForHydrant(r0.h)) return; showReportTypePicker(r0.h); }
-        );
-        m.addTo(map);
-        visibleMarkers.push(m);
+        allModeActiveOverlay = createActiveOverlayMarker(r0.h, activeTargetIdx + 1);
       }
     } else {
       // 'near' or 'top' — render numbered pins for currentRanked
@@ -1701,14 +1706,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       });
     }
 
-    // Line user → active target
-    if (currentRanked.length > 0) {
-      const t = currentRanked[activeTargetIdx];
-      lineToTarget = L.polyline([
-        [lastFix.lat, lastFix.lon],
-        [t.h.c[1], t.h.c[0]]
-      ], { color:'#ff9800', weight: 3, opacity: 0.8, dashArray: '8,6' }).addTo(map);
-    }
+    redrawActiveLine();
 
     // Auto-fit only when explicitly requested (mode change / initial fix)
     if (autoFit) {
@@ -1781,7 +1779,102 @@ window._hydrantDataReady = (async function loadHydrantData() {
   function setActiveTarget(idx) {
     if (idx < 0 || idx >= currentRanked.length) return;
     activeTargetIdx = idx;
-    refresh(false);
+    activeTargetId = currentRanked[idx].h.i;
+    if (mode === 'all' && allClusterInteractionOpen) updateAllModeActiveOverlay();
+    else refresh(false);
+  }
+
+  // Returns { h, d, idx } for the currently selected hydrant, or null. d is
+  // recomputed via Haversine from lastFix; idx is the position in
+  // currentRanked, or -1 if the active hydrant is outside the visible list.
+  function getActiveTarget() {
+    if (!activeTargetId || !lastFix) return null;
+    const h = HYDRANTS_BY_ID[activeTargetId];
+    if (!h) return null;
+    const d = haversine(lastFix.lat, lastFix.lon, h.c[1], h.c[0]);
+    return { h, d, idx: currentRanked.findIndex(r => r.h.i === activeTargetId) };
+  }
+
+  // Selects a hydrant by reference. In near/top modes (or in-list all-mode
+  // without an open spiderfy), delegates to refresh(false). In all-mode under
+  // cluster guard, or for out-of-list selections, updates the overlay
+  // incrementally without rebuilding the cluster, so any open spiderfy survives.
+  function setActiveTargetHydrant(h) {
+    if (!h || !h.i || !HYDRANTS_BY_ID[h.i]) return;
+    activeTargetId = h.i;
+    const idx = currentRanked.findIndex(r => r.h.i === h.i);
+    if (idx >= 0) activeTargetIdx = idx;
+    if (mode === 'all' && allClusterInteractionOpen) updateAllModeActiveOverlay();
+    else if (idx >= 0) refresh(false);
+    else updateAllModeActiveOverlay();
+  }
+
+  // Shared all-mode active-overlay marker constructor. Tags marker for polling
+  // (_hydrantId / _pinKind / _rank / _isActivePin) so refreshMarkerIconsForHydrant
+  // and moveMarkersForHydrant find it via markersById[id]. Caller assigns the
+  // returned marker to allModeActiveOverlay.
+  function createActiveOverlayMarker(h, rank) {
+    const m = L.marker([h.c[1], h.c[0]], { icon: makePin(rank, h, true), zIndexOffset: 800 });
+    m._hydrantId = h.i; m._pinKind = 'numbered'; m._rank = rank; m._isActivePin = true;
+    (markersById[h.i] = markersById[h.i] || []).push(m);
+    attachMarkerLongPress(m,
+      () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); },
+      () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); showReportTypePicker(h); }
+    );
+    m.addTo(map);
+    return m;
+  }
+
+  // Lightweight all-mode overlay update. Creates / updates / removes the
+  // single all-mode active overlay marker without rebuilding allClusterLayer.
+  // Must not call refresh().
+  function updateAllModeActiveOverlay() {
+    const detach = () => {
+      if (!allModeActiveOverlay) return;
+      const oid = allModeActiveOverlay._hydrantId;
+      map.removeLayer(allModeActiveOverlay);
+      if (oid && markersById[oid]) {
+        markersById[oid] = markersById[oid].filter(mm => mm !== allModeActiveOverlay);
+        if (!markersById[oid].length) delete markersById[oid];
+      }
+      allModeActiveOverlay = null;
+    };
+    const at = getActiveTarget();
+    if (!at) {
+      detach();
+      if (lineToTarget) { map.removeLayer(lineToTarget); lineToTarget = null; }
+      updateCard();
+      return;
+    }
+    // Out-of-list selections render with a neutral bullet; in-list keep their rank.
+    const rank = at.idx >= 0 ? (at.idx + 1) : '·';
+    if (allModeActiveOverlay && allModeActiveOverlay._hydrantId === at.h.i) {
+      allModeActiveOverlay.setLatLng([at.h.c[1], at.h.c[0]]);
+      allModeActiveOverlay.setIcon(makePin(rank, at.h, true));
+      allModeActiveOverlay._rank = rank;
+    } else {
+      detach();
+      allModeActiveOverlay = createActiveOverlayMarker(at.h, rank);
+    }
+    redrawActiveLine();
+    updateCardInfo();
+    updateArrow();
+  }
+
+  function redrawActiveLine() {
+    if (lineToTarget) { map.removeLayer(lineToTarget); lineToTarget = null; }
+    const at = getActiveTarget();
+    if (!at) return;
+    lineToTarget = L.polyline([[lastFix.lat, lastFix.lon], [at.h.c[1], at.h.c[0]]],
+      { color:'#ff9800', weight: 3, opacity: 0.8, dashArray: '8,6' }).addTo(map);
+  }
+
+  // GPS tick path under the cluster guard: user marker already moved; only
+  // user-dependent visuals (line, card, arrow) need updating.
+  function onUserMovedLightweight() {
+    redrawActiveLine();
+    updateCardInfo();
+    updateArrow();
   }
 
   // ===== Hybrid navigate =====
@@ -1842,15 +1935,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
 
   function updateCardInfo() {
-    if (!currentRanked.length || !lastFix) return;
-    const t = currentRanked[activeTargetIdx];
+    const at = getActiveTarget();
+    if (!at) return;
     const distEl = document.getElementById('cardDist');
     const nameEl = document.getElementById('cardName');
     const bearingEl = document.getElementById('cardBearing');
     if (!distEl) return;
-    distEl.textContent = formatDist(t.d);
-    nameEl.textContent = '#' + (activeTargetIdx + 1) + ' ' + (t.h.a || ('Хидрант ' + t.h.i));
-    const bear = bearing(lastFix.lat, lastFix.lon, t.h.c[1], t.h.c[0]);
+    distEl.textContent = formatDist(at.d);
+    const label = at.idx >= 0 ? ('#' + (at.idx + 1) + ' ') : '';
+    nameEl.textContent = label + (at.h.a || ('Хидрант ' + at.h.i));
+    const bear = bearing(lastFix.lat, lastFix.lon, at.h.c[1], at.h.c[0]);
     bearingEl.textContent = cardinal(bear) + ' · ' + Math.round(bear) + '°' +
       (smoothedHeading == null ? ' (без компас)' : '');
   }
@@ -1896,11 +1990,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
 
   function updateArrow() {
-    if (!currentRanked.length || !lastFix) return;
-    const t = currentRanked[activeTargetIdx];
+    const at = getActiveTarget();
+    if (!at) return;
     const arrow = document.getElementById('arrowTri');
     if (!arrow) return;
-    const bear = bearing(lastFix.lat, lastFix.lon, t.h.c[1], t.h.c[0]);
+    const bear = bearing(lastFix.lat, lastFix.lon, at.h.c[1], at.h.c[0]);
     const rot = smoothedHeading != null ? (bear - smoothedHeading) : bear;
     arrow.style.transform = 'rotate(' + rot + 'deg)';
   }
@@ -2990,6 +3084,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
           if (Number.isFinite(lon) && Number.isFinite(lat)) {
             h.c = [lon, lat];
             moveMarkersForHydrant(h);
+            // If polling moved the active hydrant, redraw user-dependent
+            // visuals without refresh() — refresh() would rebuild the cluster
+            // and collapse any open spiderfy.
+            if (id === activeTargetId) {
+              redrawActiveLine();
+              updateCardInfo();
+              updateArrow();
+            }
           }
         }
       }
