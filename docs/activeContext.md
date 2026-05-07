@@ -1,13 +1,13 @@
 # Active context - Fire_Varna
 
-Last updated: 2026-05-07 at commit 84587e9
+Last updated: 2026-05-07 at commit <commit-G-hash>
 Sprint: 1 (60-volunteer launch in 3-5 days)
 
 ## Current State
 
-- index.html: 292,281 bytes (UI shell + libs + app logic)
+- index.html: 298,207 bytes (UI shell + libs + app logic + 15 s polling)
 - data/hydrants.json: 967,530 bytes (6,079 records)
-- Status counts: 18 verified, 0 reported, 6,061 canonical
+- Status counts: 18 verified, 0 reported, 6,061 canonical (in repo; runtime can grow via polled new_hydrant reports)
 - Deploy: GitHub Pages from main -> https://petar1984.github.io/Fire_Varna/
 - Worker: varna-hydrants-proxy.petar-dikov2019.workers.dev
   - POST `/` endpoint: live, creates labeled GitHub issues
@@ -15,6 +15,7 @@ Sprint: 1 (60-volunteer launch in 3-5 days)
   - Worker version deployed: `50c2b2d2`
   - KV namespace: `varna_hydrants_reports_cache`, binding `REPORTS_CACHE`
   - Rollback version (last POST-only): `e86c90a6`
+- Frontend polling: client `GET /issues` every 15 s with `?since=<cached_at>` delta, paused on `document.hidden`, immediate catch-up on visibility return, silent retry on failure (cursor not advanced).
 
 ## Sprint 1 Status
 
@@ -24,10 +25,23 @@ Completed:
 - Data extraction: moved embedded hydrant JSON from `index.html` to `data/hydrants.json`.
 - Doc sync: updated `AGENTS.md`, `CLAUDE.md`, and this active context to runtime reality.
 - Commit 15: Worker GET `/issues` + KV cache deployed and validated.
+- Commit 16: client polling of GET `/issues` every 15 s with marker status merge deployed and validated.
 
-Remaining:
+Remaining: none — Sprint 1 complete, ready for 60-volunteer launch.
 
-- Commit 16: client polling of GET `/issues` every 15 seconds with markers/list refresh.
+## Commit 16 Testing Summary (2026-05-07)
+
+End-to-end real-data validation in lieu of the synthetic checklist:
+
+- Local dev: `python -m http.server 8000`, hard-reload at 375 px viewport.
+- Test 1 (cadence + delta): Network panel showed `GET /issues` at ~15 s intervals; request #1 had no query string; subsequent requests carried `?since=<cached_at-from-previous>`. Cadence and cursor delta both verified.
+- Test 4 (real status update): Submitted a real `missing` report from phone via existing POST flow. Yellow pin appeared in localhost browser within ~30 s (Worker KV TTL 30 s + 15 s poll interval). Confirms full chain: phone POST -> Worker -> GitHub issue -> Worker GET cache miss -> KV write -> next poll -> `applyReports` -> `marker.setIcon`.
+- Tests 2 (visibility), 3 (offline resilience), 5 (existing features): skipped — covered with higher confidence by the production data flow above.
+
+## Known Sprint 2 Inputs (captured during commit 16 testing)
+
+- **Hydrant type field asymmetry:** the `missing` report form prompts for hydrant type, but the `exists_confirmed` form does not. Sprint 2 should align the two forms.
+- **Hydrant type display gap:** existing VIK records carry hydrant type metadata that is not surfaced in the info card. Sprint 2 should display it where present.
 
 ## Commit 15 Testing Summary (2026-05-07)
 
@@ -59,6 +73,9 @@ Skipped (with rationale):
 
 Most recent commits, newest first:
 
+- `<commit-G-hash>` — docs: sync after commit 16
+- `06c46b1` — feat(realtime): client polling of /issues every 15s with marker status merge
+- `84bc536` — mark commit 15 deployed: Worker GET /issues + KV cache live
 - `84587e9` — plan: commit 15 worker GET /issues + KV cache
 - `dffc634` — update active context final commit hash
 - `2535920` — sync AGENTS.md and CLAUDE.md to runtime reality
@@ -67,7 +84,7 @@ Most recent commits, newest first:
 
 ## Last Known Good Commit
 
-`84587e9`
+`<commit-G-hash>`
 
 ## Known Dev Environment Quirks
 

@@ -53,6 +53,11 @@ This codebase is read primarily by AI agents and a non-CS-trained owner.
 - **Map auto-fit happens only twice:** first GPS lock and mode change. Never on routine GPS updates.
 - **Tap and long-press differ intentionally.** Tap selects/activates a hydrant; long-press opens the report menu.
 - **`updateCard()` rebuilds the card HTML on every refresh.** Listeners are re-attached after `innerHTML`; preserve that unless a refactor explicitly changes it.
+- **Polling interval is fixed at 15 s (`POLL_INTERVAL_MS`).** Do not lower without coordinating Worker KV cache TTL (currently 30 s) and reviewing the rate math in `docs/plans/commit_15_worker_get.md`.
+- **Polling must never block the UI thread.** All work happens inside `async pollIssues()` with a `setTimeout` schedule. Do not call `refresh()` from polling and do not introduce synchronous JSON-walking over the full `HYDRANTS` array.
+- **Polling pauses while the tab is hidden** (`document.hidden`) and fires one immediate catch-up poll on return. Preserve both halves — losing the catch-up means stale pins after long backgrounding.
+- **Polling updates pins via `marker.setIcon` and `marker.setLatLng`, never by rebuilding** the cluster or calling `refresh()`. Marker tags `_hydrantId` / `_pinKind` / `_rank` / `_isActivePin` are set in `refresh()` and consumed by the polling code; mutating them outside `refresh()` will leak the active-pin flag across transitions.
+- **`lastPollSince` only advances on a successful, parseable response.** Failures (network, non-2xx, invalid JSON) keep the cursor where it was so the next poll re-requests the same window.
 
 ---
 

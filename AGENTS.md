@@ -27,10 +27,11 @@ Static GitHub Pages frontend. No backend in the repo and no runtime build step.
 
 | Component | Current State | Size |
 |---|---|---:|
-| App shell | `index.html` with inlined Leaflet, MarkerCluster, CSS, and app logic | 292,281 bytes |
+| App shell | `index.html` with inlined Leaflet, MarkerCluster, CSS, and app logic | 298,207 bytes |
 | Hydrant data | `data/hydrants.json`, loaded by `fetch` on app init | 967,530 bytes |
 | Report submission | Cloudflare Worker proxy | external |
-| **Frontend first load** | `index.html` + `data/hydrants.json` | **1,259,811 bytes** |
+| Report polling | Cloudflare Worker `GET /issues`, every 15 s | external |
+| **Frontend first load** | `index.html` + `data/hydrants.json` | **1,265,737 bytes** |
 
 Hydrant data lives in `data/hydrants.json` (**6,079 records (verified at runtime)**, `vik` + `national` + `field_report` origins). Loaded via fetch on app init. `index.html` contains UI shell, Leaflet, MarkerCluster, app logic, and an empty `<script id="hydrantData">` placeholder populated at runtime.
 
@@ -170,6 +171,7 @@ All working, tested on mobile.
 7. **Follow mode** - centers on user; user pan exits follow mode.
 8. **Manual position mode** - next map click sets user position manually.
 9. **Report flow** - `🚨`, long-press, or `+` opens structured report flow; submit goes to Cloudflare Worker.
+10. **Real-time report polling** - reports auto-refresh every 15 seconds via Cloudflare Worker `GET /issues`. Status changes (`exists_confirmed`, `damaged`, `missing`, `wrong_location`) update existing pins in place via `marker.setIcon` / `marker.setLatLng`; `new_hydrant` reports are appended to the in-memory dataset. Polling pauses while the tab is hidden and resumes with an immediate catch-up on return.
 
 Tap on a pin selects/activates it. Long-press on a pin opens the report menu. This is intentional and verified on the live site.
 
