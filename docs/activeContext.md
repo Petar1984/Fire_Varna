@@ -1,6 +1,6 @@
 # Active context - Fire_Varna
 
-Last updated: 2026-05-07 at commit <commit-G-hash>
+Last updated: 2026-05-07 at commit dfd7aa9
 Sprint: 1 (60-volunteer launch in 3-5 days)
 
 ## Current State
@@ -73,7 +73,7 @@ Skipped (with rationale):
 
 Most recent commits, newest first:
 
-- `<commit-G-hash>` — docs: sync after commit 16
+- `dfd7aa9` — docs: sync after commit 16
 - `06c46b1` — feat(realtime): client polling of /issues every 15s with marker status merge
 - `84bc536` — mark commit 15 deployed: Worker GET /issues + KV cache live
 - `84587e9` — plan: commit 15 worker GET /issues + KV cache
@@ -84,7 +84,7 @@ Most recent commits, newest first:
 
 ## Last Known Good Commit
 
-`<commit-G-hash>`
+`dfd7aa9`
 
 ## Known Dev Environment Quirks
 
