@@ -2168,6 +2168,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       default:                 return '🚨 Сигнал за хидрант';
     }
   }
+  function hydrantTypeLabel(hydrant) {
+    if (!hydrant || hydrant.t == null) return '';
+    const raw = String(hydrant.t).trim().toLowerCase();
+    if (raw === 'underground' || raw.includes('подземен')) return 'Подземен';
+    if (raw === 'ground' || raw.includes('надземен')) return 'Надземен';
+    return '';
+  }
   function targetCardHTML(reportType, hydrant, placedCoord) {
     if (reportType === 'new_hydrant') {
       if (placedCoord) {
@@ -2179,10 +2186,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return '<div class="modal-target-card"><div class="name">Нов хидрант</div></div>';
     }
     if (!hydrant) return '';
+    const typeLabel = hydrantTypeLabel(hydrant);
     return '<div class="modal-target-card">' +
       '<div class="name">' + escapeHtml(hydrant.a || ('Хидрант ' + hydrant.i)) + '</div>' +
       '<div>ID: ' + escapeHtml(hydrant.i) + ' · ' + escapeHtml(hydrant.s) +
         (hydrant.r ? ' · ' + escapeHtml(hydrant.r) : '') + '</div>' +
+      (typeLabel ? '<div>Тип: ' + typeLabel + '</div>' : '') +
       '<div>Координати в базата (lon, lat): ' + hydrant.c[0].toFixed(6) + ', ' + hydrant.c[1].toFixed(6) + '</div>' +
     '</div>';
   }
@@ -3077,7 +3086,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   const WELCOME_SKIP_HASH = '#skip-welcome';
   const WELCOME_COPY = [
     'Хидранти Варна — карта на пожарни хидранти за пожарникари и доброволци',
-    'Разреши локация, за да видиш най-близките хидранти. Бутон 🚨 отваря сигнал.',
+    'Разреши локация, за да видиш най-близките хидранти. Натисни и задръж pin за сигнал; + отваря избор на доклад.',
     'За нов хидрант натисни +. Постави на картата с „📍 Тук съм" (когато си до хидранта) или влечи pin-а за корекция.'
   ];
   let welcomeShownThisSession = false;
