@@ -3,14 +3,15 @@
 > **Audience:** Petar and AI agents resuming work.
 > **Purpose:** canonical current repo/runtime state. If this conflicts with README, AGENTS.md, or CLAUDE.md on current state, this file wins.
 
-Last updated: 2026-05-07 at commit 7412878
+Last updated: 2026-05-08 at commit 2dcab73
 Sprint: 1.5 shipped; preparing for broad launch
 
 ## Current State
 
 - index.html: 304,192 bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text)
-- data/hydrants.json: 967,530 bytes (6,079 records)
-- Status counts: 18 verified, 0 reported, 6,061 canonical (in repo; runtime can grow via polled new_hydrant reports)
+- data/hydrants.json: 968,365 bytes (6,082 records — 8 field reports ingested in commit 2dcab73)
+- field_reports.json: 5,085 bytes (14 records)
+- Status counts: 23 verified, 2 reported, 6,057 canonical (in repo; runtime can grow via polled new_hydrant reports)
 - Deploy: GitHub Pages from main -> https://petar1984.github.io/Fire_Varna/
 - Worker: varna-hydrants-proxy.petar-dikov2019.workers.dev
   - POST `/` endpoint: live, creates labeled GitHub issues
@@ -82,6 +83,7 @@ Captured during Sprint 1 / 1.5 testing; ordering is not committed.
 - **All-mode out-of-list selection: list highlight discrepancy** — when the user taps a pin in 'Всички' that is outside the visible nearest-10, the bottom-sheet list still highlights row 0 instead of clearing the highlight. Source of truth (`activeTargetId`) is correct; only the visual fallback is misleading. Documented in `docs/plans/sprint_1_5_polish.md` Issue 3 plan as accepted tradeoff for launch.
 - **Visual encoding by hydrant type** — surface ground/underground type in the pin glyph (color tier or shape variant) so type is legible without opening the card.
 - **Confirm form: hydrant type prompt** — the `exists_confirmed` form should prompt for type when the field is empty, mirroring the `missing` form.
+- **GitHub issue close automation** — issues #29-#36 ingested in `2dcab73` (full hash `2dcab73d27394f34801267cdcf0974ec5977a795`) but not closed on GitHub. Manual close pending OR Worker `/close-issue` endpoint (next sprint). Polling logic is idempotent — `HYDRANTS_BY_ID` dedupes new_hydrant reports, status mutations no-op when `h.status` already matches — so there is no user-visible impact, only a queue-management nuisance.
 
 ## Data Quality Backlog (post-launch)
 
