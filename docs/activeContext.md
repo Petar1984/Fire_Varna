@@ -1,7 +1,7 @@
 # Active context - Fire_Varna
 
-Last updated: 2026-05-07 at commit dfd7aa9
-Sprint: 1 (60-volunteer launch in 3-5 days)
+Last updated: 2026-05-07 at commit 006eb6b
+Sprint: 1 shipped; Sprint 1.5 polish in flight before broad launch
 
 ## Current State
 
@@ -27,7 +27,11 @@ Completed:
 - Commit 15: Worker GET `/issues` + KV cache deployed and validated.
 - Commit 16: client polling of GET `/issues` every 15 s with marker status merge deployed and validated.
 
-Remaining: none — Sprint 1 complete, ready for 60-volunteer launch.
+Remaining: none — Sprint 1 complete.
+
+## Next Planned Work
+
+- **Sprint 1.5 — UX polish before broad launch.** Plan: [`docs/plans/sprint_1_5_polish.md`](plans/sprint_1_5_polish.md). Four `index.html`-only fixes identified during commit 16 testing: (1) welcome modal text, (2) cluster auto-close in 'Всички' during GPS updates, (3) tap-to-activate in 'Всички' (Option B-lite, ID-based active target), (4) hydrant type display in report modal. No Worker, dataset, or dependency changes; total `index.html` growth budgeted under 3 KB. Implementation grouped into two commits — cosmetic batch (issues 1+4), then all-mode behavior batch (issues 2+3) — in a fresh execution-capable session.
 
 ## Commit 16 Testing Summary (2026-05-07)
 
@@ -73,6 +77,10 @@ Skipped (with rationale):
 
 Most recent commits, newest first:
 
+- `219cf7a` — Fix number of hydrants listed in README
+- `b23017f` — Update total hydrants count in README
+- `006eb6b` — plan: sprint 1.5 UX polish fixes (4 issues)
+- `9ec694f` — docs: record commit G hash as Last Known Good
 - `dfd7aa9` — docs: sync after commit 16
 - `06c46b1` — feat(realtime): client polling of /issues every 15s with marker status merge
 - `84bc536` — mark commit 15 deployed: Worker GET /issues + KV cache live
@@ -84,7 +92,7 @@ Most recent commits, newest first:
 
 ## Last Known Good Commit
 
-`dfd7aa9`
+`006eb6b`
 
 ## Known Dev Environment Quirks
 
