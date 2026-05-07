@@ -1395,6 +1395,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let userMarker = null, userAccuracyCircle = null, lineToTarget = null;
   let watchId = null;
   let visibleMarkers = [];
+  let markersById = {};         // hydrant id -> array of L.marker (cluster member + active overlay can coexist in 'all' mode)
   let allClusterLayer = null;
   let lastFix = null;
   let userHeading = null;
@@ -1631,6 +1632,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // Clear existing markers/line
     visibleMarkers.forEach(m => map.removeLayer(m));
     visibleMarkers = [];
+    // Reset marker index. Old marker objects lose every reference here, so
+    // _isActivePin / _rank / _pinKind tags are dropped with them. Each branch
+    // below re-tags the freshly created markers using the current activeTargetIdx,
+    // which is the only way the active flag is allowed to transition.
+    markersById = {};
     if (lineToTarget) { map.removeLayer(lineToTarget); lineToTarget = null; }
     if (allClusterLayer) { map.removeLayer(allClusterLayer); allClusterLayer = null; }
 
@@ -1641,6 +1647,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       });
       HYDRANTS.forEach(h => {
         const m = L.marker([h.c[1], h.c[0]], { icon: dimPin(h) });
+        m._hydrantId = h.i;
+        m._pinKind = 'dim';
+        m._isActivePin = false;
+        (markersById[h.i] = markersById[h.i] || []).push(m);
         attachMarkerLongPress(
           m,
           () => { consumePrepickForHydrant(h); },
@@ -1655,6 +1665,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const m = L.marker([r0.h.c[1], r0.h.c[0]], {
           icon: makePin(activeTargetIdx + 1, r0.h, true), zIndexOffset: 800
         });
+        m._hydrantId = r0.h.i;
+        m._pinKind = 'numbered';
+        m._rank = activeTargetIdx + 1;
+        m._isActivePin = true;
+        (markersById[r0.h.i] = markersById[r0.h.i] || []).push(m);
         attachMarkerLongPress(
           m,
           () => { consumePrepickForHydrant(r0.h); },
@@ -1671,6 +1686,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
           icon: makePin(i + 1, r.h, isActive),
           zIndexOffset: isActive ? 800 : 600 - i
         });
+        m._hydrantId = r.h.i;
+        m._pinKind = 'numbered';
+        m._rank = i + 1;
+        m._isActivePin = isActive;
+        (markersById[r.h.i] = markersById[r.h.i] || []).push(m);
         attachMarkerLongPress(
           m,
           () => { if (consumePrepickForHydrant(r.h)) return; setActiveTarget(i); },
@@ -2876,6 +2896,142 @@ window._hydrantDataReady = (async function loadHydrantData() {
       locateBtn.classList.remove('tracking');
     }
   });
+
+  // ===== Real-time report polling (commit 16) =====
+  // Polls the Worker GET /issues every 15s, merges report status into HYDRANTS_BY_ID,
+  // and updates marker icons / positions in place. Never calls refresh(); never rebuilds
+  // the cluster. Pauses while the tab is hidden.
+  const POLL_URL = 'https://varna-hydrants-proxy.petar-dikov2019.workers.dev/issues';
+  const POLL_INTERVAL_MS = 15000;
+  let pollTimer = null;
+  let pollInFlight = false;
+  let lastPollSince = null;     // ISO string; only advanced on a successful response
+
+  function reportTypeToStatus(reportType) {
+    if (reportType === 'exists_confirmed') return 'verified';
+    if (reportType === 'wrong_location')   return 'verified';
+    if (reportType === 'missing')          return 'reported';
+    if (reportType === 'damaged')          return 'reported';
+    return null;
+  }
+
+  function refreshMarkerIconsForHydrant(h) {
+    const list = markersById[h.i];
+    if (!list) return;
+    list.forEach(m => {
+      if (m._pinKind === 'dim') {
+        m.setIcon(dimPin(h));
+      } else {
+        m.setIcon(makePin(m._rank, h, m._isActivePin));
+      }
+    });
+  }
+
+  function moveMarkersForHydrant(h) {
+    const list = markersById[h.i];
+    if (!list) return;
+    list.forEach(m => m.setLatLng([h.c[1], h.c[0]]));
+  }
+
+  function applyReports(reports) {
+    if (!Array.isArray(reports) || reports.length === 0) return;
+    for (const report of reports) {
+      const type = report && report.report_type;
+      if (!type) continue;
+
+      if (type === 'new_hydrant' && !report.hydrant_id) {
+        if (!report.id || !Array.isArray(report.coords) || report.coords.length !== 2) continue;
+        if (HYDRANTS_BY_ID[report.id]) continue; // already added in a prior poll
+        const h = {
+          i: report.id,
+          c: [Number(report.coords[0]), Number(report.coords[1])],
+          o: 'field_report',
+          status: 'verified'
+        };
+        if (!Number.isFinite(h.c[0]) || !Number.isFinite(h.c[1])) continue;
+        HYDRANTS.push(h);
+        HYDRANTS_BY_ID[h.i] = h;
+        // Render incrementally only when the cluster layer is currently mounted.
+        // In 'top'/'near' modes the new pin will appear naturally on the next refresh()
+        // when ranked by distance from the user.
+        if (allClusterLayer) {
+          const m = L.marker([h.c[1], h.c[0]], { icon: dimPin(h) });
+          m._hydrantId = h.i;
+          m._pinKind = 'dim';
+          m._isActivePin = false;
+          (markersById[h.i] = markersById[h.i] || []).push(m);
+          attachMarkerLongPress(
+            m,
+            () => { consumePrepickForHydrant(h); },
+            () => { if (consumePrepickForHydrant(h)) return; showReportTypePicker(h); }
+          );
+          allClusterLayer.addLayer(m);
+        }
+        continue;
+      }
+
+      const id = report.hydrant_id;
+      if (!id) continue;
+      const h = HYDRANTS_BY_ID[id];
+      if (!h) continue;
+
+      if (type === 'wrong_location') {
+        if (Array.isArray(report.coords) && report.coords.length === 2) {
+          const lon = Number(report.coords[0]), lat = Number(report.coords[1]);
+          if (Number.isFinite(lon) && Number.isFinite(lat)) {
+            h.c = [lon, lat];
+            moveMarkersForHydrant(h);
+          }
+        }
+      }
+
+      const newStatus = reportTypeToStatus(type);
+      if (newStatus && h.status !== newStatus) {
+        h.status = newStatus;
+        refreshMarkerIconsForHydrant(h);
+      }
+    }
+  }
+
+  async function pollIssues() {
+    if (pollInFlight) return;
+    pollInFlight = true;
+    try {
+      const url = lastPollSince ? POLL_URL + '?since=' + encodeURIComponent(lastPollSince) : POLL_URL;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return;
+      const body = await res.json();
+      if (body && Array.isArray(body.reports)) applyReports(body.reports);
+      // Only advance the cursor on a successful, parseable response.
+      if (body && typeof body.cached_at === 'string') lastPollSince = body.cached_at;
+    } catch (_) {
+      // Silent retry on next interval — no UI flashing per spec.
+    } finally {
+      pollInFlight = false;
+    }
+  }
+
+  function schedulePoll() {
+    clearTimeout(pollTimer);
+    if (document.hidden) return;
+    pollTimer = setTimeout(async () => {
+      await pollIssues();
+      schedulePoll();
+    }, POLL_INTERVAL_MS);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearTimeout(pollTimer);
+      pollTimer = null;
+    } else {
+      // Immediate catch-up poll, then resume regular cadence.
+      pollIssues().finally(schedulePoll);
+    }
+  });
+
+  // Kick off polling immediately, in parallel with welcome modal / GPS bootstrap.
+  pollIssues().finally(schedulePoll);
 
   // ===== Sheet collapse/expand =====
   const sheet = document.getElementById('sheet');
