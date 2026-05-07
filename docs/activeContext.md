@@ -1,11 +1,11 @@
 # Active context - Fire_Varna
 
-Last updated: 2026-05-07 at commit 006eb6b
-Sprint: 1 shipped; Sprint 1.5 polish in flight before broad launch
+Last updated: 2026-05-07 at commit 7412878
+Sprint: 1.5 shipped; preparing for broad launch
 
 ## Current State
 
-- index.html: 298,207 bytes (UI shell + libs + app logic + 15 s polling)
+- index.html: 304,192 bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text)
 - data/hydrants.json: 967,530 bytes (6,079 records)
 - Status counts: 18 verified, 0 reported, 6,061 canonical (in repo; runtime can grow via polled new_hydrant reports)
 - Deploy: GitHub Pages from main -> https://petar1984.github.io/Fire_Varna/
@@ -29,9 +29,37 @@ Completed:
 
 Remaining: none — Sprint 1 complete.
 
+## Sprint 1.5 Status
+
+Plan: [`docs/plans/sprint_1_5_polish.md`](plans/sprint_1_5_polish.md). Two-commit grouping shipped on 2026-05-07.
+
+Completed:
+
+- **Cosmetic batch (`8e549e1`)** — welcome modal screen-2 text rewritten to name current gestures (long-press for report, `+` for picker); report-modal target card now displays `Тип: Подземен/Надземен` for recognized values via new `hydrantTypeLabel()` helper. `index.html` +527 bytes.
+- **Behavior batch (`7412878`)** — all-mode cluster guard + ID-based active target. `allClusterInteractionOpen` flag wired to MarkerCluster `spiderfied` / `unspiderfied` events suppresses routine GPS `refresh(false)` while a spiderfy is open. New `activeTargetId` is the source of truth for the selected hydrant, with `activeTargetIdx` retained as a derived list/rank helper. New helpers: `getActiveTarget`, `setActiveTargetHydrant`, `createActiveOverlayMarker`, `updateAllModeActiveOverlay`, `redrawActiveLine`, `onUserMovedLightweight`. Tap on any 'Всички' pin (including spiderfied children, including hydrants outside the visible nearest-10) selects without rebuilding the cluster; long-press selects then opens the report picker. Polling-driven `wrong_location` moves on the active hydrant redraw the dashed line + card + arrow without `refresh()`. `index.html` +5,985 bytes.
+
+Total Sprint 1.5 footprint: `index.html` 298,207 → 304,192 (+6,512 bytes / +6.36 KB; first load now 1,271,722 bytes, well under the 2 MB hard cap). The original 3 KB self-imposed Sprint 1.5 cap was breached on the behavior batch; treated as a soft planning anchor, not a technical limit.
+
+Tested at 375 px viewport: smoke regression clean (A1-A8), cluster guard verified across a 30 s+ GPS update window (B1), spiderfied child tap activates without dismissing the spiderfy (C4 — the critical Phase 2/Phase 3 interaction edge case from the plan), out-of-list dim-pin tap shows orange overlay + dashed line + recomputed distance + bearing on hydrant 878-IZ (Issue 3 confirmation). Console clean throughout. D2 (real report submission), E1-E2 (follow mode / manual position regression) skipped — lower priority and similar code paths already exercised.
+
+Remaining: none — Sprint 1.5 complete.
+
+### Estimation Accuracy Retrospective
+
+Behavior-batch byte budget overshot estimate by 2-3x:
+
+- Phase 1 estimate: ~1.6-2.0 KB
+- Phase 2 estimate (after composing the diff): ~2.6-3.0 KB
+- Actual measured growth: 5,985 bytes (~5.85 KB)
+
+Root cause: per-helper comment headers (4 helpers × 3-4 line headers), the nested `detach()` lambda inside `updateAllModeActiveOverlay`, and the closure boilerplate in `createActiveOverlayMarker` accumulated more than counted. Each component looked small in isolation; the sum was material.
+
+Lesson for future sprints: when estimating size, count comment headers and closure boilerplate explicitly, not just executable lines. For sub-3 KB targets, strip non-load-bearing comments before measuring against the cap, or convert the cap to a ~5 KB target and accept richer in-code documentation as the default.
+
 ## Next Planned Work
 
-- **Sprint 1.5 — UX polish before broad launch.** Plan: [`docs/plans/sprint_1_5_polish.md`](plans/sprint_1_5_polish.md). Four `index.html`-only fixes identified during commit 16 testing: (1) welcome modal text, (2) cluster auto-close in 'Всички' during GPS updates, (3) tap-to-activate in 'Всички' (Option B-lite, ID-based active target), (4) hydrant type display in report modal. No Worker, dataset, or dependency changes; total `index.html` growth budgeted under 3 KB. Implementation grouped into two commits — cosmetic batch (issues 1+4), then all-mode behavior batch (issues 2+3) — in a fresh execution-capable session.
+- **Broad launch readiness check** — share live URL with the Varna fire department / volunteer pilot group, gather a one-week field feedback window before full rollout. No code work expected unless feedback surfaces a blocker.
+- **Optional pre-launch (commit 17)** — extract Worker source from the Cloudflare dashboard to a `worker/` directory in this repo with deploy notes. Until then, the live Worker is canonical.
 
 ## Commit 16 Testing Summary (2026-05-07)
 
@@ -42,10 +70,35 @@ End-to-end real-data validation in lieu of the synthetic checklist:
 - Test 4 (real status update): Submitted a real `missing` report from phone via existing POST flow. Yellow pin appeared in localhost browser within ~30 s (Worker KV TTL 30 s + 15 s poll interval). Confirms full chain: phone POST -> Worker -> GitHub issue -> Worker GET cache miss -> KV write -> next poll -> `applyReports` -> `marker.setIcon`.
 - Tests 2 (visibility), 3 (offline resilience), 5 (existing features): skipped — covered with higher confidence by the production data flow above.
 
-## Known Sprint 2 Inputs (captured during commit 16 testing)
+## Sprint 2 Backlog
 
-- **Hydrant type field asymmetry:** the `missing` report form prompts for hydrant type, but the `exists_confirmed` form does not. Sprint 2 should align the two forms.
-- **Hydrant type display gap:** existing VIK records carry hydrant type metadata that is not surfaced in the info card. Sprint 2 should display it where present.
+Captured during Sprint 1 / 1.5 testing; ordering is not committed.
+
+- **Hydrant type field asymmetry** — the `missing` report form prompts for hydrant type, but the `exists_confirmed` form does not. Align the two forms.
+- **Compact card type display** — VIK records carry hydrant type metadata that is now surfaced in the report modal (Issue 4, `8e549e1`) but not in the bottom navigation compact card. Optional add.
+- **All-mode out-of-list selection: list highlight discrepancy** — when the user taps a pin in 'Всички' that is outside the visible nearest-10, the bottom-sheet list still highlights row 0 instead of clearing the highlight. Source of truth (`activeTargetId`) is correct; only the visual fallback is misleading. Documented in `docs/plans/sprint_1_5_polish.md` Issue 3 plan as accepted tradeoff for launch.
+- **Visual encoding by hydrant type** — surface ground/underground type in the pin glyph (color tier or shape variant) so type is legible without opening the card.
+- **Confirm form: hydrant type prompt** — the `exists_confirmed` form should prompt for type when the field is empty, mirroring the `missing` form.
+
+## Data Quality Backlog (post-launch)
+
+Console analysis of `data/hydrants.json` (6,079 records) during Phase 3 testing surfaced systematic data-quality issues that will affect pilot rollout. Tracked here so field-feedback signal is not polluted by known dataset noise.
+
+- **Near-duplicate hydrants — 817 pairs total (~13% redundancy)**:
+  - 610 pairs at ≤ 1 m apart (effectively identical positions; same physical asset captured twice).
+  - 169 VIK-VIK pairs at ≤ 15 m apart (water-utility-source overlap).
+  - 554 NAT-NAT pairs (national-source archive overlap).
+  - 9 cross-source VIK + NAT pairs (same physical hydrant present in both source feeds).
+  - Field-visible symptom: 'Всички' mode shows cluster glyphs `2` / `3` at the same address that spiderfy at max zoom — observed during Phase 3 cluster-guard testing.
+- **ID format heterogeneity — 5 distinct ID conventions in the runtime dataset** (all three VIK conventions carry origin `o: 'vik'`; heterogeneity is an artifact of per-region KMZ exports having had different naming conventions at original creation time. App handles all formats correctly via the existing schema; cleanup is for operator legibility and future ingest simplicity, not functional necessity):
+  - **Numeric VIK (no suffix)**: ~2,580 records — e.g. `10123`, `10125`, `298`, `195`, `679`.
+  - **Numeric VIK with regional suffix**: ~437 records — e.g. `10122-DV`, `10523-DV` (`DV` likely encodes Devnya region).
+  - **Namespaced VIK**: ~644 records — e.g. `VIK-VARNA_IZTOK-0163`, `VIK-VARNA_ZAPAD-0158`.
+  - **National (`NAT-` prefix)**: 2,407 records — e.g. `NAT-5566`, `NAT-17472` — consistent format.
+  - **Field reports (UUID-derived)**: 11 records — e.g. `field_ba91e3ff…` — runtime-added from volunteer reports.
+  - Total: 6,079 records, matches expected count. Cleanup pass should either normalize to one convention or document them all in `AGENTS.md` § Data Model.
+- **Pending additional hydrant data file** — a follow-up data drop is queued but not yet integrated into `data/hydrants.json`. Sequence the dedup pass *after* that ingest so merge logic runs once over the full corpus, not twice.
+- **Recommended sequencing — clean before launch, not after.** Field-team pilots seeing visible duplicates or inconsistent IDs will file confused bug reports against the app rather than against the data. A dedicated dedup + ID normalization sprint scheduled *before* broad launch removes that whole class of false-positive feedback.
 
 ## Commit 15 Testing Summary (2026-05-07)
 
@@ -77,6 +130,9 @@ Skipped (with rationale):
 
 Most recent commits, newest first:
 
+- `7412878` — feat(ux): all-mode cluster guard + ID-based active target
+- `8e549e1` — fix(ux): welcome screen 2 text + report modal type display
+- `a89a9af` — docs: point Last Known Good at sprint 1.5 plan and link plan as next planned work
 - `219cf7a` — Fix number of hydrants listed in README
 - `b23017f` — Update total hydrants count in README
 - `006eb6b` — plan: sprint 1.5 UX polish fixes (4 issues)
@@ -92,7 +148,7 @@ Most recent commits, newest first:
 
 ## Last Known Good Commit
 
-`006eb6b`
+`7412878`
 
 ## Known Dev Environment Quirks
 
