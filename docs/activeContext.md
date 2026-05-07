@@ -1,5 +1,8 @@
 # Active context - Fire_Varna
 
+> **Audience:** Petar and AI agents resuming work.
+> **Purpose:** canonical current repo/runtime state. If this conflicts with README, AGENTS.md, or CLAUDE.md on current state, this file wins.
+
 Last updated: 2026-05-07 at commit 7412878
 Sprint: 1.5 shipped; preparing for broad launch
 

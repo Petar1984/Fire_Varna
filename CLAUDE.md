@@ -23,13 +23,7 @@ If you receive a task without an approved plan from Codex, or signed off by Peta
 
 ## Hard Rules
 
-1. **Do not change the runtime dataset casually.** `data/hydrants.json` is the app data file; `hydrants_varna.json` is the original KMZ-derived reference. Dataset/source changes require fresh Codex analysis and explicit Petar approval.
-2. **Do not change Bulgarian UI labels** without explicit permission.
-3. **Do not introduce dependencies** without Petar approval. No new CDNs, npm packages, or remote fonts.
-4. **Preserve static hosting.** GitHub Pages serves `index.html` plus `data/hydrants.json`; no runtime build step.
-5. **Stay under the size budget.** Current frontend first load is ~1,259,811 bytes (`index.html` 292,281 + `data/hydrants.json` 967,530). Hard cap is 2 MB.
-6. **Mobile-first.** Touch targets >= 44px. Test at 375px viewport width. No hover-dependent workflows.
-7. **HTTPS-required APIs are non-negotiable.** Geolocation, DeviceOrientation, and Worker `fetch` report submission must keep working.
+Project-wide constraints (size budget, static hosting, Bulgarian UI labels, dependencies, mobile-first, HTTPS-required APIs, Varna-only scope) are canonical in [AGENTS.md § Hard Constraints](AGENTS.md#hard-constraints). Stop and ask if an approved plan would violate them.
 
 ---
 
@@ -63,21 +57,13 @@ This codebase is read primarily by AI agents and a non-CS-trained owner.
 
 ## Field Report Ingest Rules
 
-- **`wrong_location` reports:** update the existing record's `c` coordinate in place. Do **not** create a new `field_*` record. Set `status` to `"verified"` after the coord update.
-- For canonical IDs, edit `data/hydrants.json` only.
-- For `field_*` IDs, edit both `field_reports.json` and `data/hydrants.json`.
-- Log old coords in the commit message for audit trail.
-- **`new_hydrant` reports:** only these create new `field_*` records.
-
-See `AGENTS.md` § Wrong-Location Ingest Rule for the full table.
+See [AGENTS.md § Wrong-Location Ingest Rule](AGENTS.md#wrong-location-ingest-rule) for the canonical table and rules. Stop and ask before any data edit unless the approved plan names the affected report IDs.
 
 ---
 
 ## Report Flow
 
-Reports are submitted via `fetch` POST to Cloudflare Worker `varna-hydrants-proxy.petar-dikov2019.workers.dev`. Worker creates a labeled GitHub issue in this repo. Reports queue locally if offline.
-
-Worker source currently lives only in Cloudflare dashboard. TODO commit 17: extract it to `worker/` with deploy notes. Until then, treat the live Worker as canonical.
+See [AGENTS.md § Report Flow](AGENTS.md#report-flow) and [docs/activeContext.md § Current State](docs/activeContext.md#current-state).
 
 ---
 
@@ -113,35 +99,13 @@ No CI yet. Before reporting done:
 
 ## Windows Dev Environment
 
-Defender exclusions applied (2026-05-06):
-
-- ExclusionPath: `C:\Projects\Varna_hydrants`, `C:\Users\Petar\Desktop\Fire_Varna_deploy2`
-- ExclusionProcess: `git.exe`, `git-remote-https.exe`, `node.exe`
-
-Primary workflow: edit + commit + push from `C:\Projects\Varna_hydrants` directly. Deploy clone `Fire_Varna_deploy2` is deprecated.
-
-Fallback, only if exclusions fail: Python pre-place blob recovery technique. See git history for full procedure, search "blob corruption".
-
-Verify exclusions monthly:
-
-```powershell
-Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
-```
+See [AGENTS.md § Windows Dev Environment](AGENTS.md#windows-dev-environment).
 
 ---
 
 ## What Requires Going Back To Humans
 
-| Situation | Go to |
-|---|---|
-| Architecture / file layout question | Claude (chat) |
-| Data source change | Codex (fresh analysis) |
-| Build pushes past 2 MB cap | Petar |
-| Bulgarian wording change | Petar |
-| New dependency proposal | Petar |
-| Anything load-bearing and unclear | Petar |
-
-Asking is cheap. Reverting commits is not.
+See [AGENTS.md § Tri-Agent Workflow](AGENTS.md#tri-agent-workflow) for the canonical approval gates. Asking is cheap. Reverting commits is not.
 
 ---
 
@@ -152,3 +116,4 @@ Asking is cheap. Reverting commits is not.
 - Code comments in English. UI strings in Bulgarian.
 - Before refactoring, confirm there is an approved Codex plan describing the target structure.
 - After any change to the deployable, state files changed, file sizes, and any constraint that came close to being violated.
+- After any governance section rename, run grep for old section names and update Markdown anchor links in the same pass.

@@ -25,15 +25,17 @@ The app loads a static hydrant dataset, shows the user's GPS position, and guide
 
 Static GitHub Pages frontend. No backend in the repo and no runtime build step.
 
-| Component | Current State | Size |
-|---|---|---:|
-| App shell | `index.html` with inlined Leaflet, MarkerCluster, CSS, and app logic | 298,207 bytes |
-| Hydrant data | `data/hydrants.json`, loaded by `fetch` on app init | 967,530 bytes |
-| Report submission | Cloudflare Worker proxy | external |
-| Report polling | Cloudflare Worker `GET /issues`, every 15 s | external |
-| **Frontend first load** | `index.html` + `data/hydrants.json` | **1,265,737 bytes** |
+| Component | Current State |
+|---|---|
+| App shell | `index.html` with inlined Leaflet, MarkerCluster, CSS, and app logic |
+| Hydrant data | `data/hydrants.json`, loaded by `fetch` on app init |
+| Report submission | Cloudflare Worker proxy |
+| Report polling | Cloudflare Worker `GET /issues`, every 15 s |
+| **Frontend first load** | `index.html` + `data/hydrants.json` |
 
 Hydrant data lives in `data/hydrants.json` (**6,079 records (verified at runtime)**, `vik` + `national` + `field_report` origins). Loaded via fetch on app init. `index.html` contains UI shell, Leaflet, MarkerCluster, app logic, and an empty `<script id="hydrantData">` placeholder populated at runtime.
+
+Current byte sizes for `index.html`, `data/hydrants.json`, and first load are canonical in [docs/activeContext.md § Current State](docs/activeContext.md#current-state).
 
 Local testing requires HTTP, not `file://`:
 
@@ -128,6 +130,65 @@ Approval gates:
 - **New runtime or build-time dependencies** -> Petar approval.
 - **Refactoring scope** -> Codex plan + Petar approval before edits.
 
+### Codex Plan Preamble Checklist
+
+Every Codex plan/proposal must include: request scope, deterministic inventory, files read, negative-findings matrix, quoted declared metadata, decision ledger, approval-gate check, and open questions.
+
+Decision ledger schema:
+
+| Decision | Source | Evidence | Reversibility | Approval status |
+|---|---|---|---|---|
+| Keep Worker source external until commit 17 | Repo evidence | `AGENTS.md` says live Worker is canonical; `activeContext.md` lists commit 17 optional extraction | Reversible by adding `worker/` later | Existing approved project state |
+
+---
+
+## Codex Operating Protocol
+
+### Scope Declaration
+
+Codex may use a task-scoped inventory when the user request is narrow. The preamble must declare the inventory scope and cite the user request or brief that defines it. Files outside the declared scope may not be referenced unless Codex explicitly expands the scope, explains why, and updates the inventory.
+Verification: reviewer checks that all referenced files fit the declared scope.
+
+### Deterministic Inventory First
+
+Before any plan/proposal that references files, run a deterministic filesystem inventory for the declared scope and quote it verbatim in the preamble. No file may be referenced unless it appears in that inventory.
+Verification: reviewer checks every referenced path against the inventory.
+
+### Explicit Negative Findings
+
+For every pattern/extension/category in scope, report matches or `no files matching X found in scope Y`.
+Verification: reviewer checks the request scope matrix for omissions.
+
+### Declared Metadata Beats Heuristics
+
+Quote declared metadata verbatim and treat it as authoritative: `.prj` CRS, headers, manifests, sidecars, request logs, provenance records. Heuristics are fallback only when metadata is absent, unreadable, or contradicted.
+Verification: metadata files in inventory must be quoted before inferred CRS, schema, provenance, or lineage.
+
+### Binary File Reading Rule
+
+Referencing a binary/source archive requires content inspection, not filename inspection. KMZ means unzip/list archive and inspect inner KML/doc.kml. DBF/SHP means inspect schema and metadata with `ogrinfo -al -so` / `ogrinfo -al` from GDAL, QGIS equivalent tooling, or a documented DBF/SHP parser. If required tooling is unavailable, state the file is unread and do not infer its contents.
+Verification: plan lists tool used, command, and inspected inner files/layers.
+
+### Referenced Files Must Be Read
+
+If a file is referenced, its content must have been read in the same session. Path-name matching is not reading. Preamble must list `Files read`.
+Verification: reviewer compares referenced paths against `Files read`.
+
+### Non-ASCII Encoding Gate
+
+Before committing or handing off files containing non-ASCII text, especially Cyrillic, verify UTF-8 round-trip integrity and scan for mojibake.
+
+Per-file detection form:
+`Select-String -Path <path> -Pattern '[\u00D0\u00D1\u00C2][\u0080-\u00FF]' -Encoding UTF8`
+
+Note: this regex uses Unicode escape notation (\u00D0 = Ð, \u00D1 = Ñ, \u00C2 = Â) rather than literal characters so this proposal file passes its own mojibake scan. When invoking the scan from a shell, either form is functionally equivalent.
+
+Repo-wide pre-commit detection form:
+`git diff --cached --name-only --diff-filter=ACMR | ForEach-Object { Select-String -Path $_ -Pattern '[\u00D0\u00D1\u00C2][\u0080-\u00FF]' -Encoding UTF8 }`
+
+Also recommend adding `.editorconfig` with `charset = utf-8` and a git pre-commit hook that blocks staged text files containing mojibake markers.
+Verification: handoff notes include encoding check output; reviewer may rerun the command or hook.
+
 ---
 
 ## Current Repo State
@@ -136,7 +197,7 @@ Loose files, no organized source structure yet.
 
 ```text
 C:\Projects\Varna_hydrants\
-├── index.html                     <- current app shell, 292,281 bytes
+├── index.html                     <- current app shell
 ├── data/hydrants.json             <- runtime hydrant data, 6,079 records
 ├── extract_hydrants.py            <- extracts embedded hydrant JSON from older index builds
 ├── field_reports.json             <- canonical field report state
