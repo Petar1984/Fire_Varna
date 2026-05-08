@@ -81,7 +81,7 @@ No CI yet. Before reporting done:
    - Map renders within 3 seconds.
    - Browser console has no runtime errors.
    - `data/hydrants.json` loads with HTTP 200.
-   - `JSON.parse(document.getElementById('hydrantData').textContent).length === 6079`.
+   - `JSON.parse(document.getElementById('hydrantData').textContent).length === 6082`.
    - GPS lock works, or graceful error pill with retry/manual controls appears.
    - All 3 view modes render correctly: "Близо", "Топ 5", "Всички".
    - Cluster mode shows clusters when zoomed out.
