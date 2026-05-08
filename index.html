@@ -3055,7 +3055,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
           i: reportId,
           c: [Number(report.coords[0]), Number(report.coords[1])],
           o: 'field_report',
-          status: 'verified'
+          status: 'reported'
         };
         if (!Number.isFinite(h.c[0]) || !Number.isFinite(h.c[1])) continue;
         HYDRANTS.push(h);
