@@ -1737,7 +1737,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     list_data.forEach((r, i) => {
       const h = r.h;
       const addr = h.a || ('Хидрант ' + h.i);
-      const meta = [h.s, h.r].filter(Boolean).join(' · ');
+      const typeLabel = hydrantTypeLabel(h.t);
+      const meta = [h.s, h.r, typeLabel ? ('Тип: ' + typeLabel) : ''].filter(Boolean).join(' · ');
       const row = document.createElement('div');
       row.className = 'row' + (i === activeTargetIdx ? ' active-target' : '');
       row.dataset.idx = i;
@@ -1943,7 +1944,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!distEl) return;
     distEl.textContent = formatDist(at.d);
     const label = at.idx >= 0 ? ('#' + (at.idx + 1) + ' ') : '';
-    nameEl.textContent = label + (at.h.a || ('Хидрант ' + at.h.i));
+    const typeLabel = hydrantTypeLabel(at.h.t);
+    const baseName = at.h.a || ('Хидрант ' + at.h.i);
+    const nameWithType = baseName + (typeLabel ? ' · ' + typeLabel : '');
+    nameEl.textContent = label + nameWithType;
     const bear = bearing(lastFix.lat, lastFix.lon, at.h.c[1], at.h.c[0]);
     bearingEl.textContent = cardinal(bear) + ' · ' + Math.round(bear) + '°' +
       (smoothedHeading == null ? ' (без компас)' : '');
@@ -2262,9 +2266,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
       default:                 return '🚨 Сигнал за хидрант';
     }
   }
-  function hydrantTypeLabel(hydrant) {
-    if (!hydrant || hydrant.t == null) return '';
-    const raw = String(hydrant.t).trim().toLowerCase();
+  function hydrantTypeLabel(typeValue) {
+    if (typeValue == null) return '';
+    const raw = String(typeValue).trim().toLowerCase();
     if (raw === 'underground' || raw.includes('подземен')) return 'Подземен';
     if (raw === 'ground' || raw.includes('надземен')) return 'Надземен';
     return '';
@@ -2280,7 +2284,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return '<div class="modal-target-card"><div class="name">Нов хидрант</div></div>';
     }
     if (!hydrant) return '';
-    const typeLabel = hydrantTypeLabel(hydrant);
+    const typeLabel = hydrantTypeLabel(hydrant.t);
     return '<div class="modal-target-card">' +
       '<div class="name">' + escapeHtml(hydrant.a || ('Хидрант ' + hydrant.i)) + '</div>' +
       '<div>ID: ' + escapeHtml(hydrant.i) + ' · ' + escapeHtml(hydrant.s) +
