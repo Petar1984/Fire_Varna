@@ -33,11 +33,15 @@ Audit confirmed чрез pairwise distance analysis: hydrants_varna.json е на
 **2. 609 zero-meter intra-file duplicates в data/hydrants.json.**
 Examples: `VIK-VARNA_IZTOK-0003` и `VIK-VARNA_ZAPAD-0017` съществуват с identical coordinates. VIK regional namespaces се припокриват в boundary zones между Изток и Запад. Plus 200 cross-pattern numeric collisions (`10122` присъства като `10122-DC` и `10122-DV`). Все same physical hydrant с multiple ID forms.
 
-**3. NAT CRS handling differs between raw source and runtime.**
+**3. NAT source data CRS axis convention is inconsistent across regions.**
 
-- **Raw source files** (`geo_fire_hydrants.*`): `.prj` sidecar declares EPSG:3857, but raw values require inverse EPSG:3857 **plus axis swap** to resolve to Bulgaria. Only 4 of 17,962 source records pass Bulgaria envelope check without the axis-swap fix.
-- **Runtime data** (`data/hydrants.json` NAT records): the 2,407 NAT records currently shipped are already correctly transformed — original ingest applied the axis swap. Standard inverse only is needed when reading them back.
-- **Future re-imports from source** must replicate the axis-swap step per `docs/audits/data_architecture_audit_20260508.md` § 6 NAT CRS empirical check.
+Empirical verification 2026-05-09 (source evidence in `docs/audits/data_architecture_audit_20260508.md` § 6 NAT CRS empirical check, refined by post-audit investigation):
+
+- **Varna scope (regions 71-79, included region 81 records, null-region records NAT-16734 and NAT-17891):** raw coordinates resolve correctly with standard inverse EPSG:3857. No axis swap. Verified across 3 samples (regions 71/73/81) matching runtime at 0.0m exactly.
+
+- **Sofia-area records (e.g., geo_fire_hydrants.12651, region_structure_id=5):** require inverse EPSG:3857 + axis swap. This is internal source inconsistency outside cleanup scope.
+
+Cleanup applies filter BEFORE transform: source records outside Varna scope never reach the transform step, so Sofia anomaly does not affect cleanup. Documented for future scope-expansion sprints.
 
 **4. NAT scope filter recovered: regions 71-79 + Varna-side 81 + 2 null-region exceptions.**
 Original filter logic не беше в repo. Codex post-audit reconstruction: not a bounding box, а administrative filter using `geo_region` codes plus manual curation на boundary cases (Обзор/Бургас side excluded). Documented for cleanup sprint replication. See § 2.4 — filter rule pending Codex investigation 2026-05-09.
@@ -159,33 +163,108 @@ This makes data layer reproducible. Without committed sources, future rebuild be
 
 ### 2.4 NAT Scope Filter
 
-**Decision:** Replicate documented filter rule when rebuilding NAT subset.
+**Decision:** Replicate existing 2,407-record subset via empirical filter rule, established 2026-05-09 by Codex investigation.
 
-**Status:** Investigation delegated to Codex 2026-05-09 to identify exact filter rule. Roadmap will be updated when results return.
+**Filter rule (in execution order):**
 
-Per Codex 2026-05-08 reconstruction (preliminary):
-- `geo_region` codes 71-79 (Varna oblast administrative codes)
-- Plus subset of region 81 (Varna-side only, exclude Обзор/Бургас-side)
-- Plus 2 null-region records (manually included; preserve)
-- Apply standard EPSG:3857 inverse (no axis swap needed for runtime; only required when reading raw source files — see § 1 finding #3)
+1. **Read** geo_fire_hydrants.json with declared CRS EPSG:3857.
 
-**Open Questions added (will move to § 7 Open Questions):**
-- Q8: Precise region 81 split rule (coordinate cutoff? polygon? manual ID list?)
-- Q9: Identification of 2 null-region records currently included (which IDs?)
-- Q10: Should boundary-area NAT records (currently excluded) be reviewed for inclusion?
+2. **Region selection:**
+   - Include all records with `geo_region` ∈ {71, 72, 73, 74, 75, 76, 77, 78, 79}
+   - Include records with `geo_region` = 81 EXCEPT 38 IDs in manual exclusion list (below)
+   - Include exactly 2 null-region records: NAT-16734 and NAT-17891
+   - Exclude all other null-region records (39 of 41 source nulls excluded)
 
-Until investigation completes, cleanup sprint **must not** rebuild NAT subset.
+3. **CRS transform:** Apply standard inverse EPSG:3857 (no axis swap).
 
-Cleanup sprint will encode this as `scripts/build_nat_subset.py` with full filter logic versioned in code.
+4. **Verify count:** Result must equal 2,407 records.
+
+**Region 81 manual exclusion list (38 IDs, Obzor/Burgas direction):**
+
+```
+NAT-7208,
+NAT-7212,
+NAT-7213,
+NAT-7214,
+NAT-7219,
+NAT-7224,
+NAT-7226,
+NAT-7227,
+NAT-7228,
+NAT-7232,
+NAT-7234,
+NAT-7235,
+NAT-7236,
+NAT-7237,
+NAT-7238,
+NAT-7241,
+NAT-7242,
+NAT-7249,
+NAT-7364,
+NAT-7365,
+NAT-7366,
+NAT-7367,
+NAT-7368,
+NAT-7369,
+NAT-7370,
+NAT-7371,
+NAT-7372,
+NAT-7373,
+NAT-7377,
+NAT-7378,
+NAT-7379,
+NAT-7380,
+NAT-7381,
+NAT-7382,
+NAT-7383,
+NAT-7384,
+NAT-7385,
+NAT-7386
+```
+
+These records cluster geographically in settlements south/southeast of Varna toward Obzor and Burgas (Obzor, Burgas, s. Banya, Rakovskovo, Priselci, Koznica, Panitsovo, Emona) per source `notes` field.
+
+**Region 71-79 coverage table (verified 2026-05-09):**
+
+| Region | Source count | Runtime count | Status |
+|---|---:|---:|---|
+| 71 | 379 | 379 | ✓ Complete |
+| 72 | 308 | 308 | ✓ Complete |
+| 73 | 438 | 438 | ✓ Complete |
+| 74 | 302 | 302 | ✓ Complete |
+| 75 | 313 | 313 | ✓ Complete |
+| 76 | 85 | 85 | ✓ Complete |
+| 77 | 225 | 225 | ✓ Complete |
+| 78 | 159 | 159 | ✓ Complete |
+| 79 | 23 | 23 | ✓ Complete |
+| 81 | 211 | 173 | 38 excluded (see list above) |
+| null | 41 | 2 | NAT-16734, NAT-17891 only |
+| **Total** | | **2,407** | |
+
+**Implementation:** Cleanup sprint will encode this rule as `scripts/build_nat_subset.py` with the exclusion list maintained in `scripts/nat_excluded_region_81_ids.json` for clean separation of data and logic.
+
+**Future scope expansion:** If Varna oblast scope is later redefined (e.g., to include some Obzor-side records), revisit this exclusion list. Document reasoning and update list. Not anticipated pre-launch.
 
 ### 2.5 Wrong-Location Correction Preservation
 
 **Decision:** Preserve existing wrong_location corrections during rebuild.
 
-Audit found `NAT-14277` differs от source by ~20m due to applied wrong_location report. Rebuild process must:
-- Load existing corrections from `field_reports.json`
-- Apply corrections after source merge
-- Document each correction в commit message
+**Empirical inventory 2026-05-09:** Only one NAT record currently differs from source coordinates beyond float precision.
+
+| ID | Region | Runtime coords | Source coords | Distance |
+|---|---:|---|---|---:|
+| NAT-14277 | 73 | [27.847444, 43.246995] | [27.847454, 43.246812] | 20.365 m |
+
+This correction matches the WRONG_LOCATION table in `audit/apply_field_reports.py` (issue #15). Single case, traceable provenance.
+
+No VIK records differ from source coordinates beyond float precision (verified across all 5 KMZ files; max VIK difference = 0.068m, consistent with 6-decimal rounding).
+
+**Rebuild process must:**
+- After source merge and CRS transform, apply wrong_location overlay
+- Source: `audit/apply_field_reports.py` WRONG_LOCATION table for canonical NAT-14277; `field_reports.json` for field_* corrections
+- Document each correction in cleanup sprint commit message
+
+**If new wrong-location corrections accumulate before cleanup sprint runs:** rerun this inventory check during sprint Stage 0 to capture any drift.
 
 ### 2.6 Address Strategy
 
@@ -415,11 +494,11 @@ Decisions deferred — need future input:
 
 **Q7.** Multi-language support — fixed Bulgarian-only for now per AGENTS.md, but Cyrillic display + Latin code makes future English layer easier. Document this design intent.
 
-**Q8.** NAT region 81 split rule (precise cutoff for Varna-side vs Burgas-side).
+**Q8.** Region 81 split rule — RESOLVED 2026-05-09: Manual exclusion list of 38 specific NAT IDs (see Section 2.4), clustering geographically toward Obzor/Burgas. Empirical only; no derived rule.
 
-**Q9.** Two null-region NAT records — which IDs are currently included?
+**Q9.** Two null-region NAT records — RESOLVED 2026-05-09: NAT-16734 and NAT-17891 identified (see Section 2.4).
 
-**Q10.** Nominatim contact email for User-Agent header — Petar to provide.
+**Q10.** Nominatim contact email for User-Agent — STILL OPEN. Petar to provide.
 
 **Q11.** Source priority conflict matrix for all report types (missing, damaged, exists_confirmed, wrong_location, new_hydrant). Codex audit § 7 raised this; needs explicit decision before cleanup.
 
@@ -427,9 +506,11 @@ Decisions deferred — need future input:
 
 **Q13.** Notes merge format — when multiple sources have notes for same hydrant, separator/dedup/order policy.
 
-**Q14.** Wrong-location corrections inventory — full list of NAT/VIK records currently differing from source coords. NAT-14277 is one example; investigation needed for completeness.
+**Q14.** Wrong-location corrections inventory — RESOLVED 2026-05-09: NAT-14277 is the only case. See Section 2.5. Singular, not systemic. Re-verify in cleanup Stage 0.
 
 **Q15.** Source archive size monitoring — when does git repo cross 100MB threshold and trigger LFS evaluation?
+
+**Q16.** NAT data axis-order inconsistency: Sofia-area sample (geo_fire_hydrants.12651, region_structure_id=5) requires axis swap while Varna scope uses standard inverse. Are there other Bulgarian regions with this anomaly that are NOT in current scope but might be needed if scope expands? Investigate before any post-launch scope expansion.
 
 ---
 
@@ -465,6 +546,10 @@ Decisions deferred — need future input:
 | Polling dedupe bug status corrected | Auto-fix | activeContext.md ground truth | N/a | Fact-driven |
 | Markdown escapes removed | Auto-fix | GitHub render correctness | N/a | Cosmetic |
 | Record count verified empirical | Auto-fix | Codex 2026-05-08 verified | N/a | Fact-driven |
+| NAT CRS rule for Varna scope: standard inverse only | Empirical investigation 2026-05-09 | 3-sample verification across regions 71/73/81 at 0.0m diff | Reversible (re-run script) | Approved by Petar 2026-05-09 |
+| NAT region 81 split: manual exclusion list of 38 IDs | Empirical investigation 2026-05-09 | Geographic clustering (Obzor/Burgas) verified via source notes field | Reversible (edit list) | Approved by Petar 2026-05-09 |
+| Two null-region NAT records preserved: NAT-16734, NAT-17891 | Empirical investigation 2026-05-09 | Both within Varna envelope; only 2 of 41 source nulls included | Reversible (edit list) | Approved by Petar 2026-05-09 |
+| Wrong-location inventory: NAT-14277 only | Empirical investigation 2026-05-09 | Cross-file diff scan at 1m threshold; matches apply_field_reports.py | Reversible (re-scan) | Approved by Petar 2026-05-09 |
 
 ---
 
@@ -472,3 +557,4 @@ Decisions deferred — need future input:
 
 - **2026-05-08:** Initial draft. Section 1 evidence from `data_architecture_audit_20260508.md`. Decisions in Sections 2-3 ratified by Petar in chat 2026-05-08. Bug findings from `issue_ingest_plan_20260508.md` + chat investigation.
 - **2026-05-09:** v2 revision. Addressed 2026-05-08 reviews from Codex (10 findings) and Claude Code (5 blocking + 8 smaller gaps). Ratifications by Petar 2026-05-09. See § Decision Ledger.
+- **2026-05-09:** D7 NAT scope investigation completed. Section 2.4 rewritten with empirical filter rule. Section 2.5 wrong-location inventory added. Q8/Q9/Q14 resolved; Q16 added. Findings sourced from Codex read-only investigation 2026-05-09.
