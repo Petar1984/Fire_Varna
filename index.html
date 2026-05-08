@@ -3044,9 +3044,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
       if (type === 'new_hydrant' && !report.hydrant_id) {
         if (!report.id || !Array.isArray(report.coords) || report.coords.length !== 2) continue;
-        if (HYDRANTS_BY_ID[report.id]) continue; // already added in a prior poll
+        const reportId = String(report.id);
+        const fieldId = reportId.startsWith('field_') ? reportId : 'field_' + reportId.slice(0, 8);
+        if (HYDRANTS_BY_ID[reportId] || HYDRANTS_BY_ID[fieldId]) continue; // already added in a prior poll or ingest
         const h = {
-          i: report.id,
+          i: reportId,
           c: [Number(report.coords[0]), Number(report.coords[1])],
           o: 'field_report',
           status: 'verified'
