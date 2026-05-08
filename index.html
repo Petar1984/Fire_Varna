@@ -1202,9 +1202,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
     font-weight:700; font-size:13px;
   }
   .h-pin span { transform: rotate(45deg); }
-  .h-pin.canonical { background:#757575; color:white; }
-  .h-pin.verified  { background:#c41e3a; color:white; }
-  .h-pin.reported  { background:#fdd835; color:#333;  }
+  .h-pin.canonical   { background:#757575; color:white; }
+  .h-pin.verified    { background:#c41e3a; color:white; }
+  .h-pin.reported    { background:#fdd835; color:#333;  }
+  .h-pin.operational { background:#2e7d32; color:white; }
+  .h-pin.broken      { background:#212121; color:white; }
   .h-pin.first {
     box-shadow: 0 0 0 5px rgba(255,152,0,0.55), 0 2px 6px rgba(0,0,0,0.4);
   }
@@ -1350,11 +1352,84 @@ window._hydrantDataReady = (async function loadHydrantData() {
   const ABSOLUTE_ORIENTATION_STALE_MS = 1500;
   const WEBKIT_COMPASS_MAX_ACCURACY_DEG = 45;
 
+  // ===== Schema adapter (Phase 1 of cleanup_execution_plan_20260508) =====
+  // Bridges the current compact runtime schema and the future verbose schema
+  // produced by Phase 2. Reads either shape and exposes both compatibility
+  // fields (i, c, o, a, r, t) and semantic fields
+  // (existence_status, operational_status, review_status, legacy_ids).
+  const EXISTENCE_LABELS = {
+    verified:   'Проверен',
+    unverified: 'Непроверен',
+    missing:    'Липсва'
+  };
+  const OPERATIONAL_LABELS = {
+    works:       'Работи',
+    not_working: 'Не работи',
+    not_tested:  'Не е тестван'
+  };
+
+  function normalizeHydrantRecord(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const id = raw.id != null ? raw.id : raw.i;
+    const coordsRaw = Array.isArray(raw.coords) ? raw.coords : raw.c;
+    if (id == null || !Array.isArray(coordsRaw) || coordsRaw.length !== 2) {
+      console.warn('normalizeHydrantRecord: skipping record with missing id/coords', raw);
+      return null;
+    }
+    const lon = Number(coordsRaw[0]), lat = Number(coordsRaw[1]);
+    if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
+      console.warn('normalizeHydrantRecord: skipping record with invalid coords', raw);
+      return null;
+    }
+    let existenceStatus = raw.existence_status || null;
+    let reviewStatus    = raw.review_status    || null;
+    if (!existenceStatus && raw.status === 'verified') existenceStatus = 'verified';
+    if (!reviewStatus    && raw.status === 'reported') reviewStatus    = 'reported';
+    const h = {
+      i: id,
+      c: [lon, lat],
+      o: raw.origin  != null ? raw.origin  : raw.o,
+      a: raw.address != null ? raw.address : (raw.a != null ? raw.a : ''),
+      r: raw.region  != null ? raw.region  : (raw.r != null ? raw.r : ''),
+      t: raw.type    != null ? raw.type    : (raw.t != null ? raw.t : ''),
+      existence_status:   existenceStatus,
+      operational_status: raw.operational_status || null,
+      review_status:      reviewStatus,
+      legacy_ids:         Array.isArray(raw.legacy_ids) ? raw.legacy_ids.slice() : []
+    };
+    if (raw.report_id   != null) h.report_id   = raw.report_id;
+    if (raw.reported_at != null) h.reported_at = raw.reported_at;
+    return h;
+  }
+
+  // Dual-index: canonical id plus every legacy_ids alias resolves to the same record.
+  // resolveHydrantById is the single read path; callers must not touch HYDRANTS_BY_ID directly
+  // for resolution — only for indexing new records via indexHydrant().
+  function indexHydrant(h) {
+    if (!h) return;
+    HYDRANTS_BY_ID[h.i] = h;
+    if (Array.isArray(h.legacy_ids)) {
+      for (const alias of h.legacy_ids) {
+        if (alias != null && alias !== h.i) HYDRANTS_BY_ID[alias] = h;
+      }
+    }
+  }
+  function resolveHydrantById(id) {
+    if (id == null) return null;
+    return HYDRANTS_BY_ID[id] || null;
+  }
+
   // ===== Data =====
   await window._hydrantDataReady;
-  const HYDRANTS = JSON.parse(document.getElementById('hydrantData').textContent);
+  const HYDRANTS_RAW = JSON.parse(document.getElementById('hydrantData').textContent);
+  const HYDRANTS = [];
   const HYDRANTS_BY_ID = {};
-  HYDRANTS.forEach(h => { HYDRANTS_BY_ID[h.i] = h; });
+  for (const raw of HYDRANTS_RAW) {
+    const h = normalizeHydrantRecord(raw);
+    if (!h) continue;
+    HYDRANTS.push(h);
+    indexHydrant(h);
+  }
   document.getElementById('meta').textContent = HYDRANTS.length + ' точки';
 
   // ===== Map =====
@@ -1367,10 +1442,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
     .addAttribution('© OpenStreetMap').addTo(map);
 
   // ===== Icons =====
+  // Semantic precedence per cleanup_execution_plan_20260508 Section 1E.
+  // Order matters: review state overrides existence/operational state because a
+  // freshly reported issue is the most actionable signal for field workers.
   function hydrantStatusClass(h) {
-    const s = h && h.status;
-    if (s === 'verified') return 'verified';
-    if (s === 'reported') return 'reported';
+    if (!h) return 'canonical';
+    const review      = h.review_status;
+    const existence   = h.existence_status;
+    const operational = h.operational_status;
+    if (review === 'reported' || review === 'pending_review') return 'reported';
+    if (existence === 'missing') return 'missing'; // not expected in current data; caller filters before render
+    if (existence === 'verified' && operational === 'works')       return 'operational';
+    if (existence === 'verified' && operational === 'not_working') return 'broken';
+    if (existence === 'verified') return 'verified';
     return 'canonical';
   }
   function makePin(rank, hydrant, isActive) {
@@ -3014,11 +3098,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let pollInFlight = false;
   let lastPollSince = null;     // ISO string; only advanced on a successful response
 
-  function reportTypeToStatus(reportType) {
-    if (reportType === 'exists_confirmed') return 'verified';
-    if (reportType === 'wrong_location')   return 'verified';
-    if (reportType === 'missing')          return 'reported';
-    if (reportType === 'damaged')          return 'reported';
+  // Maps a polled report type to the semantic field changes that should land on
+  // the in-memory hydrant record. Returns null when the report type does not
+  // change rendering. Phase 1 keeps the same visible color outcomes as before
+  // (verified=red, reported=yellow); operational/broken green/black are reserved
+  // for future flows that submit operational_status directly.
+  function reportTypeToSemanticPatch(reportType) {
+    if (reportType === 'exists_confirmed') return { existence_status: 'verified' };
+    if (reportType === 'wrong_location')   return { existence_status: 'verified' };
+    if (reportType === 'missing')          return { review_status:    'reported' };
+    if (reportType === 'damaged')          return { review_status:    'reported' };
     return null;
   }
 
@@ -3050,16 +3139,21 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (!report.id || !Array.isArray(report.coords) || report.coords.length !== 2) continue;
         const reportId = String(report.id);
         const fieldId = reportId.startsWith('field_') ? reportId : 'field_' + reportId.slice(0, 8);
-        if (HYDRANTS_BY_ID[reportId] || HYDRANTS_BY_ID[fieldId]) continue; // already added in a prior poll or ingest
-        const h = {
-          i: reportId,
-          c: [Number(report.coords[0]), Number(report.coords[1])],
-          o: 'field_report',
-          status: 'reported'
-        };
-        if (!Number.isFinite(h.c[0]) || !Number.isFinite(h.c[1])) continue;
+        // Dedupe across full UUID, derived field_<8>, canonical id, and any
+        // legacy_ids alias. resolveHydrantById reads the dual index, so an old
+        // canonical record that lists this report's id under legacy_ids is also
+        // matched and the polled record is dropped as a duplicate.
+        if (resolveHydrantById(reportId) || resolveHydrantById(fieldId)) continue;
+        const h = normalizeHydrantRecord({
+          id:           reportId,
+          coords:       [Number(report.coords[0]), Number(report.coords[1])],
+          origin:       'field_report',
+          review_status:'reported',
+          legacy_ids:   reportId === fieldId ? [] : [fieldId]
+        });
+        if (!h) continue;
         HYDRANTS.push(h);
-        HYDRANTS_BY_ID[h.i] = h;
+        indexHydrant(h);
         // Render incrementally only when the cluster layer is currently mounted.
         // In 'top'/'near' modes the new pin will appear naturally on the next refresh()
         // when ranked by distance from the user.
@@ -3081,7 +3175,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
       const id = report.hydrant_id;
       if (!id) continue;
-      const h = HYDRANTS_BY_ID[id];
+      const h = resolveHydrantById(id);
       if (!h) continue;
 
       if (type === 'wrong_location') {
@@ -3093,7 +3187,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
             // If polling moved the active hydrant, redraw user-dependent
             // visuals without refresh() — refresh() would rebuild the cluster
             // and collapse any open spiderfy.
-            if (id === activeTargetId) {
+            if (h.i === activeTargetId) {
               redrawActiveLine();
               updateCardInfo();
               updateArrow();
@@ -3102,10 +3196,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
         }
       }
 
-      const newStatus = reportTypeToStatus(type);
-      if (newStatus && h.status !== newStatus) {
-        h.status = newStatus;
-        refreshMarkerIconsForHydrant(h);
+      const patch = reportTypeToSemanticPatch(type);
+      if (patch) {
+        let changed = false;
+        for (const key in patch) {
+          if (h[key] !== patch[key]) { h[key] = patch[key]; changed = true; }
+        }
+        if (changed) refreshMarkerIconsForHydrant(h);
       }
     }
   }
