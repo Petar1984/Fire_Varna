@@ -3,12 +3,12 @@
 > **Audience:** Petar and AI agents resuming work.
 > **Purpose:** canonical current repo/runtime state. If this conflicts with README, AGENTS.md, or CLAUDE.md on current state, this file wins.
 
-Last updated: 2026-05-08 at commit 2dcab73
+Last updated: 2026-05-08 at commit 2d8b767
 Sprint: 1.5 shipped; preparing for broad launch
 
 ## Current State
 
-- index.html: 304,192 bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text)
+- index.html: 304,615 bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text + 2026-05-08 bug fixes: polling dedupe / card+row type display / polled new-hydrant status)
 - data/hydrants.json: 968,365 bytes (6,082 records — 8 field reports ingested in commit 2dcab73)
 - field_reports.json: 5,085 bytes (14 records)
 - Status counts: 23 verified, 2 reported, 6,057 canonical (in repo; runtime can grow via polled new_hydrant reports)
@@ -20,6 +20,7 @@ Sprint: 1.5 shipped; preparing for broad launch
   - KV namespace: `varna_hydrants_reports_cache`, binding `REPORTS_CACHE`
   - Rollback version (last POST-only): `e86c90a6`
 - Frontend polling: client `GET /issues` every 15 s with `?since=<cached_at>` delta, paused on `document.hidden`, immediate catch-up on visibility return, silent retry on failure (cursor not advanced).
+- Polling dedupe: fixed 2026-05-08, dual-format ID check (8bd123e) — `applyReports` checks both the full-UUID `report.id` and the truncated `field_<8>` form against `HYDRANTS_BY_ID` so polled new_hydrant records do not double-render after ingest.
 
 ## Sprint 1 Status
 
@@ -60,6 +61,14 @@ Root cause: per-helper comment headers (4 helpers × 3-4 line headers), the nest
 
 Lesson for future sprints: when estimating size, count comment headers and closure boilerplate explicitly, not just executable lines. For sub-3 KB targets, strip non-load-bearing comments before measuring against the cap, or convert the cap to a ~5 KB target and accept richer in-code documentation as the default.
 
+## Recent Bug Fixes (2026-05-08)
+
+Three-commit bug fixes sprint shipped after phone verification surfaced regressions and gaps:
+
+- **`8bd123e` — Bug A: polling dedupe.** `applyReports` now matches polled report IDs against both full-UUID and truncated `field_<8>` forms so a polled new_hydrant record already present in `HYDRANTS_BY_ID` (ingested earlier in `data/hydrants.json`) does not render a duplicate runtime pin. Resolves observed double-pins after ingest commits.
+- **`9974eb7` — Bug B: card and row type display.** Hydrant type (надземен/подземен) now renders in the bottom-sheet compact card and in nearest-list rows via the existing `hydrantTypeLabel()` helper. Closes the "compact card type display" Sprint 2 backlog item.
+- **`2d8b767` — Status fix: polled new hydrants render as `reported`.** Polled new_hydrant records now use the yellow `reported` status pin (under-review) instead of the red `verified` status, matching the volunteer-submitted-but-not-yet-confirmed semantics. Mitigates the "any user can publish a verified pin" exposure (see Submission moderation backlog item below).
+
 ## Next Planned Work
 
 - **Broad launch readiness check** — share live URL with the Varna fire department / volunteer pilot group, gather a one-week field feedback window before full rollout. No code work expected unless feedback surfaces a blocker.
@@ -84,6 +93,11 @@ Captured during Sprint 1 / 1.5 testing; ordering is not committed.
 - **Visual encoding by hydrant type** — surface ground/underground type in the pin glyph (color tier or shape variant) so type is legible without opening the card.
 - **Confirm form: hydrant type prompt** — the `exists_confirmed` form should prompt for type when the field is empty, mirroring the `missing` form.
 - **GitHub issue close automation** — issues #29-#36 ingested in `2dcab73` (full hash `2dcab73d27394f34801267cdcf0974ec5977a795`) but not closed on GitHub. Manual close pending OR Worker `/close-issue` endpoint (next sprint). Polling logic is idempotent — `HYDRANTS_BY_ID` dedupes new_hydrant reports, status mutations no-op when `h.status` already matches — so there is no user-visible impact, only a queue-management nuisance.
+- **Submission moderation architecture** (Section B of `docs/audits/submission_status_and_moderation_plan_20260508.md`) — any user can publish a pin; the 2026-05-08 yellow-status fix (`2d8b767`) mitigates impact, but there is no admin approval gate. Plan ratifies the M1 label-based gating approach. Future sprint after cleanup planning. Requires the Worker source extraction prep commit (commit 17 placeholder) before implementation.
+- **Operational status taxonomy** (Section E of same plan) — the `status` field currently conflates "exists" with "operational/working." Plan ratifies T3: a separate `operational_status` field, extending the `exists_confirmed` and `new_hydrant` flows with a "Работи ли?" question. Future sprint.
+- **Type picker absent in `exists_confirmed` ("Хидрантът е там") presence flow.** Field workers cannot specify or correct hydrant type (надземен/подземен) for existing records through the presence-confirmation modal. Phone observation 2026-05-08. Investigation needed; likely bundles with the Section E taxonomy sprint since both extend the same modal.
+- **Records with full UUID instead of `field_<8>` ID format observed in data** (e.g. `e3a185db-501d-4162-abf3-c212c657bbf7`). Likely legacy records from before the `field_` truncation convention was adopted. Cleanup sprint scope; pairs with the existing ID-format heterogeneity item under Data Quality Backlog.
+- **GCM crash on Windows during git push remains intermittent** — occurred during the Bug A push (`8bd123e`) but not during the combined Bug B + status-fix push. Switch to SSH or reinstall Git Credential Manager when convenient. Tracked under dev-environment quirks.
 
 ## Data Quality Backlog (post-launch)
 
@@ -135,6 +149,11 @@ Skipped (with rationale):
 
 Most recent commits, newest first:
 
+- `2d8b767` — fix(realtime): polled new hydrants render as reported
+- `9974eb7` — fix(ux): show hydrant type in card and rows
+- `8bd123e` — fix(realtime): dedupe polled field report ids
+- `54eb36c` — docs(roadmap): D7 NAT scope investigation — empirical filter rule
+- `7f7a1c4` — docs(roadmap): v2 reflects 2026-05-08 reviews + Petar ratifications
 - `7412878` — feat(ux): all-mode cluster guard + ID-based active target
 - `8e549e1` — fix(ux): welcome screen 2 text + report modal type display
 - `a89a9af` — docs: point Last Known Good at sprint 1.5 plan and link plan as next planned work
