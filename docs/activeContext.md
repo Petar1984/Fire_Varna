@@ -3,7 +3,7 @@
 > **Audience:** Petar and AI agents resuming work.
 > **Purpose:** canonical current repo/runtime state. If this conflicts with README, AGENTS.md, or CLAUDE.md on current state, this file wins.
 
-Last updated: 2026-05-08 at commit 2d8b767
+Last updated: 2026-05-09 at commit d6cbcd5
 Sprint: 1.5 shipped; preparing for broad launch
 
 ## Current State
@@ -61,6 +61,20 @@ Root cause: per-helper comment headers (4 helpers × 3-4 line headers), the nest
 
 Lesson for future sprints: when estimating size, count comment headers and closure boilerplate explicitly, not just executable lines. For sub-3 KB targets, strip non-load-bearing comments before measuring against the cap, or convert the cap to a ~5 KB target and accept richer in-code documentation as the default.
 
+## Phase 1 Cleanup Rollout (2026-05-09)
+
+Phase 1 of the three-phase cleanup plan (`docs/audits/cleanup_execution_plan_20260508.md`) shipped:
+
+- **`d6cbcd5` — Phase 1 cleanup rollout shipped:**
+  - Frontend adapter (`normalizeHydrantRecord`, `resolveHydrantById`)
+  - Dual-schema reading (compact current + verbose target)
+  - Two new pin classes (`.h-pin.operational` green, `.h-pin.broken` black)
+  - Bulgarian display label tables (`EXISTENCE_LABELS`, `OPERATIONAL_LABELS`)
+  - Semantic precedence in `hydrantStatusClass`
+  - Polling dedupe via `legacy_ids` alias index
+  - Phase 1 phone verification passed: visible behavior unchanged.
+  - Ready for Phase 2 data migration in next session.
+
 ## Recent Bug Fixes (2026-05-08)
 
 Three-commit bug fixes sprint shipped after phone verification surfaced regressions and gaps:
@@ -98,6 +112,16 @@ Captured during Sprint 1 / 1.5 testing; ordering is not committed.
 - **Type picker absent in `exists_confirmed` ("Хидрантът е там") presence flow.** Field workers cannot specify or correct hydrant type (надземен/подземен) for existing records through the presence-confirmation modal. Phone observation 2026-05-08. Investigation needed; likely bundles with the Section E taxonomy sprint since both extend the same modal.
 - **Records with full UUID instead of `field_<8>` ID format observed in data** (e.g. `e3a185db-501d-4162-abf3-c212c657bbf7`). Likely legacy records from before the `field_` truncation convention was adopted. Cleanup sprint scope; pairs with the existing ID-format heterogeneity item under Data Quality Backlog.
 - **GCM crash on Windows during git push remains intermittent** — occurred during the Bug A push (`8bd123e`) but not during the combined Bug B + status-fix push. Switch to SSH or reinstall Git Credential Manager when convenient. Tracked under dev-environment quirks.
+- **Defender blob corruption recovery technique** — after the 2026-05-06 exclusions, Defender still occasionally corrupts loose objects on commit. Working recovery: `git update-index --force-remove <file>` + `git add` + `git commit` writes a fresh clean blob first try. Faster than the Python pre-place workaround documented in `AGENTS.md`. Both methods kept in the playbook.
+- **GCM crash on push remains intermittent** — 3 occurrences during the 2026-05-09 session (Bug A push, Phase 1 push attempt 1 + 2). Crash output is cosmetic noise — git operation actually succeeds on first attempt despite the exception. Long-term fix: `winget upgrade GitHub.GitCredentialManager` or switch to SSH.
+- **Phase 2 data migration scope** (per `docs/audits/cleanup_execution_plan_20260508.md` Section 2):
+  - Migration script: `scripts/migrate_to_verbose_schema.py`
+  - Snapshot first commit: `data/hydrants.json.pre_cleanup_snapshot.json`
+  - Output: 6,082 records → 5,901 records
+  - Provenance archive: `data/hydrants_provenance.json`
+  - Migration report: `docs/audits/cleanup_migration_report_20260508.json`
+  - Drop `field_reports.json`
+  - Phase 3 (adapter removal) follows after Phase 2 verified.
 
 ## Data Quality Backlog (post-launch)
 
