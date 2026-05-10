@@ -1370,31 +1370,25 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
   function normalizeHydrantRecord(raw) {
     if (!raw || typeof raw !== 'object') return null;
-    const id = raw.id != null ? raw.id : raw.i;
-    const coordsRaw = Array.isArray(raw.coords) ? raw.coords : raw.c;
-    if (id == null || !Array.isArray(coordsRaw) || coordsRaw.length !== 2) {
+    if (raw.id == null || !Array.isArray(raw.coords) || raw.coords.length !== 2) {
       console.warn('normalizeHydrantRecord: skipping record with missing id/coords', raw);
       return null;
     }
-    const lon = Number(coordsRaw[0]), lat = Number(coordsRaw[1]);
+    const lon = Number(raw.coords[0]), lat = Number(raw.coords[1]);
     if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
       console.warn('normalizeHydrantRecord: skipping record with invalid coords', raw);
       return null;
     }
-    let existenceStatus = raw.existence_status || null;
-    let reviewStatus    = raw.review_status    || null;
-    if (!existenceStatus && raw.status === 'verified') existenceStatus = 'verified';
-    if (!reviewStatus    && raw.status === 'reported') reviewStatus    = 'reported';
     const h = {
-      i: id,
-      c: [lon, lat],
-      o: raw.origin  != null ? raw.origin  : raw.o,
-      a: raw.address != null ? raw.address : (raw.a != null ? raw.a : ''),
-      r: raw.region  != null ? raw.region  : (raw.r != null ? raw.r : ''),
-      t: raw.type    != null ? raw.type    : (raw.t != null ? raw.t : ''),
-      existence_status:   existenceStatus,
+      id:                 raw.id,
+      coords:             [lon, lat],
+      origin:             raw.origin,
+      address:            raw.address || '',
+      region:             raw.region  || '',
+      type:               raw.type    || '',
+      existence_status:   raw.existence_status   || null,
       operational_status: raw.operational_status || null,
-      review_status:      reviewStatus,
+      review_status:      raw.review_status      || null,
       legacy_ids:         Array.isArray(raw.legacy_ids) ? raw.legacy_ids.slice() : []
     };
     if (raw.report_id   != null) h.report_id   = raw.report_id;
@@ -1407,10 +1401,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // for resolution — only for indexing new records via indexHydrant().
   function indexHydrant(h) {
     if (!h) return;
-    HYDRANTS_BY_ID[h.i] = h;
+    HYDRANTS_BY_ID[h.id] = h;
     if (Array.isArray(h.legacy_ids)) {
       for (const alias of h.legacy_ids) {
-        if (alias != null && alias !== h.i) HYDRANTS_BY_ID[alias] = h;
+        if (alias != null && alias !== h.id) HYDRANTS_BY_ID[alias] = h;
       }
     }
   }
@@ -1703,7 +1697,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     // Compute distances to all
     const allRanked = HYDRANTS.map(h => ({
-      h, d: haversine(lastFix.lat, lastFix.lon, h.c[1], h.c[0])
+      h, d: haversine(lastFix.lat, lastFix.lon, h.coords[1], h.coords[0])
     })).sort((a,b) => a.d - b.d);
 
     // Determine visible set based on mode
@@ -1718,7 +1712,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     if (activeTargetIdx >= currentRanked.length) activeTargetIdx = 0;
-    activeTargetId = currentRanked.length ? currentRanked[activeTargetIdx].h.i : null;
+    activeTargetId = currentRanked.length ? currentRanked[activeTargetIdx].h.id : null;
 
     // Clear existing markers/line
     visibleMarkers.forEach(m => map.removeLayer(m));
@@ -1747,11 +1741,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       allClusterLayer.on('spiderfied',   () => { allClusterInteractionOpen = true;  });
       allClusterLayer.on('unspiderfied', () => { allClusterInteractionOpen = false; });
       HYDRANTS.forEach(h => {
-        const m = L.marker([h.c[1], h.c[0]], { icon: dimPin(h) });
-        m._hydrantId = h.i;
+        const m = L.marker([h.coords[1], h.coords[0]], { icon: dimPin(h) });
+        m._hydrantId = h.id;
         m._pinKind = 'dim';
         m._isActivePin = false;
-        (markersById[h.i] = markersById[h.i] || []).push(m);
+        (markersById[h.id] = markersById[h.id] || []).push(m);
         attachMarkerLongPress(
           m,
           () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); },
@@ -1771,15 +1765,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // 'near' or 'top' — render numbered pins for currentRanked
       currentRanked.forEach((r, i) => {
         const isActive = i === activeTargetIdx;
-        const m = L.marker([r.h.c[1], r.h.c[0]], {
+        const m = L.marker([r.h.coords[1], r.h.coords[0]], {
           icon: makePin(i + 1, r.h, isActive),
           zIndexOffset: isActive ? 800 : 600 - i
         });
-        m._hydrantId = r.h.i;
+        m._hydrantId = r.h.id;
         m._pinKind = 'numbered';
         m._rank = i + 1;
         m._isActivePin = isActive;
-        (markersById[r.h.i] = markersById[r.h.i] || []).push(m);
+        (markersById[r.h.id] = markersById[r.h.id] || []).push(m);
         attachMarkerLongPress(
           m,
           () => { if (consumePrepickForHydrant(r.h)) return; setActiveTarget(i); },
@@ -1820,9 +1814,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const list_data = mode === 'all' ? currentRanked.slice(0, 10) : currentRanked;
     list_data.forEach((r, i) => {
       const h = r.h;
-      const addr = h.a || ('Хидрант ' + h.i);
-      const typeLabel = hydrantTypeLabel(h.t);
-      const meta = [h.s, h.r, typeLabel ? ('Тип: ' + typeLabel) : ''].filter(Boolean).join(' · ');
+      const addr = h.address || ('Хидрант ' + h.id);
+      const typeLabel = hydrantTypeLabel(h.type);
+      const meta = [h.region, typeLabel ? ('Тип: ' + typeLabel) : ''].filter(Boolean).join(' · ');
       const row = document.createElement('div');
       row.className = 'row' + (i === activeTargetIdx ? ' active-target' : '');
       row.dataset.idx = i;
@@ -1830,7 +1824,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         '<div class="rank">' + (i+1) + '</div>' +
         '<div class="row-info">' +
           '<div class="row-addr">' + escapeHtml(addr) + '</div>' +
-          '<div class="row-meta">' + escapeHtml(meta) + ' · ID ' + escapeHtml(h.i) + '</div>' +
+          '<div class="row-meta">' + escapeHtml(meta) + ' · ID ' + escapeHtml(h.id) + '</div>' +
         '</div>' +
         '<div class="row-dist">' + formatDist(r.d) + '</div>' +
         '<button class="row-btn nav" data-idx="' + i + '">🧭</button>' +
@@ -1864,7 +1858,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   function setActiveTarget(idx) {
     if (idx < 0 || idx >= currentRanked.length) return;
     activeTargetIdx = idx;
-    activeTargetId = currentRanked[idx].h.i;
+    activeTargetId = currentRanked[idx].h.id;
     if (mode === 'all' && allClusterInteractionOpen) updateAllModeActiveOverlay();
     else refresh(false);
   }
@@ -1876,8 +1870,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!activeTargetId || !lastFix) return null;
     const h = HYDRANTS_BY_ID[activeTargetId];
     if (!h) return null;
-    const d = haversine(lastFix.lat, lastFix.lon, h.c[1], h.c[0]);
-    return { h, d, idx: currentRanked.findIndex(r => r.h.i === activeTargetId) };
+    const d = haversine(lastFix.lat, lastFix.lon, h.coords[1], h.coords[0]);
+    return { h, d, idx: currentRanked.findIndex(r => r.h.id === activeTargetId) };
   }
 
   // Selects a hydrant by reference. In near/top modes (or in-list all-mode
@@ -1885,9 +1879,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // cluster guard, or for out-of-list selections, updates the overlay
   // incrementally without rebuilding the cluster, so any open spiderfy survives.
   function setActiveTargetHydrant(h) {
-    if (!h || !h.i || !HYDRANTS_BY_ID[h.i]) return;
-    activeTargetId = h.i;
-    const idx = currentRanked.findIndex(r => r.h.i === h.i);
+    if (!h || !h.id || !HYDRANTS_BY_ID[h.id]) return;
+    activeTargetId = h.id;
+    const idx = currentRanked.findIndex(r => r.h.id === h.id);
     if (idx >= 0) activeTargetIdx = idx;
     if (mode === 'all' && allClusterInteractionOpen) updateAllModeActiveOverlay();
     else if (idx >= 0) refresh(false);
@@ -1899,9 +1893,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // and moveMarkersForHydrant find it via markersById[id]. Caller assigns the
   // returned marker to allModeActiveOverlay.
   function createActiveOverlayMarker(h, rank) {
-    const m = L.marker([h.c[1], h.c[0]], { icon: makePin(rank, h, true), zIndexOffset: 800 });
-    m._hydrantId = h.i; m._pinKind = 'numbered'; m._rank = rank; m._isActivePin = true;
-    (markersById[h.i] = markersById[h.i] || []).push(m);
+    const m = L.marker([h.coords[1], h.coords[0]], { icon: makePin(rank, h, true), zIndexOffset: 800 });
+    m._hydrantId = h.id; m._pinKind = 'numbered'; m._rank = rank; m._isActivePin = true;
+    (markersById[h.id] = markersById[h.id] || []).push(m);
     attachMarkerLongPress(m,
       () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); },
       () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); showReportTypePicker(h); }
@@ -1933,8 +1927,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
     // Out-of-list selections render with a neutral bullet; in-list keep their rank.
     const rank = at.idx >= 0 ? (at.idx + 1) : '·';
-    if (allModeActiveOverlay && allModeActiveOverlay._hydrantId === at.h.i) {
-      allModeActiveOverlay.setLatLng([at.h.c[1], at.h.c[0]]);
+    if (allModeActiveOverlay && allModeActiveOverlay._hydrantId === at.h.id) {
+      allModeActiveOverlay.setLatLng([at.h.coords[1], at.h.coords[0]]);
       allModeActiveOverlay.setIcon(makePin(rank, at.h, true));
       allModeActiveOverlay._rank = rank;
     } else {
@@ -1950,7 +1944,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (lineToTarget) { map.removeLayer(lineToTarget); lineToTarget = null; }
     const at = getActiveTarget();
     if (!at) return;
-    lineToTarget = L.polyline([[lastFix.lat, lastFix.lon], [at.h.c[1], at.h.c[0]]],
+    lineToTarget = L.polyline([[lastFix.lat, lastFix.lon], [at.h.coords[1], at.h.coords[0]]],
       { color:'#ff9800', weight: 3, opacity: 0.8, dashArray: '8,6' }).addTo(map);
   }
 
@@ -1966,12 +1960,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
   function navigateTo(r) {
     if (r.d > NEAR_THRESHOLD_M) {
       window.open('https://www.google.com/maps/dir/?api=1&destination=' +
-                  r.h.c[1] + ',' + r.h.c[0] + '&travelmode=driving', '_blank');
+                  r.h.coords[1] + ',' + r.h.coords[0] + '&travelmode=driving', '_blank');
       flashStatus('Отваря Google Maps (' + formatDist(r.d) + ')');
     } else {
       const idx = currentRanked.indexOf(r);
       if (idx >= 0) setActiveTarget(idx);
-      map.setView([r.h.c[1], r.h.c[0]], 19);
+      map.setView([r.h.coords[1], r.h.coords[0]], 19);
       flashStatus('На място (' + Math.round(r.d) + ' м) — компасна стрелка', 4000);
     }
   }
@@ -2028,11 +2022,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!distEl) return;
     distEl.textContent = formatDist(at.d);
     const label = at.idx >= 0 ? ('#' + (at.idx + 1) + ' ') : '';
-    const typeLabel = hydrantTypeLabel(at.h.t);
-    const baseName = at.h.a || ('Хидрант ' + at.h.i);
+    const typeLabel = hydrantTypeLabel(at.h.type);
+    const baseName = at.h.address || ('Хидрант ' + at.h.id);
     const nameWithType = baseName + (typeLabel ? ' · ' + typeLabel : '');
     nameEl.textContent = label + nameWithType;
-    const bear = bearing(lastFix.lat, lastFix.lon, at.h.c[1], at.h.c[0]);
+    const bear = bearing(lastFix.lat, lastFix.lon, at.h.coords[1], at.h.coords[0]);
     bearingEl.textContent = cardinal(bear) + ' · ' + Math.round(bear) + '°' +
       (smoothedHeading == null ? ' (без компас)' : '');
   }
@@ -2082,7 +2076,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!at) return;
     const arrow = document.getElementById('arrowTri');
     if (!arrow) return;
-    const bear = bearing(lastFix.lat, lastFix.lon, at.h.c[1], at.h.c[0]);
+    const bear = bearing(lastFix.lat, lastFix.lon, at.h.coords[1], at.h.coords[0]);
     const rot = smoothedHeading != null ? (bear - smoothedHeading) : bear;
     arrow.style.transform = 'rotate(' + rot + 'deg)';
   }
@@ -2351,10 +2345,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
   }
   function hydrantTypeLabel(typeValue) {
-    if (typeValue == null) return '';
-    const raw = String(typeValue).trim().toLowerCase();
-    if (raw === 'underground' || raw.includes('подземен')) return 'Подземен';
-    if (raw === 'ground' || raw.includes('надземен')) return 'Надземен';
+    if (typeValue === 'надземен') return 'Надземен';
+    if (typeValue === 'подземен') return 'Подземен';
     return '';
   }
   function targetCardHTML(reportType, hydrant, placedCoord) {
@@ -2368,13 +2360,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return '<div class="modal-target-card"><div class="name">Нов хидрант</div></div>';
     }
     if (!hydrant) return '';
-    const typeLabel = hydrantTypeLabel(hydrant.t);
+    const typeLabel = hydrantTypeLabel(hydrant.type);
     return '<div class="modal-target-card">' +
-      '<div class="name">' + escapeHtml(hydrant.a || ('Хидрант ' + hydrant.i)) + '</div>' +
-      '<div>ID: ' + escapeHtml(hydrant.i) + ' · ' + escapeHtml(hydrant.s) +
-        (hydrant.r ? ' · ' + escapeHtml(hydrant.r) : '') + '</div>' +
+      '<div class="name">' + escapeHtml(hydrant.address || ('Хидрант ' + hydrant.id)) + '</div>' +
+      '<div>ID: ' + escapeHtml(hydrant.id) +
+        (hydrant.region ? ' · ' + escapeHtml(hydrant.region) : '') + '</div>' +
       (typeLabel ? '<div>Тип: ' + typeLabel + '</div>' : '') +
-      '<div>Координати в базата (lon, lat): ' + hydrant.c[0].toFixed(6) + ', ' + hydrant.c[1].toFixed(6) + '</div>' +
+      '<div>Координати в базата (lon, lat): ' + hydrant.coords[0].toFixed(6) + ', ' + hydrant.coords[1].toFixed(6) + '</div>' +
     '</div>';
   }
   function nameFieldHTML(reporter) {
@@ -2523,7 +2515,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const draftCopy = Object.assign({}, reportDraft);
         const hydrant = reportDraft.hydrant;
         const initialCoord = reportDraft.placedCoord ||
-          (hydrant && hydrant.c ? [hydrant.c[0], hydrant.c[1]] : null);
+          (hydrant && hydrant.coords ? [hydrant.coords[0], hydrant.coords[1]] : null);
         modalBackdrop.classList.remove('show');
         enterLocationPlacementMode(initialCoord, (coord) => {
           if (coord) draftCopy.placedCoord = coord;
@@ -2591,7 +2583,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   function buildReportObject(reportType) {
     const d = reportDraft;
     const h = d.hydrant;
-    const expected = h ? [Number(h.c[0]), Number(h.c[1])] : null;
+    const expected = h ? [Number(h.coords[0]), Number(h.coords[1])] : null;
     const placed = d.placedCoord
       ? [Number(d.placedCoord[0].toFixed(6)), Number(d.placedCoord[1].toFixed(6))]
       : null;
@@ -2603,7 +2595,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       report_type: reportType,
       timestamp: localISOString(),
       reporter: d.reporter,
-      hydrant_ref: h ? h.i : null,
+      hydrant_ref: h ? h.id : null,
       expected_coord: expected,
       reported_coord: placed,
       location_method: location_method,
@@ -2899,7 +2891,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // Extracted from showReportTypePicker so pre-pick + per-hydrant menu share it.
   function beginWrongLocationPlacement(hydrant) {
     const draft = { reporter: getReporterName() || '' };
-    enterLocationPlacementMode([hydrant.c[0], hydrant.c[1]], (coord) => {
+    enterLocationPlacementMode([hydrant.coords[0], hydrant.coords[1]], (coord) => {
       if (!coord) return;
       draft.placedCoord = coord;
       showReportModal(hydrant, 'wrong_location', draft);
@@ -3112,7 +3104,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
 
   function refreshMarkerIconsForHydrant(h) {
-    const list = markersById[h.i];
+    const list = markersById[h.id];
     if (!list) return;
     list.forEach(m => {
       if (m._pinKind === 'dim') {
@@ -3124,9 +3116,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
 
   function moveMarkersForHydrant(h) {
-    const list = markersById[h.i];
+    const list = markersById[h.id];
     if (!list) return;
-    list.forEach(m => m.setLatLng([h.c[1], h.c[0]]));
+    list.forEach(m => m.setLatLng([h.coords[1], h.coords[0]]));
   }
 
   function applyReports(reports) {
@@ -3158,11 +3150,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
         // In 'top'/'near' modes the new pin will appear naturally on the next refresh()
         // when ranked by distance from the user.
         if (allClusterLayer) {
-          const m = L.marker([h.c[1], h.c[0]], { icon: dimPin(h) });
-          m._hydrantId = h.i;
+          const m = L.marker([h.coords[1], h.coords[0]], { icon: dimPin(h) });
+          m._hydrantId = h.id;
           m._pinKind = 'dim';
           m._isActivePin = false;
-          (markersById[h.i] = markersById[h.i] || []).push(m);
+          (markersById[h.id] = markersById[h.id] || []).push(m);
           attachMarkerLongPress(
             m,
             () => { consumePrepickForHydrant(h); },
@@ -3182,12 +3174,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (Array.isArray(report.coords) && report.coords.length === 2) {
           const lon = Number(report.coords[0]), lat = Number(report.coords[1]);
           if (Number.isFinite(lon) && Number.isFinite(lat)) {
-            h.c = [lon, lat];
+            h.coords = [lon, lat];
             moveMarkersForHydrant(h);
             // If polling moved the active hydrant, redraw user-dependent
             // visuals without refresh() — refresh() would rebuild the cluster
             // and collapse any open spiderfy.
-            if (h.i === activeTargetId) {
+            if (h.id === activeTargetId) {
               redrawActiveLine();
               updateCardInfo();
               updateArrow();
