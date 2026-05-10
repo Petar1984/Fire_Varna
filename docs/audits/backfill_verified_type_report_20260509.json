@@ -1,0 +1,124 @@
+{
+  "summary": {
+    "input_count": 5901,
+    "verified_count": 23,
+    "changed_count": 8,
+    "unchanged_verified_typed_count": 15,
+    "timestamp": "2026-05-11T02:14:27+03:00",
+    "attribution": "Petar physical verification: all currently verified records are physically надземни"
+  },
+  "records": [
+    {
+      "id": "coord_27.90237_43.21801",
+      "origin": "vik",
+      "coords": [
+        27.902373,
+        43.218008
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "VIK-VARNA_ZAPAD-0158"
+      ],
+      "provenance_appended": true
+    },
+    {
+      "id": "coord_27.90313_43.21833",
+      "origin": "vik",
+      "coords": [
+        27.903127,
+        43.218328
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "VIK-VARNA_ZAPAD-0159"
+      ],
+      "provenance_appended": true
+    },
+    {
+      "id": "coord_27.90397_43.21860",
+      "origin": "vik",
+      "coords": [
+        27.903968,
+        43.218596
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "877-ZP"
+      ],
+      "provenance_appended": true
+    },
+    {
+      "id": "coord_27.90493_43.21885",
+      "origin": "vik",
+      "coords": [
+        27.90493,
+        43.218849
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "VIK-VARNA_IZTOK-0167"
+      ],
+      "provenance_appended": true
+    },
+    {
+      "id": "coord_27.90614_43.21898",
+      "origin": "vik",
+      "coords": [
+        27.90614,
+        43.218982
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "VIK-VARNA_IZTOK-0173"
+      ],
+      "provenance_appended": true
+    },
+    {
+      "id": "coord_27.90733_43.21900",
+      "origin": "vik",
+      "coords": [
+        27.907334,
+        43.218998
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "VIK-VARNA_IZTOK-0169"
+      ],
+      "provenance_appended": true
+    },
+    {
+      "id": "coord_27.93420_43.21373",
+      "origin": "vik",
+      "coords": [
+        27.934205,
+        43.213728
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "271"
+      ],
+      "provenance_appended": true
+    },
+    {
+      "id": "coord_27.93447_43.21327",
+      "origin": "vik",
+      "coords": [
+        27.934473,
+        43.213267
+      ],
+      "old_type": null,
+      "new_type": "надземен",
+      "legacy_ids": [
+        "913"
+      ],
+      "provenance_appended": true
+    }
+  ]
+}
