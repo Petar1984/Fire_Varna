@@ -8,7 +8,7 @@ Sprint: 1.5 shipped; preparing for broad launch
 
 ## Current State
 
-- index.html: 304,615 bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text + 2026-05-08 bug fixes: polling dedupe / card+row type display / polled new-hydrant status)
+- index.html: 309,477 bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text + 2026-05-08 bug fixes: polling dedupe / card+row type display / polled new-hydrant status + 2026-05-09 Phase 1 schema bridge: normalizeHydrantRecord / resolveHydrantById / dual-schema reading / .h-pin.operational+.h-pin.broken / EXISTENCE_LABELS+OPERATIONAL_LABELS / semantic hydrantStatusClass / legacy_ids polling dedupe)
 - data/hydrants.json: 968,365 bytes (6,082 records — 8 field reports ingested in commit 2dcab73)
 - field_reports.json: 5,085 bytes (14 records)
 - Status counts: 23 verified, 2 reported, 6,057 canonical (in repo; runtime can grow via polled new_hydrant reports)
