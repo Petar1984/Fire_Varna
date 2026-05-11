@@ -29,6 +29,10 @@ temp_*
 # Generated audit runs
 audit/run_*/
 
+# Address backfill script ephemera (cache + progress state)
+data/.address_backfill_cache.json
+data/.address_backfill_progress.json
+
 # Source data — too large, regeneratable from external sources
 geo_fire_hydrants.*
 *.kmz

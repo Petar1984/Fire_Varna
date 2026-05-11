@@ -55,6 +55,20 @@ BG_SETTLEMENT_KEYS = (
 )
 DEFAULT_INPUT = "data/hydrants.json"
 DEFAULT_PROVENANCE = "data/hydrants_provenance.json"
+CACHE_PATH = "data/.address_backfill_cache.json"
+PROGRESS_PATH = "data/.address_backfill_progress.json"
+CACHE_VERSION = 1
+PROGRESS_VERSION = 1
+# Provider params identity: invalidates cache if changed.
+PROVIDER_PARAMS_IDENTITY = {
+    "format": "jsonv2",
+    "addressdetails": "1",
+    "zoom": "18",
+    "layer": "address",
+    "accept-language": "bg,en",
+}
+BACKOFF_429_5XX_S = (2, 5, 15, 45, 120)
+BACKOFF_NETWORK_S = (2, 5, 15)
 QUALITY_CATEGORIES = (
     "accepted",
     "rejected_generic",
@@ -247,6 +261,184 @@ def build_provenance_ref(
     }
 
 
+def cache_key_for(lon: float, lat: float) -> str:
+    return f"{lon:.5f},{lat:.5f}"
+
+
+def load_cache(path: str) -> dict:
+    if not os.path.exists(path):
+        return {
+            "version": CACHE_VERSION,
+            "provider_params": PROVIDER_PARAMS_IDENTITY,
+            "entries": {},
+        }
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            cache = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        sys.stderr.write(f"WARNING: cache at {path} unreadable; starting fresh\n")
+        return {
+            "version": CACHE_VERSION,
+            "provider_params": PROVIDER_PARAMS_IDENTITY,
+            "entries": {},
+        }
+    if (
+        cache.get("version") != CACHE_VERSION
+        or cache.get("provider_params") != PROVIDER_PARAMS_IDENTITY
+    ):
+        sys.stderr.write(
+            f"WARNING: cache at {path} is from a different script version "
+            "or different provider params; invalidating and starting fresh\n"
+        )
+        return {
+            "version": CACHE_VERSION,
+            "provider_params": PROVIDER_PARAMS_IDENTITY,
+            "entries": {},
+        }
+    cache.setdefault("entries", {})
+    return cache
+
+
+def save_cache(path: str, cache: dict) -> None:
+    atomic_write_json(path, cache)
+
+
+def fresh_progress(run_args: dict, input_count: int) -> dict:
+    return {
+        "version": PROGRESS_VERSION,
+        "input_count_at_start": input_count,
+        "run_args": run_args,
+        "processed_ids": [],
+        "accepted_ids": [],
+        "rejected_ids": {
+            "rejected_generic": [],
+            "rejected_no_street": [],
+            "rejected_distance": [],
+        },
+        "error_ids": [],
+        "last_successful_ts": None,
+        "started_at": iso_now(),
+        "completed_at": None,
+    }
+
+
+def load_progress(path: str) -> Optional[dict]:
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        sys.stderr.write(f"WARNING: progress at {path} unreadable; ignoring\n")
+        return None
+
+
+def save_progress(path: str, progress: dict) -> None:
+    atomic_write_json(path, progress)
+
+
+def parse_retry_after(value: Optional[str]) -> Optional[float]:
+    if not value:
+        return None
+    text = value.strip()
+    try:
+        return max(0.0, float(text))
+    except ValueError:
+        pass
+    try:
+        from email.utils import parsedate_to_datetime
+        dt = parsedate_to_datetime(text)
+        if dt is None:
+            return None
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        delta = (dt - datetime.now(timezone.utc)).total_seconds()
+        return max(0.0, delta)
+    except (TypeError, ValueError, IndexError):
+        return None
+
+
+def fetch_with_retries(
+    lon: float,
+    lat: float,
+    contact_email: str,
+    last_request_at: float,
+) -> tuple[Optional[dict], Optional[str], float, int]:
+    """Fetch one record from Nominatim with retry policy per plan §4.
+
+    Returns (response_or_None, error_reason_or_None, new_last_request_at,
+    http_attempts). Retry waits are added on top of the base 1.1s rate limit;
+    rate limit is enforced before every attempt, including retries.
+    """
+    retries_429_5xx = 0
+    retries_network = 0
+    http_attempts = 0
+    record_label = cache_key_for(lon, lat)
+    while True:
+        if last_request_at:
+            elapsed = time.monotonic() - last_request_at
+            if elapsed < MIN_REQUEST_INTERVAL_S:
+                time.sleep(MIN_REQUEST_INTERVAL_S - elapsed)
+        try:
+            result = query_nominatim(lon, lat, contact_email)
+            http_attempts += 1
+            return result, None, time.monotonic(), http_attempts
+        except urllib.error.HTTPError as exc:
+            http_attempts += 1
+            last_request_at = time.monotonic()
+            code = exc.code
+            if code == 429 or 500 <= code < 600:
+                if retries_429_5xx >= len(BACKOFF_429_5XX_S):
+                    reason = "429_exhausted" if code == 429 else f"http_{code}_exhausted"
+                    return None, reason, last_request_at, http_attempts
+                wait_s: Optional[float] = None
+                if code == 429:
+                    wait_s = parse_retry_after(exc.headers.get("Retry-After"))
+                if wait_s is None:
+                    wait_s = float(BACKOFF_429_5XX_S[retries_429_5xx])
+                sys.stderr.write(
+                    f"[retry] {record_label} http_{code} "
+                    f"attempt {retries_429_5xx + 1}/{len(BACKOFF_429_5XX_S)} "
+                    f"wait {wait_s:.1f}s\n"
+                )
+                time.sleep(wait_s)
+                retries_429_5xx += 1
+                continue
+            return None, f"http_{code}", last_request_at, http_attempts
+        except (urllib.error.URLError, TimeoutError) as exc:
+            http_attempts += 1
+            last_request_at = time.monotonic()
+            if retries_network >= len(BACKOFF_NETWORK_S):
+                reason_kind = type(exc).__name__
+                return None, f"network_exhausted_{reason_kind}", last_request_at, http_attempts
+            wait_s = float(BACKOFF_NETWORK_S[retries_network])
+            err_label = type(exc).__name__
+            sys.stderr.write(
+                f"[retry] {record_label} {err_label} "
+                f"attempt {retries_network + 1}/{len(BACKOFF_NETWORK_S)} "
+                f"wait {wait_s:.1f}s\n"
+            )
+            time.sleep(wait_s)
+            retries_network += 1
+            continue
+        except (json.JSONDecodeError, ValueError):
+            http_attempts += 1
+            return None, "parse_error", time.monotonic(), http_attempts
+
+
+def run_args_identity(args, apply_mode: bool) -> dict:
+    """Subset of CLI args that determines whether a saved progress file
+    can be resumed by the current invocation."""
+    return {
+        "input": args.input,
+        "provenance": args.provenance,
+        "output": args.output or args.input,
+        "limit": args.limit,
+        "skip_origin": sorted(set(args.skip_origin or [])),
+        "apply": apply_mode,
+    }
+
+
 def main() -> int:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -273,6 +465,9 @@ def main() -> int:
                         help="Default; never writes data/provenance")
     parser.add_argument("--apply", action="store_true",
                         help="Required to write data/provenance files")
+    parser.add_argument("--reset-progress", action="store_true",
+                        help="Delete cache and progress files before starting; "
+                             "use to recover from args-mismatch or to force fresh run")
     args = parser.parse_args()
 
     if args.apply and args.dry_run:
@@ -298,6 +493,14 @@ def main() -> int:
         )
     else:
         contact_email = args.contact_email
+
+    if args.reset_progress:
+        for path in (CACHE_PATH, PROGRESS_PATH):
+            try:
+                os.remove(path)
+                sys.stderr.write(f"--reset-progress: removed {path}\n")
+            except FileNotFoundError:
+                pass
 
     records = load_json(args.input)
     provenance = load_json(args.provenance)
@@ -331,24 +534,67 @@ def main() -> int:
             "(plan §0 default-locked policy)"
         )
 
-    start_ts = iso_now()
+    # Resume detection: if a progress file exists with matching args and was
+    # not cleanly completed, skip records already processed in the prior run.
+    # If args differ, refuse to clobber state; user must pass --reset-progress.
+    current_run_args = run_args_identity(args, apply_mode)
+    prior_progress = load_progress(PROGRESS_PATH)
+    resume_skip_ids: set[str] = set()
+    if prior_progress is not None:
+        prior_args = prior_progress.get("run_args")
+        if prior_args != current_run_args:
+            sys.stderr.write(
+                "ERROR: existing progress file at "
+                f"{PROGRESS_PATH} was written with different args:\n"
+                f"  prior:   {json.dumps(prior_args, ensure_ascii=False, sort_keys=True)}\n"
+                f"  current: {json.dumps(current_run_args, ensure_ascii=False, sort_keys=True)}\n"
+                "Pass --reset-progress to start fresh.\n"
+            )
+            return 2
+        if prior_progress.get("completed_at"):
+            # Last run completed cleanly; start a new run with warm cache.
+            progress = fresh_progress(current_run_args, len(records))
+        else:
+            # Mid-run resume; skip already-processed records.
+            resume_skip_ids = set(prior_progress.get("processed_ids") or [])
+            progress = prior_progress
+            progress["run_args"] = current_run_args
+            progress["input_count_at_start"] = len(records)
+            sys.stderr.write(
+                f"Resuming from prior progress: "
+                f"{len(resume_skip_ids)} records already processed.\n"
+            )
+    else:
+        progress = fresh_progress(current_run_args, len(records))
+
+    cache = load_cache(CACHE_PATH)
+    # Save initial state so a crash before the first record still leaves a
+    # consistent on-disk progress record.
+    save_progress(PROGRESS_PATH, progress)
+
+    start_ts = progress.get("started_at") or iso_now()
     start_wall = time.monotonic()
     last_request_at = 0.0
 
     report_records: list[dict] = []
     status_counter: Counter = Counter()
     http_requests = 0
-    timestamp = start_ts
+    cache_hits = 0
+    timestamp = iso_now()
 
     for index in eligible_indices:
         record = records[index]
+        record_id = record.get("id")
+        if record_id in resume_skip_ids:
+            continue
+
         coords = record.get("coords") or []
         try:
             lon = float(coords[0])
             lat = float(coords[1])
         except (TypeError, ValueError, IndexError):
-            entry = {
-                "id": record.get("id"),
+            report_records.append({
+                "id": record_id,
                 "origin": record.get("origin"),
                 "coords": coords,
                 "old_address": None,
@@ -357,25 +603,44 @@ def main() -> int:
                 "quality_reason": "bad_coords",
                 "provider_result": None,
                 "provenance_appended": False,
-            }
-            report_records.append(entry)
+            })
             status_counter["error"] += 1
+            progress["processed_ids"].append(record_id)
+            progress["error_ids"].append(record_id)
+            save_progress(PROGRESS_PATH, progress)
             continue
 
-        # Rate-limit: ensure ≥ MIN_REQUEST_INTERVAL_S between requests.
-        elapsed = time.monotonic() - last_request_at
-        if last_request_at and elapsed < MIN_REQUEST_INTERVAL_S:
-            time.sleep(MIN_REQUEST_INTERVAL_S - elapsed)
-
-        quality_status = "error"
-        quality_reason = "unknown"
-        compact = ""
-        provider_meta = None
+        cache_key = cache_key_for(lon, lat)
         result: Optional[dict] = None
-        try:
-            result = query_nominatim(lon, lat, contact_email)
-            http_requests += 1
-            last_request_at = time.monotonic()
+        error_reason: Optional[str] = None
+        cache_hit = False
+
+        if cache_key in cache.get("entries", {}):
+            entry = cache["entries"][cache_key]
+            cached_response = entry.get("response") if isinstance(entry, dict) else None
+            if isinstance(cached_response, dict):
+                result = cached_response
+                cache_hit = True
+                cache_hits += 1
+
+        if not cache_hit:
+            result, error_reason, last_request_at, attempts = fetch_with_retries(
+                lon, lat, contact_email, last_request_at
+            )
+            http_requests += attempts
+            if result is not None and error_reason is None:
+                cache["entries"][cache_key] = {
+                    "ts": iso_now(),
+                    "response": result,
+                }
+                save_cache(CACHE_PATH, cache)
+
+        if error_reason:
+            quality_status = "error"
+            quality_reason = error_reason
+            compact = ""
+            provider_meta = None
+        else:
             quality_status, quality_reason, compact = classify_result(result, lon, lat)
             provider_meta = {
                 "osm_type": result.get("osm_type") if isinstance(result, dict) else None,
@@ -384,22 +649,6 @@ def main() -> int:
                 "category": result.get("category") if isinstance(result, dict) else None,
                 "type": result.get("type") if isinstance(result, dict) else None,
             }
-        except urllib.error.HTTPError as exc:
-            last_request_at = time.monotonic()
-            quality_status = "error"
-            quality_reason = f"http_{exc.code}"
-        except urllib.error.URLError as exc:
-            last_request_at = time.monotonic()
-            quality_status = "error"
-            quality_reason = f"url_error_{type(exc.reason).__name__}"
-        except (json.JSONDecodeError, ValueError):
-            last_request_at = time.monotonic()
-            quality_status = "error"
-            quality_reason = "parse_error"
-        except TimeoutError:
-            last_request_at = time.monotonic()
-            quality_status = "error"
-            quality_reason = "timeout"
 
         status_counter[quality_status] += 1
 
@@ -407,23 +656,36 @@ def main() -> int:
         if quality_status == "accepted" and apply_mode:
             ref = build_provenance_ref(record, compact, result or {}, timestamp)
             record["address"] = compact
-            entry = provenance.setdefault(record["id"], {"source_refs": []})
-            entry.setdefault("source_refs", []).append(ref)
+            prov_entry = provenance.setdefault(record_id, {"source_refs": []})
+            prov_entry.setdefault("source_refs", []).append(ref)
             provenance_appended = True
 
-        report_records.append(
-            {
-                "id": record.get("id"),
-                "origin": record.get("origin"),
-                "coords": list(coords),
-                "old_address": None,
-                "new_address": compact if quality_status == "accepted" else None,
-                "quality_status": quality_status,
-                "quality_reason": quality_reason,
-                "provider_result": provider_meta,
-                "provenance_appended": provenance_appended,
-            }
-        )
+        report_records.append({
+            "id": record_id,
+            "origin": record.get("origin"),
+            "coords": list(coords),
+            "old_address": None,
+            "new_address": compact if quality_status == "accepted" else None,
+            "quality_status": quality_status,
+            "quality_reason": quality_reason,
+            "provider_result": provider_meta,
+            "cache_hit": cache_hit,
+            "provenance_appended": provenance_appended,
+        })
+
+        progress["processed_ids"].append(record_id)
+        if quality_status == "accepted":
+            progress["accepted_ids"].append(record_id)
+        elif quality_status == "error":
+            progress["error_ids"].append(record_id)
+        else:
+            progress["rejected_ids"].setdefault(quality_status, []).append(record_id)
+        if result is not None and error_reason is None:
+            progress["last_successful_ts"] = iso_now()
+        save_progress(PROGRESS_PATH, progress)
+
+    progress["completed_at"] = iso_now()
+    save_progress(PROGRESS_PATH, progress)
 
     end_ts = iso_now()
     wall_seconds = round(time.monotonic() - start_wall, 3)
@@ -438,6 +700,8 @@ def main() -> int:
         "skip_origins": sorted(skip_origins),
         "provider": PROVIDER_NAME,
         "http_requests": http_requests,
+        "cache_hits": cache_hits,
+        "resumed_skipped": len(resume_skip_ids),
         "accepted_count": status_counter.get("accepted", 0),
         "rejected_generic_count": status_counter.get("rejected_generic", 0),
         "rejected_no_street_count": status_counter.get("rejected_no_street", 0),
@@ -484,7 +748,9 @@ def main() -> int:
     print(f"  candidate_count: {summary['candidate_count']}")
     print(f"  preserved_existing: {summary['preserved_existing']}")
     print(f"  skipped_by_origin: {summary['skipped_by_origin']} {sorted(skip_origins)}")
+    print(f"  resumed_skipped: {summary['resumed_skipped']}")
     print(f"  http_requests: {summary['http_requests']}")
+    print(f"  cache_hits: {summary['cache_hits']}")
     for category in QUALITY_CATEGORIES:
         count = status_counter.get(category, 0)
         print(f"  {category}: {count}")
