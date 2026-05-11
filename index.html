@@ -2349,6 +2349,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (typeValue === 'подземен') return 'Подземен';
     return '';
   }
+  // Picker value -> canonical schema value. Returning null means "omit from
+  // the canonical YAML payload" — the opt-out "не знам" and any unexpected
+  // value collapse to null so the Worker parser never has to second-guess.
+  function canonicalTypeFromPicker(pickerValue) {
+    if (pickerValue === 'надземен' || pickerValue === 'подземен') return pickerValue;
+    return null;
+  }
+  function canonicalOperationalFromPicker(pickerValue) {
+    if (pickerValue === 'да') return 'works';
+    if (pickerValue === 'не') return 'not_working';
+    if (pickerValue === 'не съм проверявал') return 'not_tested';
+    return null;
+  }
   function targetCardHTML(reportType, hydrant, placedCoord) {
     if (reportType === 'new_hydrant') {
       if (placedCoord) {
@@ -2385,10 +2398,32 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
   function typeFieldsHTML(t, d) {
     if (t === 'exists_confirmed') {
-      return '<div class="field">' +
+      // Hide pickers whose target field is already populated on the hydrant
+      // record. With both fields populated, the modal collapses back to its
+      // original reporter + free-text friction level.
+      const h = d.hydrant;
+      const showTypePicker = !(h && h.type);
+      const showOpPicker   = !(h && h.operational_status);
+      let html = '';
+      if (showTypePicker) {
+        html += '<div class="field" id="fld_hydrant_type">' +
+          '<label>Тип хидрант <span class="req">*</span></label>' +
+          radioRowHTML('hydrant_type', ['надземен','подземен','не знам'], d.hydrant_type) +
+          '<div class="err">Моля избери тип.</div>' +
+        '</div>';
+      }
+      if (showOpPicker) {
+        html += '<div class="field" id="fld_operational">' +
+          '<label>Работи ли? <span class="req">*</span></label>' +
+          radioRowHTML('operational', ['да','не','не съм проверявал'], d.operational) +
+          '<div class="err">Моля избери дали работи.</div>' +
+        '</div>';
+      }
+      html += '<div class="field">' +
         '<label>Свободен текст (опционално)</label>' +
         '<textarea data-field="free_text" maxlength="2000">' + escapeHtml(d.free_text) + '</textarea>' +
       '</div>';
+      return html;
     }
     if (t === 'missing') {
       return '<div class="field">' +
@@ -2401,9 +2436,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
       '</div>';
     }
     if (t === 'new_hydrant') {
-      return '<div class="field">' +
-        '<label>Тип хидрант</label>' +
+      return '<div class="field" id="fld_hydrant_type">' +
+        '<label>Тип хидрант <span class="req">*</span></label>' +
         radioRowHTML('hydrant_type', ['надземен','подземен','не знам'], d.hydrant_type) +
+        '<div class="err">Моля избери тип.</div>' +
+      '</div>' +
+      '<div class="field" id="fld_operational">' +
+        '<label>Работи ли? <span class="req">*</span></label>' +
+        radioRowHTML('operational', ['да','не','не съм проверявал'], d.operational) +
+        '<div class="err">Моля избери дали работи.</div>' +
       '</div>' +
       '<div class="field">' +
         '<label>Описание (опционално)</label>' +
@@ -2425,7 +2466,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       '</div>' +
       '<div class="field">' +
         '<label>Работи ли?</label>' +
-        radioRowHTML('operational', ['да','не','не съм проверявал, само видимо'], d.operational) +
+        radioRowHTML('operational', ['да','не','не съм проверявал'], d.operational) +
       '</div>';
     }
     return '';
@@ -2456,9 +2497,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
       description: draft.description || '',
       terrain_description: draft.terrain_description || '',
       damage_description: draft.damage_description || '',
-      hydrant_type: draft.hydrant_type || 'не знам',
+      // hydrant_type and operational require explicit selection in
+      // exists_confirmed (when visible) and new_hydrant. Default to empty so
+      // no chip is pre-selected and submit validation forces a choice. The
+      // damaged and missing flows keep their existing default selections.
+      hydrant_type: draft.hydrant_type != null ? draft.hydrant_type : '',
       hydrant_type_at_location: draft.hydrant_type_at_location || 'не знам',
-      operational: draft.operational || 'не съм проверявал, само видимо',
+      operational: draft.operational != null
+        ? draft.operational
+        : (reportType === 'damaged' ? 'не съм проверявал' : ''),
       placedCoord: draft.placedCoord || null,
     };
 
@@ -2555,6 +2602,33 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const f = document.getElementById('fld_location'); if (f) f.classList.add('invalid');
       invalid = true;
     }
+    // new_hydrant always requires explicit type and operational selection.
+    if (reportType === 'new_hydrant') {
+      if (!reportDraft.hydrant_type) {
+        const f = document.getElementById('fld_hydrant_type'); if (f) f.classList.add('invalid');
+        invalid = true;
+      }
+      if (!reportDraft.operational) {
+        const f = document.getElementById('fld_operational'); if (f) f.classList.add('invalid');
+        invalid = true;
+      }
+    }
+    // exists_confirmed: validation applies only to whichever pickers are
+    // visible (which is decided by whether the target hydrant already has
+    // those fields populated). Opt-out picker values are valid choices.
+    if (reportType === 'exists_confirmed') {
+      const h = reportDraft.hydrant;
+      const typeVisible = !(h && h.type);
+      const opVisible   = !(h && h.operational_status);
+      if (typeVisible && !reportDraft.hydrant_type) {
+        const f = document.getElementById('fld_hydrant_type'); if (f) f.classList.add('invalid');
+        invalid = true;
+      }
+      if (opVisible && !reportDraft.operational) {
+        const f = document.getElementById('fld_operational'); if (f) f.classList.add('invalid');
+        invalid = true;
+      }
+    }
     if (invalid) {
       flashStatus('Моля попълни задължителните полета', 3000);
       return;
@@ -2605,8 +2679,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
       description: ((reportType === 'wrong_location' || reportType === 'new_hydrant') && d.description) ? d.description : null,
       damage_description: reportType === 'damaged' && d.damage_description ? d.damage_description : null,
       hydrant_type_at_location: reportType === 'missing' ? d.hydrant_type_at_location : null,
-      hydrant_type: reportType === 'new_hydrant' ? d.hydrant_type : null,
-      operational: reportType === 'damaged' ? d.operational : null,
+      // Canonical fields per Section B of
+      // docs/audits/backfill_and_submission_extension_plan_20260509.md.
+      // Legacy keys (hydrant_type / operational) are deliberately not emitted
+      // — the Worker still accepts them on inbound parsing for backward
+      // compat with old issues, but new submissions are canonical-only.
+      type:
+        (reportType === 'exists_confirmed' || reportType === 'new_hydrant')
+          ? canonicalTypeFromPicker(d.hydrant_type)
+          : null,
+      operational_status:
+        (reportType === 'exists_confirmed' || reportType === 'new_hydrant' || reportType === 'damaged')
+          ? canonicalOperationalFromPicker(d.operational)
+          : null,
     };
   }
 
@@ -2642,7 +2727,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       'report_id','report_type','timestamp','reporter','hydrant_ref',
       'expected_coord','reported_coord','location_method','app_version',
       'free_text','terrain_description','description','damage_description',
-      'hydrant_type_at_location','hydrant_type','operational'
+      'hydrant_type_at_location','type','operational_status'
     ];
     const lines = ['---'];
     for (const k of order) lines.push(k + ': ' + yamlValue(report[k]));
@@ -2682,9 +2767,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (report.description)          { md.push(''); md.push('**Описание:**'); md.push('> ' + report.description.replace(/\n/g, '\n> ')); }
     if (report.terrain_description)  { md.push(''); md.push('**Терен:**');     md.push('> ' + report.terrain_description.replace(/\n/g, '\n> ')); }
     if (report.damage_description)   { md.push(''); md.push('**Повреда:**');   md.push('> ' + report.damage_description.replace(/\n/g, '\n> ')); }
-    if (report.hydrant_type)              md.push('**Тип хидрант:** ' + report.hydrant_type);
+    if (report.type)                      md.push('**Тип хидрант:** ' + (hydrantTypeLabel(report.type) || report.type));
     if (report.hydrant_type_at_location)  md.push('**Очакван тип на място:** ' + report.hydrant_type_at_location);
-    if (report.operational)               md.push('**Работи:** ' + report.operational);
+    if (report.operational_status)        md.push('**Работи:** ' + (OPERATIONAL_LABELS[report.operational_status] || report.operational_status));
     md.push('');
     md.push('— App: ' + report.app_version);
     return yaml + '\n\n' + md.join('\n');
@@ -3090,17 +3175,34 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let pollInFlight = false;
   let lastPollSince = null;     // ISO string; only advanced on a successful response
 
-  // Maps a polled report type to the semantic field changes that should land on
-  // the in-memory hydrant record. Returns null when the report type does not
-  // change rendering. Phase 1 keeps the same visible color outcomes as before
-  // (verified=red, reported=yellow); operational/broken green/black are reserved
-  // for future flows that submit operational_status directly.
-  function reportTypeToSemanticPatch(reportType) {
-    if (reportType === 'exists_confirmed') return { existence_status: 'verified' };
-    if (reportType === 'wrong_location')   return { existence_status: 'verified' };
-    if (reportType === 'missing')          return { review_status:    'reported' };
-    if (reportType === 'damaged')          return { review_status:    'reported' };
-    return null;
+  // Maps a polled report to the semantic field changes that should land on the
+  // in-memory hydrant record. Returns null when the report type does not
+  // change rendering. All polled submissions set review_status:'reported' so
+  // the pin renders yellow until commit 4 ingest approves the report and
+  // clears the flag — single moderation gate covering exists_confirmed and
+  // wrong_location alongside the pre-existing yellow gate on new_hydrant /
+  // missing / damaged. Canonical type and operational_status from the report
+  // are merged so they are available immediately for ingest, even though the
+  // yellow precedence in hydrantStatusClass hides them visually pre-approval.
+  // Per Section B5 of
+  // docs/audits/backfill_and_submission_extension_plan_20260509.md.
+  function reportTypeToSemanticPatch(report) {
+    const t = report && report.report_type;
+    let patch = null;
+    if (t === 'exists_confirmed') {
+      patch = { existence_status: 'verified', review_status: 'reported' };
+    } else if (t === 'wrong_location' || t === 'missing' || t === 'damaged') {
+      patch = { review_status: 'reported' };
+    } else {
+      return null;
+    }
+    if (t === 'exists_confirmed' && report.type) {
+      patch.type = report.type;
+    }
+    if ((t === 'exists_confirmed' || t === 'damaged') && report.operational_status) {
+      patch.operational_status = report.operational_status;
+    }
+    return patch;
   }
 
   function refreshMarkerIconsForHydrant(h) {
@@ -3137,11 +3239,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
         // matched and the polled record is dropped as a duplicate.
         if (resolveHydrantById(reportId) || resolveHydrantById(fieldId)) continue;
         const h = normalizeHydrantRecord({
-          id:           reportId,
-          coords:       [Number(report.coords[0]), Number(report.coords[1])],
-          origin:       'field_report',
-          review_status:'reported',
-          legacy_ids:   reportId === fieldId ? [] : [fieldId]
+          id:                 reportId,
+          coords:             [Number(report.coords[0]), Number(report.coords[1])],
+          origin:             'field_report',
+          review_status:      'reported',
+          type:               report.type || null,
+          operational_status: report.operational_status || null,
+          legacy_ids:         reportId === fieldId ? [] : [fieldId]
         });
         if (!h) continue;
         HYDRANTS.push(h);
@@ -3188,7 +3292,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         }
       }
 
-      const patch = reportTypeToSemanticPatch(type);
+      const patch = reportTypeToSemanticPatch(report);
       if (patch) {
         let changed = false;
         for (const key in patch) {
