@@ -1,0 +1,364 @@
+{
+  "snapshot_timestamp": "2026-05-11T17:15:26.921224",
+  "source_data_file": "data/hydrants.json",
+  "description": "Snapshot of all verified records before address backfill sprint",
+  "verified_count": 23,
+  "records": [
+    {
+      "id": "coord_27.90493_43.21885",
+      "coords": [
+        27.90493,
+        43.218849
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "VIK-VARNA_IZTOK-0167"
+      ],
+      "existence_status": "verified",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.90733_43.21900",
+      "coords": [
+        27.907334,
+        43.218998
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "VIK-VARNA_IZTOK-0169"
+      ],
+      "existence_status": "verified",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.90614_43.21898",
+      "coords": [
+        27.90614,
+        43.218982
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "VIK-VARNA_IZTOK-0173"
+      ],
+      "existence_status": "verified",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.93420_43.21373",
+      "coords": [
+        27.934205,
+        43.213728
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "271"
+      ],
+      "existence_status": "verified",
+      "region": "КВ. ЧАЙКА; 19 М.Р; ЧАСТ 1",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.93447_43.21327",
+      "coords": [
+        27.934473,
+        43.213267
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "913"
+      ],
+      "address": "Ул. Никола Вапцаров",
+      "existence_status": "verified",
+      "region": "КВ. ЧАЙКА; 19 М.Р; ЧАСТ 1",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.90237_43.21801",
+      "coords": [
+        27.902373,
+        43.218008
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "VIK-VARNA_ZAPAD-0158"
+      ],
+      "existence_status": "verified",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.90313_43.21833",
+      "coords": [
+        27.903127,
+        43.218328
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "VIK-VARNA_ZAPAD-0159"
+      ],
+      "existence_status": "verified",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.90397_43.21860",
+      "coords": [
+        27.903968,
+        43.218596
+      ],
+      "origin": "vik",
+      "legacy_ids": [
+        "877-ZP"
+      ],
+      "existence_status": "verified",
+      "region": "14-ТИ ПОДРАЙОН",
+      "type": "надземен"
+    },
+    {
+      "id": "coord_27.84744_43.24699",
+      "coords": [
+        27.847444,
+        43.246995
+      ],
+      "origin": "national",
+      "legacy_ids": [
+        "NAT-14277"
+      ],
+      "type": "надземен",
+      "existence_status": "verified"
+    },
+    {
+      "id": "coord_27.84742_43.25021",
+      "coords": [
+        27.847417,
+        43.250208
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_ba91e3ff",
+        "ba91e3ff-f28a-4499-82ba-61d850a051a4"
+      ],
+      "address": "Пред бл. 408 вх 13",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "ba91e3ff-f28a-4499-82ba-61d850a051a4",
+      "reported_at": "2026-05-05T11:06:15Z"
+    },
+    {
+      "id": "coord_27.84839_43.25008",
+      "coords": [
+        27.848389,
+        43.250078
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_3326a776",
+        "3326a776-516a-4e34-8e34-efd4773c5e80"
+      ],
+      "address": "Пред бл. 408 вх.17",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "3326a776-516a-4e34-8e34-efd4773c5e80",
+      "reported_at": "2026-05-05T11:05:14Z"
+    },
+    {
+      "id": "coord_27.84864_43.25005",
+      "coords": [
+        27.848635,
+        43.250045
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_1a6e6d56",
+        "1a6e6d56-f977-46b9-8a96-2adf698d133a"
+      ],
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "1a6e6d56-f977-46b9-8a96-2adf698d133a",
+      "reported_at": "2026-05-05T11:04:11Z"
+    },
+    {
+      "id": "coord_27.84809_43.25059",
+      "coords": [
+        27.848088,
+        43.250588
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_228b7518",
+        "228b7518-bf56-465b-bdda-2f8e2681e8cb"
+      ],
+      "address": "До игрището",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "228b7518-bf56-465b-bdda-2f8e2681e8cb",
+      "reported_at": "2026-05-05T13:22:16Z"
+    },
+    {
+      "id": "coord_27.87534_43.23909",
+      "coords": [
+        27.875344,
+        43.239089
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_a641fc26",
+        "a641fc26-7c60-404d-9a51-844a0b9af3e7"
+      ],
+      "address": "Пред бл 17 вх 1",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "a641fc26-7c60-404d-9a51-844a0b9af3e7",
+      "reported_at": "2026-05-05T16:40:45Z"
+    },
+    {
+      "id": "coord_27.87717_43.23904",
+      "coords": [
+        27.877168,
+        43.239038
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_79c7d4b5",
+        "79c7d4b5-9b46-442b-8b0d-d80b11a4ca9a"
+      ],
+      "address": "На велоалеята",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "79c7d4b5-9b46-442b-8b0d-d80b11a4ca9a",
+      "reported_at": "2026-05-05T16:43:07Z"
+    },
+    {
+      "id": "coord_27.88038_43.23940",
+      "coords": [
+        27.880378,
+        43.239405
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_9e4cbe81",
+        "9e4cbe81-f755-42a3-987b-11acf5d8d31e"
+      ],
+      "address": "Срещу каса на easypay до дърво",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "9e4cbe81-f755-42a3-987b-11acf5d8d31e",
+      "reported_at": "2026-05-05T16:46:17Z"
+    },
+    {
+      "id": "coord_27.88152_43.23913",
+      "coords": [
+        27.881519,
+        43.239128
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_2e92297a",
+        "2e92297a-c426-4ded-beef-c257fa61dc50"
+      ],
+      "address": "В парка до велоалеята",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "2e92297a-c426-4ded-beef-c257fa61dc50",
+      "reported_at": "2026-05-05T16:47:50Z"
+    },
+    {
+      "id": "coord_27.88243_43.23261",
+      "coords": [
+        27.882429,
+        43.232609
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_eec742fe",
+        "eec742fe-94de-409f-902e-02f68deee26d"
+      ],
+      "address": "До магазин бурлекс",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "eec742fe-94de-409f-902e-02f68deee26d",
+      "reported_at": "2026-05-05T16:52:42Z"
+    },
+    {
+      "id": "coord_27.88915_43.22763",
+      "coords": [
+        27.889152,
+        43.227634
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_c1eff605",
+        "c1eff605-1934-40ac-8bb0-98834e53bbf8"
+      ],
+      "address": "До входа на подземният паркинг",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "c1eff605-1934-40ac-8bb0-98834e53bbf8",
+      "reported_at": "2026-05-05T16:58:39Z"
+    },
+    {
+      "id": "coord_27.89611_43.22234",
+      "coords": [
+        27.896106,
+        43.222344
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_35aeaca9",
+        "35aeaca9-cdb0-4b0a-97ec-0d7aaa96cfde"
+      ],
+      "address": "Срещу магазин Тръпкови и diad clima, до трафопост 2313",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "35aeaca9-cdb0-4b0a-97ec-0d7aaa96cfde",
+      "reported_at": "2026-05-05T17:03:22Z"
+    },
+    {
+      "id": "coord_27.93077_43.21144",
+      "coords": [
+        27.930768,
+        43.211441
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_a183a467",
+        "a183a467-6454-42e7-8a0d-691fe30d30f8"
+      ],
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "a183a467-6454-42e7-8a0d-691fe30d30f8",
+      "reported_at": "2026-05-06T17:20:21+03:00"
+    },
+    {
+      "id": "coord_27.98047_43.24008",
+      "coords": [
+        27.980469,
+        43.240082
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_c42352c8",
+        "c42352c8-d327-46e2-b7d1-35660292ba82"
+      ],
+      "address": "До сградата на Руси",
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "c42352c8-d327-46e2-b7d1-35660292ba82",
+      "reported_at": "2026-05-07T13:20:15+03:00"
+    },
+    {
+      "id": "coord_27.89740_43.21260",
+      "coords": [
+        27.897397,
+        43.212598
+      ],
+      "origin": "field_report",
+      "legacy_ids": [
+        "field_bf18790e",
+        "bf18790e-5855-4324-92ef-00a1b161a0a8"
+      ],
+      "type": "надземен",
+      "existence_status": "verified",
+      "report_id": "bf18790e-5855-4324-92ef-00a1b161a0a8",
+      "reported_at": "2026-05-07T21:33:24+03:00"
+    }
+  ]
+}
