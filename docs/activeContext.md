@@ -16,7 +16,7 @@ Sprint: 1.5 shipped; preparing for broad launch
 - Worker: varna-hydrants-proxy.petar-dikov2019.workers.dev
   - POST `/` endpoint: live, creates labeled GitHub issues
   - GET `/issues` endpoint: live as of 2026-05-07 (commit 15), 30s KV-cached
-  - Worker version deployed: `50c2b2d2`
+  - Worker version deployed: `5accc88e`
   - KV namespace: `varna_hydrants_reports_cache`, binding `REPORTS_CACHE`
   - Rollback version (last POST-only): `e86c90a6`
 - Frontend polling: client `GET /issues` every 15 s with `?since=<cached_at>` delta, paused on `document.hidden`, immediate catch-up on visibility return, silent retry on failure (cursor not advanced).

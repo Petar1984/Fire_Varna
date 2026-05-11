@@ -17,12 +17,19 @@ for the Worker code lives here; deploys to Cloudflare are manual.
 | | Value |
 |---|---|
 | URL | `https://varna-hydrants-proxy.petar-dikov2019.workers.dev` |
-| Active version | `50c2b2d2` (manually deployed 2026-05-07) |
-| Rollback target | `e86c90a6` (earliest pre-KV deploy, POST-only) |
+| Active version | `5accc88e` (manually deployed 2026-05-11) |
+| Previous deploy (parser/contract revert) | `50c2b2d2` (last pre-canonical-fields, 2026-05-07) |
+| Architectural rollback (pre-GET/KV) | `e86c90a6` (earliest pre-KV deploy, POST-only) |
 | Custom domain | none — only the default `*.workers.dev` |
 
-Update the active version line above whenever a new version is deployed,
-and mirror it in `docs/activeContext.md` under *Worker version deployed*.
+Roll back to *Previous deploy* for a recent contract or parser issue.
+Fall back to *Architectural rollback* only if the GET endpoint or KV
+layer itself needs to be removed.
+
+When deploying a new version: set *Active version* to the new ID, move
+the prior *Active version* into *Previous deploy*, and mirror the new
+active version in `docs/activeContext.md` under *Worker version
+deployed*.
 
 ## Bindings
 
