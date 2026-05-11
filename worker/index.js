@@ -333,6 +333,8 @@ function normalizeIssue(issue) {
     issue_url: issue.html_url,
     hydrant_id: textOrNull(data.hydrant_ref),
     report_type: data.report_type,
+    type: canonicalHydrantType(data),
+    operational_status: canonicalOperationalStatus(data),
     coords,
     expected_coord: expectedCoord,
     reported_coord: reportedCoord,
@@ -350,6 +352,44 @@ function normalizeIssue(issue) {
     labels,
     pending_review: labels.includes("pending-review")
   };
+}
+
+function canonicalHydrantType(data) {
+  // Prefer the canonical YAML key (`type`); fall back to the legacy key
+  // (`hydrant_type`) for issues created before the contract update.
+  // Unknown values and the "не знам" opt-out collapse to null so that
+  // downstream record updates only see authoritative values.
+  const fromCanonical = textOrNull(data.type);
+  if (fromCanonical) {
+    if (fromCanonical === "надземен" || fromCanonical === "подземен") return fromCanonical;
+    return null;
+  }
+
+  const fromLegacy = textOrNull(data.hydrant_type);
+  if (fromLegacy === "надземен" || fromLegacy === "подземен") return fromLegacy;
+  return null;
+}
+
+function canonicalOperationalStatus(data) {
+  // Prefer the canonical YAML key (`operational_status`, English vocabulary
+  // matching the hydrant-record schema); fall back to the legacy key
+  // (`operational`, Bulgarian picker value) for old issues. The legacy
+  // ", само видимо" suffix is the pre-amendment damaged-modal variant.
+  const fromCanonical = textOrNull(data.operational_status);
+  if (fromCanonical) {
+    if (fromCanonical === "works" || fromCanonical === "not_working" || fromCanonical === "not_tested") {
+      return fromCanonical;
+    }
+    return null;
+  }
+
+  const fromLegacy = textOrNull(data.operational);
+  if (!fromLegacy) return null;
+  if (fromLegacy === "да") return "works";
+  if (fromLegacy === "не") return "not_working";
+  if (fromLegacy === "не съм проверявал") return "not_tested";
+  if (fromLegacy === "не съм проверявал, само видимо") return "not_tested";
+  return null;
 }
 
 function parseReportFrontmatter(body) {
