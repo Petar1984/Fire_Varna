@@ -103,7 +103,7 @@ Worker source currently lives only in Cloudflare dashboard. TODO commit 17: extr
 |---|---|
 | Static hosting only (GitHub Pages free tier) | Budget = 0 BGN |
 | App shell at repo root (`index.html`) plus static `data/hydrants.json` | GitHub Pages serves it |
-| First load <= 1 MB ideal, **2 MB hard cap** | Mobile data, emergency use |
+| First load <= 3 MB ideal, **5 MB hard cap** | Mobile data, emergency use |
 | Bulgarian UI labels preserved verbatim | Users speak Bulgarian only; wording is reviewed |
 | Mobile-first: touch targets >= 44px, no hover-dependent UX | Field use, gloves, sweat |
 | HTTPS-required APIs must work: Geolocation, DeviceOrientation, Worker `fetch` | Core features depend on these |
