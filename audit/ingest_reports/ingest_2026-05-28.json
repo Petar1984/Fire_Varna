@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "fetched_count": 2,
+    "applied_count": 2,
+    "skipped_count": 0,
+    "skipped_reasons": {},
+    "by_report_type": {
+      "exists_confirmed": 1,
+      "new_hydrant": 1
+    },
+    "approver_id": "petar",
+    "timestamp": "2026-05-28T11:15:01+03:00",
+    "input_count": 5901,
+    "output_count": 5902
+  },
+  "records": [
+    {
+      "issue_number": 62,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.89919_43.22531",
+      "target_id_after": "coord_27.89919_43.22531",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 48,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.89635_43.22162",
+      "changes": {
+        "created": {
+          "id": "coord_27.89635_43.22162",
+          "coords": [
+            27.896349,
+            43.221619
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "df15579a-7dbe-4cbd-9157-8540a33ec6dd",
+            "field_df15579a"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "df15579a-7dbe-4cbd-9157-8540a33ec6dd",
+          "reported_at": "2026-05-11T15:55:12+03:00"
+        }
+      }
+    }
+  ],
+  "overrides": [
+    {
+      "issue_number": 48,
+      "original_report_type": "exists_confirmed",
+      "applied_report_type": "new_hydrant",
+      "rationale": "phantom hydrant_id (full UUID not present in 5,901-record dataset post-Phase-2). Petar 2026-05-28: treat as new hydrant; expected_coord promoted to reported_coord. Type 'надземен' supplied by reporter (Petar) in chat 2026-05-28 — original report had type:null."
+    }
+  ]
+}
