@@ -1,5 +1,7 @@
 # Commit 15 plan: Worker GET `/issues` + KV cache
 
+> **Status (docs-sync 2026-06-22):** Historical. Worker source was later extracted into repo in `914dc2a`; see `worker/README.md` for current deploy notes.
+
 ## Overview
 
 Commit 15 adds a backend-only `GET /issues` endpoint to the live Cloudflare Worker at:

@@ -69,7 +69,13 @@ See [AGENTS.md § Report Flow](AGENTS.md#report-flow) and [docs/activeContext.md
 
 ## Verification
 
-No CI yet. Before reporting done:
+No CI yet, but tests exist (`tests/`, Python `unittest`). When ingest or shared-core (`scripts/lib/hydrant_core.py`) behavior is relevant, run the suite:
+
+```powershell
+python -m unittest discover -s tests
+```
+
+For frontend / deployable changes, before reporting done:
 
 1. Serve locally over HTTP:
 
@@ -81,7 +87,7 @@ No CI yet. Before reporting done:
    - Map renders within 3 seconds.
    - Browser console has no runtime errors.
    - `data/hydrants.json` loads with HTTP 200.
-   - `JSON.parse(document.getElementById('hydrantData').textContent).length === 6082`.
+   - `JSON.parse(document.getElementById('hydrantData').textContent).length` equals the current expected count declared in [`docs/activeContext.md`](docs/activeContext.md#current-state) (currently `5911`).
    - GPS lock works, or graceful error pill with retry/manual controls appears.
    - All 3 view modes render correctly: "Близо", "Топ 5", "Всички".
    - Cluster mode shows clusters when zoomed out.

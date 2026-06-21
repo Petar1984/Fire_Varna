@@ -3,24 +3,52 @@
 > **Audience:** Petar and AI agents resuming work.
 > **Purpose:** canonical current repo/runtime state. If this conflicts with README, AGENTS.md, or CLAUDE.md on current state, this file wins.
 
-Last updated: 2026-05-09 at commit d6cbcd5
-Sprint: 1.5 shipped; preparing for broad launch
+Last updated: 2026-06-22 at commit 38ebbad
+Sprint: post-Sprint 1.5. Shipped since: Phase 2 verbose-schema migration, compact-schema compatibility removal, dataset cleanup (6,082 -> 5,911), address backfill, Worker source extraction to `worker/`, label-gated issue ingest, line-ending (EOL) hygiene, and H1 shared-core + spatial dedup. Phase 2 Fire_Varna reintegration into the Varna_buildings map is in planning under ADR 020 Amendment 2 (tracked in the Varna_buildings repo).
 
 ## Current State
 
-- index.html: 309,477 bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text + 2026-05-08 bug fixes: polling dedupe / card+row type display / polled new-hydrant status + 2026-05-09 Phase 1 schema bridge: normalizeHydrantRecord / resolveHydrantById / dual-schema reading / .h-pin.operational+.h-pin.broken / EXISTENCE_LABELS+OPERATIONAL_LABELS / semantic hydrantStatusClass / legacy_ids polling dedupe)
-- data/hydrants.json: 968,365 bytes (6,082 records — 8 field reports ingested in commit 2dcab73)
-- field_reports.json: 5,085 bytes (14 records)
-- Status counts: 23 verified, 2 reported, 6,057 canonical (in repo; runtime can grow via polled new_hydrant reports)
+- Branch: `main`; `origin/main == HEAD` at `38ebbad` (2026-06-22).
+- index.html: 314,484 worktree bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text + 2026-05-08 bug fixes: polling dedupe / card+row type display / polled new-hydrant status + 2026-05-09 Phase 1 schema bridge: normalizeHydrantRecord / resolveHydrantById / dual-schema reading / .h-pin.operational+.h-pin.broken / EXISTENCE_LABELS+OPERATIONAL_LABELS / semantic hydrantStatusClass / legacy_ids polling dedupe)
+- data/hydrants.json: 5,911 records, 874,593 worktree bytes (git blob 874,592). The previous 968,365-byte / 6,082-record file was the pre-cleanup snapshot, not current data.
+- data/hydrants_provenance.json: 1,364,172 worktree bytes (cleanup/migration provenance archive).
+- `field_reports.json`: not present in the current repo. New `field_*` records live in `data/hydrants.json` only. (Historical mentions of `field_reports.json` in dated docs/plans are point-in-time records.)
+- Current schema: verbose hydrant records — `id`, `coords` `[lon,lat]` WGS84, `origin` (`vik`/`national`/`field_report`), `legacy_ids` (all present), plus sparse `type` / `region` / `address` / `existence_status` / `operational_status` / `review_status` / `report_id` / `reported_at`. Compact-schema compatibility has been removed. See [AGENTS.md § Data Model](../AGENTS.md#data-model).
+- Status counts (in repo): 45 verified (`existence_status`), 4 reported/review (`review_status`), 5,862 canonical/unreviewed. Runtime can grow via polled new_hydrant reports.
+- Origin counts: `vik` 3,542; `national` 2,345; `field_report` 24.
+- Enrichment counts: 555 with address; 2,313 with type; 16 with operational status.
 - Deploy: GitHub Pages from main -> https://petar1984.github.io/Fire_Varna/
 - Worker: varna-hydrants-proxy.petar-dikov2019.workers.dev
-  - POST `/` endpoint: live, creates labeled GitHub issues
-  - GET `/issues` endpoint: live as of 2026-05-07 (commit 15), 30s KV-cached
-  - Worker version deployed: `5accc88e`
+  - POST `/` endpoint: creates labeled GitHub issues.
+  - GET `/issues` endpoint: 30s KV-cached.
+  - Worker code source of truth is now `worker/` (extracted to repo in `914dc2a`); see `worker/README.md`. Cloudflare deployment remains manual unless another current doc says otherwise.
+  - Worker deploy version: repo-declared `5accc88e`.
   - KV namespace: `varna_hydrants_reports_cache`, binding `REPORTS_CACHE`
   - Rollback version (last POST-only): `e86c90a6`
+- Endpoint liveness: Pages endpoint liveness verified 2026-06-21; deploy version repo-declared; served 5,911 hydrant points. Worker `GET /issues` endpoint liveness verified 2026-06-21; deploy version repo-declared; 30s KV cache, `stale:false`, `cached_at 2026-06-21`.
 - Frontend polling: client `GET /issues` every 15 s with `?since=<cached_at>` delta, paused on `document.hidden`, immediate catch-up on visibility return, silent retry on failure (cursor not advanced).
 - Polling dedupe: fixed 2026-05-08, dual-format ID check (8bd123e) — `applyReports` checks both the full-UUID `report.id` and the truncated `field_<8>` form against `HYDRANTS_BY_ID` so polled new_hydrant records do not double-render after ingest.
+
+## Recent Completed Work (since 2026-05-09)
+
+Newest first; commit hashes from `git log`. These post-date the Sprint 1.5 snapshot below.
+
+- **H1 shared hydrant core + spatial dedup (`38ebbad`, 2026-06-22)** — reusable `scripts/lib/hydrant_core.py`; deterministic spatial matcher (`Rm = 5 m`, `Rf = 20 m`) drives the `new_hydrant` path into UPDATE (<=5 m) / FLAG ((5 m, 20 m]) / ADD (>20 m); the other handlers (`exists_confirmed`, `damaged`, `missing`, `wrong_location`) stay byte-identical. Refactor plus tests; CLI dry-run by default. Plan status-stamped in `docs/plans/h1_shared_core_spatial_dedup.md`.
+- **Line-ending (EOL) attributes (`47cd3ed`)** — repository line-ending hygiene.
+- **Label-gated issue ingest** — batch ingest of 24 approved reports (`a4bd946`); reports #62 and #48 (`791d817`). Moderation now gated via GitHub issue labels.
+- **Worker hard cap raised to 5 MB (`aa7897e`).**
+- **Address backfill + pre-sprint snapshots (`209bb36`)** — address-backfill script; 555 records now carry an address.
+- **Canonical type + operational pickers with moderation gate (`797b357`).**
+- **Worker source extracted to repo (`914dc2a`)** — Worker code now lives in `worker/`; the live Worker is no longer the only source.
+- **Phase 2 verbose-schema migration (`10bb67a`)** and **compact-schema compatibility removal (`142a494`)** — runtime dataset migrated to verbose records; the dual-schema adapter was retired.
+- **Dataset cleanup `6,082 -> 5,911`** — duplicate/invalid records removed during the migration; provenance archived in `data/hydrants_provenance.json`.
+
+## Intentions / Backlog
+
+Documented future intentions (not scheduled; no implementation in this doc-sync pass):
+
+- **Street View on each hydrant detail** — surface a Street View link/view on the per-hydrant detail later.
+- **Integrated Phase 2 UI** — an integrated UI built on the Varna_buildings interface, OSM basemap by default, with hydrant data in a separate panel. Tracked cross-repo under ADR 020 Amendment 2 (Varna_buildings repo).
 
 ## Sprint 1 Status
 

@@ -1,5 +1,7 @@
 # Sprint 1.5 Plan: UX Polish Before Broad Launch
 
+> **Status (docs-sync 2026-06-22):** Historical point-in-time Sprint 1.5 plan; current counts/state live in `docs/activeContext.md`.
+
 ## Overview
 Plan target: `docs/plans/sprint_1_5_polish.md`.
 

@@ -33,7 +33,7 @@ Static GitHub Pages frontend. No backend in the repo and no runtime build step.
 | Report polling | Cloudflare Worker `GET /issues`, every 15 s |
 | **Frontend first load** | `index.html` + `data/hydrants.json` |
 
-Hydrant data lives in `data/hydrants.json` (**6,079 records (verified at runtime)**, `vik` + `national` + `field_report` origins). Loaded via fetch on app init. `index.html` contains UI shell, Leaflet, MarkerCluster, app logic, and an empty `<script id="hydrantData">` placeholder populated at runtime.
+Hydrant data lives in `data/hydrants.json` (**5,911 records**, `vik` + `national` + `field_report` origins). Loaded via fetch on app init. `index.html` contains UI shell, Leaflet, MarkerCluster, app logic, and an empty `<script id="hydrantData">` placeholder populated at runtime.
 
 Current byte sizes for `index.html`, `data/hydrants.json`, and first load are canonical in [docs/activeContext.md § Current State](docs/activeContext.md#current-state).
 
@@ -49,37 +49,39 @@ python -m http.server 8000
 
 `data/hydrants.json` is the runtime dataset. The original KMZ-derived `hydrants_varna.json` remains as a reference/source artifact, not the full runtime dataset.
 
-Runtime compact schema:
+Runtime verbose schema (compact-schema compatibility was removed in `142a494`):
 
 ```text
-{ i, s, a, r, z, t, st, c, o, status? }
+{ id, coords, origin, legacy_ids, type?, region?, address?,
+  existence_status?, operational_status?, review_status?,
+  report_id?, reported_at? }
 ```
 
-- `c` is `[lon, lat]` in WGS84 and is always present.
-- `o` is the origin: `vik`, `national`, or `field_report`.
-- `st` is the source raw status string from source data.
-- `status` is app-level visual state and is unrelated to `st`.
+- `coords` is `[lon, lat]` in WGS84 and is always present.
+- `origin` is `vik`, `national`, or `field_report` and is always present.
+- `legacy_ids` is the array of a record's prior IDs (used for polling dedupe); always present.
+- `type`, `region`, `address` are sparse descriptive fields.
+- Visual / moderation state is split across three sparse fields, not one app-level `status`:
 
-App-level `status` values:
-
-| Value | Meaning | Render |
+| Field | Observed values | Meaning / render |
 |---|---|---|
-| `verified` | Hydrant physically confirmed on-site | Red pin |
-| `reported` | Reported damaged / missing / needs attention | Yellow pin |
-| absent/unknown | Canonical unverified record | Gray pin |
+| `existence_status` | `verified` | Hydrant physically confirmed on-site (red pin) |
+| `review_status` | `reported` | Reported damaged / missing / needs attention (yellow pin) |
+| `operational_status` | `works`, `not_working`, `not_tested` | Operational state, independent of existence |
+| (all three absent) | — | Canonical unverified record (gray pin) |
 
-Older app builds and unknown status values must fall back to canonical/unverified behavior.
+Older app builds and unknown values must fall back to canonical/unverified behavior. `report_id` / `reported_at` carry field-report provenance.
 
 ### Wrong-Location Ingest Rule
 
-For `wrong_location` reports, **always update the existing record's coordinate field (`c`) in place. Never create a new `field_*` record for `wrong_location`.**
+For `wrong_location` reports, **always update the existing record's coordinate field (`coords`) in place. Never create a new `field_*` record for `wrong_location`.**
 
 | Target ID type | Action |
 |---|---|
-| Canonical IDs (`NAT-`, `VIK-`, `877-ZP`, etc.) | update `c` in `data/hydrants.json` only |
-| `field_*` IDs | update `c` in **both** `field_reports.json` and `data/hydrants.json` |
+| Canonical IDs (`NAT-`, `VIK-`, `877-ZP`, etc.) | update `coords` in `data/hydrants.json` |
+| `field_*` IDs | update `coords` in `data/hydrants.json` |
 
-After the coord update, set `status` to `"verified"`. Old coords go in the commit message for audit trail. New `field_*` records are created **only** for `new_hydrant` reports.
+`field_reports.json` is no longer a current file; all records (including `field_*`) live in `data/hydrants.json` only. After the coord update, set `existence_status` to `"verified"`. Old coords go in the commit message for audit trail. New `field_*` records are created **only** for `new_hydrant` reports.
 
 ### National Dataset Role
 
@@ -93,7 +95,7 @@ Future option, not implemented: build-time enrichment of runtime data with natio
 
 Reports are submitted via `fetch` POST to Cloudflare Worker `varna-hydrants-proxy.petar-dikov2019.workers.dev`. Worker creates a labeled GitHub issue in this repo. Reports queue locally if offline.
 
-Worker source currently lives only in Cloudflare dashboard. TODO commit 17: extract it to a `worker/` directory in this repo with deploy notes. Until then, treat the live Worker as the canonical source.
+Worker source now lives in the `worker/` directory in this repo (extracted in `914dc2a`); see `worker/README.md` for deploy notes. The Cloudflare deployment remains manual; the Worker deploy version is repo-declared as `5accc88e`.
 
 ---
 
@@ -138,7 +140,7 @@ Decision ledger schema:
 
 | Decision | Source | Evidence | Reversibility | Approval status |
 |---|---|---|---|---|
-| Keep Worker source external until commit 17 | Repo evidence | `AGENTS.md` says live Worker is canonical; `activeContext.md` lists commit 17 optional extraction | Reversible by adding `worker/` later | Existing approved project state |
+| Worker source extracted to `worker/` (`914dc2a`) | Repo evidence | `worker/` holds the Worker source + README; deploy version repo-declared `5accc88e` | Reversible by reverting the extraction commit | Existing approved project state |
 
 ---
 
@@ -193,26 +195,29 @@ Verification: handoff notes include encoding check output; reviewer may rerun th
 
 ## Current Repo State
 
-Loose files, no organized source structure yet.
+Working directory: `C:\git\Fire_Varna`. Organized source structure (tracked top-level):
 
 ```text
-C:\Projects\Varna_hydrants\
+C:\git\Fire_Varna\
 ├── index.html                     <- current app shell
-├── data/hydrants.json             <- runtime hydrant data, 6,079 records
+├── data/                          <- runtime hydrant data (hydrants.json, 5,911 records;
+│                                     hydrants_provenance.json)
+├── scripts/                       <- ingest / migration / backfill tooling
+│   ├── apply_approved_reports.py
+│   ├── migrate_to_verbose_schema.py
+│   ├── backfill_addresses_20260511.py / backfill_verified_type_20260509.py
+│   ├── replay_historical_new_hydrant.py
+│   └── lib/hydrant_core.py        <- H1 shared core (spatial dedup)
+├── tests/                         <- unittest suite (test_hydrant_core.py,
+│                                     test_apply_approved_reports_parity.py, golden fixtures)
+├── worker/                        <- Cloudflare Worker source + README (deploy version 5accc88e)
 ├── extract_hydrants.py            <- extracts embedded hydrant JSON from older index builds
-├── field_reports.json             <- canonical field report state
 ├── hydrants_varna.json            <- original KMZ-derived reference dataset
-├── VARNA_IZTOK.kmz                <- source data
-├── VARNA_ZAPAD.kmz
-├── DEVNIa.kmz
-├── DOLNI_ChIFLIK.kmz
-├── PROVADIIa.kmz
-├── geo_fire_hydrants.json         <- national archive/reference
-├── geo_fire_hydrants.kml          <- same data, KML format
-└── wfsrequest.txt                 <- WFS endpoint record
+├── audit/                         <- historical audit snapshots / plans
+└── docs/                          <- activeContext, plans, audits, architecture roadmap
 ```
 
-No `src/`, `dist/`, `scripts/`, `package.json`, or CI yet.
+`field_reports.json` is no longer present (records merged into `data/hydrants.json`). `scripts/`, `tests/`, and `worker/` now exist; CI is still absent/unconfirmed.
 
 ---
 
@@ -225,7 +230,7 @@ All working, tested on mobile.
 3. **Three view modes**:
    - "Близо <100м" - hydrants within 100m radius
    - "Топ 5" - default, 5 nearest by Haversine
-   - "Всички" - full clustered overlay of all 6,079 records (verified at runtime)
+   - "Всички" - full clustered overlay of all 5,911 records
 4. **Bottom sheet** - compact card always visible; list expands from handle.
 5. **Compass arrow + heading cone** on user marker.
 6. **Hybrid navigation** - distance >100m opens Google Maps, <=100m uses in-app compass target.
@@ -254,10 +259,10 @@ Tap on a pin selects/activates it. Long-press on a pin opens the report menu. Th
 1. **HTML has accumulated patches.** `updateCard()` rebuilds full HTML on every refresh and rewires buttons after `innerHTML`.
 2. **No build system.** Diffs are hard to read. Refactoring is post-launch.
 3. **Data is static JSON.** Updating hydrants requires regenerating/reviewing `data/hydrants.json`.
-4. **Worker source not yet in repo.** Live Worker is canonical until commit 17 extracts it.
+4. **Worker source lives in `worker/`** (extracted in `914dc2a`); Cloudflare deploy is manual, deploy version repo-declared `5accc88e`.
 5. **No offline tile cache.** App fails where live OSM tiles cannot load.
 6. **No PWA manifest.**
-7. **No tests, no CI.**
+7. **Tests exist (`tests/`, Python unittest); CI is absent/unconfirmed.**
 8. **Bulgarian-only UI.** No localization layer.
 
 ---

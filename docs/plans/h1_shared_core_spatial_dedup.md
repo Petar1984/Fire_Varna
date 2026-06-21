@@ -1,5 +1,7 @@
 # H1 Shared Core + Spatial Dedup Plan
 
+> **Status (docs-sync 2026-06-22):** Executed after this plan; H1 shipped in `38ebbad` on 2026-06-22. Historical inventory below was true at authoring time and is retained as a point-in-time plan.
+
 Status: final plan for execution review.  
 Authoring date: 2026-06-21.  
 Mode: PLAN ONLY. This document authorizes no data apply, no commit, and no push.
