@@ -1,0 +1,25 @@
+# Repository line-ending attributes: normalize text to LF, mark binaries.
+* text=auto eol=lf
+
+# Binary file types: no text conversion, no diff, no merge.
+*.pdf -text -diff -merge
+*.png -text -diff -merge
+*.jpg -text -diff -merge
+*.jpeg -text -diff -merge
+*.gif -text -diff -merge
+*.ico -text -diff -merge
+*.kmz -text -diff -merge
+*.kml -text -diff -merge
+*.xlsx -text -diff -merge
+*.xls -text -diff -merge
+*.zip -text -diff -merge
+*.shp -text -diff -merge
+*.dbf -text -diff -merge
+*.shx -text -diff -merge
+*.prj -text -diff -merge
+*.cpg -text -diff -merge
+
+# Dead snapshots: frozen, never re-normalized (live data/*.json stay text).
+data/hydrants.json.pre_address_backfill.json -text
+data/hydrants.json.pre_cleanup_snapshot.json -text
+data/hydrants_provenance.json.pre_address_backfill.json -text
