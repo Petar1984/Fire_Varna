@@ -898,6 +898,33 @@ svg.leaflet-image-layer.leaflet-interactive path {
     cursor: pointer; font-size: 11px; margin-top: 4px;
   }
 
+  /* ===== E3a — shared navigation/action buttons (building popup + hydrant card) ===== */
+  /* Plain link-outs (textContent, target=_blank, rel=noopener) in the ADR 031
+     C12 pattern; URL templates ported verbatim from Varna_buildings
+     sectionUnits.js. Mobile-compact pill style with flex-wrap so the 4 actions
+     wrap cleanly at 375px. */
+  .nav-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .nav-action {
+    display: inline-block; padding: 7px 11px; border-radius: 8px;
+    background: #eef2f7; color: #1f2d3d; font-size: 12px; font-weight: 600;
+    text-decoration: none; border: 1px solid #d4dce6; white-space: nowrap;
+  }
+  .nav-action:active { transform: scale(0.96); }
+
+  /* Hydrant card nav strip: a sibling below the compact card (the card's own
+     content is unchanged). :empty collapses it when there is no active target. */
+  .hydrant-nav-actions {
+    padding: 8px 14px; background: #fffdf5; border-bottom: 1px solid #f0d878;
+  }
+  .hydrant-nav-actions:empty { display: none; }
+
+  /* Building popup (Leaflet popup): safe tile props only. */
+  .building-popup { font-size: 13px; line-height: 1.45; min-width: 150px; }
+  .building-popup .bp-title { font-weight: 700; margin-bottom: 4px; color: #1f2d3d; }
+  .building-popup .bp-row { margin: 2px 0; color: #333; }
+  .building-popup .bp-row .bp-label { color: #777; }
+  .building-popup .nav-actions { margin-top: 8px; }
+
   /* Mode chips */
   .sheet-modes {
     display: flex; gap: 6px; padding: 8px 10px;
@@ -1256,6 +1283,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <div class="controls">
   <button class="ctrl-btn" id="manualPinBtn" title="Задай позиция с tap">📌</button>
   <button class="ctrl-btn" id="addHydrantBtn" title="Добави хидрант" aria-label="Добави хидрант">+</button>
+  <button class="ctrl-btn" id="buildingsToggle" title="Сгради вкл/изкл" aria-label="Сгради вкл/изкл" aria-pressed="false">🏢</button>
+  <button class="ctrl-btn" id="basemapToggle" title="Спътникова карта вкл/изкл" aria-label="Спътникова карта" aria-pressed="false">🛰️</button>
 </div>
 
 <div class="placement-banner" id="placementBanner" hidden>Постави pin-а на мястото на хидранта.</div>
@@ -1290,6 +1319,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <button class="card-btn nav" id="cardNav" title="Навигация">🧭</button>
     </div>
   </div>
+
+  <!-- E3a: shared nav/action buttons for the selected hydrant (populated by
+       refreshHydrantNavActions). Empty -> CSS collapses it. -->
+  <div class="hydrant-nav-actions" id="hydrantNavActions"></div>
 
   <div class="sheet-modes">
     <button class="mode-chip" data-mode="near">Близо &lt;100м</button>
@@ -1429,11 +1462,24 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // ===== Map =====
   const map = L.map('map', { zoomControl: true, tap: true, attributionControl: false })
               .setView([43.2141, 27.9147], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '© OpenStreetMap'
+  const OSM_ATTRIB = '© OpenStreetMap';
+  const SAT_ATTRIB = 'Спътник: © Esri, Maxar, Earthstar Geographics, GIS User Community';
+  const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
   }).addTo(map);
-  L.control.attribution({ prefix: false, position: 'bottomleft' })
-    .addAttribution('© OpenStreetMap').addTo(map);
+  // E3a — Esri World Imagery satellite basemap (alternative, lazily added by the
+  // 🛰️ toggle; never added by default so OSM stays the default basemap). The
+  // legacy arcgisonline tiles need no API key; Esri attribution is required and
+  // use is noncommercial (volunteer public-safety map). NO CARTO basemap is used.
+  const satLayer = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { maxZoom: 19, maxNativeZoom: 19 }
+  );
+  // Attribution is managed explicitly by setBasemap so the OSM⇄satellite swap
+  // always credits EXACTLY the active basemap (no layer auto-tracking, which can
+  // leave a stale credit). Map was created with attributionControl:false.
+  const attribCtrl = L.control.attribution({ prefix: false, position: 'bottomleft' }).addTo(map);
+  attribCtrl.addAttribution(OSM_ATTRIB);
 
   // ===== Icons =====
   // Semantic precedence per cleanup_execution_plan_20260508 Section 1E.
@@ -1980,6 +2026,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
           ? 'Няма хидранти в радиус ' + NEAR_THRESHOLD_M + ' м'
           : 'Няма данни') +
         '</span>';
+      refreshHydrantNavActions();
       return;
     }
     card.classList.remove('empty');
@@ -2015,6 +2062,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
   function updateCardInfo() {
     const at = getActiveTarget();
+    // E3a — keep the shared hydrant nav-action strip in sync with the active
+    // target. Pass `at` so the per-frame path does not re-scan; the helper
+    // id+coords-guards its own DOM rebuild (and clears when `at` is null).
+    refreshHydrantNavActions(at);
     if (!at) return;
     const distEl = document.getElementById('cardDist');
     const nameEl = document.getElementById('cardName');
@@ -3448,6 +3499,285 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (shouldShow) showWelcome(startTracking);
     else            startTracking();
   }
+
+  // =========================================================================
+  // E3a — Public building layer (additive, isolated). Renders ONLY from the
+  // live safe tile gateway (same Worker host as WORKER_URL); reads NO private
+  // data. Fails CLOSED for buildings only — token/tile/script failure never
+  // touches the hydrant map. The building UX (ADR 054 type colours, popup
+  // fields, nav buttons) is ported from the Varna_buildings buildings module.
+  // Everything below is namespaced under this block; it only reuses `map`,
+  // `osmLayer`, `satLayer`, `WORKER_URL`, `flashStatus`, `getActiveTarget`.
+  // =========================================================================
+
+  // --- gateway + plugin config ---
+  const BUILDING_TOKEN_URL = WORKER_URL + 'tiles/buildings/token';
+  const BUILDING_TILE_URL  = WORKER_URL + 'tiles/buildings/v1/{z}/{x}/{y}.mvt?token={token}';
+  const BUILDING_MIN_Z = 15;   // gateway serves z15-17; below 15 = suspend (no requests)
+  const BUILDING_MAX_Z = 17;   // native max; overzoom-display above via maxNativeZoom
+  // Leaflet.VectorGrid (bundled = includes pbf + vector-tile); loaded on demand
+  // the first time buildings are turned on, with SRI pinning (probe 2026-06-22).
+  const VECTORGRID_CDN = 'https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.min.js';
+  const VECTORGRID_SRI = 'sha384-QDTA8MXPewzk8Ryt7UyfUmk+WcHcVYLcxAydowJk1WPgwjdXOIlJIDz25ITLVwTl';
+
+  // ADR 054 D1/D2 building-type colour lens (verbatim from render.js TYPE_STYLES),
+  // keyed by the tile `bt` property. `unknown` is the explicit dashed residual.
+  const BUILDING_TYPE_STYLES = {
+    block:         { color: '#1d4ed8', weight: 1, fillColor: '#3b82f6', fillOpacity: 0.45 },
+    house:         { color: '#15803d', weight: 1, fillColor: '#22c55e', fillOpacity: 0.42 },
+    accommodation: { color: '#9a3412', weight: 1, fillColor: '#f97316', fillOpacity: 0.55 },
+    non_res:       { color: '#334155', weight: 1, fillColor: '#64748b', fillOpacity: 0.40 },
+    unknown:       { color: '#111827', weight: 2, fillColor: '#e5e7eb', fillOpacity: 0.45, dashArray: '2 3' }
+  };
+  // Bulgarian type labels (ported from render.js TYPE_LABEL_BG). Used for the
+  // popup тип line when the tile carries no `bt_text` (current tiles omit it),
+  // honouring the Bulgarian-UI constraint instead of showing the raw class.
+  const BUILDING_TYPE_LABEL = {
+    block: 'Многофамилна сграда', house: 'Къща', accommodation: 'Настаняване',
+    non_res: 'Нежилищно', unknown: 'Неизвестно'
+  };
+
+  // --- building module state ---
+  // NOTE: refreshHydrantNavActions() (hoisted) reads hydrantNavActionsSig, and is
+  // called from the hydrant card path (updateCard/updateCardInfo). That path only
+  // runs after bootApp() — the IIFE's last statement, below this block — so these
+  // `let`s are always initialised first. Keep this block above bootApp().
+  let tileToken = null, tileTokenExp = 0, tokenRefreshTimer = null;
+  let vectorGridLoadPromise = null, buildingLayer = null, buildingsEnabled = false;
+  let hydrantNavActionsSig = null;  // "id:lng,lat" of the hydrant currently in the strip
+  let satelliteOn = false;
+
+  // --- shared nav/action buttons (building popup + hydrant card) ------------
+  // URL templates ported verbatim from Varna_buildings sectionUnits.js
+  // (googleMapsUrl / streetViewUrl / googleMapsDirUrl / wazeUrl). Keyless
+  // link-outs only (ToS-clean); finite-coord guard -> null row, never a broken
+  // link. Coords are always the point's own lat/lng — never geocoded.
+  function buildNavActions(lat, lng) {
+    const la = Number(lat), lo = Number(lng);
+    if (!isFinite(la) || !isFinite(lo)) return null;
+    const row = document.createElement('div');
+    row.className = 'nav-actions';
+    const specs = [
+      ['Street View', 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + la + ',' + lo],
+      ['Google Maps', 'https://www.google.com/maps?q=' + la + ',' + lo],
+      ['Закарай ме',  'https://www.google.com/maps/dir/?api=1&destination=' + la + ',' + lo],
+      ['Waze',        'https://waze.com/ul?ll=' + la + ',' + lo + '&navigate=yes']
+    ];
+    for (const spec of specs) {
+      const a = document.createElement('a');
+      a.className = 'nav-action';
+      a.href = spec[1];
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = spec[0];
+      row.appendChild(a);
+    }
+    return row;
+  }
+
+  // Hydrant card nav strip — rebuilds only when the active hydrant changes, so
+  // it is safe to call from the per-frame updateCardInfo path.
+  // `at` is optional — updateCardInfo passes its own getActiveTarget() result to
+  // avoid a duplicate scan on the per-frame path. The signature includes coords
+  // so the strip rebuilds when a wrong_location poll moves the active hydrant
+  // (same id, new coords), while staying a cheap no-op on unchanged frames.
+  function refreshHydrantNavActions(at) {
+    const el = document.getElementById('hydrantNavActions');
+    if (!el) return;
+    if (at === undefined) at = getActiveTarget();
+    const coords = at && at.h && Array.isArray(at.h.coords) ? at.h.coords : null;
+    const sig = at && at.h ? (at.h.id + ':' + (coords ? coords[0] + ',' + coords[1] : '')) : null;
+    if (sig === hydrantNavActionsSig) return;
+    hydrantNavActionsSig = sig;
+    el.replaceChildren();
+    if (!coords) return;
+    const row = buildNavActions(coords[1], coords[0]);
+    if (row) el.appendChild(row);
+  }
+
+  // --- building popup (safe tile props ONLY) -------------------------------
+  function buildingPosInt(v) { const n = Number(v); return isFinite(n) && n > 0 ? n : null; }
+  function buildingFloors(p) {
+    const fl = buildingPosInt(p.fl);
+    if (fl) return String(fl);
+    const lo = buildingPosInt(p.fl_min), hi = buildingPosInt(p.fl_max);
+    if (lo && hi) return lo === hi ? String(lo) : (lo + '–' + hi);
+    if (lo) return String(lo);
+    if (hi) return String(hi);
+    return null;
+  }
+  function buildBuildingPopup(props, lat, lng) {
+    const p = props || {};
+    const wrap = document.createElement('div');
+    wrap.className = 'building-popup';
+    const typeLabel = p.bt_text || BUILDING_TYPE_LABEL[p.bt] || p.bt || null;
+    if (typeLabel) {
+      const t = document.createElement('div');
+      t.className = 'bp-title';
+      t.textContent = typeLabel;
+      wrap.appendChild(t);
+    }
+    const addRow = (label, value) => {
+      const r = document.createElement('div');
+      r.className = 'bp-row';
+      const l = document.createElement('span');
+      l.className = 'bp-label';
+      l.textContent = label + ': ';
+      r.appendChild(l);
+      r.appendChild(document.createTextNode(value));
+      wrap.appendChild(r);
+    };
+    const floors = buildingFloors(p);
+    if (floors) addRow('Етажи', floors);
+    const en = buildingPosInt(p.en);
+    if (en) addRow('Входове', String(en));
+    const u = buildingPosInt(p.u);
+    if (u) addRow('Апартаменти', String(u));
+    const nav = buildNavActions(lat, lng);
+    if (nav) wrap.appendChild(nav);
+    return wrap;
+  }
+
+  // --- token (memory only; refresh before exp; fail closed) ----------------
+  async function ensureTileToken(force) {
+    const now = Math.floor(Date.now() / 1000);
+    if (!force && tileToken && now < tileTokenExp - 60) return tileToken;
+    const resp = await fetch(BUILDING_TOKEN_URL, { method: 'GET', mode: 'cors', credentials: 'omit' });
+    if (!resp.ok) throw new Error('token http ' + resp.status);
+    const data = await resp.json();
+    if (!data || !data.token || typeof data.exp !== 'number') throw new Error('token malformed');
+    tileToken = data.token;
+    tileTokenExp = data.exp;
+    if (buildingLayer) buildingLayer.options.token = tileToken;  // new tile fetches use fresh token
+    scheduleTokenRefresh();
+    return tileToken;
+  }
+  function scheduleTokenRefresh() {
+    if (tokenRefreshTimer) { clearTimeout(tokenRefreshTimer); tokenRefreshTimer = null; }
+    // Only arm while buildings are on. This also stops a refresh from being
+    // resurrected when an in-flight enable's token fetch resolves after the user
+    // already toggled off (otherwise disable's clear would be undone).
+    if (!buildingsEnabled) return;
+    const now = Math.floor(Date.now() / 1000);
+    const delayMs = Math.max(15, tileTokenExp - now - 60) * 1000;
+    tokenRefreshTimer = setTimeout(() => {
+      if (!buildingsEnabled) return;   // suspend refresh while buildings are off
+      ensureTileToken(true).catch(() => {});  // fail closed: stale tiles 404/401 quietly
+    }, delayMs);
+  }
+
+  // --- VectorGrid loader (load if absent) ----------------------------------
+  function loadVectorGrid() {
+    if (window.L && L.vectorGrid && L.vectorGrid.protobuf) return Promise.resolve();
+    if (vectorGridLoadPromise) return vectorGridLoadPromise;
+    vectorGridLoadPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = VECTORGRID_CDN;
+      s.integrity = VECTORGRID_SRI;
+      s.crossOrigin = 'anonymous';
+      s.async = true;
+      s.onload = () => (window.L && L.vectorGrid && L.vectorGrid.protobuf)
+        ? resolve() : reject(new Error('vectorgrid missing after load'));
+      s.onerror = () => { vectorGridLoadPromise = null; reject(new Error('vectorgrid script failed')); };
+      document.head.appendChild(s);
+    });
+    return vectorGridLoadPromise;
+  }
+
+  // --- layer lifecycle ------------------------------------------------------
+  function buildingTileStyle(props) {
+    const base = BUILDING_TYPE_STYLES[(props && props.bt)] || BUILDING_TYPE_STYLES.unknown;
+    return Object.assign({ fill: true, stroke: true }, base);
+  }
+  function createBuildingLayer() {
+    const layer = L.vectorGrid.protobuf(BUILDING_TILE_URL, {
+      rendererFactory: L.svg.tile,   // DOM features -> reliable click interactivity
+      interactive: true,
+      minZoom: BUILDING_MIN_Z,
+      maxNativeZoom: BUILDING_MAX_Z,
+      maxZoom: 19,
+      token: tileToken,              // substituted into {token} per tile fetch
+      fetchOptions: { credentials: 'omit' },
+      vectorTileLayerStyles: { buildings: buildingTileStyle }
+    });
+    layer.on('click', (e) => {
+      // Placement / manual-position modes own map taps — the tap still bubbles
+      // to the map's own click handler (which sets the pin); we just must NOT
+      // also pop a building popup over it.
+      if (placementActive || manualMode) return;
+      const props = e.layer && e.layer.properties ? e.layer.properties : {};
+      const node = buildBuildingPopup(props, e.latlng.lat, e.latlng.lng);
+      L.popup({ closeButton: true, autoPan: true })
+        .setLatLng(e.latlng).setContent(node).openOn(map);
+    });
+    // Tile-level fetch errors stay contained to the building layer (fail closed).
+    layer.on('tileerror', () => {});
+    return layer;
+  }
+  function reflectBuildingsButton() {
+    const btn = document.getElementById('buildingsToggle');
+    if (!btn) return;
+    btn.classList.toggle('active', buildingsEnabled);
+    btn.setAttribute('aria-pressed', buildingsEnabled ? 'true' : 'false');
+  }
+  async function enableBuildings() {
+    buildingsEnabled = true;
+    reflectBuildingsButton();
+    try {
+      await Promise.all([ensureTileToken(false), loadVectorGrid()]);
+    } catch (err) {
+      // Fail CLOSED for buildings only — hydrants untouched. Quiet, revert toggle.
+      buildingsEnabled = false;
+      reflectBuildingsButton();
+      flashStatus('Сградите не са налични в момента', 3500);
+      return;
+    }
+    if (!buildingsEnabled) return;   // user turned it off mid-load
+    if (!buildingLayer) buildingLayer = createBuildingLayer();
+    else buildingLayer.options.token = tileToken;
+    // Re-arm the pre-expiry refresh on every enable. ensureTileToken only arms
+    // it after a real fetch, so a disable→re-enable while the cached token is
+    // still valid would otherwise leave it un-refreshed until silent expiry.
+    scheduleTokenRefresh();
+    // Add once; the layer's own minZoom (BUILDING_MIN_Z) lazily gates BOTH tile
+    // requests and rendering by zoom (no requests below z15), and resumes
+    // natively on zoom-in — so we never remove/re-add on zoom (which would not
+    // re-render a VectorGrid layer reliably).
+    if (!map.hasLayer(buildingLayer)) buildingLayer.addTo(map);
+    if (map.getZoom() < BUILDING_MIN_Z) flashStatus('Приближи, за да се покажат сградите', 2500);
+  }
+  function disableBuildings() {
+    buildingsEnabled = false;
+    reflectBuildingsButton();
+    if (buildingLayer && map.hasLayer(buildingLayer)) map.removeLayer(buildingLayer);
+    if (tokenRefreshTimer) { clearTimeout(tokenRefreshTimer); tokenRefreshTimer = null; }
+  }
+
+  // --- basemap toggle (OSM default <-> Esri satellite) ---------------------
+  function setBasemap(satellite) {
+    satelliteOn = satellite;
+    if (satellite) {
+      if (map.hasLayer(osmLayer)) map.removeLayer(osmLayer);
+      if (!map.hasLayer(satLayer)) satLayer.addTo(map);
+      attribCtrl.removeAttribution(OSM_ATTRIB);
+      attribCtrl.addAttribution(SAT_ATTRIB);
+    } else {
+      if (map.hasLayer(satLayer)) map.removeLayer(satLayer);
+      if (!map.hasLayer(osmLayer)) osmLayer.addTo(map);
+      attribCtrl.removeAttribution(SAT_ATTRIB);
+      attribCtrl.addAttribution(OSM_ATTRIB);
+    }
+    const b = document.getElementById('basemapToggle');
+    if (b) { b.classList.toggle('active', satellite); b.setAttribute('aria-pressed', satellite ? 'true' : 'false'); }
+  }
+
+  // --- wiring ---------------------------------------------------------------
+  const buildingsBtnEl = document.getElementById('buildingsToggle');
+  if (buildingsBtnEl) buildingsBtnEl.addEventListener('click', () => {
+    if (buildingsEnabled) disableBuildings(); else enableBuildings();
+  });
+  const basemapBtnEl = document.getElementById('basemapToggle');
+  if (basemapBtnEl) basemapBtnEl.addEventListener('click', () => setBasemap(!satelliteOn));
 
   // ===== Auto-start =====
   bootApp();
