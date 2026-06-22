@@ -1,0 +1,4 @@
+# Local dev / test only — never deployed (deploy is a dashboard paste of index.js).
+node_modules/
+.dev.vars
+.wrangler/

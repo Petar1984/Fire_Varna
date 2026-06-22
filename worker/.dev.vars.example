@@ -1,0 +1,11 @@
+# Copy this file to worker/.dev.vars (gitignored) for local `wrangler dev`.
+# NEVER commit real secret values. These are local-dev only; production secrets
+# live in the Cloudflare dashboard (Settings > Variables and Secrets).
+
+# HMAC secret used to sign/verify /tiles/buildings tokens. Use any long random
+# string for local dev; production uses a different, dashboard-managed value.
+TILES_HMAC_SECRET="local-dev-only-change-me-to-a-long-random-string"
+
+# Optional for local dev: a GitHub PAT so POST / and GET /issues work end-to-end.
+# Leave unset if you only want to exercise the /tiles/* routes locally.
+GITHUB_PAT=""

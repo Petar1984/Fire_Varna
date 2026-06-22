@@ -1,0 +1,47 @@
+# wrangler.toml — LOCAL DEV ONLY (Miniflare). This is NOT the deploy mechanism.
+#
+# Production deploy of this Worker is, and stays, a dashboard paste of
+# worker/index.js (see worker/README.md "Deploy workflow"). The real KV
+# namespace, R2 bucket/binding, secrets (GITHUB_PAT, TILES_HMAC_SECRET) and the
+# production vars are all managed in the Cloudflare dashboard.
+#
+# This file exists solely so `wrangler dev` / Miniflare can run the Worker
+# locally against simulated (local) R2 + KV, to exercise the /tiles/* gateway
+# without touching Cloudflare. Do NOT run `wrangler deploy` from this file.
+
+name = "varna-hydrants-proxy"
+main = "index.js"
+compatibility_date = "2026-05-01"
+
+# Local KV for the existing GET /issues second cache layer. The id below is a
+# placeholder for local dev only; the authoritative namespace lives in the
+# dashboard (binding name REPORTS_CACHE -> varna_hydrants_reports_cache).
+[[kv_namespaces]]
+binding = "REPORTS_CACHE"
+id = "local_dev_placeholder_reports_cache"
+
+# Local R2 bucket holding the E1 "safe_min" building PMTiles. The real private
+# bucket + binding are created by Petar in the dashboard; this is local only.
+# Seed it for local dev with:
+#   wrangler r2 object put varna-building-tiles-local/<OBJECT_KEY> \
+#       --file ../../Varna_buildings/output/building_tiles/safe_min/varna_buildings_safe_min_z15_z17.pmtiles
+# (omit --remote so it writes to the LOCAL simulated bucket).
+[[r2_buckets]]
+binding = "BUILDING_TILES"
+bucket_name = "varna-building-tiles-local"
+
+[vars]
+# Object key = tiles/buildings_safe_v<full sha256 of the pmtiles>.pmtiles
+# (the sha below is the E1 manifest's output.pmtiles.sha256, 2026-06-22).
+BUILDING_TILES_OBJECT_KEY = "tiles/buildings_safe_vf1f92e297a9beacc0c3b46ae10032a0afd86f1a6b3e441e772eee7aeb9daffa1.pmtiles"
+TILES_MIN_Z = "15"
+TILES_MAX_Z = "17"
+TILES_TOKEN_TTL_S = "600"
+TILES_RATE_WINDOW_S = "60"
+TILES_TOKEN_RATE_MAX = "30"
+TILES_TILE_RATE_MAX = "600"
+
+# Secrets are intentionally NOT defined here. Provide them:
+#   - locally: via worker/.dev.vars (gitignored; copy from .dev.vars.example)
+#   - production: via the Cloudflare dashboard (Settings > Variables and Secrets)
+# Required secrets: TILES_HMAC_SECRET (tile tokens), GITHUB_PAT (existing routes).

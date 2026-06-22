@@ -1,0 +1,14 @@
+{
+  "name": "varna-hydrants-worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local dev + tests for the Varna hydrants Cloudflare Worker. NOT a deploy mechanism — production deploy is a dashboard paste of index.js (see README.md).",
+  "scripts": {
+    "test": "node test/run_tests.mjs",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
