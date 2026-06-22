@@ -356,7 +356,12 @@ def build_update_preview(cc: ClassifiedComponent, *, timestamp: str) -> dict:
     rec = cc.nearest_record
     comp = cc.component
     existing = list(rec.get("legacy_ids", []))
-    added = [uid for uid in comp.member_uids if uid not in existing]
+    # Collapse duplicate-coordinate source points (same source_uid) so each alias
+    # is appended at most once. ArcGIS KMZ exports contain repeated placemarks at
+    # identical coordinates; without this an alias could land in legacy_ids 2-3x.
+    # Mirrors the ADD path, which already dedupes member uids.
+    member_aliases = list(dict.fromkeys(comp.member_uids))
+    added = [uid for uid in member_aliases if uid not in existing]
     new_legacy = existing + added  # existing order preserved, ETR aliases appended
 
     if added:
@@ -384,9 +389,14 @@ def build_update_preview(cc: ClassifiedComponent, *, timestamp: str) -> dict:
         "distance_m": round(cc.distance_m, 3),
         "source_file": comp.representative.source_file,
         "municipality": comp.representative.municipality,
+        "source_origin": comp.representative.origin,
         "old_legacy_ids": existing,
         "new_legacy_ids": new_legacy,
         "added_aliases": added,
+        # Every distinct source alias in this collapsed <2 m component, not just
+        # the ones newly appended. H4 apply needs the full set to distinguish a
+        # clean noop (all present) from a partial apply (some present, some not).
+        "member_aliases": member_aliases,
         "provenance_ref": provenance_ref,
     }
 
@@ -787,6 +797,599 @@ def render_markdown(report: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+# ---------- H4 signed apply ----------
+#
+# Per docs/plans/h4_kmz_apply_plan.md (approved, Petar 2026-06-22). Apply is an
+# explicit opt-in (--apply); without it the script stays dry-run only. Apply
+# mutates only data/hydrants.json, data/hydrants_provenance.json, the FLAG queue,
+# and the post-apply report. It applies the confident outcomes:
+#   * UPDATE (<= Rm): append ETR aliases to legacy_ids + one provenance ref.
+#   * ADD (> Rf): append a {id, coords, origin, legacy_ids} record + provenance.
+#   * FLAG ((Rm, Rf]): NOT applied — written to the manual-review queue only.
+#
+# Idempotency design: classification is computed against the BASE records (those
+# whose origin does not start with "etr_"), so prior H4 ADD records never alter
+# the signed UPDATE/FLAG/ADD batch. Whether each item is applied or a no-op is
+# then resolved per item against the FULL alias index.
+
+APPLY_SCHEMA_VERSION = "h4_kmz_apply_v1"
+FLAG_QUEUE_SCHEMA_VERSION = "h4_kmz_flag_queue_v1"
+
+DEFAULT_FLAG_QUEUE = "docs/audits/h2_kmz_flag_queue.json"
+DEFAULT_APPLY_REPORT = "docs/audits/h4_kmz_apply_report.json"
+
+# First-apply signed baseline (H2 dry-run report metadata; SIGNED Petar 2026-06-22).
+# Enforced only when the data is still pristine (no ETR records yet); an already
+# applied dataset legitimately differs and is validated for full consistency.
+BASELINE_HYDRANTS_COUNT = 5911
+BASELINE_PROVENANCE_COUNT = 5911
+BASELINE_HYDRANTS_SHA = (
+    "65F4E4CCCE8528E53710BC53EEA3590D6B2BD92DDCABC81803B8DBAFDA93585B")
+BASELINE_PROVENANCE_SHA = (
+    "894F81F6C2728BEB3356551A9FD6074435A520E3C00CA6AA843E58ED43D1016E")
+
+# Signed batch counts the recompute must reproduce on every apply run.
+EXPECTED_UPDATED = 3170
+EXPECTED_FLAGGED = 317
+EXPECTED_ADDED = 1306
+EXPECTED_OUTPUT_COUNT = 7217  # BASELINE_HYDRANTS_COUNT + EXPECTED_ADDED
+
+UPDATE_MERGE_ACTION = "kmz_etr_update"
+ADD_MERGE_ACTION = "kmz_etr_add"
+ETR_CONFIRM_ATTRIBUTION = "confirmed by ETR"
+QUEUE_STATUS_PENDING = "pending_manual_review"
+
+
+@dataclass(frozen=True)
+class ApplyExpectations:
+    """Hardcoded preconditions a real apply must satisfy. Any None field skips
+    that specific assertion (tests over synthetic batches pass all-None)."""
+
+    hydrants_count: int | None
+    provenance_count: int | None
+    hydrants_sha: str | None
+    provenance_sha: str | None
+    updated: int | None
+    flagged: int | None
+    added: int | None
+    output_count: int | None
+
+
+# The signed H4 batch (Petar 2026-06-22): the real apply over data/hydrants.json
+# must reproduce exactly these. main() always uses this; only tests override it.
+SIGNED_EXPECTATIONS = ApplyExpectations(
+    hydrants_count=BASELINE_HYDRANTS_COUNT,
+    provenance_count=BASELINE_PROVENANCE_COUNT,
+    hydrants_sha=BASELINE_HYDRANTS_SHA,
+    provenance_sha=BASELINE_PROVENANCE_SHA,
+    updated=EXPECTED_UPDATED,
+    flagged=EXPECTED_FLAGGED,
+    added=EXPECTED_ADDED,
+    output_count=EXPECTED_OUTPUT_COUNT,
+)
+
+# Synthetic-batch apply (tests only): no hardcoded baseline/count expectations;
+# the expected output count is derived dynamically as base_count + planned ADDs.
+NO_FIXED_EXPECTATIONS = ApplyExpectations(
+    None, None, None, None, None, None, None, None)
+
+
+class ApplyError(Exception):
+    """An apply precondition or invariant failed. Fail loud and write nothing.
+
+    Raised for baseline mismatch, recompute mismatch, alias/id collision,
+    partial-apply detection, or any post-construction invariant violation."""
+
+
+def is_etr_origin(record: dict) -> bool:
+    origin = record.get("origin")
+    return isinstance(origin, str) and origin.startswith("etr_")
+
+
+def base_records_for_classification(records: list[dict]) -> list[dict]:
+    """Records used as the stable classification base.
+
+    Records appended by a prior H4 ADD run carry origin=etr_<municipality>;
+    excluding them (by object reference, so UPDATE targets keep their identity)
+    means dedup/classify reproduces the signed batch on a second run instead of
+    seeing the just-added points as zero-distance self-matches."""
+    return [r for r in records if not is_etr_origin(r)]
+
+
+def _has_provenance_ref(provenance: dict, key: str, merge_action: str) -> bool:
+    entry = provenance.get(key)
+    if not isinstance(entry, dict):
+        return False
+    return any(ref.get("merge_action") == merge_action
+               for ref in entry.get("source_refs", []))
+
+
+# ----- Preflight -----
+
+def assert_input_integrity(records: list[dict], provenance: dict) -> None:
+    """Structural invariants required before any apply, on any run."""
+    ids = [r["id"] for r in records]
+    if len(ids) != len(set(ids)):
+        raise ApplyError("duplicate record ids present before apply")
+    for r in records:
+        if "legacy_ids" not in r or not isinstance(r["legacy_ids"], list):
+            raise ApplyError(f"record {r.get('id')!r} missing legacy_ids list")
+        if len(r["legacy_ids"]) != len(set(r["legacy_ids"])):
+            raise ApplyError(f"record {r.get('id')!r} has duplicate legacy_ids")
+    for key, entry in provenance.items():
+        if not isinstance(entry, dict) or "source_refs" not in entry:
+            raise ApplyError(f"provenance key {key!r} missing source_refs")
+
+
+def assert_first_apply_baseline(sha_in: str, sha_prov: str, count_in: int,
+                                count_prov: int, expected: ApplyExpectations) -> None:
+    """Pristine-data precondition. Only enforced when no ETR records exist yet,
+    and only for the fields the caller pins (None fields are skipped)."""
+    if expected.hydrants_count is not None and count_in != expected.hydrants_count:
+        raise ApplyError(
+            f"baseline hydrants count {count_in} != {expected.hydrants_count}")
+    if expected.provenance_count is not None and count_prov != expected.provenance_count:
+        raise ApplyError(
+            f"baseline provenance count {count_prov} != {expected.provenance_count}")
+    if expected.hydrants_sha is not None and sha_in.upper() != expected.hydrants_sha:
+        raise ApplyError(
+            f"baseline hydrants sha {sha_in} != {expected.hydrants_sha}")
+    if expected.provenance_sha is not None and sha_prov.upper() != expected.provenance_sha:
+        raise ApplyError(
+            f"baseline provenance sha {sha_prov} != {expected.provenance_sha}")
+
+
+def assert_recompute_counts(report: dict, base_count: int,
+                            expected: ApplyExpectations) -> None:
+    """The recompute must reproduce the signed batch exactly, every run (for the
+    fields the caller pins)."""
+    s = report["summary"]
+    if expected.updated is not None and s["updated"] != expected.updated:
+        raise ApplyError(
+            f"recomputed updated {s['updated']} != {expected.updated}")
+    if expected.flagged is not None and s["flagged"] != expected.flagged:
+        raise ApplyError(
+            f"recomputed flagged {s['flagged']} != {expected.flagged}")
+    if expected.added is not None and s["added"] != expected.added:
+        raise ApplyError(
+            f"recomputed added {s['added']} != {expected.added}")
+    if expected.output_count is not None:
+        projected = s["projected_output_count_if_applied"]
+        if base_count + s["added"] != expected.output_count or projected != expected.output_count:
+            raise ApplyError(
+                f"projected output {projected} (base {base_count} + {s['added']}) "
+                f"!= {expected.output_count}")
+
+
+# ----- Plan resolution (pure: classify each preview as apply/noop, detect faults) -----
+
+def _resolve_update(pv: dict, alias: dict, provenance: dict):
+    """Classify one UPDATE preview against live data.
+
+    Returns (state, missing_aliases, fault) where state is 'apply' or 'noop',
+    and fault is None or a (code, ...) tuple that must abort the whole run."""
+    target = alias.get(pv["target_id"])
+    if target is None:
+        return None, [], ("update_target_missing", pv["target_id"])
+    legacy = target.get("legacy_ids", [])
+    member = pv["member_aliases"]
+    present = [a for a in member if a in legacy]
+    missing = [a for a in member if a not in legacy]
+    # Alias collision: a not-yet-applied alias is already bound to a DIFFERENT
+    # record. Never steal an alias from another hydrant.
+    for a in missing:
+        other = alias.get(a)
+        if other is not None and other is not target:
+            return None, [], ("alias_collision", a, target["id"], other["id"])
+    if present and missing:
+        return None, [], ("partial_update", pv["target_id"], present, missing)
+    if present and not missing:
+        # Fully present already: a no-op only if the H4 provenance ref also exists.
+        if not _has_provenance_ref(provenance, target["id"], UPDATE_MERGE_ACTION):
+            return None, [], ("update_alias_without_provenance", target["id"])
+        return "noop", [], None
+    return "apply", missing, None
+
+
+def _resolve_add(g: dict, alias: dict, provenance: dict):
+    """Classify one ADD group against live data.
+
+    Returns (state, fault) where state is 'apply' or 'noop'."""
+    rec = g["record"]
+    if set(rec.keys()) != {"id", "coords", "origin", "legacy_ids"}:
+        return None, ("add_record_bad_shape", rec.get("id"), sorted(rec.keys()))
+    cid = rec["id"]
+    existing = alias.get(cid)
+    if existing is None:
+        # Id free; an alias already bound elsewhere is a collision.
+        for a in rec["legacy_ids"]:
+            if a in alias:
+                return None, ("add_alias_bound_elsewhere", a, alias[a]["id"])
+        if cid in provenance:
+            return None, ("add_provenance_without_record", cid)
+        return "apply", None
+    # Id already present: must be the same logical record to be a no-op.
+    if existing.get("coords") != rec["coords"] or existing.get("origin") != rec["origin"]:
+        return None, ("add_id_collision", cid, existing.get("origin"))
+    missing = [a for a in rec["legacy_ids"] if a not in existing.get("legacy_ids", [])]
+    if missing:
+        return None, ("add_record_missing_aliases", cid, missing)
+    if not _has_provenance_ref(provenance, cid, ADD_MERGE_ACTION):
+        return None, ("add_record_without_provenance", cid)
+    return "noop", None
+
+
+def build_apply_plan(previews: dict, records: list[dict], provenance: dict) -> dict:
+    """Resolve every UPDATE/ADD preview into apply/noop actions against live data.
+
+    Pure: mutates nothing. Collects every collision / partial-apply fault; the
+    caller aborts the run (writing nothing) if any fault is present."""
+    alias = core.build_alias_index(records)
+    faults: list[tuple] = []
+    update_actions: list[dict] = []
+    add_actions: list[dict] = []
+
+    for pv in previews["update_previews"]:
+        state, missing, fault = _resolve_update(pv, alias, provenance)
+        if fault is not None:
+            faults.append(fault)
+            continue
+        update_actions.append({"preview": pv, "target_id": pv["target_id"],
+                               "state": state, "missing": missing})
+
+    for g in previews["add_groups"]:
+        state, fault = _resolve_add(g, alias, provenance)
+        if fault is not None:
+            faults.append(fault)
+            continue
+        add_actions.append({"group": g, "state": state})
+
+    return {"update_actions": update_actions, "add_actions": add_actions,
+            "faults": faults}
+
+
+# ----- Mutation -----
+
+def apply_update(target: dict, missing: list[str], pv: dict, provenance: dict,
+                 *, timestamp: str) -> None:
+    """Append missing ETR aliases to legacy_ids and one provenance ref. Touches
+    no other field of the target record (plan UPDATE Semantics)."""
+    old_legacy = list(target["legacy_ids"])
+    new_legacy = old_legacy + missing  # existing order preserved, ETR appended
+    target["legacy_ids"] = new_legacy
+    provenance.setdefault(target["id"], {"source_refs": []})["source_refs"].append({
+        "old_id": target["id"],
+        "old_coord": list(target["coords"]),
+        "manual_field": "legacy_ids",
+        "old_value": old_legacy,
+        "new_value": new_legacy,
+        "attribution": ETR_CONFIRM_ATTRIBUTION,
+        "timestamp": timestamp,
+        "merge_action": UPDATE_MERGE_ACTION,
+        "source_origin": pv["source_origin"],
+        "source_file": pv["provenance_ref"]["source_file"],
+        "source_uids": list(missing),
+        "distance_m": pv["distance_m"],
+        "conflict_flags": [],
+    })
+
+
+def apply_add(group: dict, records: list[dict], alias: dict, provenance: dict,
+              *, timestamp: str) -> None:
+    """Append the new {id, coords, origin, legacy_ids} record and its provenance."""
+    rec = dict(group["record"])  # defensive copy; preview dict is not shared in
+    records.append(rec)
+    alias[rec["id"]] = rec
+    for a in rec["legacy_ids"]:
+        alias.setdefault(a, rec)
+    provenance[rec["id"]] = {"source_refs": [{
+        "old_id": None,
+        "old_coord": None,
+        "manual_field": "new_record",
+        "old_value": None,
+        "new_value": dict(rec),
+        "attribution": ETR_CONFIRM_ATTRIBUTION,
+        "timestamp": timestamp,
+        "merge_action": ADD_MERGE_ACTION,
+        "source_origin": rec["origin"],
+        "source_file": group["representative_source_file"],
+        "source_uids": list(rec["legacy_ids"]),
+        "conflict_flags": [],
+    }]}
+
+
+def build_flag_queue(flag_rows: list[dict], *, timestamp: str) -> dict:
+    """Versioned FLAG queue (plan FLAG Semantics). Deterministic on every run."""
+    queued = []
+    for row in flag_rows:
+        queued.append({"flag_id": row["flag_id"],
+                       "queue_status": QUEUE_STATUS_PENDING,
+                       **{k: v for k, v in row.items() if k != "flag_id"}})
+    return {
+        "schema_version": FLAG_QUEUE_SCHEMA_VERSION,
+        "generated_at": timestamp,
+        "queue_status_default": QUEUE_STATUS_PENDING,
+        "count": len(queued),
+        "flags": queued,
+    }
+
+
+# ----- Post-construction validation -----
+
+def validate_apply_state(records: list[dict], provenance: dict,
+                         before_snapshot: dict, update_target_ids: set) -> dict:
+    """Assert the mutated in-memory state is internally consistent and that
+    UPDATE touched nothing but legacy_ids. Returns a validation summary dict.
+
+    before_snapshot: {id: deepcopy of original record} for every pre-apply record.
+    update_target_ids: ids that were UPDATE targets this run."""
+    ids = [r["id"] for r in records]
+    dup_after = len(ids) - len(set(ids))
+    if dup_after:
+        raise ApplyError(f"duplicate ids after apply: {dup_after}")
+    for r in records:
+        if len(r["legacy_ids"]) != len(set(r["legacy_ids"])):
+            raise ApplyError(
+                f"record {r['id']!r} has duplicate legacy_ids after apply")
+    current = {r["id"]: r for r in records}
+
+    missing_prov = sum(1 for r in records if r["id"] not in provenance)
+    if missing_prov:
+        raise ApplyError(f"{missing_prov} records missing provenance after apply")
+    orphan_prov = sum(1 for k in provenance if k not in current)
+    if orphan_prov:
+        raise ApplyError(f"{orphan_prov} provenance keys without a record after apply")
+
+    unexpected = 0
+    for rid, before in before_snapshot.items():
+        after = current.get(rid)
+        if after is None:
+            raise ApplyError(f"pre-apply record {rid} vanished during apply")
+        if set(before.keys()) != set(after.keys()):
+            raise ApplyError(f"record {rid} gained/lost a field during apply")
+        before_other = {k: v for k, v in before.items() if k != "legacy_ids"}
+        after_other = {k: v for k, v in after.items() if k != "legacy_ids"}
+        if before_other != after_other:
+            unexpected += 1
+            raise ApplyError(
+                f"UPDATE mutated a field outside legacy_ids on record {rid}")
+        if rid not in update_target_ids and before.get("legacy_ids") != after.get("legacy_ids"):
+            unexpected += 1
+            raise ApplyError(f"legacy_ids changed on non-UPDATE record {rid}")
+    return {
+        "duplicate_ids_after": dup_after,
+        "missing_provenance_after": missing_prov,
+        "unexpected_field_mutations": unexpected,
+    }
+
+
+# ----- Report assembly -----
+
+def build_apply_report(*, timestamp, plan, applied_updates, applied_adds,
+                       noop_updates, noop_adds, queued_flags, previews,
+                       report_dry, sha_in_before, sha_in_after, sha_prov_before,
+                       sha_prov_after, count_in_before, count_in_after,
+                       count_prov_before, count_prov_after, h2_report_path,
+                       h2_report_sha, validation, output_files, args,
+                       expected_output_count) -> dict:
+    # Per-municipality applied/noop aggregation, keyed by source file.
+    per = {b: {"source_file": b, "municipality": m, "applied_updates": 0,
+               "applied_adds": 0, "queued_flags": 0, "noop_updates": 0,
+               "noop_adds": 0}
+           for b, m in KNOWN_KMZ}
+    for a in plan["update_actions"]:
+        bucket = per[a["preview"]["source_file"]]
+        bucket["applied_updates" if a["state"] == "apply" else "noop_updates"] += 1
+    for a in plan["add_actions"]:
+        bucket = per[a["group"]["representative_source_file"]]
+        bucket["applied_adds" if a["state"] == "apply" else "noop_adds"] += 1
+    for row in previews["flag_rows"]:
+        per[row["source_file"]]["queued_flags"] += 1
+
+    s = report_dry["summary"]
+    return {
+        "schema_version": APPLY_SCHEMA_VERSION,
+        "mode": "apply",
+        "generated_at": timestamp,
+        "inputs": {
+            "hydrants_json": {
+                "path": args.input.replace(os.sep, "/"),
+                "sha256_before": sha_in_before,
+                "sha256_after": sha_in_after,
+                "record_count_before": count_in_before,
+                "record_count_after": count_in_after,
+            },
+            "provenance_json": {
+                "path": args.provenance.replace(os.sep, "/"),
+                "sha256_before": sha_prov_before,
+                "sha256_after": sha_prov_after,
+                "record_count_before": count_prov_before,
+                "record_count_after": count_prov_after,
+            },
+            "h2_dry_run_report": {
+                "path": h2_report_path,
+                "sha256": h2_report_sha,
+            },
+            "kmz_files": report_dry["inputs"]["kmz_files"],
+        },
+        "thresholds_m": report_dry["thresholds_m"],
+        "summary": {
+            "planned_updates": s["updated"],
+            "planned_adds": s["added"],
+            "planned_flags": s["flagged"],
+            "applied_updates": applied_updates,
+            "applied_adds": applied_adds,
+            "queued_flags": queued_flags,
+            "noop_updates": noop_updates,
+            "noop_adds": noop_adds,
+            "record_count_before": count_in_before,
+            "record_count_after": count_in_after,
+            "expected_record_count_after": expected_output_count,
+            "provenance_count_before": count_prov_before,
+            "provenance_count_after": count_prov_after,
+            "collisions": 0,
+            "partial_apply_detected": False,
+        },
+        "output_files": output_files,
+        "per_file": [per[b] for b, _m in KNOWN_KMZ],
+        "validation": {
+            "dry_run_default_preserved": True,
+            "only_allowed_paths_written": True,
+            "mojibake_scan_passed": True,
+            "duplicate_ids_after": validation["duplicate_ids_after"],
+            "missing_provenance_after": validation["missing_provenance_after"],
+            "unexpected_field_mutations": validation["unexpected_field_mutations"],
+        },
+    }
+
+
+def run_apply(args, timestamp: str, *, expected: ApplyExpectations = SIGNED_EXPECTATIONS) -> int:
+    """Signed apply path. Mutates only the four allowed files; fails loud and
+    writes nothing on any precondition/invariant failure.
+
+    expected pins the hardcoded baseline + signed-batch counts. main() always
+    passes SIGNED_EXPECTATIONS (the real data guard); tests pass
+    NO_FIXED_EXPECTATIONS so a synthetic batch of any size can be applied."""
+    import copy
+
+    # 1. Load + hash protected files BEFORE any mutation.
+    sha_in_before = sha256_file(args.input)
+    sha_prov_before = sha256_file(args.provenance)
+    records = core.load_json(args.input)
+    provenance = core.load_json(args.provenance)
+    count_in_before = len(records)
+    count_prov_before = len(provenance)
+
+    # 2. Structural integrity (every run).
+    assert_input_integrity(records, provenance)
+
+    # 3. First-apply baseline only while the data is still pristine. An already
+    #    applied dataset (ETR records present) legitimately differs.
+    first_apply = not any(is_etr_origin(r) for r in records)
+    if first_apply:
+        assert_first_apply_baseline(sha_in_before, sha_prov_before,
+                                    count_in_before, count_prov_before, expected)
+
+    # 4. Recompute the signed batch against the stable base records.
+    base = base_records_for_classification(records)
+    files = load_source_dir(args.source_dir)
+    input_meta = {"path": args.input.replace(os.sep, "/"),
+                  "sha256": sha_in_before, "record_count": count_in_before}
+    provenance_meta = {"path": args.provenance.replace(os.sep, "/"),
+                       "sha256": sha_prov_before, "record_count": count_prov_before}
+    report_dry, previews = run_consolidation(
+        files, base, provenance, timestamp=timestamp,
+        input_meta=input_meta, provenance_meta=provenance_meta)
+    assert_recompute_counts(report_dry, len(base), expected)
+    expected_out = (expected.output_count if expected.output_count is not None
+                    else len(base) + report_dry["summary"]["added"])
+
+    # 5. Resolve apply/noop per item; abort loud on any collision/partial fault.
+    plan = build_apply_plan(previews, records, provenance)
+    if plan["faults"]:
+        preview = "; ".join(str(f) for f in plan["faults"][:10])
+        raise ApplyError(
+            f"{len(plan['faults'])} collision/partial-apply fault(s) detected; "
+            f"writing nothing. First faults: {preview}")
+
+    # 6. Snapshot every pre-apply record to prove UPDATE only touches legacy_ids.
+    before_snapshot = {r["id"]: copy.deepcopy(r) for r in records}
+    update_target_ids = {a["target_id"] for a in plan["update_actions"]}
+    alias = core.build_alias_index(records)
+
+    # 7. Mutate in memory: UPDATE then ADD.
+    applied_updates = noop_updates = 0
+    for a in plan["update_actions"]:
+        if a["state"] == "apply":
+            apply_update(alias[a["target_id"]], a["missing"], a["preview"],
+                         provenance, timestamp=timestamp)
+            applied_updates += 1
+        else:
+            noop_updates += 1
+    applied_adds = noop_adds = 0
+    for a in plan["add_actions"]:
+        if a["state"] == "apply":
+            apply_add(a["group"], records, alias, provenance, timestamp=timestamp)
+            applied_adds += 1
+        else:
+            noop_adds += 1
+
+    flag_queue = build_flag_queue(previews["flag_rows"], timestamp=timestamp)
+    queued_flags = flag_queue["count"]
+
+    # 8. Validate the mutated state (count, uniqueness, provenance, field guard).
+    validation = validate_apply_state(records, provenance, before_snapshot,
+                                      update_target_ids)
+    count_in_after = len(records)
+    count_prov_after = len(provenance)
+    if count_in_after != expected_out:
+        raise ApplyError(
+            f"record count after apply {count_in_after} != {expected_out}")
+    if count_prov_after != count_in_after:
+        raise ApplyError(
+            f"provenance count {count_prov_after} != record count {count_in_after}")
+
+    # 9. Mojibake scan all four outputs BEFORE writing anything.
+    output_files_map = {
+        "hydrants_json": args.input.replace(os.sep, "/"),
+        "provenance_json": args.provenance.replace(os.sep, "/"),
+        "flag_queue": args.flag_queue.replace(os.sep, "/"),
+        "apply_report": args.apply_report.replace(os.sep, "/"),
+    }
+    core.mojibake_scan("hydrants", records)
+    core.mojibake_scan("provenance", provenance)
+    core.mojibake_scan("flag_queue", flag_queue)
+
+    # 10. Record the (untouched) H2 dry-run report hash for the apply report.
+    h2_report_path = args.json_report.replace(os.sep, "/")
+    h2_report_sha = sha256_file(args.json_report) if os.path.exists(args.json_report) else None
+
+    # 11. Write data + provenance + flag queue, then hash them for the report.
+    core.atomic_write_json(args.input, records)
+    core.atomic_write_json(args.provenance, provenance)
+    core.atomic_write_json(args.flag_queue, flag_queue, indent=2)
+    sha_in_after = sha256_file(args.input)
+    sha_prov_after = sha256_file(args.provenance)
+
+    apply_report = build_apply_report(
+        timestamp=timestamp, plan=plan,
+        applied_updates=applied_updates, applied_adds=applied_adds,
+        noop_updates=noop_updates, noop_adds=noop_adds, queued_flags=queued_flags,
+        previews=previews, report_dry=report_dry,
+        sha_in_before=sha_in_before, sha_in_after=sha_in_after,
+        sha_prov_before=sha_prov_before, sha_prov_after=sha_prov_after,
+        count_in_before=count_in_before, count_in_after=count_in_after,
+        count_prov_before=count_prov_before, count_prov_after=count_prov_after,
+        h2_report_path=h2_report_path, h2_report_sha=h2_report_sha,
+        validation=validation, output_files=output_files_map, args=args,
+        expected_output_count=expected_out)
+    core.mojibake_scan("apply_report", apply_report)
+    core.atomic_write_json(args.apply_report, apply_report, indent=2)
+
+    _print_apply_summary(apply_report, args, sha_in_after, sha_prov_after)
+    return 0
+
+
+def _print_apply_summary(report, args, sha_in_after, sha_prov_after) -> None:
+    s = report["summary"]
+    print("H4 KMZ signed apply summary")
+    print(f"  input:               {args.input}")
+    print(f"  provenance:          {args.provenance}")
+    print(f"  record_count_before: {s['record_count_before']}")
+    print(f"  record_count_after:  {s['record_count_after']} "
+          f"(expected {s['expected_record_count_after']})")
+    print(f"  provenance_before:   {s['provenance_count_before']}")
+    print(f"  provenance_after:    {s['provenance_count_after']}")
+    print(f"  applied_updates:     {s['applied_updates']}  (noop {s['noop_updates']})")
+    print(f"  applied_adds:        {s['applied_adds']}  (noop {s['noop_adds']})")
+    print(f"  queued_flags:        {s['queued_flags']}")
+    print(f"  hydrants  sha after: {sha_in_after}")
+    print(f"  provenance sha after:{sha_prov_after}")
+    print(f"  flag_queue:          {args.flag_queue}")
+    print(f"  apply_report:        {args.apply_report}")
+    print("  H2 dry-run report left unchanged (pre-apply artifact).")
+
+
 # ---------- CLI ----------
 
 def _atomic_write_text(path: str, text: str) -> None:
@@ -814,10 +1417,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--provenance", default=DEFAULT_PROVENANCE)
     parser.add_argument("--json-report", default=DEFAULT_JSON_REPORT)
     parser.add_argument("--md-report", default=DEFAULT_MD_REPORT)
+    parser.add_argument("--flag-queue", default=DEFAULT_FLAG_QUEUE,
+                        help="FLAG manual-review queue written in --apply mode.")
+    parser.add_argument("--apply-report", default=DEFAULT_APPLY_REPORT,
+                        help="Post-apply report written in --apply mode.")
     parser.add_argument("--timestamp", default=None,
                         help="ISO-8601 timestamp recorded in the report. Defaults "
                              "to current local time.")
-    # NOTE: there is deliberately no --apply. H2 is dry-run only; H4 owns apply.
+    # Dry-run is the default. --apply (H4, signed) is an explicit opt-in that
+    # mutates data/provenance and writes the FLAG queue + apply report; it never
+    # rewrites the H2 dry-run report (a pre-apply artifact).
+    parser.add_argument("--apply", action="store_true",
+                        help="H4 signed apply: mutate data/provenance, write the "
+                             "FLAG queue and apply report. Without it, dry-run only.")
     return parser
 
 
@@ -830,6 +1442,9 @@ def main(argv=None) -> int:
 
     args = build_parser().parse_args(argv)
     timestamp = args.timestamp or core.default_timestamp()
+
+    if args.apply:
+        return run_apply(args, timestamp)
 
     # Dry-run safety: hash the protected files BEFORE doing anything.
     sha_in_before = sha256_file(args.input)

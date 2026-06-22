@@ -484,12 +484,15 @@ class AddClusterTest(unittest.TestCase):
 # --------------------------------------------------------------------------
 
 class CliDryRunTest(unittest.TestCase):
-    def test_no_apply_flag(self):
+    def test_apply_flag_present_and_dry_run_default(self):
+        # H4 added an explicit --apply; dry-run is still the default (no flag).
         parser = adapter.build_parser()
         option_strings = [s for a in parser._actions for s in a.option_strings]
-        self.assertNotIn("--apply", option_strings)
-        with self.assertRaises(SystemExit):
-            parser.parse_args(["--apply"])
+        self.assertIn("--apply", option_strings)
+        self.assertIn("--flag-queue", option_strings)
+        self.assertIn("--apply-report", option_strings)
+        self.assertFalse(parser.parse_args([]).apply)        # default dry-run
+        self.assertTrue(parser.parse_args(["--apply"]).apply)  # explicit opt-in
 
     def test_input_and_provenance_untouched(self):
         with tempfile.TemporaryDirectory() as d:
@@ -597,6 +600,425 @@ class RealDataGuardTest(unittest.TestCase):
             self.assertEqual(rc, 0)
         after = {p: _sha256(p) for p in present}
         self.assertEqual(before, after)
+
+
+# --------------------------------------------------------------------------
+# H4 signed apply (docs/plans/h4_kmz_apply_plan.md). All writes go to temp dirs;
+# the synthetic batch uses adapter.NO_FIXED_EXPECTATIONS so any size is allowed.
+# --------------------------------------------------------------------------
+
+KMZ_BASENAMES = {
+    "varna": "Пожарни хидранти ЕТР Варна.kmz",
+    "provadia": "Пожарни хидранти ЕТР Провадия.kmz",
+    "dolni_chiflik": "Пожарни хидранти ЕТР Долни Чифлик.kmz",
+    "devnya": "Пожарни хидранти ЕТР Девня.kmz",
+}
+
+
+def write_source_dir(d, *, varna=(), provadia=(), dolni=(), devnya=()):
+    """Write the four required KMZ basenames with caller-supplied placemarks.
+    Any municipality may be empty; load_source_dir still needs all four files."""
+    write_kmz(os.path.join(d, KMZ_BASENAMES["varna"]), list(varna))
+    write_kmz(os.path.join(d, KMZ_BASENAMES["provadia"]), list(provadia))
+    write_kmz(os.path.join(d, KMZ_BASENAMES["dolni_chiflik"]), list(dolni))
+    write_kmz(os.path.join(d, KMZ_BASENAMES["devnya"]), list(devnya))
+    return d
+
+
+def run_apply_over_temp(d, *, records, provenance=None, timestamp=TIMESTAMP,
+                        expected=None, varna=(), provadia=(), dolni=(), devnya=(),
+                        via_main=False, apply_report_name="apply_report.json"):
+    """Set up temp input/provenance/source-dir, run the apply path, return
+    (rc_or_exc, paths). Uses NO_FIXED_EXPECTATIONS unless overridden."""
+    src = os.path.join(d, "src")
+    os.makedirs(src, exist_ok=True)
+    write_source_dir(src, varna=varna, provadia=provadia, dolni=dolni, devnya=devnya)
+    inp = os.path.join(d, "hydrants.json")
+    prov = os.path.join(d, "provenance.json")
+    jrep = os.path.join(d, "out", "h2_report.json")
+    mrep = os.path.join(d, "out", "h2_report.md")
+    fq = os.path.join(d, "out", "flag_queue.json")
+    arep = os.path.join(d, "out", apply_report_name)
+    if provenance is None:
+        provenance = build_provenance(records)
+    core.atomic_write_json(inp, records)
+    core.atomic_write_json(prov, provenance)
+    argv = ["--source-dir", src, "--input", inp, "--provenance", prov,
+            "--json-report", jrep, "--md-report", mrep,
+            "--flag-queue", fq, "--apply-report", arep,
+            "--timestamp", timestamp, "--apply"]
+    paths = {"input": inp, "provenance": prov, "json": jrep, "md": mrep,
+             "flag_queue": fq, "apply_report": arep, "src": src}
+    if via_main:
+        with contextlib.redirect_stdout(io.StringIO()):
+            rc = adapter.main(argv)
+        return rc, paths
+    args = adapter.build_parser().parse_args(argv)
+    with contextlib.redirect_stdout(io.StringIO()):
+        rc = adapter.run_apply(args, timestamp,
+                               expected=expected or adapter.NO_FIXED_EXPECTATIONS)
+    return rc, paths
+
+
+def _load(path):
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+# A standard mixed batch against build_records() (one R1 at 27.900, 43.200):
+#   varna: UPDATE on R1, FLAG ~6 m, ADD far; + one ADD per other municipality.
+STD_VARNA = [
+    {"name": 'УЛ. "ТЕСТ"', "coord": (27.900, 43.200, 0)},            # UPDATE (0 m)
+    {"name": "", "coord": (*point_north(27.900, 43.200, 6.0), 0)},   # FLAG (~6 m)
+    {"name": " ", "coord": (27.950, 43.250, 0)},                     # ADD (far)
+]
+STD_PROVADIA = [{"name": "", "coord": (27.44281, 43.18480, 0)}]      # ADD
+STD_DOLNI = [{"name": "x", "coord": (27.72436, 42.99677, 0)}]        # ADD
+STD_DEVNYA = [{"name": "y", "coord": (27.62786, 43.36714, 0)}]       # ADD
+STD_BATCH = dict(varna=STD_VARNA, provadia=STD_PROVADIA,
+                 dolni=STD_DOLNI, devnya=STD_DEVNYA)
+# This batch yields: applied_updates=1, applied_adds=4, queued_flags=1.
+
+
+class ApplyUpdateTest(unittest.TestCase):
+    def test_apply_updates_append_only_etr_alias_and_provenance(self):
+        rec = {"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+               "origin": "vik", "legacy_ids": ["VIK-1"], "type": "надземен",
+               "operational_status": "works", "existence_status": "verified",
+               "address": "ул. Тест 1", "review_status": "reported"}
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(
+                d, records=[copy.deepcopy(rec)],
+                varna=[{"name": "n", "coord": (27.900, 43.200, 0)}])
+            self.assertEqual(rc, 0)
+            out = _load(paths["input"])
+            self.assertEqual(len(out), 1)            # UPDATE never adds a record
+            target = out[0]
+            alias = "etr_varna:27.90000000,43.20000000"
+            # Every field except legacy_ids is byte-identical to the original.
+            for k, v in rec.items():
+                if k == "legacy_ids":
+                    continue
+                self.assertEqual(target[k], v, f"field {k} must not change")
+            self.assertEqual(set(target.keys()), set(rec.keys()))  # no new fields
+            self.assertEqual(target["legacy_ids"], ["VIK-1", alias])  # appended
+            # Provenance: exactly one appended ref, kmz_etr_update, ETR-attributed.
+            refs = _load(paths["provenance"])["coord_27.90000_43.20000"]["source_refs"]
+            self.assertEqual(len(refs), 1)
+            ref = refs[0]
+            self.assertEqual(ref["merge_action"], "kmz_etr_update")
+            self.assertEqual(ref["attribution"], "confirmed by ETR")
+            self.assertEqual(ref["manual_field"], "legacy_ids")
+            self.assertEqual(ref["old_value"], ["VIK-1"])
+            self.assertEqual(ref["new_value"], ["VIK-1", alias])
+            self.assertEqual(ref["source_uids"], [alias])
+            self.assertEqual(ref["conflict_flags"], [])
+
+    def test_duplicate_coordinate_sources_append_alias_once(self):
+        # ArcGIS KMZ exports repeat placemarks at identical coordinates; both
+        # share one source_uid and must not land in legacy_ids more than once.
+        recs = [{"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+                 "origin": "vik", "legacy_ids": ["VIK-1"]}]
+        alias = "etr_varna:27.90000000,43.20000000"
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(
+                d, records=copy.deepcopy(recs),
+                varna=[{"name": "a", "coord": (27.900, 43.200, 0)},   # same coord
+                       {"name": "b", "coord": (27.900, 43.200, 0)},   # twice
+                       {"name": "c", "coord": (27.900, 43.200, 0)}])  # thrice
+            self.assertEqual(rc, 0)
+            out = _load(paths["input"])
+            self.assertEqual(len(out), 1)
+            self.assertEqual(out[0]["legacy_ids"], ["VIK-1", alias])  # exactly once
+            refs = _load(paths["provenance"])["coord_27.90000_43.20000"]["source_refs"]
+            self.assertEqual(refs[0]["source_uids"], [alias])  # provenance single
+
+    def test_update_does_not_change_record_count(self):
+        recs = [{"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+                 "origin": "vik", "legacy_ids": []}]
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(
+                d, records=copy.deepcopy(recs),
+                varna=[{"name": "n", "coord": (27.900, 43.200, 0)}])  # only UPDATE
+            self.assertEqual(rc, 0)
+            out = _load(paths["input"])
+            self.assertEqual(len(out), len(recs))   # 1 -> 1
+            report = _load(paths["apply_report"])
+            self.assertEqual(report["summary"]["applied_updates"], 1)
+            self.assertEqual(report["summary"]["applied_adds"], 0)
+            self.assertEqual(report["summary"]["record_count_after"], 1)
+
+
+class ApplyAddTest(unittest.TestCase):
+    def test_add_shape_and_real_coordinate(self):
+        recs = [{"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+                 "origin": "vik", "legacy_ids": []}]
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(
+                d, records=copy.deepcopy(recs),
+                varna=[{"name": "z", "coord": (27.950, 43.250, 0)}])  # one far ADD
+            self.assertEqual(rc, 0)
+            out = _load(paths["input"])
+            self.assertEqual(len(out), 2)
+            added = [r for r in out if r["id"] != "coord_27.90000_43.20000"][0]
+            # Exactly the four allowed keys, real KMZ coordinate, etr_ origin.
+            self.assertEqual(set(added.keys()), {"id", "coords", "origin", "legacy_ids"})
+            self.assertEqual(added["coords"], [27.950, 43.250])
+            self.assertEqual(added["id"], core.canonical_coord_id(27.950, 43.250))
+            self.assertEqual(added["origin"], "etr_varna")
+            self.assertEqual(added["legacy_ids"], ["etr_varna:27.95000000,43.25000000"])
+
+    def test_add_creates_provenance(self):
+        recs = [{"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+                 "origin": "vik", "legacy_ids": []}]
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(
+                d, records=copy.deepcopy(recs),
+                varna=[{"name": "z", "coord": (27.950, 43.250, 0)}])
+            self.assertEqual(rc, 0)
+            prov = _load(paths["provenance"])
+            new_id = core.canonical_coord_id(27.950, 43.250)
+            self.assertIn(new_id, prov)
+            refs = prov[new_id]["source_refs"]
+            self.assertEqual(len(refs), 1)
+            self.assertEqual(refs[0]["merge_action"], "kmz_etr_add")
+            self.assertEqual(refs[0]["attribution"], "confirmed by ETR")
+            self.assertEqual(refs[0]["manual_field"], "new_record")
+            self.assertEqual(refs[0]["new_value"]["id"], new_id)
+
+
+class ApplyFlagTest(unittest.TestCase):
+    def test_flag_not_applied_and_queue_written(self):
+        recs = [{"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+                 "origin": "vik", "legacy_ids": []}]
+        prov = build_provenance(recs)
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(
+                d, records=copy.deepcopy(recs), provenance=copy.deepcopy(prov),
+                varna=[{"name": "f", "coord": (*point_north(27.900, 43.200, 6.0), 0)}])
+            self.assertEqual(rc, 0)
+            # Record + provenance unchanged (FLAG mutates nothing).
+            self.assertEqual(_load(paths["input"]), recs)
+            self.assertEqual(_load(paths["provenance"]), prov)
+            queue = _load(paths["flag_queue"])
+            self.assertEqual(queue["schema_version"], adapter.FLAG_QUEUE_SCHEMA_VERSION)
+            self.assertEqual(queue["count"], 1)
+            row = queue["flags"][0]
+            self.assertEqual(row["queue_status"], "pending_manual_review")
+            self.assertTrue(row["flag_id"].startswith("FLAG-"))
+            self.assertEqual(row["nearest_existing_id"], "coord_27.90000_43.20000")
+
+
+class ApplyCountsTest(unittest.TestCase):
+    def test_apply_first_run_counts(self):
+        recs = build_records()
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(d, records=copy.deepcopy(recs), **STD_BATCH)
+            self.assertEqual(rc, 0)
+            s = _load(paths["apply_report"])["summary"]
+            self.assertEqual(s["applied_updates"], 1)
+            self.assertEqual(s["applied_adds"], 4)
+            self.assertEqual(s["queued_flags"], 1)
+            self.assertEqual(s["noop_updates"], 0)
+            self.assertEqual(s["noop_adds"], 0)
+            self.assertEqual(s["record_count_after"], 1 + 4)
+            self.assertEqual(s["provenance_count_after"], 1 + 4)
+
+
+class ApplyIdempotencyTest(unittest.TestCase):
+    def test_apply_idempotent_second_run_noop(self):
+        recs = build_records()
+        with tempfile.TemporaryDirectory() as d:
+            rc1, paths = run_apply_over_temp(d, records=copy.deepcopy(recs), **STD_BATCH)
+            self.assertEqual(rc1, 0)
+            data_after_first = _sha256(paths["input"])
+            prov_after_first = _sha256(paths["provenance"])
+            queue_after_first = _sha256(paths["flag_queue"])
+            first = _load(paths["apply_report"])["summary"]
+            self.assertEqual(first["applied_updates"], 1)
+            self.assertEqual(first["applied_adds"], 4)
+
+            # Second run over the SAME (already-applied) temp files.
+            src = paths["src"]
+            args = adapter.build_parser().parse_args(
+                ["--source-dir", src, "--input", paths["input"],
+                 "--provenance", paths["provenance"],
+                 "--json-report", paths["json"], "--md-report", paths["md"],
+                 "--flag-queue", paths["flag_queue"],
+                 "--apply-report", paths["apply_report"],
+                 "--timestamp", TIMESTAMP, "--apply"])
+            with contextlib.redirect_stdout(io.StringIO()):
+                rc2 = adapter.run_apply(args, TIMESTAMP,
+                                        expected=adapter.NO_FIXED_EXPECTATIONS)
+            self.assertEqual(rc2, 0)
+            second = _load(paths["apply_report"])["summary"]
+            self.assertEqual(second["applied_updates"], 0)
+            self.assertEqual(second["applied_adds"], 0)
+            self.assertEqual(second["noop_updates"], 1)
+            self.assertEqual(second["noop_adds"], 4)
+            self.assertEqual(second["queued_flags"], 1)
+            self.assertEqual(second["record_count_before"], 5)
+            self.assertEqual(second["record_count_after"], 5)
+            # Data + provenance + queue are byte-identical after the no-op run.
+            self.assertEqual(_sha256(paths["input"]), data_after_first)
+            self.assertEqual(_sha256(paths["provenance"]), prov_after_first)
+            self.assertEqual(_sha256(paths["flag_queue"]), queue_after_first)
+
+
+class ApplyCollisionTest(unittest.TestCase):
+    def test_alias_collision_aborts(self):
+        alias = "etr_varna:27.90000000,43.20000000"
+        recs = [
+            {"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+             "origin": "vik", "legacy_ids": []},                  # UPDATE target
+            {"id": "coord_27.80000_43.10000", "coords": [27.800, 43.100],
+             "origin": "vik", "legacy_ids": [alias]},             # alias bound here
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(adapter.ApplyError):
+                run_apply_over_temp(
+                    d, records=copy.deepcopy(recs),
+                    varna=[{"name": "n", "coord": (27.900, 43.200, 0)}])
+            # Nothing was written to the protected files (still the originals).
+            self.assertEqual(_load(os.path.join(d, "hydrants.json")), recs)
+            self.assertFalse(os.path.exists(os.path.join(d, "out", "apply_report.json")))
+
+    def test_add_id_collision_aborts(self):
+        coll_id = core.canonical_coord_id(27.950, 43.250)
+        recs = [
+            {"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+             "origin": "vik", "legacy_ids": []},
+            {"id": coll_id, "coords": [27.960, 43.260],   # same id, DIFFERENT coords
+             "origin": "vik", "legacy_ids": []},
+        ]
+        prov = build_provenance(recs)
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(adapter.ApplyError):
+                run_apply_over_temp(
+                    d, records=copy.deepcopy(recs), provenance=copy.deepcopy(prov),
+                    varna=[{"name": "z", "coord": (27.950, 43.250, 0)}])
+            self.assertEqual(_load(os.path.join(d, "hydrants.json")), recs)
+            self.assertEqual(_load(os.path.join(d, "provenance.json")), prov)
+            self.assertFalse(os.path.exists(os.path.join(d, "out", "apply_report.json")))
+
+
+class ApplyPartialTest(unittest.TestCase):
+    def test_partial_apply_detected(self):
+        # Two source points <2 m apart collapse into one UPDATE component with two
+        # member aliases. Preload only ONE of them -> some-but-not-all -> abort.
+        a1 = "etr_varna:27.90000000,43.20000000"
+        recs = [{"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+                 "origin": "vik", "legacy_ids": [a1]}]   # only the first alias
+        p1 = (27.900, 43.200, 0)
+        p2 = (*point_north(27.900, 43.200, 1.0), 0)      # 1 m -> same component
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(adapter.ApplyError):
+                run_apply_over_temp(
+                    d, records=copy.deepcopy(recs),
+                    varna=[{"name": "a", "coord": p1}, {"name": "b", "coord": p2}])
+            self.assertEqual(_load(os.path.join(d, "hydrants.json")), recs)
+
+    def test_alias_present_without_provenance_detected(self):
+        # Record already carries the ETR alias but provenance lacks the H4 ref:
+        # an inconsistent partial state that must abort, not silently re-noop.
+        alias = "etr_varna:27.90000000,43.20000000"
+        recs = [{"id": "coord_27.90000_43.20000", "coords": [27.900, 43.200],
+                 "origin": "vik", "legacy_ids": [alias]}]
+        prov = {"coord_27.90000_43.20000": {"source_refs": []}}   # no kmz_etr_update
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(adapter.ApplyError):
+                run_apply_over_temp(
+                    d, records=copy.deepcopy(recs), provenance=copy.deepcopy(prov),
+                    varna=[{"name": "n", "coord": (27.900, 43.200, 0)}])
+
+
+class ApplyBaselineGuardTest(unittest.TestCase):
+    def test_main_uses_signed_baseline_by_default(self):
+        # main() routes --apply through SIGNED_EXPECTATIONS; synthetic data is not
+        # the signed 5911/SHA baseline, so the real-data guard must fire.
+        recs = build_records()
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(adapter.ApplyError):
+                run_apply_over_temp(d, records=copy.deepcopy(recs),
+                                    via_main=True, **STD_BATCH)
+
+
+class ApplyAllowedPathsTest(unittest.TestCase):
+    def test_only_allowed_paths_written(self):
+        recs = build_records()
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(d, records=copy.deepcopy(recs), **STD_BATCH)
+            self.assertEqual(rc, 0)
+            # The four allowed outputs exist...
+            for key in ("input", "provenance", "flag_queue", "apply_report"):
+                self.assertTrue(os.path.exists(paths[key]), key)
+            # ...and the H2 dry-run reports were NOT written by apply mode.
+            self.assertFalse(os.path.exists(paths["json"]))
+            self.assertFalse(os.path.exists(paths["md"]))
+
+
+class ApplyReportShapeTest(unittest.TestCase):
+    def test_apply_report_shape(self):
+        recs = build_records()
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(d, records=copy.deepcopy(recs), **STD_BATCH)
+            self.assertEqual(rc, 0)
+            report = _load(paths["apply_report"])
+        self.assertEqual(report["schema_version"], adapter.APPLY_SCHEMA_VERSION)
+        self.assertEqual(report["mode"], "apply")
+        hj = report["inputs"]["hydrants_json"]
+        for key in ("sha256_before", "sha256_after", "record_count_before",
+                    "record_count_after"):
+            self.assertIn(key, hj)
+        self.assertEqual(hj["record_count_before"], 1)
+        self.assertEqual(hj["record_count_after"], 5)
+        self.assertNotEqual(hj["sha256_before"], hj["sha256_after"])
+        pj = report["inputs"]["provenance_json"]
+        self.assertEqual(pj["record_count_before"], 1)
+        self.assertEqual(pj["record_count_after"], 5)
+        self.assertEqual(len(report["per_file"]), 4)
+        for pf in report["per_file"]:
+            for key in ("source_file", "municipality", "applied_updates",
+                        "applied_adds", "queued_flags", "noop_updates", "noop_adds"):
+                self.assertIn(key, pf)
+        val = report["validation"]
+        self.assertTrue(val["dry_run_default_preserved"])
+        self.assertTrue(val["only_allowed_paths_written"])
+        self.assertTrue(val["mojibake_scan_passed"])
+        self.assertEqual(val["duplicate_ids_after"], 0)
+        self.assertEqual(val["missing_provenance_after"], 0)
+        self.assertEqual(val["unexpected_field_mutations"], 0)
+        for key in ("hydrants_json", "provenance_json", "flag_queue", "apply_report"):
+            self.assertIn(key, report["output_files"])
+        # Per-file rows reconcile with the summary totals.
+        self.assertEqual(sum(pf["applied_updates"] for pf in report["per_file"]),
+                         report["summary"]["applied_updates"])
+        self.assertEqual(sum(pf["applied_adds"] for pf in report["per_file"]),
+                         report["summary"]["applied_adds"])
+        self.assertEqual(sum(pf["queued_flags"] for pf in report["per_file"]),
+                         report["summary"]["queued_flags"])
+
+
+class ApplyMojibakeTest(unittest.TestCase):
+    def test_mojibake_scan_runs_on_apply_outputs(self):
+        # Cyrillic placemark names + filenames must pass the scan clean.
+        recs = build_records()
+        with tempfile.TemporaryDirectory() as d:
+            rc, paths = run_apply_over_temp(
+                d, records=copy.deepcopy(recs),
+                varna=[{"name": 'УЛ. "МАРА ГИДИК"', "coord": (27.900, 43.200, 0)},
+                       {"name": "Хидрант №7", "coord": (27.950, 43.250, 0)}],
+                provadia=STD_PROVADIA, dolni=STD_DOLNI, devnya=STD_DEVNYA)
+            self.assertEqual(rc, 0)
+            for key in ("input", "provenance", "flag_queue", "apply_report"):
+                obj = _load(paths[key])
+                core.mojibake_scan(key, obj)   # must not raise on clean Cyrillic
+            self.assertIn("Варна", json.dumps(_load(paths["apply_report"]),
+                                              ensure_ascii=False))
+        # The scan still catches a constructed mojibake byte sequence:
+        # U+00D0 immediately followed by U+00FF matches core's regex.
+        with self.assertRaises(AssertionError):
+            core.mojibake_scan("bad", {"x": "\u00d0\u00ff"})
 
 
 if __name__ == "__main__":

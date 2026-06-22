@@ -1,0 +1,154 @@
+{
+  "schema_version": "h4_kmz_apply_v1",
+  "mode": "apply",
+  "generated_at": "2026-06-22T00:00:00+03:00",
+  "inputs": {
+    "hydrants_json": {
+      "path": "data/hydrants.json",
+      "sha256_before": "65F4E4CCCE8528E53710BC53EEA3590D6B2BD92DDCABC81803B8DBAFDA93585B",
+      "sha256_after": "9E4FCB37D668B9DE5EB849786191ACF734FD0AFDFEE008F974D3742996AFCA32",
+      "record_count_before": 5911,
+      "record_count_after": 7217
+    },
+    "provenance_json": {
+      "path": "data/hydrants_provenance.json",
+      "sha256_before": "894F81F6C2728BEB3356551A9FD6074435A520E3C00CA6AA843E58ED43D1016E",
+      "sha256_after": "13D49812AE6823C0D21FAB28A71ED6DB1015C5E22FEEE8AB7878452E2BEC84D1",
+      "record_count_before": 5911,
+      "record_count_after": 7217
+    },
+    "h2_dry_run_report": {
+      "path": "docs/audits/h2_kmz_consolidation_dry_run.json",
+      "sha256": "DA613B3E9EA1035116C9147505284ABC07524BA7425CCFF067CE02028EBB9A27"
+    },
+    "kmz_files": [
+      {
+        "path": "data/hydrants_17_06_26/Пожарни хидранти ЕТР Варна.kmz",
+        "sha256": "DAD33C8A59299F084E7B584625D03417C6D3C6F5AB1DE360A985824D971D2E8B",
+        "municipality": "varna",
+        "origin": "etr_varna",
+        "kml_entry": "doc.kml",
+        "placemarks": 2681,
+        "points": 2681,
+        "extended_data": 0,
+        "schema_data": 0,
+        "missing_coords": 0,
+        "invalid_coords": 0
+      },
+      {
+        "path": "data/hydrants_17_06_26/Пожарни хидранти ЕТР Провадия.kmz",
+        "sha256": "0CFF65A686E9E3698AAE97F5DE6ACC81D9BCEE29466B6B66A4E5EB0F885E0BFC",
+        "municipality": "provadia",
+        "origin": "etr_provadia",
+        "kml_entry": "doc.kml",
+        "placemarks": 1422,
+        "points": 1422,
+        "extended_data": 0,
+        "schema_data": 0,
+        "missing_coords": 0,
+        "invalid_coords": 0
+      },
+      {
+        "path": "data/hydrants_17_06_26/Пожарни хидранти ЕТР Долни Чифлик.kmz",
+        "sha256": "B2F96E41D2993AEB7F5A330EA2869F47CE46AE4BEE452F37BE00BBFD9E55F90C",
+        "municipality": "dolni_chiflik",
+        "origin": "etr_dolni_chiflik",
+        "kml_entry": "doc.kml",
+        "placemarks": 639,
+        "points": 639,
+        "extended_data": 0,
+        "schema_data": 0,
+        "missing_coords": 0,
+        "invalid_coords": 0
+      },
+      {
+        "path": "data/hydrants_17_06_26/Пожарни хидранти ЕТР Девня.kmz",
+        "sha256": "741AC5112D2B9DEB18BA97467841FC6049E9829D08A551FDECC46B724FF7690B",
+        "municipality": "devnya",
+        "origin": "etr_devnya",
+        "kml_entry": "doc.kml",
+        "placemarks": 118,
+        "points": 118,
+        "extended_data": 0,
+        "schema_data": 0,
+        "missing_coords": 0,
+        "invalid_coords": 0
+      }
+    ]
+  },
+  "thresholds_m": {
+    "intra_batch_dedup_strict_lt": 2.0,
+    "rm_update_lte": 5.0,
+    "rf_flag_lte": 20.0,
+    "add_candidate_cluster_strict_lt": 5.0
+  },
+  "summary": {
+    "planned_updates": 3170,
+    "planned_adds": 1306,
+    "planned_flags": 317,
+    "applied_updates": 3170,
+    "applied_adds": 1306,
+    "queued_flags": 317,
+    "noop_updates": 0,
+    "noop_adds": 0,
+    "record_count_before": 5911,
+    "record_count_after": 7217,
+    "expected_record_count_after": 7217,
+    "provenance_count_before": 5911,
+    "provenance_count_after": 7217,
+    "collisions": 0,
+    "partial_apply_detected": false
+  },
+  "output_files": {
+    "hydrants_json": "data/hydrants.json",
+    "provenance_json": "data/hydrants_provenance.json",
+    "flag_queue": "docs/audits/h2_kmz_flag_queue.json",
+    "apply_report": "docs/audits/h4_kmz_apply_report.json"
+  },
+  "per_file": [
+    {
+      "source_file": "Пожарни хидранти ЕТР Варна.kmz",
+      "municipality": "varna",
+      "applied_updates": 1634,
+      "applied_adds": 764,
+      "queued_flags": 216,
+      "noop_updates": 0,
+      "noop_adds": 0
+    },
+    {
+      "source_file": "Пожарни хидранти ЕТР Провадия.kmz",
+      "municipality": "provadia",
+      "applied_updates": 1127,
+      "applied_adds": 245,
+      "queued_flags": 50,
+      "noop_updates": 0,
+      "noop_adds": 0
+    },
+    {
+      "source_file": "Пожарни хидранти ЕТР Долни Чифлик.kmz",
+      "municipality": "dolni_chiflik",
+      "applied_updates": 377,
+      "applied_adds": 219,
+      "queued_flags": 43,
+      "noop_updates": 0,
+      "noop_adds": 0
+    },
+    {
+      "source_file": "Пожарни хидранти ЕТР Девня.kmz",
+      "municipality": "devnya",
+      "applied_updates": 32,
+      "applied_adds": 78,
+      "queued_flags": 8,
+      "noop_updates": 0,
+      "noop_adds": 0
+    }
+  ],
+  "validation": {
+    "dry_run_default_preserved": true,
+    "only_allowed_paths_written": true,
+    "mojibake_scan_passed": true,
+    "duplicate_ids_after": 0,
+    "missing_provenance_after": 0,
+    "unexpected_field_mutations": 0
+  }
+}
