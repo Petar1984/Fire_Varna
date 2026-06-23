@@ -848,8 +848,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* Compact target card (always visible) */
   .sheet-card {
-    display: flex; align-items: center; gap: 12px;
-    padding: 6px 14px 12px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 5px 12px 9px;
     background: linear-gradient(135deg, #fff8e1, #ffecb3);
     border-bottom: 1px solid #f0d878;
   }
@@ -859,7 +859,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     justify-content: center;
   }
   .arrow-circle {
-    width: 56px; height: 56px; flex-shrink: 0;
+    width: 46px; height: 46px; flex-shrink: 0;
     border-radius: 50%; background: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     display: flex; align-items: center; justify-content: center;
@@ -871,23 +871,30 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .arrow-tri {
     width: 0; height: 0;
-    border-left: 11px solid transparent;
-    border-right: 11px solid transparent;
-    border-bottom: 22px solid #ff9800;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 18px solid #ff9800;
     transform-origin: 50% 70%;
     will-change: transform;
   }
   .card-info { flex: 1; min-width: 0; }
-  .card-dist { font-size: 22px; font-weight: 800; color: #c41e3a; line-height: 1.05; }
+  .card-dist { font-size: 20px; font-weight: 800; color: #c41e3a; line-height: 1.05; }
   .card-name {
-    font-size: 13px; color: #333; margin-top: 2px;
+    font-size: 13px; color: #333; margin-top: 1px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .card-bearing { font-size: 11px; color: #888; margin-top: 2px; }
-  .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .card-bearing { font-size: 11px; color: #888; margin-top: 1px; }
+  /* Verifier note (moderated free-text only; populated via textContent, never
+     HTML). Clamped to 2 lines so a long note never grows the compact card. */
+  .card-note {
+    font-size: 11px; color: #6b6b6b; margin-top: 2px; line-height: 1.25;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+  .card-actions { display: flex; gap: 5px; flex-shrink: 0; }
   .card-btn {
-    color: white; border: none; width: 44px; height: 44px;
-    border-radius: 50%; font-size: 18px; cursor: pointer;
+    color: white; border: none; width: 40px; height: 40px;
+    border-radius: 50%; font-size: 17px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
   .card-btn.nav { background: #1976d2; }
@@ -2037,6 +2044,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         '<div class="card-dist" id="cardDist">—</div>' +
         '<div class="card-name" id="cardName">—</div>' +
         '<div class="card-bearing" id="cardBearing">—</div>' +
+        '<div class="card-note" id="cardNote" style="display:none;"></div>' +
         '<button class="compass-perm-card-btn" id="compassPermBtn" style="display:none;">Активирай компас</button>' +
       '</div>' +
       '<div class="card-actions">' +
@@ -2073,13 +2081,25 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!distEl) return;
     distEl.textContent = formatDist(at.d);
     const label = at.idx >= 0 ? ('#' + (at.idx + 1) + ' ') : '';
-    const typeLabel = hydrantTypeLabel(at.h.type);
     const baseName = at.h.address || ('Хидрант ' + at.h.id);
-    const nameWithType = baseName + (typeLabel ? ' · ' + typeLabel : '');
-    nameEl.textContent = label + nameWithType;
+    nameEl.textContent = label + baseName;
+    // Type (надземен/подземен) folds into the meta/bearing line — shown via the
+    // existing hydrantTypeLabel() whenever the hydrant has a type, omitted cleanly
+    // otherwise — so the name line stays compact.
+    const typeLabel = hydrantTypeLabel(at.h.type);
     const bear = bearing(lastFix.lat, lastFix.lon, at.h.coords[1], at.h.coords[0]);
-    bearingEl.textContent = cardinal(bear) + ' · ' + Math.round(bear) + '°' +
+    const bearingText = cardinal(bear) + ' · ' + Math.round(bear) + '°' +
       (smoothedHeading == null ? ' (без компас)' : '');
+    bearingEl.textContent = (typeLabel ? typeLabel + ' · ' : '') + bearingText;
+    // Verifier note: the moderated free-text the reporter left, surfaced from the
+    // live /issues feed via applyReports(). textContent only (never HTML); reporter
+    // name / issue url+number / labels / provenance are intentionally excluded.
+    const noteEl = document.getElementById('cardNote');
+    if (noteEl) {
+      const note = at.h.verifier_note;
+      if (note) { noteEl.textContent = note; noteEl.style.display = '-webkit-box'; }
+      else { noteEl.textContent = ''; noteEl.style.display = 'none'; }
+    }
   }
 
   // ===== Compass arrow with smoothing =====
@@ -3274,6 +3294,28 @@ window._hydrantDataReady = (async function loadHydrantData() {
     list.forEach(m => m.setLatLng([h.coords[1], h.coords[0]]));
   }
 
+  // Pull the verifier's free-text note out of a normalized /issues report.
+  // The Worker already collapses the four free-text fields into `comment`
+  // (firstText of damage_description / description / terrain_description /
+  // free_text); we fall back to the raw details only if `comment` is absent.
+  // ONLY free-text is returned — never reporter, issue url/number, labels, or
+  // the structured picker values (hydrant_type / operational) in details.
+  function extractReportNote(report) {
+    if (!report) return null;
+    const d = report.details || {};
+    const candidates = [
+      report.comment,
+      d.damage_description, d.description, d.terrain_description, d.free_text
+    ];
+    for (const c of candidates) {
+      if (typeof c === 'string') {
+        const trimmed = c.trim();
+        if (trimmed) return trimmed;
+      }
+    }
+    return null;
+  }
+
   function applyReports(reports) {
     if (!Array.isArray(reports) || reports.length === 0) return;
     for (const report of reports) {
@@ -3299,6 +3341,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
           legacy_ids:         reportId === fieldId ? [] : [fieldId]
         });
         if (!h) continue;
+        const newNote = extractReportNote(report);
+        if (newNote) h.verifier_note = newNote;
         HYDRANTS.push(h);
         indexHydrant(h);
         // Render incrementally only when the cluster layer is currently mounted.
@@ -3324,6 +3368,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (!id) continue;
       const h = resolveHydrantById(id);
       if (!h) continue;
+
+      // Surface the verifier's moderated note in-memory on the matched hydrant.
+      // Only set when this report carries free-text, so a structured-only
+      // confirmation never wipes a note shown from an earlier report.
+      const reportNote = extractReportNote(report);
+      if (reportNote) h.verifier_note = reportNote;
 
       if (type === 'wrong_location') {
         if (Array.isArray(report.coords) && report.coords.length === 2) {
@@ -3560,8 +3610,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const specs = [
       ['Street View', 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + la + ',' + lo],
       ['Google Maps', 'https://www.google.com/maps?q=' + la + ',' + lo],
-      ['Закарай ме',  'https://www.google.com/maps/dir/?api=1&destination=' + la + ',' + lo],
-      ['Waze',        'https://waze.com/ul?ll=' + la + ',' + lo + '&navigate=yes']
+      ['Закарай ме с Google Maps', 'https://www.google.com/maps/dir/?api=1&destination=' + la + ',' + lo],
+      ['Закарай ме с Waze',        'https://waze.com/ul?ll=' + la + ',' + lo + '&navigate=yes']
     ];
     for (const spec of specs) {
       const a = document.createElement('a');
