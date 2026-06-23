@@ -755,14 +755,17 @@ svg.leaflet-image-layer.leaflet-interactive path {
                background: #f0f0f0; }
   #map { position:absolute; top:0; left:0; right:0; bottom:0; z-index:1; }
 
-  /* ===== Header stack (topbar + mode bar) =====
-     Both float over the top edge of the full-bleed map. The mode bar sits
-     flush under the topbar (no magic offset between them) because they share
-     this one absolutely-positioned wrapper. The stack is ~85px tall
-     (topbar ~40px + mode bar ~46px); other top-anchored overlays (pill,
-     status, banners, controls) clear it at top:100px below. */
+  /* ===== Header stack (topbar + mode bar + search bar) =====
+     All three float over the top edge of the full-bleed map and share this one
+     absolutely-positioned wrapper (no magic offsets between rows). The stack is
+     ~140px tall (topbar ~40px + mode bar ~46px + search bar ~54px); other
+     top-anchored overlays (pill, status, banners, controls) clear it at
+     top:150px below. z-index is 1100 (was 1000) so the address-search dropdown —
+     a child of this wrapper — paints OVER the right-side .controls column (also
+     z:1000), while the transient pill/status/banner toasts (z:1500) stay above
+     the header as before. */
   .app-header {
-    position:absolute; top:0; left:0; right:0; z-index:1000;
+    position:absolute; top:0; left:0; right:0; z-index:1100;
   }
   .topbar {
     background: rgba(196,30,58,0.95); color:white;
@@ -782,7 +785,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Pill (loading / error) ===== */
   .pill {
-    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(0,0,0,0.85); color: white;
     padding: 10px 16px; border-radius: 22px; font-size: 13px;
     display: flex; align-items: center; gap: 10px;
@@ -804,7 +807,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Right-side buttons ===== */
   .controls {
-    position:absolute; top:100px; right:10px; z-index:1000;
+    position:absolute; top:150px; right:10px; z-index:1000;
     display:flex; flex-direction:column; gap:8px;
   }
   .ctrl-btn {
@@ -837,7 +840,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Status pill (transient) ===== */
   .status {
-    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
     z-index:1500; background: rgba(0,0,0,0.85); color:white;
     padding: 10px 18px; border-radius: 20px; font-size: 13px;
     pointer-events:none; opacity: 0; transition: opacity 0.3s;
@@ -899,6 +902,63 @@ svg.leaflet-image-layer.leaflet-interactive path {
     background: #c41e3a; border-color: #c41e3a; color: white;
   }
   .mode-chip:active { transform: scale(0.97); }
+
+  /* ===== E3b — Address search (header field + dropdown + result marker/popup) =====
+     The search field is the third header row (under .mode-bar); the results
+     dropdown is an absolute overlay anchored under it (it does NOT add header
+     height). See the .app-header note above for the z-index rationale. */
+  .search-bar {
+    position: relative; padding: 7px 10px;
+    background: rgba(250,250,250,0.97); box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  #addrSearchInput {
+    width: 100%; padding: 9px 12px; font-size: 14px; line-height: 18px;
+    border: 1px solid #ccc; border-radius: 8px; background: #fff; color: #222;
+    outline: none; -webkit-appearance: none;
+  }
+  #addrSearchInput:focus { border-color: #c41e3a; }
+  #addrSearchInput::placeholder { color: #999; }
+  .search-results {
+    position: absolute; left: 10px; right: 10px; top: calc(100% - 2px);
+    max-height: 50vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    background: #fff; border: 1px solid #ddd; border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.20); z-index: 1200; display: none;
+  }
+  .search-results.visible { display: block; }
+  .asr-item {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 9px 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer;
+  }
+  .asr-item:last-child { border-bottom: none; }
+  .asr-item.active, .asr-item:hover { background: #f4f7fb; }
+  .asr-kind {
+    flex: none; font-size: 11px; font-weight: 700; color: #fff;
+    border-radius: 4px; padding: 2px 6px; line-height: 1.3;
+  }
+  .asr-kind.complex  { background: #1f6feb; }
+  .asr-kind.entrance { background: #2e7d32; }
+  .asr-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .asr-title { font-size: 13.5px; color: #1f2d3d; line-height: 1.3; word-break: break-word; }
+  .asr-meta { font-size: 11.5px; color: #6b7785; line-height: 1.25; }
+  /* район/block group header above the results (display-only summary). */
+  .asr-group-header {
+    padding: 7px 12px; font-size: 12px; font-weight: 700; color: #3a4a5c;
+    background: #eef2f7; border-bottom: 1px solid #e2e8f0;
+  }
+  .asr-status { padding: 10px 12px; color: #777; font-size: 13px; }
+  /* Result marker (one at a time) — teal dot, distinct from the red/numbered
+     hydrant pins and the blue user dot. className replaces leaflet-div-icon so
+     no default white box; the override below is belt-and-suspenders. */
+  .search-pin-wrapper { background: transparent; border: none; }
+  .search-pin {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #00897b; border: 3px solid #fff;
+    box-shadow: 0 0 0 1.5px #00897b, 0 2px 5px rgba(0,0,0,0.45);
+  }
+  /* Result popup (an ADDRESS, not a hydrant): title + nav link-outs, no "Докладвай". */
+  .search-popup { font-size: 13px; line-height: 1.45; min-width: 160px; max-width: 240px; }
+  .search-popup .sp-title { font-weight: 700; margin-bottom: 6px; color: #1f2d3d; }
+  .search-popup .nav-actions { margin-top: 6px; }
 
   /* Report modal */
   .modal-backdrop {
@@ -1073,7 +1133,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Placement mode (long-press) ===== */
   .placement-banner {
-    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(196,30,58,0.95); color: white;
     padding: 10px 16px; border-radius: 20px; font-size: 13px;
     max-width: 92%; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -1083,7 +1143,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
      (cancel button must be tappable). Shown after user picks a report type
      from the global "+" menu and is now waiting to tap a hydrant. */
   .prepick-banner {
-    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(196,30,58,0.95); color: white;
     padding: 6px 6px 6px 16px; border-radius: 22px; font-size: 13px;
     max-width: 92%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -1189,6 +1249,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <button class="mode-chip" data-mode="near">Близо &lt;100м</button>
     <button class="mode-chip active" data-mode="top">Топ 5</button>
     <button class="mode-chip" data-mode="all">Всички</button>
+  </div>
+  <!-- E3b — address search: third header row under the mode chips. The index
+       (data/search_index.json) lazy-loads on first focus; the dropdown overlays
+       the map. Wired by initAddressSearch() in the main script. -->
+  <div class="search-bar">
+    <input id="addrSearchInput" type="text" inputmode="search" enterkeyhint="search"
+           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+           placeholder="Търси адрес или вход…" aria-label="Търсене на адрес или вход" />
+    <div id="addrSearchResults" class="search-results" role="listbox" aria-label="Резултати от търсенето"></div>
   </div>
 </header>
 
@@ -1346,6 +1415,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // ===== Map =====
   const map = L.map('map', { zoomControl: true, tap: true, attributionControl: false })
               .setView([43.2141, 27.9147], 13);
+  // E3b — the address-search header is ~140px tall and .app-header sits at z-index
+  // 1100 (so the search dropdown overlays the right-side controls); the default
+  // top-left zoom control would otherwise be painted over and untappable. Move the
+  // +/- buttons to the bottom-left, clear of the header, the right-side controls,
+  // and the bottom-right locate FAB.
+  map.zoomControl.setPosition('bottomleft');
   const OSM_ATTRIB = '© OpenStreetMap';
   const SAT_ATTRIB = 'Спътник: © Esri, Maxar, Earthstar Geographics, GIS User Community';
   const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -3383,12 +3458,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
 
   // --- shared popup auto-pan padding ---------------------------------------
-  // Keep Leaflet popups clear of the fixed header stack (topbar + mode bar)
-  // when they auto-pan into view. Leaflet does not know about our absolutely
-  // positioned overlays, so without this a popup opened near the top edge can
-  // land hidden behind the mode bar. Top padding ≈ header height (~85px) + gap;
-  // bottom padding keeps the popup off the corner locate FAB.
-  const POPUP_AUTOPAN_TL = [16, 100];
+  // Keep Leaflet popups clear of the fixed header stack (topbar + mode bar +
+  // search bar) when they auto-pan into view. Leaflet does not know about our
+  // absolutely positioned overlays, so without this a popup opened near the top
+  // edge can land hidden behind the header. Top padding ≈ header height (~140px)
+  // + gap; bottom padding keeps the popup off the corner locate FAB.
+  const POPUP_AUTOPAN_TL = [16, 150];
   const POPUP_AUTOPAN_BR = [16, 96];
 
   // --- hydrant popup (Leaflet popup; modeled on buildBuildingPopup) ---------
@@ -3608,6 +3683,480 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const b = document.getElementById('basemapToggle');
     if (b) { b.classList.toggle('active', satellite); b.setAttribute('aria-pressed', satellite ? 'true' : 'false'); }
   }
+
+  // =========================================================================
+  // E3b — Public address search (additive, isolated). A header search field +
+  // dropdown over TWO privacy-projected payloads, both built in Varna_buildings:
+  //   * data/search_index.json (the GEOCODER matcher projection — streets,
+  //     addresses, kvartali AND MF block/entrance, with район/квартал area-gating),
+  //     by js/build_fire_varna_search_index.mjs;
+  //   * data/address_rows.json (display fallback: normalized_address by row id),
+  //     by js/build_fire_varna_address_rows.mjs.
+  // Neither carries cadnum / complex_id / section / ГРАО / owner data — enforced by
+  // that repo's publish gate (js/test_fire_varna_publish_gate.mjs) over BOTH files.
+  // Selecting a result flies the map to its pin, drops ONE teal result marker, and
+  // opens a standalone popup with the address + nav link-outs (NO "Докладвай" — it
+  // is an address, not a hydrant). Nothing here touches the hydrant layer, the
+  // building layer, modes, report, offline, or compass.
+  //
+  // The matcher is PORTED from Varna_buildings app/modules/search (skeleton.js
+  // norm/skel/lev/matchKindSet + searchLogic.js runGeocoderSearch) — NO MiniSearch,
+  // NO new engine. The ONLY adaptations: the group key bg||complex_id -> the opaque
+  // `g`; cadnum tie-breaks -> a stable runtime `_ord`; the inverted index + area-
+  // vocab are rebuilt client-side (the payload omits them). Folding queries through
+  // the SAME skeleton the index builder used means index tokens and queries can
+  // never drift. Reuses the IIFE-scoped `map`, `buildNavActions`, `POPUP_AUTOPAN_TL/BR`.
+  // =========================================================================
+  (function initAddressSearch() {
+    const inputEl = document.getElementById('addrSearchInput');
+    const resultsEl = document.getElementById('addrSearchResults');
+    if (!inputEl || !resultsEl) return; // header markup missing -> no-op
+
+    // ---- skeleton primitives (verbatim from app/modules/search/skeleton.js) ----
+    function norm(s){return (''+(s||'')).toLowerCase().replace(/блок/g,'бл').replace(/вход/g,'вх').replace(/[.№,'"-]/g,' ').replace(/\s+/g,' ').trim();}
+    function skel(w){w=w.toLowerCase();var C={'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ж':'zh','з':'z','и':'i','й':'i','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sht','ъ':'a','ь':'','ю':'yu','я':'ya'};var o='';for(var i=0;i<w.length;i++){o+=(C[w[i]]!==undefined?C[w[i]]:w[i]);}return o.replace(/[yj]/g,'i').replace(/(\D)\1+/g,'$1');}
+    function lev(a,b,cap){var la=a.length,lb=b.length;if(Math.abs(la-lb)>cap)return cap+1;var prev=[];for(var j=0;j<=lb;j++)prev[j]=j;for(var i=1;i<=la;i++){var cur=[i],best=i;for(var j=1;j<=lb;j++){var v=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));cur[j]=v;if(v<best)best=v;}if(best>cap)return cap+1;prev=cur;}return prev[lb];}
+    // ADR 032 A2 per-(query token) match-KIND classifier (verbatim from
+    // searchLogic.js): 3 exact / 2 prefix / 1 within-cap fuzzy. The geocoder route
+    // ranks on match KIND, so a binary matchSet is insufficient.
+    function matchKindSet(qt, VOCAB){var s={},cap=qt.length>=7?2:1;for(var i=0;i<VOCAB.length;i++){var v=VOCAB[i],k=0;if(v===qt)k=3;else if(qt.length<=1)k=0;else if(v.indexOf(qt)===0)k=2;else if(qt.length<=3)k=0;else if(lev(qt,v,cap)<=cap)k=1;if(k)s[v]=k;}return s;}
+
+    // ---- display payload (address_rows.json) + label resolution ----------------
+    // The matcher index carries NO display string for the 48k entries with no
+    // addr_key; their text is the source row's normalized_address, looked up by the
+    // hit's display_id in the SEPARATE address_rows.json. These closure vars are set
+    // by ensureSearchData() after both payloads load.
+    let addressRows = null;   // array of [normalized_address, lat, lng] by row id
+    let addrFieldIdx = null;  // { normalized_address, lat, lng } column indices
+    let districtNames = [];   // район display-enum table (search_index.district_names)
+
+    // Schema-driven address-row layout (M1 plan: never hardcode a column). Derive
+    // each needed field position from the payload's field_order.
+    function buildAddressFieldIndex(payload){
+      const order = payload && Array.isArray(payload.field_order) ? payload.field_order : null;
+      if (!order) throw new Error('address_rows.json missing field_order');
+      const idx = {};
+      ['normalized_address', 'lat', 'lng'].forEach(function (name) {
+        const i = order.indexOf(name);
+        if (i === -1) throw new Error('address_rows.json field_order missing "' + name + '"');
+        idx[name] = i;
+      });
+      return idx;
+    }
+
+    // formatAddressHit — label resolution chain (privacy-safe):
+    //   (1) the public geocoder `label` (= cleaned addr_key) when present;
+    //   (2) else addressRows[display_id].normalized_address (the separate display
+    //       payload, indexed by the source row id);
+    //   (3) else the район name; NEVER a cadnum / section / complex id (the index
+    //       carries none). An entrance (kind:"mf" + en) appends " · вх. <en>" to its
+    //       parent building's resolved address.
+    function prettyKey(s){ return String(s).replace(/\|/g, ' ').replace(/\s+/g, ' ').trim(); }
+    function baseAddressLabel(hit){
+      if (hit.label) return prettyKey(hit.label);
+      if (hit.display_id != null && addressRows && addrFieldIdx) {
+        const row = addressRows[hit.display_id];
+        if (Array.isArray(row)) {
+          const na = row[addrFieldIdx.normalized_address];
+          if (na) return na;
+        }
+      }
+      if (hit.d != null && districtNames[hit.d]) return districtNames[hit.d];
+      return '(адрес)';
+    }
+    function formatAddressHit(hit){
+      const base = baseAddressLabel(hit);
+      const isEntrance = hit.kind === 'mf' && hit.en != null && hit.en !== undefined;
+      return isEntrance ? base + ' · вх. ' + hit.en : base;
+    }
+
+    // ---- ported runGeocoderSearch (public-safe geocoder route) ------------------
+    // Transplanted from Varna_buildings app/modules/search/searchLogic.js. The ONLY
+    // adaptations: the group key `bg||complex_id` -> the opaque `g`; the cadnum /
+    // section_cadnum determinism tie-breaks -> a stable runtime `_ord`; the inverted
+    // index + area-vocab are rebuilt CLIENT-SIDE (payload omits inverted); dropped
+    // fields (life_safety_rank / physical_building_id / quarter_assignment_trust /
+    // odem) are absent, leaving their comparator/dedup slots inert (null-safe).
+    // Result rows carry ONLY safe fields + label/display_id for resolution.
+    const SEARCH_LIMIT = 8;
+
+    // Build vocab (if absent), the inverted index, the area-vocab, and stamp a stable
+    // `_ord` on every entry. Called ONCE after the payload loads.
+    function prepareIndex(index){
+      if (!index || !Array.isArray(index.entries)) return index;
+      for (let i = 0; i < index.entries.length; i++) index.entries[i]._ord = i;
+      if (!Array.isArray(index.vocab)) {
+        const set = new Set();
+        for (const e of index.entries) for (const f of ['tk','qtk','alias_tk','dtk','stk']) { const a = e[f]; if (a) for (const t of a) if (t) set.add(t); }
+        index.vocab = Array.from(set).sort();
+      }
+      const postings = new Map();
+      for (let i = 0; i < index.entries.length; i++) {
+        const e = index.entries[i];
+        let toks = e.tk || [];
+        if (e.qtk) toks = toks.concat(e.qtk);
+        if (e.alias_tk) toks = toks.concat(e.alias_tk);
+        if (e.dtk) toks = toks.concat(e.dtk);
+        if (e.stk) toks = toks.concat(e.stk);
+        for (const t of toks) { let ids = postings.get(t); if (!ids) postings.set(t, (ids = [])); if (ids[ids.length-1] !== i) ids.push(i); }
+      }
+      const inverted = {};
+      for (const t of index.vocab) inverted[t] = postings.get(t) || [];
+      index.inverted = inverted;
+      const av = new Set();
+      for (const e of index.entries) for (const f of ['dtk','qtk','stk']) { const a = e[f]; if (a) for (const t of a) if (t) av.add(t); }
+      index._areaVocab = av;
+      return index;
+    }
+
+    function runGeocoderSearch(query, index){
+      if (!index || !Array.isArray(index.entries)) return [];
+      const qn = norm(query);
+      if (qn.length < 1) return [];
+      const rawToks = qn.split(/\s+/).filter(Boolean);
+      const toks = rawToks.map(skel);
+      if (toks.length === 0) return [];
+
+      const blIdx = toks.indexOf('bl');
+      const qBlk = blIdx >= 0 && blIdx+1 < toks.length ? toks[blIdx+1] : null;
+      const qBlkDisplay = blIdx >= 0 && blIdx+1 < rawToks.length ? rawToks[blIdx+1] : null;
+      const av = index._areaVocab || new Set();
+      const areaPresent = qBlk != null && toks.some(function (t) { return t !== 'bl' && t !== 'vh' && t !== qBlk && av.has(t); });
+      const areaBlockTyped = qBlk != null && areaPresent;
+      const bareBlockTyped = qBlk != null && !areaPresent && !toks.includes('vh') && toks.every(function (t) { return t === 'bl' || t === qBlk; });
+      const blockTyped = areaBlockTyped;
+
+      let vocab = index.vocab;
+      if (!Array.isArray(vocab)) { const set = new Set(); for (const e of index.entries) for (const t of (e.tk||[])) if (t) set.add(t); vocab = Array.from(set); }
+      const inverted = index.inverted && typeof index.inverted === 'object' ? index.inverted : null;
+
+      const ms = toks.map(function (t) { return matchKindSet(t, vocab); });
+      const numericTok = toks.map(function (t) { return /^[0-9]+$/.test(t); });
+
+      let candidateIds = null;
+      if (inverted) { candidateIds = new Set(); for (const m of ms) { for (const vt in m) { const ids = inverted[vt]; if (ids) for (let i = 0; i < ids.length; i++) candidateIds.add(ids[i]); } } }
+
+      const scored = [];
+      const scoreEntry = function (e) {
+        if (!e) return;
+        let matched = 0, exactName = 0, exactNum = 0, prefix = 0, fuzzy = 0, matchedCore = 0, matchedViaDtk = 0, matchedViaStk = 0;
+        let qBlkMatched = false, all = true;
+        const tk = e.tk || [], qtk = e.qtk || null, atk = e.alias_tk || null, dtk = e.dtk || null, stk = e.stk || null;
+        for (let qi = 0; qi < toks.length; qi++) {
+          const m = ms[qi]; let best = 0;
+          for (let ti = 0; ti < tk.length; ti++) { const k = m[tk[ti]]||0; if (k > best) { best = k; if (best === 3) break; } }
+          if (atk && best < 3) { for (let ti = 0; ti < atk.length; ti++) { const k = m[atk[ti]]||0; if (k > best) { best = k; if (best === 3) break; } } }
+          if (best > 0) matchedCore += 1;
+          if (qtk && best < 3) { for (let ti = 0; ti < qtk.length; ti++) { const k = m[qtk[ti]]||0; if (k > best) { best = k; if (best === 3) break; } } }
+          if (dtk && best < 3) { for (let ti = 0; ti < dtk.length; ti++) { const k = m[dtk[ti]]||0; if (k > best) { best = k; matchedViaDtk += 1; if (best === 3) break; } } }
+          if (stk && best < 3) { for (let ti = 0; ti < stk.length; ti++) { const k = m[stk[ti]]||0; if (k > best) { best = k; matchedViaStk += 1; if (best === 3) break; } } }
+          if (best === 0) { all = false; continue; }
+          matched += 1;
+          if (blockTyped && toks[qi] === qBlk) qBlkMatched = true;
+          if (best === 3) { if (numericTok[qi]) exactNum += 1; else exactName += 1; } else if (best === 2) prefix += 1; else fuzzy += 1;
+        }
+        if (matched > 0) {
+          const dem = e.quarter_assignment_trust === 'conflicted' && matchedCore === 0 ? 1 : 0;
+          const ddem = matchedCore === 0 && matchedViaDtk > 0 ? 1 : 0;
+          const odem = e.odem ? 1 : 0;
+          const sdem = matchedCore === 0 && matchedViaStk > 0 ? 1 : 0;
+          const bmatch = blockTyped && (e.btk || []).includes(qBlk) ? 1 : 0;
+          scored.push({ e: e, matched: matched, exactName: exactName, exactNum: exactNum, prefix: prefix, fuzzy: fuzzy, all: all, dem: dem, ddem: ddem, sdem: sdem, odem: odem, bmatch: bmatch, qBlkMatched: qBlkMatched ? 1 : 0, bdem: 0 });
+        }
+      };
+      if (candidateIds) { for (const id of candidateIds) scoreEntry(index.entries[id]); }
+      else { for (const e of index.entries) scoreEntry(e); }
+
+      const existsBtkHolder = blockTyped && scored.some(function (s) { return s.bmatch === 1; });
+      if (existsBtkHolder) { for (const s of scored) s.bdem = (s.qBlkMatched === 1 && s.bmatch === 0) ? 1 : 0; }
+
+      scored.sort(function (a, b) {
+        if (a.all !== b.all) return a.all ? -1 : 1;
+        if (b.matched !== a.matched) return b.matched - a.matched;
+        if (b.exactName !== a.exactName) return b.exactName - a.exactName;
+        if (b.exactNum !== a.exactNum) return b.exactNum - a.exactNum;
+        if (b.prefix !== a.prefix) return b.prefix - a.prefix;
+        if (a.bdem !== b.bdem) return a.bdem - b.bdem;
+        if (a.dem !== b.dem) return a.dem - b.dem;
+        if (a.ddem !== b.ddem) return a.ddem - b.ddem;
+        if (a.sdem !== b.sdem) return a.sdem - b.sdem;
+        if (a.odem !== b.odem) return a.odem - b.odem;
+        const aRank = a.e.life_safety_rank == null ? 2 : a.e.life_safety_rank;
+        const bRank = b.e.life_safety_rank == null ? 2 : b.e.life_safety_rank;
+        if (aRank !== bRank) return aRank - bRank;
+        const aEnt = a.e.en !== undefined, bEnt = b.e.en !== undefined;
+        if (aEnt !== bEnt) return aEnt ? 1 : -1;
+        const al = (a.e.tk||[]).length + (a.e.qtk ? a.e.qtk.length : 0);
+        const bl = (b.e.tk||[]).length + (b.e.qtk ? b.e.qtk.length : 0);
+        if (al !== bl) return al - bl;
+        return (a.e._ord||0) - (b.e._ord||0); // determinism (cadnum dropped)
+      });
+
+      // physical_building dedup: physical_building_id is DROPPED -> pbid always null
+      // -> every row passes through (the block is inert but preserved verbatim).
+      const isEntranceQuery = toks.includes('vh');
+      let ranked = scored;
+      if (!isEntranceQuery) {
+        const reps = index.physical_building_reps && typeof index.physical_building_reps === 'object' ? index.physical_building_reps : {};
+        const rankOf = function (s) { return s.e.life_safety_rank == null ? 2 : s.e.life_safety_rank; };
+        const trueTie = function (a, b) { return a.all === b.all && a.matched === b.matched && a.exactName === b.exactName && a.exactNum === b.exactNum && a.prefix === b.prefix && a.bdem === b.bdem && a.dem === b.dem && a.ddem === b.ddem && a.sdem === b.sdem && a.odem === b.odem && rankOf(a) === rankOf(b); };
+        const keptPos = new Map(); ranked = [];
+        for (const s of scored) {
+          const pbid = s.e.physical_building_id;
+          if (pbid == null || s.e.en !== undefined) { ranked.push(s); continue; }
+          if (!keptPos.has(pbid)) { keptPos.set(pbid, ranked.length); ranked.push(s); continue; }
+          const pos = keptPos.get(pbid), kept = ranked[pos];
+          if (String(s.e._ord) === String(reps[pbid]) && String(kept.e._ord) !== String(reps[pbid]) && trueTie(kept, s)) ranked[pos] = s;
+        }
+      }
+
+      // area-gated block GROUPING (opaque g instead of bg||complex_id).
+      let blockHeader = null;
+      if (blockTyped && !isEntranceQuery) {
+        const seen = new Set(); const grouped = []; let blockGroups = 0; const districtCount = new Map();
+        for (const s of ranked) {
+          const key = s.e.g;
+          if (key != null) { if (seen.has(key)) continue; seen.add(key); }
+          grouped.push(s);
+          if (s.all && s.bmatch === 1) { blockGroups += 1; const d = s.e.d; if (d != null) districtCount.set(d, (districtCount.get(d)||0)+1); }
+        }
+        ranked = grouped;
+        if (blockGroups > 0) { let bestD = null, bestN = -1; for (const pair of districtCount) if (pair[1] > bestN) { bestN = pair[1]; bestD = pair[0]; } blockHeader = { block: qBlkDisplay, count: blockGroups, district_enum: bestD }; }
+      }
+
+      // bare-block surface (parent/child), grouped by opaque g.
+      if (bareBlockTyped) {
+        const parentCandidates = [];
+        for (const s of ranked) if (s.all && s.e.en === undefined && (s.e.btk || []).includes(qBlk)) parentCandidates.push(s);
+        if (parentCandidates.length > 0) {
+          const repByGroup = new Map();
+          for (const s of parentCandidates) { const key = s.e.g; if (key == null) continue; if (!repByGroup.has(key)) repByGroup.set(key, s); }
+          const childrenByGroup = new Map();
+          for (const s of ranked) { if (s.e.en === undefined) continue; const key = s.e.g; if (key == null || !repByGroup.has(key)) continue; if (!childrenByGroup.has(key)) childrenByGroup.set(key, []); childrenByGroup.get(key).push(s); }
+          const childSort = function (a, b) { const na = /^[0-9]+$/.test(a.e.en) ? parseInt(a.e.en,10) : NaN, nb = /^[0-9]+$/.test(b.e.en) ? parseInt(b.e.en,10) : NaN; const an = !Number.isNaN(na), bn = !Number.isNaN(nb); if (an && bn && na !== nb) return na - nb; if (an !== bn) return an ? -1 : 1; if (a.e.en !== b.e.en) return String(a.e.en).localeCompare(String(b.e.en)); return (a.e._ord||0) - (b.e._ord||0); };
+          const bareDistrictCount = new Map(); const groupList = [];
+          for (const pair of repByGroup) { const key = pair[0], rep = pair[1]; const children = (childrenByGroup.get(key) || []).slice().sort(childSort); groupList.push({ key: key, rep: rep, children: children }); const d = rep.e.d; if (d != null) bareDistrictCount.set(d, (bareDistrictCount.get(d)||0)+1); }
+          groupList.sort(function (a, b) { const da = a.rep.e.d == null ? Infinity : a.rep.e.d, db = b.rep.e.d == null ? Infinity : b.rep.e.d; if (da !== db) return da - db; return (a.rep.e._ord||0) - (b.rep.e._ord||0); });
+          const projectRow = function (s, role) { const e = s.e; return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy, bareRole: role, block: qBlkDisplay }; };
+          const bareOut = [];
+          for (const g of groupList) { bareOut.push(projectRow(g.rep, 'parent')); for (const c of g.children) bareOut.push(projectRow(c, 'child')); }
+          bareOut.bareBlockHeader = { block: qBlkDisplay, groups: groupList.length, districts: Array.from(bareDistrictCount, function (p) { return { district_enum: p[0], count: p[1] }; }).sort(function (a, b) { return a.district_enum - b.district_enum; }) };
+          return bareOut;
+        }
+      }
+
+      const out = ranked.slice(0, SEARCH_LIMIT).map(function (s) {
+        const e = s.e;
+        return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy };
+      });
+      if (blockHeader) out.blockHeader = blockHeader;
+      return out;
+    }
+
+    // ---- lazy load + cache (memory for the session + Cache API offline) ----------
+    // TWO payloads: the matcher index (search_index.json) + the display rows
+    // (address_rows.json). Both lazy-load on first focus, are parsed once, and are
+    // persisted to the Cache API so a return visit works offline. The index is only
+    // published to `searchIndex` AFTER prepareIndex() finishes (so a racing query
+    // never sees a half-built inverted index).
+    const SEARCH_INDEX_URL = 'data/search_index.json';
+    const ADDRESS_ROWS_URL = 'data/address_rows.json';
+    const SEARCH_CACHE = 'fire-varna-search-v2'; // v2 = geocoder payload (v1 was section_units)
+    const RESULT_LIMIT = 10;
+    const DEBOUNCE_MS = 120;
+    let searchIndex = null;       // prepared matcher index (memory cache)
+    let searchDataPromise = null; // in-flight load (dedupes concurrent focus/input)
+
+    async function fetchCachedJson(url) {
+      try {
+        const resp = await fetch(url, { cache: 'no-cache' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        // Persist a clone for offline use (best-effort; never blocks the parse).
+        if (typeof caches !== 'undefined') {
+          try { const c = await caches.open(SEARCH_CACHE); await c.put(url, resp.clone()); } catch (e) {}
+        }
+        return await resp.json();
+      } catch (netErr) {
+        // Offline fallback: serve the previously cached copy if we have one.
+        if (typeof caches !== 'undefined') {
+          try { const c = await caches.open(SEARCH_CACHE); const hit = await c.match(url); if (hit) return await hit.json(); } catch (e) {}
+        }
+        throw netErr;
+      }
+    }
+
+    async function ensureSearchData() {
+      if (searchIndex) return searchIndex;
+      if (searchDataPromise) return searchDataPromise;
+      searchDataPromise = (async function () {
+        try {
+          const [idx, rowsPayload] = await Promise.all([
+            fetchCachedJson(SEARCH_INDEX_URL),
+            fetchCachedJson(ADDRESS_ROWS_URL),
+          ]);
+          addressRows = (rowsPayload && Array.isArray(rowsPayload.rows)) ? rowsPayload.rows : [];
+          addrFieldIdx = buildAddressFieldIndex(rowsPayload);
+          districtNames = (idx && Array.isArray(idx.district_names)) ? idx.district_names : [];
+          prepareIndex(idx);        // build vocab/inverted/area-vocab + _ord (once)
+          searchIndex = idx;        // publish only AFTER fully prepared
+          return searchIndex;
+        } catch (err) {
+          searchDataPromise = null; // allow a later retry
+          throw err;
+        }
+      })();
+      return searchDataPromise;
+    }
+
+    // ---- dropdown rendering (textContent only; never innerHTML) ----
+    let currentResults = [];
+    function hideResults() { resultsEl.classList.remove('visible'); resultsEl.replaceChildren(); currentResults = []; }
+    function showStatus(text) {
+      const d = document.createElement('div'); d.className = 'asr-status'; d.textContent = text;
+      resultsEl.replaceChildren(d); resultsEl.classList.add('visible');
+    }
+    // Chip per geocoder kind: an entrance (mf + en) -> "вход"; a parcel -> "парцел";
+    // an MF section -> "сграда"; a plain address -> "адрес".
+    function hitChip(hit) {
+      if (hit.kind === 'mf' && hit.en != null && hit.en !== undefined) return { cls: 'entrance', label: 'вход' };
+      if (hit.kind === 'parcel') return { cls: 'complex', label: 'парцел' };
+      if (hit.kind === 'mf') return { cls: 'complex', label: 'сграда' };
+      return { cls: 'complex', label: 'адрес' };
+    }
+    function renderResults(rows) {
+      currentResults = rows;
+      if (!rows.length) { showStatus('Няма съвпадения'); return; }
+      const frag = document.createDocumentFragment();
+      // Optional район/block group header (display-only; no personal data). Set by
+      // runGeocoderSearch for an area+block query (blockHeader) or a bare-block query
+      // (bareBlockHeader). district_names[*] is the public район enum table.
+      if (rows.blockHeader && rows.blockHeader.count > 0) {
+        const bh = rows.blockHeader;
+        const noun = bh.count === 1 ? 'блок' : 'блока';
+        const raion = (bh.district_enum != null && districtNames[bh.district_enum]) ? (' в район ' + districtNames[bh.district_enum]) : '';
+        const h = document.createElement('div'); h.className = 'asr-group-header';
+        h.textContent = bh.count + ' ' + noun + ' № ' + bh.block + raion;
+        frag.appendChild(h);
+      } else if (rows.bareBlockHeader) {
+        const bbh = rows.bareBlockHeader;
+        const noun = bbh.groups === 1 ? 'блок' : 'блока';
+        const nd = (bbh.districts || []).length;
+        const h = document.createElement('div'); h.className = 'asr-group-header';
+        h.textContent = bbh.groups + ' ' + noun + ' № ' + bbh.block + (nd > 1 ? (' в ' + nd + ' района') : '');
+        frag.appendChild(h);
+      }
+      // runGeocoderSearch caps a normal query at 8; a bare-block surface can return
+      // many rows, so the dropdown render is bounded by RESULT_LIMIT (data-idx stays
+      // aligned to currentResults for click resolution).
+      const n = Math.min(rows.length, RESULT_LIMIT);
+      for (let i = 0; i < n; i++) {
+        const r = rows[i];
+        const item = document.createElement('div');
+        item.className = 'asr-item';
+        item.setAttribute('role', 'option');
+        item.dataset.idx = String(i);
+        const spec = hitChip(r);
+        const chip = document.createElement('span');
+        chip.className = 'asr-kind ' + spec.cls;
+        chip.textContent = spec.label;
+        const body = document.createElement('span');
+        body.className = 'asr-body';
+        const title = document.createElement('span');
+        title.className = 'asr-title';
+        title.textContent = formatAddressHit(r);
+        body.appendChild(title);
+        const raionName = r.d != null && districtNames[r.d] ? districtNames[r.d] : '';
+        if (raionName) {
+          const meta = document.createElement('span');
+          meta.className = 'asr-meta';
+          meta.textContent = 'район ' + raionName;
+          body.appendChild(meta);
+        }
+        item.appendChild(chip); item.appendChild(body);
+        frag.appendChild(item);
+      }
+      resultsEl.replaceChildren(frag);
+      resultsEl.classList.add('visible');
+    }
+
+    // ---- result selection: fly + single marker + standalone popup ----
+    let searchMarker = null;
+    function clearSearchMarker() { if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; } }
+    function searchPinIcon() {
+      return L.divIcon({ className: 'search-pin-wrapper', html: '<div class="search-pin"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
+    }
+    function openSearchPopup(label, lat, lng) {
+      const wrap = document.createElement('div');
+      wrap.className = 'search-popup';
+      const t = document.createElement('div');
+      t.className = 'sp-title';
+      t.textContent = label;
+      wrap.appendChild(t);
+      const nav = buildNavActions(lat, lng); // Street View · Google Maps · nav — NO "Докладвай"
+      if (nav) wrap.appendChild(nav);
+      L.popup({ closeButton: true, autoPan: true, autoPanPaddingTopLeft: POPUP_AUTOPAN_TL, autoPanPaddingBottomRight: POPUP_AUTOPAN_BR })
+        .setLatLng([lat, lng]).setContent(wrap).openOn(map);
+    }
+    function selectResult(r) {
+      if (!r || !Array.isArray(r.pin) || r.pin.length !== 2) return;
+      const lat = Number(r.pin[0]), lng = Number(r.pin[1]);
+      if (!isFinite(lat) || !isFinite(lng)) return; // validate pin
+      const label = formatAddressHit(r);            // resolved address (never cadnum)
+      clearSearchMarker(); // replace any previous result marker
+      searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
+      searchMarker.on('click', function () { openSearchPopup(label, lat, lng); });
+      map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
+      openSearchPopup(label, lat, lng);
+      hideResults();
+    }
+
+    // ---- query runner (debounced; stale-guarded) ----
+    let debounceTimer = null;
+    async function runQuery(value) {
+      const q = (value || '').trim();
+      if (q.length < 1) { hideResults(); clearSearchMarker(); return; }
+      let index;
+      try { index = await ensureSearchData(); }
+      catch (e) { showStatus('Търсачката не е налична офлайн'); return; }
+      if (inputEl.value.trim() !== q) return; // a newer keystroke superseded this run
+      renderResults(runGeocoderSearch(q, index));
+    }
+
+    // ---- events ----
+    inputEl.addEventListener('focus', function () { ensureSearchData().catch(function () {}); });
+    inputEl.addEventListener('input', function (ev) {
+      const v = ev.target.value;
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function () { runQuery(v); }, DEBOUNCE_MS);
+    });
+    inputEl.addEventListener('keydown', async function (ev) {
+      if (ev.key === 'Escape') {
+        if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
+        inputEl.value = ''; hideResults(); clearSearchMarker(); inputEl.blur();
+      } else if (ev.key === 'Enter') {
+        ev.preventDefault();
+        if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
+        const q = inputEl.value.trim();
+        if (!q) return;                              // empty box -> no stale selection
+        let index;
+        try { index = await ensureSearchData(); }   // works during the cold-load window too
+        catch (e) { showStatus('Търсачката не е налична офлайн'); return; }
+        if (inputEl.value.trim() !== q) return;      // a newer keystroke superseded this
+        renderResults(runGeocoderSearch(q, index));
+        if (currentResults[0]) selectResult(currentResults[0]);
+      }
+    });
+    resultsEl.addEventListener('click', function (ev) {
+      const item = ev.target.closest('.asr-item');
+      if (!item) return;
+      const idx = parseInt(item.dataset.idx, 10);
+      if (Number.isFinite(idx) && currentResults[idx]) selectResult(currentResults[idx]);
+    });
+    // Click outside the search bar hides the dropdown (covers map clicks too).
+    document.addEventListener('click', function (ev) {
+      if (!ev.target.closest('.search-bar')) hideResults();
+    });
+  })();
 
   // --- wiring ---------------------------------------------------------------
   const buildingsBtnEl = document.getElementById('buildingsToggle');
