@@ -755,9 +755,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
                background: #f0f0f0; }
   #map { position:absolute; top:0; left:0; right:0; bottom:0; z-index:1; }
 
-  /* ===== Topbar ===== */
-  .topbar {
+  /* ===== Header stack (topbar + mode bar) =====
+     Both float over the top edge of the full-bleed map. The mode bar sits
+     flush under the topbar (no magic offset between them) because they share
+     this one absolutely-positioned wrapper. The stack is ~85px tall
+     (topbar ~40px + mode bar ~46px); other top-anchored overlays (pill,
+     status, banners, controls) clear it at top:100px below. */
+  .app-header {
     position:absolute; top:0; left:0; right:0; z-index:1000;
+  }
+  .topbar {
     background: rgba(196,30,58,0.95); color:white;
     padding: 10px 14px; display:flex; align-items:center; justify-content:space-between;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25); font-weight:600;
@@ -765,9 +772,17 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .topbar .title { font-size: 16px; }
   .topbar .meta { font-size: 12px; opacity: 0.9; }
 
+  /* Mode bar — always-visible filter chips (Близо / Топ 5 / Всички). Replaces
+     the old bottom-sheet .sheet-modes; reuses the .mode-chip styling below. */
+  .mode-bar {
+    display:flex; gap: 6px; padding: 6px 10px;
+    background: rgba(250,250,250,0.97);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+
   /* ===== Pill (loading / error) ===== */
   .pill {
-    position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(0,0,0,0.85); color: white;
     padding: 10px 16px; border-radius: 22px; font-size: 13px;
     display: flex; align-items: center; gap: 10px;
@@ -789,7 +804,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Right-side buttons ===== */
   .controls {
-    position:absolute; top:60px; right:10px; z-index:1000;
+    position:absolute; top:100px; right:10px; z-index:1000;
     display:flex; flex-direction:column; gap:8px;
   }
   .ctrl-btn {
@@ -802,8 +817,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .ctrl-btn:active { transform: scale(0.95); }
 
   /* ===== Locate button ===== */
+  /* Bottom-right corner. The bottom of the screen is now free (the bottom sheet
+     was removed in the popup pivot), so the FAB drops from the old bottom:170px
+     to the corner, clear of the iOS home indicator. */
   .locate-btn {
-    position: absolute; bottom: 170px; right: 14px; z-index:1000;
+    position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); right: 14px; z-index:1000;
     width: 56px; height: 56px; border-radius: 50%;
     background: #c41e3a; color: white; border: 3px solid white;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -819,7 +837,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Status pill (transient) ===== */
   .status {
-    position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
     z-index:1500; background: rgba(0,0,0,0.85); color:white;
     padding: 10px 18px; border-radius: 20px; font-size: 13px;
     pointer-events:none; opacity: 0; transition: opacity 0.3s;
@@ -827,85 +845,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .status.show { opacity: 1; }
 
-  /* ===== Bottom sheet ===== */
-  .sheet {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 999;
-    background: white; border-top: 2px solid #c41e3a;
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.25s ease-out;
-    border-radius: 12px 12px 0 0;
-  }
-  .sheet.collapsed-fully { transform: translateY(calc(100% - 28px)); }
-
-  .sheet-handle {
-    height: 28px; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; user-select: none;
-  }
-  .sheet-handle::before {
-    content: ''; width: 36px; height: 4px;
-    background: #ccc; border-radius: 2px;
-  }
-
-  /* Compact target card (always visible) */
-  .sheet-card {
-    display: flex; align-items: center; gap: 10px;
-    padding: 5px 12px 9px;
-    background: linear-gradient(135deg, #fff8e1, #ffecb3);
-    border-bottom: 1px solid #f0d878;
-  }
-  .sheet-card.empty {
-    background: #f5f5f5; border-bottom-color: #e0e0e0;
-    color: #777; font-size: 13px; padding: 16px;
-    justify-content: center;
-  }
-  .arrow-circle {
-    width: 46px; height: 46px; flex-shrink: 0;
-    border-radius: 50%; background: white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-  }
-  .arrow-circle::before {
-    content: 'С'; position: absolute; top: 3px;
-    font-size: 9px; color: #999; font-weight: 700;
-  }
-  .arrow-tri {
-    width: 0; height: 0;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-bottom: 18px solid #ff9800;
-    transform-origin: 50% 70%;
-    will-change: transform;
-  }
-  .card-info { flex: 1; min-width: 0; }
-  .card-dist { font-size: 20px; font-weight: 800; color: #c41e3a; line-height: 1.05; }
-  .card-name {
-    font-size: 13px; color: #333; margin-top: 1px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .card-bearing { font-size: 11px; color: #888; margin-top: 1px; }
-  /* Verifier note (moderated free-text only; populated via textContent, never
-     HTML). Clamped to 2 lines so a long note never grows the compact card. */
-  .card-note {
-    font-size: 11px; color: #6b6b6b; margin-top: 2px; line-height: 1.25;
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-    overflow: hidden;
-  }
-  .card-actions { display: flex; gap: 5px; flex-shrink: 0; }
-  .card-btn {
-    color: white; border: none; width: 40px; height: 40px;
-    border-radius: 50%; font-size: 17px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .card-btn.nav { background: #1976d2; }
-  .card-btn.nav:active { background: #0d5cb5; }
-  .compass-perm-card-btn {
-    background: #ff9800; color: white; border: none;
-    padding: 4px 10px; border-radius: 6px; font-weight: 600;
-    cursor: pointer; font-size: 11px; margin-top: 4px;
-  }
-
-  /* ===== E3a — shared navigation/action buttons (building popup + hydrant card) ===== */
+  /* ===== E3a — shared navigation/action buttons (building popup + hydrant popup) ===== */
   /* Plain link-outs (textContent, target=_blank, rel=noopener) in the ADR 031
      C12 pattern; URL templates ported verbatim from Varna_buildings
      sectionUnits.js. Mobile-compact pill style with flex-wrap so the 4 actions
@@ -918,13 +858,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .nav-action:active { transform: scale(0.96); }
 
-  /* Hydrant card nav strip: a sibling below the compact card (the card's own
-     content is unchanged). :empty collapses it when there is no active target. */
-  .hydrant-nav-actions {
-    padding: 8px 14px; background: #fffdf5; border-bottom: 1px solid #f0d878;
-  }
-  .hydrant-nav-actions:empty { display: none; }
-
   /* Building popup (Leaflet popup): safe tile props only. */
   .building-popup { font-size: 13px; line-height: 1.45; min-width: 150px; }
   .building-popup .bp-title { font-weight: 700; margin-bottom: 4px; color: #1f2d3d; }
@@ -932,11 +865,30 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .building-popup .bp-row .bp-label { color: #777; }
   .building-popup .nav-actions { margin-top: 8px; }
 
-  /* Mode chips */
-  .sheet-modes {
-    display: flex; gap: 6px; padding: 8px 10px;
-    background: #fafafa; border-bottom: 1px solid #eee;
+  /* Hydrant popup (Leaflet popup) — modeled on .building-popup. Compact; the
+     nav-action chips wrap at 375px via .nav-actions flex-wrap. Replaces the old
+     bottom-sheet compact card. */
+  .hydrant-popup { font-size: 13px; line-height: 1.45; min-width: 160px; max-width: 240px; }
+  .hydrant-popup .hp-title { font-weight: 700; margin-bottom: 4px; color: #1f2d3d; }
+  .hydrant-popup .hp-row { margin: 2px 0; color: #333; }
+  .hydrant-popup .hp-row .hp-label { color: #777; }
+  /* Verifier note: moderated free-text only, set via textContent (never HTML). */
+  .hydrant-popup .hp-note {
+    margin: 6px 0; padding: 6px 8px; background: #fffdf5;
+    border-left: 3px solid #f0d878; border-radius: 0 4px 4px 0;
+    color: #6b6b6b; font-size: 12px; line-height: 1.3;
   }
+  .hydrant-popup .nav-actions { margin-top: 8px; }
+  .hydrant-popup .hp-report-btn {
+    display: block; width: 100%; margin-top: 8px;
+    padding: 9px 11px; border-radius: 8px; border: none;
+    background: #ff5722; color: white; font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+  .hydrant-popup .hp-report-btn:active { transform: scale(0.98); }
+
+  /* Mode chips (live in .mode-bar at the top; styling unchanged from when they
+     lived in the old bottom-sheet .sheet-modes). */
   .mode-chip {
     flex: 1; padding: 9px 6px; border-radius: 18px;
     background: white; border: 1px solid #ddd; color: #555;
@@ -947,51 +899,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     background: #c41e3a; border-color: #c41e3a; color: white;
   }
   .mode-chip:active { transform: scale(0.97); }
-
-  /* Expanded list */
-  .sheet-list {
-    max-height: 30vh; overflow-y: auto;
-    transition: max-height 0.25s ease-out;
-  }
-  .sheet-list.collapsed { max-height: 0; overflow: hidden; }
-  .empty-list {
-    padding: 24px 16px; text-align: center; color: #888; font-size: 13px;
-  }
-
-  .row {
-    padding: 10px 12px; border-bottom: 1px solid #eee;
-    display:flex; align-items:center; gap:8px;
-    cursor:pointer;
-  }
-  .row:active { background: #f5f5f5; }
-  .row.active-target { background: #fff3e0; border-left: 4px solid #ff9800; padding-left: 8px; }
-  .rank {
-    flex-shrink:0; width:28px; height:28px; border-radius:50%;
-    background:#c41e3a; color:white;
-    display:flex; align-items:center; justify-content:center;
-    font-weight:700; font-size:13px;
-  }
-  .row.active-target .rank { background: #ff9800; }
-  .row-info { flex:1; min-width:0; }
-  .row-addr {
-    font-size: 13px; color:#222; overflow:hidden;
-    text-overflow:ellipsis; white-space:nowrap; font-weight: 500;
-  }
-  .row-meta {
-    font-size: 10px; color:#888; margin-top:1px;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-  .row-dist {
-    font-size: 14px; font-weight: 700; color:#c41e3a; flex-shrink:0;
-  }
-  .row.active-target .row-dist { color:#ff9800; }
-  .row-btn {
-    color: white; border:none; width: 34px; height: 34px;
-    border-radius: 6px; font-size: 14px; flex-shrink:0; cursor:pointer;
-  }
-  .row-btn.nav { background: #1976d2; }
-  .row-btn.report { background: #ff5722; }
-
 
   /* Report modal */
   .modal-backdrop {
@@ -1166,7 +1073,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Placement mode (long-press) ===== */
   .placement-banner {
-    position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(196,30,58,0.95); color: white;
     padding: 10px 16px; border-radius: 20px; font-size: 13px;
     max-width: 92%; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -1176,7 +1083,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
      (cancel button must be tappable). Shown after user picks a report type
      from the global "+" menu and is now waiting to tap a hydrant. */
   .prepick-banner {
-    position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(196,30,58,0.95); color: white;
     padding: 6px 6px 6px 16px; border-radius: 22px; font-size: 13px;
     max-width: 92%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -1245,12 +1152,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     box-shadow: 0 0 0 5px rgba(255,152,0,0.55), 0 2px 6px rgba(0,0,0,0.4);
   }
   .h-pin.dim { opacity:0.7; }
-  .status-legend {
-    text-align: center; font-size: 14px; line-height: 1.2;
-    padding: 6px 8px; background: #fafafa;
-    border-bottom: 1px solid #eee; color: #444;
-    user-select: none; pointer-events: none;
-  }
   /* User marker: blue dot + heading cone */
   .user-marker-wrap { position: relative; width: 100px; height: 100px; pointer-events: none; }
   .user-cone {
@@ -1277,10 +1178,19 @@ svg.leaflet-image-layer.leaflet-interactive path {
 </head>
 <body>
 
-<div class="topbar">
-  <div class="title">🚒 Хидранти</div>
-  <div class="meta" id="meta">—</div>
-</div>
+<header class="app-header">
+  <div class="topbar">
+    <div class="title">🚒 Хидранти</div>
+    <div class="meta" id="meta">—</div>
+  </div>
+  <!-- Mode bar: always-visible filter chips. setMode() (JS) toggles .active and
+       re-ranks/renumbers markers; reuses data-mode / TOP_K=5 / NEAR_THRESHOLD_M=100. -->
+  <div class="mode-bar" id="modeBar">
+    <button class="mode-chip" data-mode="near">Близо &lt;100м</button>
+    <button class="mode-chip active" data-mode="top">Топ 5</button>
+    <button class="mode-chip" data-mode="all">Всички</button>
+  </div>
+</header>
 
 <div id="map"></div>
 
@@ -1308,39 +1218,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
 </div>
 
 <button class="locate-btn" id="locateBtn" title="GPS toggle">📍</button>
-
-<div class="sheet" id="sheet">
-  <div class="sheet-handle" id="sheetHandle"></div>
-
-  <div class="sheet-card" id="sheetCard">
-    <div class="arrow-circle">
-      <div class="arrow-tri" id="arrowTri"></div>
-    </div>
-    <div class="card-info">
-      <div class="card-dist" id="cardDist">—</div>
-      <div class="card-name" id="cardName">—</div>
-      <div class="card-bearing" id="cardBearing">—</div>
-      <button class="compass-perm-card-btn" id="compassPermBtn" style="display:none;">Активирай компас</button>
-    </div>
-    <div class="card-actions">
-      <button class="card-btn nav" id="cardNav" title="Навигация">🧭</button>
-    </div>
-  </div>
-
-  <!-- E3a: shared nav/action buttons for the selected hydrant (populated by
-       refreshHydrantNavActions). Empty -> CSS collapses it. -->
-  <div class="hydrant-nav-actions" id="hydrantNavActions"></div>
-
-  <div class="sheet-modes">
-    <button class="mode-chip" data-mode="near">Близо &lt;100м</button>
-    <button class="mode-chip active" data-mode="top">Топ 5</button>
-    <button class="mode-chip" data-mode="all">Всички</button>
-  </div>
-
-  <div class="status-legend">🔴 Проверен  🟡 Обработва се  ⚫ Непроверен</div>
-
-  <div class="sheet-list collapsed" id="sheetList"></div>
-</div>
 
 <script id="leaflet-js">/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1801,7 +1678,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         (markersById[h.id] = markersById[h.id] || []).push(m);
         attachMarkerLongPress(
           m,
-          () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); },
+          () => selectHydrantAndOpenPopup(h, () => setActiveTargetHydrant(h)),
           () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); showReportTypePicker(h); }
         );
         allClusterLayer.addLayer(m);
@@ -1829,7 +1706,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         (markersById[r.h.id] = markersById[r.h.id] || []).push(m);
         attachMarkerLongPress(
           m,
-          () => { if (consumePrepickForHydrant(r.h)) return; setActiveTarget(i); },
+          () => selectHydrantAndOpenPopup(r.h, () => setActiveTarget(i)),
           () => { if (consumePrepickForHydrant(r.h)) return; setActiveTarget(i); showReportTypePicker(r.h); }
         );
         m.addTo(map);
@@ -1849,62 +1726,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       }
     }
 
-    renderList();
-    updateCard();
-  }
-
-  // ===== List =====
-  function renderList() {
-    const list = document.getElementById('sheetList');
-    list.innerHTML = '';
-
-    if (mode === 'near' && currentRanked.length === 0) {
-      list.innerHTML = '<div class="empty-list">Няма хидранти в радиус ' +
-                       NEAR_THRESHOLD_M + ' м.<br>Превключи на „Топ 5".</div>';
-      return;
-    }
-
-    const list_data = mode === 'all' ? currentRanked.slice(0, 10) : currentRanked;
-    list_data.forEach((r, i) => {
-      const h = r.h;
-      const addr = h.address || ('Хидрант ' + h.id);
-      const typeLabel = hydrantTypeLabel(h.type);
-      const meta = [h.region, typeLabel ? ('Тип: ' + typeLabel) : ''].filter(Boolean).join(' · ');
-      const row = document.createElement('div');
-      row.className = 'row' + (i === activeTargetIdx ? ' active-target' : '');
-      row.dataset.idx = i;
-      row.innerHTML =
-        '<div class="rank">' + (i+1) + '</div>' +
-        '<div class="row-info">' +
-          '<div class="row-addr">' + escapeHtml(addr) + '</div>' +
-          '<div class="row-meta">' + escapeHtml(meta) + ' · ID ' + escapeHtml(h.id) + '</div>' +
-        '</div>' +
-        '<div class="row-dist">' + formatDist(r.d) + '</div>' +
-        '<button class="row-btn nav" data-idx="' + i + '">🧭</button>' +
-        '<button class="row-btn report" data-idx="' + i + '">🚨</button>';
-      list.appendChild(row);
-    });
-
-    list.querySelectorAll('.row-btn.nav').forEach(b => {
-      b.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        const r = list_data[parseInt(b.dataset.idx, 10)];
-        if (r) navigateTo(r);
-      });
-    });
-    list.querySelectorAll('.row-btn.report').forEach(b => {
-      b.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        const r = list_data[parseInt(b.dataset.idx, 10)];
-        if (r) showReportTypePicker(r.h);
-      });
-    });
-    list.querySelectorAll('.row').forEach(r => {
-      r.addEventListener('click', (ev) => {
-        if (ev.target.classList.contains('row-btn')) return;
-        setActiveTarget(parseInt(r.dataset.idx, 10));
-      });
-    });
+    // No bottom-sheet list/card to render — selection now surfaces via the
+    // marker pin highlight, the line to the user, and the hydrant popup.
   }
 
   // ===== Active target =====
@@ -1950,7 +1773,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     m._hydrantId = h.id; m._pinKind = 'numbered'; m._rank = rank; m._isActivePin = true;
     (markersById[h.id] = markersById[h.id] || []).push(m);
     attachMarkerLongPress(m,
-      () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); },
+      () => selectHydrantAndOpenPopup(h, () => setActiveTargetHydrant(h)),
       () => { if (consumePrepickForHydrant(h)) return; setActiveTargetHydrant(h); showReportTypePicker(h); }
     );
     m.addTo(map);
@@ -1975,7 +1798,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!at) {
       detach();
       if (lineToTarget) { map.removeLayer(lineToTarget); lineToTarget = null; }
-      updateCard();
       return;
     }
     // Out-of-list selections render with a neutral bullet; in-list keep their rank.
@@ -1989,8 +1811,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
       allModeActiveOverlay = createActiveOverlayMarker(at.h, rank);
     }
     redrawActiveLine();
-    updateCardInfo();
-    updateArrow();
   }
 
   function redrawActiveLine() {
@@ -2001,108 +1821,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
       { color:'#ff9800', weight: 3, opacity: 0.8, dashArray: '8,6' }).addTo(map);
   }
 
-  // GPS tick path under the cluster guard: user marker already moved; only
-  // user-dependent visuals (line, card, arrow) need updating.
+  // GPS tick path under the cluster guard: user marker already moved; only the
+  // line to the active target needs redrawing (the heading cone is updated by
+  // placeUser(); there is no longer a sheet card/arrow to refresh).
   function onUserMovedLightweight() {
     redrawActiveLine();
-    updateCardInfo();
-    updateArrow();
   }
 
-  // ===== Hybrid navigate =====
-  function navigateTo(r) {
-    if (r.d > NEAR_THRESHOLD_M) {
-      window.open('https://www.google.com/maps/dir/?api=1&destination=' +
-                  r.h.coords[1] + ',' + r.h.coords[0] + '&travelmode=driving', '_blank');
-      flashStatus('Отваря Google Maps (' + formatDist(r.d) + ')');
-    } else {
-      const idx = currentRanked.indexOf(r);
-      if (idx >= 0) setActiveTarget(idx);
-      map.setView([r.h.coords[1], r.h.coords[0]], 19);
-      flashStatus('На място (' + Math.round(r.d) + ' м) — компасна стрелка', 4000);
-    }
-  }
-
-  // ===== Compact card update =====
-  function updateCard() {
-    const card = document.getElementById('sheetCard');
-    if (!currentRanked.length) {
-      card.classList.add('empty');
-      card.innerHTML = '<span>' +
-        (mode === 'near'
-          ? 'Няма хидранти в радиус ' + NEAR_THRESHOLD_M + ' м'
-          : 'Няма данни') +
-        '</span>';
-      refreshHydrantNavActions();
-      return;
-    }
-    card.classList.remove('empty');
-    // Reuse static HTML structure (rebuild for safety)
-    card.innerHTML =
-      '<div class="arrow-circle"><div class="arrow-tri" id="arrowTri"></div></div>' +
-      '<div class="card-info">' +
-        '<div class="card-dist" id="cardDist">—</div>' +
-        '<div class="card-name" id="cardName">—</div>' +
-        '<div class="card-bearing" id="cardBearing">—</div>' +
-        '<div class="card-note" id="cardNote" style="display:none;"></div>' +
-        '<button class="compass-perm-card-btn" id="compassPermBtn" style="display:none;">Активирай компас</button>' +
-      '</div>' +
-      '<div class="card-actions">' +
-        '<button class="card-btn nav" id="cardNav" title="Навигация">🧭</button>' +
-      '</div>';
-
-    // Wire actions
-    document.getElementById('cardNav').addEventListener('click', () => {
-      const r = currentRanked[activeTargetIdx];
-      if (r) navigateTo(r);
-    });
-
-    // Show compass permission button if needed
-    if (needsCompassPerm) {
-      const btn = document.getElementById('compassPermBtn');
-      btn.style.display = 'inline-block';
-      btn.addEventListener('click', requestCompassPerm);
-    }
-
-    updateCardInfo();
-    updateArrow();
-  }
-
-  function updateCardInfo() {
-    const at = getActiveTarget();
-    // E3a — keep the shared hydrant nav-action strip in sync with the active
-    // target. Pass `at` so the per-frame path does not re-scan; the helper
-    // id+coords-guards its own DOM rebuild (and clears when `at` is null).
-    refreshHydrantNavActions(at);
-    if (!at) return;
-    const distEl = document.getElementById('cardDist');
-    const nameEl = document.getElementById('cardName');
-    const bearingEl = document.getElementById('cardBearing');
-    if (!distEl) return;
-    distEl.textContent = formatDist(at.d);
-    const label = at.idx >= 0 ? ('#' + (at.idx + 1) + ' ') : '';
-    const baseName = at.h.address || ('Хидрант ' + at.h.id);
-    nameEl.textContent = label + baseName;
-    // Type (надземен/подземен) folds into the meta/bearing line — shown via the
-    // existing hydrantTypeLabel() whenever the hydrant has a type, omitted cleanly
-    // otherwise — so the name line stays compact.
-    const typeLabel = hydrantTypeLabel(at.h.type);
-    const bear = bearing(lastFix.lat, lastFix.lon, at.h.coords[1], at.h.coords[0]);
-    const bearingText = cardinal(bear) + ' · ' + Math.round(bear) + '°' +
-      (smoothedHeading == null ? ' (без компас)' : '');
-    bearingEl.textContent = (typeLabel ? typeLabel + ' · ' : '') + bearingText;
-    // Verifier note: the moderated free-text the reporter left, surfaced from the
-    // live /issues feed via applyReports(). textContent only (never HTML); reporter
-    // name / issue url+number / labels / provenance are intentionally excluded.
-    const noteEl = document.getElementById('cardNote');
-    if (noteEl) {
-      const note = at.h.verifier_note;
-      if (note) { noteEl.textContent = note; noteEl.style.display = '-webkit-box'; }
-      else { noteEl.textContent = ''; noteEl.style.display = 'none'; }
-    }
-  }
-
-  // ===== Compass arrow with smoothing =====
+  // ===== Compass bearing / cardinal helpers =====
   function bearing(lat1, lon1, lat2, lon2) {
     const toRad = x => x * Math.PI / 180;
     const toDeg = x => x * 180 / Math.PI;
@@ -2126,8 +1852,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
     return smoothedHeading;
   }
 
+  // Per-frame heading smoothing. Runs one EMA step per rAF (deviceorientation
+  // fires at 100-200Hz; we must not EMA in the event handler). The only live
+  // compass UI left is the user heading cone — the bottom-sheet card and its
+  // target arrow were removed in the popup pivot, and the hydrant popup shows a
+  // direction snapshot captured at open time.
   let pendingFrame = false;
-  function scheduleArrowUpdate() {
+  function scheduleHeadingUpdate() {
     if (pendingFrame) return;
     pendingFrame = true;
     requestAnimationFrame(() => {
@@ -2136,20 +1867,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
         smoothHeading(pendingHeading);   // 1 EMA step per frame max
         pendingHeading = null;
       }
-      updateArrow();
-      updateCardInfo();
       updateUserCone();
     });
-  }
-
-  function updateArrow() {
-    const at = getActiveTarget();
-    if (!at) return;
-    const arrow = document.getElementById('arrowTri');
-    if (!arrow) return;
-    const bear = bearing(lastFix.lat, lastFix.lon, at.h.coords[1], at.h.coords[0]);
-    const rot = smoothedHeading != null ? (bear - smoothedHeading) : bear;
-    arrow.style.transform = 'rotate(' + rot + 'deg)';
   }
 
   // ===== Compass init / smoothing =====
@@ -2192,7 +1911,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
     lastHeadingSourceUsed = sample.source;
     pendingHeading = sample.deg;
-    scheduleArrowUpdate();
+    scheduleHeadingUpdate();
   }
 
   function attachOrientation() {
@@ -3216,6 +2935,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // ===== Misc controls =====
   const locateBtn = document.getElementById('locateBtn');
   locateBtn.addEventListener('click', () => {
+    // Compass permission (iOS Safari) is user-gesture-gated. The bottom-sheet
+    // card that used to host the "Активирай компас" button is gone, so the
+    // locate FAB doubles as the one-time compass-permission trigger: request
+    // orientation access first (no-op on Android/desktop), then proceed with
+    // locate. attachOrientation() clears needsCompassPerm on grant, so later
+    // taps skip straight to locate.
+    if (needsCompassPerm) requestCompassPerm();
     if (!lastFix) {
       flashStatus('Локацията не е известна — опитвам пак');
       startTracking();
@@ -3356,7 +3082,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
           (markersById[h.id] = markersById[h.id] || []).push(m);
           attachMarkerLongPress(
             m,
-            () => { consumePrepickForHydrant(h); },
+            () => selectHydrantAndOpenPopup(h, () => setActiveTargetHydrant(h)),
             () => { if (consumePrepickForHydrant(h)) return; showReportTypePicker(h); }
           );
           allClusterLayer.addLayer(m);
@@ -3381,13 +3107,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
           if (Number.isFinite(lon) && Number.isFinite(lat)) {
             h.coords = [lon, lat];
             moveMarkersForHydrant(h);
-            // If polling moved the active hydrant, redraw user-dependent
-            // visuals without refresh() — refresh() would rebuild the cluster
-            // and collapse any open spiderfy.
+            // If polling moved the active hydrant, redraw the line to it without
+            // refresh() — refresh() would rebuild the cluster and collapse any
+            // open spiderfy. No sheet card to refresh; an open popup is anchored
+            // to the hydrant's coords and shows a snapshot from open time.
             if (h.id === activeTargetId) {
               redrawActiveLine();
-              updateCardInfo();
-              updateArrow();
             }
           }
         }
@@ -3443,15 +3168,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
   // Kick off polling immediately, in parallel with welcome modal / GPS bootstrap.
   pollIssues().finally(schedulePoll);
-
-  // ===== Sheet collapse/expand =====
-  const sheet = document.getElementById('sheet');
-  const sheetList = document.getElementById('sheetList');
-  let listOpen = false;
-  document.getElementById('sheetHandle').addEventListener('click', () => {
-    listOpen = !listOpen;
-    sheetList.classList.toggle('collapsed', !listOpen);
-  });
 
   // ===== Helpers =====
   function haversine(lat1, lon1, lat2, lon2) {
@@ -3588,13 +3304,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
   };
 
   // --- building module state ---
-  // NOTE: refreshHydrantNavActions() (hoisted) reads hydrantNavActionsSig, and is
-  // called from the hydrant card path (updateCard/updateCardInfo). That path only
-  // runs after bootApp() — the IIFE's last statement, below this block — so these
-  // `let`s are always initialised first. Keep this block above bootApp().
+  // NOTE: these `let`s must be initialised before the building layer is created
+  // (lazily, on the 🏢 toggle, which fires after bootApp() — the IIFE's last
+  // statement, below this block). Keep this block above bootApp().
   let tileToken = null, tileTokenExp = 0, tokenRefreshTimer = null;
   let vectorGridLoadPromise = null, buildingLayer = null, buildingsEnabled = false;
-  let hydrantNavActionsSig = null;  // "id:lng,lat" of the hydrant currently in the strip
   let satelliteOn = false;
 
   // --- shared nav/action buttons (building popup + hydrant card) ------------
@@ -3623,26 +3337,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
       row.appendChild(a);
     }
     return row;
-  }
-
-  // Hydrant card nav strip — rebuilds only when the active hydrant changes, so
-  // it is safe to call from the per-frame updateCardInfo path.
-  // `at` is optional — updateCardInfo passes its own getActiveTarget() result to
-  // avoid a duplicate scan on the per-frame path. The signature includes coords
-  // so the strip rebuilds when a wrong_location poll moves the active hydrant
-  // (same id, new coords), while staying a cheap no-op on unchanged frames.
-  function refreshHydrantNavActions(at) {
-    const el = document.getElementById('hydrantNavActions');
-    if (!el) return;
-    if (at === undefined) at = getActiveTarget();
-    const coords = at && at.h && Array.isArray(at.h.coords) ? at.h.coords : null;
-    const sig = at && at.h ? (at.h.id + ':' + (coords ? coords[0] + ',' + coords[1] : '')) : null;
-    if (sig === hydrantNavActionsSig) return;
-    hydrantNavActionsSig = sig;
-    el.replaceChildren();
-    if (!coords) return;
-    const row = buildNavActions(coords[1], coords[0]);
-    if (row) el.appendChild(row);
   }
 
   // --- building popup (safe tile props ONLY) -------------------------------
@@ -3686,6 +3380,97 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const nav = buildNavActions(lat, lng);
     if (nav) wrap.appendChild(nav);
     return wrap;
+  }
+
+  // --- shared popup auto-pan padding ---------------------------------------
+  // Keep Leaflet popups clear of the fixed header stack (topbar + mode bar)
+  // when they auto-pan into view. Leaflet does not know about our absolutely
+  // positioned overlays, so without this a popup opened near the top edge can
+  // land hidden behind the mode bar. Top padding ≈ header height (~85px) + gap;
+  // bottom padding keeps the popup off the corner locate FAB.
+  const POPUP_AUTOPAN_TL = [16, 100];
+  const POPUP_AUTOPAN_BR = [16, 96];
+
+  // --- hydrant popup (Leaflet popup; modeled on buildBuildingPopup) ---------
+  // DOM-built with textContent only (never innerHTML) — the verifier note is
+  // moderated free-text from the /issues feed. Distance/direction are a snapshot
+  // taken from the current GPS fix at open time (the popup is not live-updated).
+  function buildHydrantPopup(h) {
+    const wrap = document.createElement('div');
+    wrap.className = 'hydrant-popup';
+
+    const title = document.createElement('div');
+    title.className = 'hp-title';
+    title.textContent = h.address || ('Хидрант ' + h.id);
+    wrap.appendChild(title);
+
+    const addRow = (label, value) => {
+      const r = document.createElement('div');
+      r.className = 'hp-row';
+      const l = document.createElement('span');
+      l.className = 'hp-label';
+      l.textContent = label + ': ';
+      r.appendChild(l);
+      r.appendChild(document.createTextNode(value));
+      wrap.appendChild(r);
+    };
+
+    const typeLabel = hydrantTypeLabel(h.type);
+    if (typeLabel) addRow('Тип', typeLabel);
+
+    // Distance + direction snapshot — only when we have a GPS fix to measure from.
+    if (lastFix) {
+      const d = haversine(lastFix.lat, lastFix.lon, h.coords[1], h.coords[0]);
+      addRow('Разстояние', formatDist(d));
+      const bear = bearing(lastFix.lat, lastFix.lon, h.coords[1], h.coords[0]);
+      addRow('Посока', cardinal(bear) + ' · ' + Math.round(bear) + '°');
+    }
+
+    const opLabel = OPERATIONAL_LABELS[h.operational_status];
+    if (opLabel) addRow('Състояние', opLabel);
+
+    if (h.verifier_note) {
+      const note = document.createElement('div');
+      note.className = 'hp-note';
+      note.textContent = h.verifier_note;
+      wrap.appendChild(note);
+    }
+
+    // Reuse the shared nav link-outs (Street View · Google Maps · Закарай ме с
+    // Google Maps · Waze). coords are [lon, lat]; buildNavActions takes (lat, lng).
+    const nav = buildNavActions(h.coords[1], h.coords[0]);
+    if (nav) wrap.appendChild(nav);
+
+    const reportBtn = document.createElement('button');
+    reportBtn.type = 'button';
+    reportBtn.className = 'hp-report-btn';
+    reportBtn.textContent = 'Докладвай';
+    reportBtn.addEventListener('click', () => showReportTypePicker(h));
+    wrap.appendChild(reportBtn);
+
+    return wrap;
+  }
+
+  // Opens the hydrant detail popup as a standalone Leaflet popup anchored to the
+  // hydrant's coordinates (NOT bound to the marker) — like the building popup —
+  // so a refresh() that rebuilds markers does not close it.
+  function openHydrantPopup(h) {
+    const node = buildHydrantPopup(h);
+    L.popup({
+      closeButton: true, autoPan: true,
+      autoPanPaddingTopLeft: POPUP_AUTOPAN_TL,
+      autoPanPaddingBottomRight: POPUP_AUTOPAN_BR
+    }).setLatLng([h.coords[1], h.coords[0]]).setContent(node).openOn(map);
+  }
+
+  // Marker tap entry point: consume any pending pre-pick first (report flow);
+  // otherwise select the hydrant (pin highlight + line to the user via the
+  // mode-appropriate setter) and open its detail popup. Long-press still routes
+  // to the report menu, unchanged.
+  function selectHydrantAndOpenPopup(h, select) {
+    if (consumePrepickForHydrant(h)) return;
+    if (select) select();
+    openHydrantPopup(h);
   }
 
   // --- token (memory only; refresh before exp; fail closed) ----------------
@@ -3757,8 +3542,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (placementActive || manualMode) return;
       const props = e.layer && e.layer.properties ? e.layer.properties : {};
       const node = buildBuildingPopup(props, e.latlng.lat, e.latlng.lng);
-      L.popup({ closeButton: true, autoPan: true })
-        .setLatLng(e.latlng).setContent(node).openOn(map);
+      L.popup({
+        closeButton: true, autoPan: true,
+        autoPanPaddingTopLeft: POPUP_AUTOPAN_TL,
+        autoPanPaddingBottomRight: POPUP_AUTOPAN_BR
+      }).setLatLng(e.latlng).setContent(node).openOn(map);
     });
     // Tile-level fetch errors stay contained to the building layer (fail closed).
     layer.on('tileerror', () => {});
