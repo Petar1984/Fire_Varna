@@ -886,6 +886,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .building-popup .bp-ent-sum { font-weight: 600; }
   .building-popup .bp-ent-detail { display: none; margin-top: 3px; color: #555; font-weight: 400; }
   .building-popup .bp-entrance.active .bp-ent-detail { display: block; }
+  .building-popup .bp-ent-warning {
+    margin: 0 0 6px; padding: 6px 8px; border-radius: 8px;
+    border: 1px solid #f3d08a; background: #fff7df; color: #6b4f00;
+    font-size: 12px; font-weight: 600;
+  }
 
   /* Entrance markers (shown ONLY for the selected building; cleared on close /
      new click / layer-off). divIcon per house style; active = orange + larger. */
@@ -3501,7 +3506,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const en = buildingPosInt(p.en);
     if (en) addRow('Входове', String(en));
     const u = buildingPosInt(p.u);
-    if (u) addRow('Апартаменти', String(u));
+    // Tile "u" is an object count (≈ Σ object_count), not SOIS apartments — label
+    // it as "Обекти" so the summary stops overstating apartments. Value unchanged.
+    if (u) addRow('Обекти', String(u));
     // Lazy per-building detail (entrance list + linked markers) lands here once
     // fetched; stays collapsed (CSS :empty) for tile-summary-only buildings.
     const detailBox = document.createElement('div');
@@ -3537,6 +3544,47 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (Number.isInteger(e.apartment_count) && e.apartment_count > 0) parts.push(e.apartment_count + ' ап');
     return parts.length ? ' · ' + parts.join(' · ') : '';
   }
+  // Display-only ordering for the entrance list (F3, render-only — the emit-side
+  // compareEntrances is intentionally left untouched, as re-sorting there would
+  // require a detail-JSON re-emit). Purely numeric "en" labels come first, sorted
+  // as integers (so вх. 2 precedes вх. 10), then other labelled entrances by a
+  // locale-aware compare, then pin-only / unlabelled entrances last. Stable by
+  // original array index within each group.
+  function compareEntranceDisplay(a, b) {
+    const aEn = (a.e && typeof a.e.en === 'string') ? a.e.en.trim() : '';
+    const bEn = (b.e && typeof b.e.en === 'string') ? b.e.en.trim() : '';
+    const aRank = /^\d+$/.test(aEn) ? 0 : (aEn ? 1 : 2);
+    const bRank = /^\d+$/.test(bEn) ? 0 : (bEn ? 1 : 2);
+    if (aRank !== bRank) return aRank - bRank;
+    if (aRank === 0) {
+      const d = parseInt(aEn, 10) - parseInt(bEn, 10);
+      return d !== 0 ? d : (a.sourceIndex - b.sourceIndex);
+    }
+    if (aRank === 1) {
+      const c = aEn.localeCompare(bEn, 'bg', { numeric: true, sensitivity: 'base' });
+      return c !== 0 ? c : (a.sourceIndex - b.sourceIndex);
+    }
+    return a.sourceIndex - b.sourceIndex;
+  }
+  // F9 — building-level "entrance breakdown incomplete" warning. Reads only fields
+  // the detail JSON already carries (no new data, no re-emit); mirrors the local
+  // app's coverage badge at a coarser (building) granularity.
+  function getEntranceCoverage(detail) {
+    return (detail && detail.data_confidence) ? detail.data_confidence.entrance_coverage : undefined;
+  }
+  function hasEntranceFact(e) {
+    if (!e) return false;
+    if (e.en) return true;
+    if (Number.isFinite(e.floors) && e.floors > 0) return true;
+    if (Number.isFinite(e.apartment_count) && e.apartment_count > 0) return true;
+    return false;
+  }
+  function shouldShowEntranceCoverageWarning(detail, entrances) {
+    const coverage = getEntranceCoverage(detail);
+    if (Number.isFinite(coverage) && coverage < 0.5) return true;
+    if (entrances.length && entrances.every((e) => !hasEntranceFact(e))) return true;
+    return false;
+  }
   function entranceIcon(label, active) {
     return L.divIcon({
       className: 'entrance-pin-wrap',
@@ -3568,11 +3616,23 @@ window._hydrantDataReady = (async function loadHydrantData() {
     head.className = 'bp-ent-head';
     head.textContent = 'Входове';
     detailBox.appendChild(head);
+    if (shouldShowEntranceCoverageWarning(detail, entrances)) {
+      const warn = document.createElement('div');
+      warn.className = 'bp-ent-warning';
+      warn.textContent = 'Входната разбивка е непълна (СОИС).';
+      detailBox.appendChild(warn);
+    }
     const list = document.createElement('div');
     list.className = 'bp-entrances';
     detailBox.appendChild(list);
 
-    const entries = entrances.map((e, i) => ({ e, i, row: null, marker: null }));
+    // Render-only display ordering: sort by compareEntranceDisplay, then re-index
+    // so entries[i].i === i stays true (selectEntrance relies on both entries[i]
+    // and en.i === i). sourceIndex keeps the sort stable.
+    const entries = entrances
+      .map((e, sourceIndex) => ({ e, sourceIndex }))
+      .sort(compareEntranceDisplay)
+      .map((entry, i) => ({ ...entry, i, row: null, marker: null }));
     function selectEntrance(i) {
       for (const en of entries) {
         const on = en.i === i;
