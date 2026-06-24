@@ -30,7 +30,7 @@ const ORIGIN = "https://petar1984.github.io";
 const ORIGIN2 = "http://localhost:8000";        // also allowlisted
 const BAD_ORIGIN = "https://evil.example";
 const WORKER_BASE = "https://worker.example";
-const ALLOWED_KEYS = new Set(["bt", "en", "fl", "fl_min", "fl_max", "u", "bd"]);
+const ALLOWED_KEYS = new Set(["bt", "en", "fl", "fl_min", "fl_max", "u"]);
 
 // Known-present tiles (from the PMTiles probe, 2026-06-22).
 const T15 = "/tiles/buildings/v1/15/18926/12026.mvt";
@@ -55,9 +55,8 @@ function check(name, cond, detail) {
   else { failed++; failures.push(name + (detail ? " — " + detail : "")); console.log("  FAIL  " + name + (detail ? " — " + detail : "")); }
 }
 
-function makeR2(buffer, key, extra) {
+function makeR2(buffer, key) {
   const store = new Map([[key, buffer]]);
-  if (extra) for (const [k, v] of extra) store.set(k, v);
   return {
     reads: 0,
     async get(objectKey, options) {
@@ -76,10 +75,7 @@ function makeR2(buffer, key, extra) {
 }
 
 function makeEnv(opts = {}) {
-  const extra = opts.detail
-    ? [["details/buildings/v1/" + opts.detail.bd + ".json", opts.detail.bytes]]
-    : null;
-  const r2 = makeR2(PMTILES_BYTES, opts.objectKey || OBJECT_KEY, extra);
+  const r2 = makeR2(PMTILES_BYTES, opts.objectKey || OBJECT_KEY);
   const kv = opts.kv || { async get() { return null; }, async put() {} };
   const env = {
     BUILDING_TILES: opts.noR2 ? undefined : r2,
@@ -500,141 +496,6 @@ async function testRegression() {
   }
 }
 
-async function testCacheObjectKeyVersioning() {
-  console.log("\n[cache-objkey] tile cache key is versioned by object key -> no stale tile after a key bump");
-  const mod = await loadFreshModule("cache-objkey");
-  installCaches(); // ONE shared cache across both envs (simulates the same isolate across a redeploy)
-  const token = await mintToken(SECRET, { v: 1, scope: "buildings:v1", origin: ORIGIN, iat: nowS(), exp: nowS() + 600 });
-  const K1 = OBJECT_KEY; // current build's object key
-  const K2 = "tiles/buildings_safe_v0000000000000000000000000000000000000000000000000000000000000000.pmtiles"; // a redeploy
-  const { env: envA, r2: r2A } = makeEnv({ objectKey: K1 });
-  const { env: envB, r2: r2B } = makeEnv({ objectKey: K2 }); // same PMTiles bytes seeded under the new key
-
-  const a1 = await callWorker(mod, envA, T15 + "?token=" + token, { origin: ORIGIN, ip: "6.6.6.1" });
-  check("objkey: A first MISS", a1.status === 200 && a1.headers.get("X-Cache") === "MISS", "x-cache=" + a1.headers.get("X-Cache"));
-  check("objkey: A read R2", r2A.reads > 0, "reads=" + r2A.reads);
-
-  // Same tile PATH, NEW object key (redeploy): must be a MISS (fresh cache key),
-  // NOT a stale HIT of A's cached bytes.
-  const r2bBefore = r2B.reads;
-  const b1 = await callWorker(mod, envB, T15 + "?token=" + token, { origin: ORIGIN, ip: "6.6.6.2" });
-  check("objkey: B (new key) MISS not stale", b1.status === 200 && b1.headers.get("X-Cache") === "MISS", "x-cache=" + b1.headers.get("X-Cache"));
-  check("objkey: B read R2 under new key", r2B.reads > r2bBefore, "reads=" + r2B.reads);
-
-  // Dedup still holds WITHIN a key: re-request under K1 -> HIT, no new R2 read.
-  const r2aBefore = r2A.reads;
-  const a2 = await callWorker(mod, envA, T15 + "?token=" + token, { origin: ORIGIN, ip: "6.6.6.3" });
-  check("objkey: A second HIT (dedup within key)", a2.status === 200 && a2.headers.get("X-Cache") === "HIT", "x-cache=" + a2.headers.get("X-Cache"));
-  check("objkey: A second avoided R2", r2A.reads === r2aBefore, "reads=" + r2A.reads + " expected=" + r2aBefore);
-}
-
-async function testDetailRoute() {
-  console.log("\n[detail] GET /tiles/buildings/v1/detail/{bd}.json — token-gated, fail-closed, cached");
-  const BD = "b0123456789abcdef";
-  const D_OK = "/tiles/buildings/v1/detail/" + BD + ".json";
-  const D_MISSING = "/tiles/buildings/v1/detail/b0000000000000000.json"; // valid format, no object
-  const D_BADFMT = "/tiles/buildings/v1/detail/babc.json";               // routes here, fails bd regex
-  const detailJson = JSON.stringify({
-    v: 1, bd: BD, type: { code: "110", label: "Жилищна сграда - многофамилна", class: "block" },
-    apartment_count: 18, data_confidence: { entrance_coverage: 0.94 },
-    entrances: [{ en: "А", pin: { lat: 43.2061, lng: 27.89209 }, floors: 5, apartment_count: 17, breakdown: { apartment: 17 } }],
-  });
-  const detailBytes = new TextEncoder().encode(detailJson);
-  const seed = () => ({ detail: { bd: BD, bytes: detailBytes } });
-
-  // --- happy path ---
-  {
-    const mod = await loadFreshModule("detail-happy");
-    installCaches();
-    const { env, r2 } = makeEnv(seed());
-    const token = await mintToken(SECRET, { v: 1, scope: "buildings:v1", origin: ORIGIN, iat: nowS(), exp: nowS() + 600 });
-    const res = await callWorker(mod, env, D_OK + "?token=" + token, { origin: ORIGIN, ip: "8.8.8.1" });
-    check("detail happy 200", res.status === 200, "status=" + res.status);
-    check("detail Content-Type application/json", res.headers.get("Content-Type") === "application/json; charset=utf-8");
-    check("detail Cache-Control immutable", res.headers.get("Cache-Control") === "public, max-age=86400, s-maxage=604800, immutable");
-    check("detail X-Robots-Tag noindex", res.headers.get("X-Robots-Tag") === "noindex");
-    check("detail ACAO echoes origin", res.headers.get("Access-Control-Allow-Origin") === ORIGIN);
-    check("detail X-Cache MISS first", res.headers.get("X-Cache") === "MISS");
-    const body = await res.json();
-    check("detail body bd matches", body.bd === BD, "bd=" + body.bd);
-    check("detail body has entrances", Array.isArray(body.entrances) && body.entrances.length === 1);
-    check("detail read R2 once", r2.reads === 1, "reads=" + r2.reads);
-    const opt = await callWorker(mod, env, D_OK, { method: "OPTIONS", origin: ORIGIN });
-    check("detail OPTIONS 204 (via /tiles/* branch)", opt.status === 204, "status=" + opt.status);
-  }
-
-  // --- rejections: origin / token / scope / expiry / bd format / missing object ---
-  {
-    const mod = await loadFreshModule("detail-reject");
-    installCaches();
-    const { env } = makeEnv(seed());
-    const good = await mintToken(SECRET, { v: 1, scope: "buildings:v1", origin: ORIGIN, iat: nowS(), exp: nowS() + 600 });
-
-    const noOrigin = await callWorker(mod, env, D_OK + "?token=" + good, { origin: null, ip: "8.8.9.1" });
-    check("detail no origin -> 403", noOrigin.status === 403, "status=" + noOrigin.status);
-    check("detail 403 no-store", noOrigin.headers.get("Cache-Control") === "no-store");
-
-    const badOrigin = await callWorker(mod, env, D_OK + "?token=" + good, { origin: BAD_ORIGIN, ip: "8.8.9.2" });
-    check("detail disallowed origin -> 403", badOrigin.status === 403, "status=" + badOrigin.status);
-
-    const noToken = await callWorker(mod, env, D_OK, { origin: ORIGIN, ip: "8.8.9.3" });
-    check("detail missing token -> 401", noToken.status === 401, "status=" + noToken.status);
-
-    const malformed = await callWorker(mod, env, D_OK + "?token=not-a-token", { origin: ORIGIN, ip: "8.8.9.4" });
-    check("detail malformed token -> 401", malformed.status === 401, "status=" + malformed.status);
-
-    const wrongScope = await mintToken(SECRET, { v: 1, scope: "buildings:v0", origin: ORIGIN, iat: nowS(), exp: nowS() + 600 });
-    const wsRes = await callWorker(mod, env, D_OK + "?token=" + wrongScope, { origin: ORIGIN, ip: "8.8.9.5" });
-    check("detail wrong scope -> 401 invalid_scope", wsRes.status === 401 && (await wsRes.json()).error === "invalid_scope");
-
-    const expired = await mintToken(SECRET, { v: 1, scope: "buildings:v1", origin: ORIGIN, iat: nowS() - 700, exp: nowS() - 100 });
-    const expRes = await callWorker(mod, env, D_OK + "?token=" + expired, { origin: ORIGIN, ip: "8.8.9.6" });
-    check("detail expired -> 401 token_expired", expRes.status === 401 && (await expRes.json()).error === "token_expired");
-
-    const mism = await callWorker(mod, env, D_OK + "?token=" + good, { origin: ORIGIN2, ip: "8.8.9.7" });
-    check("detail origin mismatch -> 401", mism.status === 401 && (await mism.json()).error === "origin_mismatch");
-
-    const badFmt = await callWorker(mod, env, D_BADFMT + "?token=" + good, { origin: ORIGIN, ip: "8.8.9.8" });
-    check("detail bad bd format -> 404 not_found", badFmt.status === 404 && (await badFmt.json()).error === "not_found");
-    check("detail 404 no-store", badFmt.headers.get("Cache-Control") === "no-store");
-
-    const missing = await callWorker(mod, env, D_MISSING + "?token=" + good, { origin: ORIGIN, ip: "8.8.9.9" });
-    check("detail valid-but-missing -> 404 not_found", missing.status === 404 && (await missing.json()).error === "not_found");
-  }
-
-  // --- rate-limit (shares the 'tile' bucket) ---
-  {
-    const mod = await loadFreshModule("detail-rl");
-    installCaches();
-    const { env } = makeEnv({ ...seed(), tileMax: 2, tokenMax: 1000, window: 60 });
-    const token = await mintToken(SECRET, { v: 1, scope: "buildings:v1", origin: ORIGIN, iat: nowS(), exp: nowS() + 600 });
-    const ip = "8.8.10.1";
-    const a = await callWorker(mod, env, D_OK + "?token=" + token, { origin: ORIGIN, ip });
-    const b = await callWorker(mod, env, D_MISSING + "?token=" + token, { origin: ORIGIN, ip });
-    const c = await callWorker(mod, env, D_OK + "?token=" + token, { origin: ORIGIN, ip });
-    check("detail rl 1st ok", a.status === 200, "status=" + a.status);
-    check("detail rl 2nd (missing) 404", b.status === 404, "status=" + b.status);
-    check("detail rl 3rd -> 429", c.status === 429, "status=" + c.status);
-    check("detail rl 429 Retry-After", !!c.headers.get("Retry-After"));
-  }
-
-  // --- cache dedup: different token, same path -> HIT, no new R2 read ---
-  {
-    const mod = await loadFreshModule("detail-cache");
-    installCaches();
-    const { env, r2 } = makeEnv(seed());
-    const t1 = await mintToken(SECRET, { v: 1, scope: "buildings:v1", origin: ORIGIN, iat: nowS(), exp: nowS() + 600 });
-    const t2 = await mintToken(SECRET, { v: 1, scope: "buildings:v1", origin: ORIGIN, iat: nowS() + 1, exp: nowS() + 601 });
-    const r0 = r2.reads;
-    const first = await callWorker(mod, env, D_OK + "?token=" + t1, { origin: ORIGIN, ip: "8.8.11.1" });
-    check("detail cache first MISS", first.status === 200 && first.headers.get("X-Cache") === "MISS");
-    check("detail cache first read R2 (1)", r2.reads - r0 === 1, "delta=" + (r2.reads - r0));
-    const second = await callWorker(mod, env, D_OK + "?token=" + t2, { origin: ORIGIN, ip: "8.8.11.2" });
-    check("detail cache second HIT", second.status === 200 && second.headers.get("X-Cache") === "HIT", "x-cache=" + second.headers.get("X-Cache"));
-    check("detail cache second avoided R2", r2.reads - r0 === 1, "reads delta=" + (r2.reads - r0));
-  }
-}
-
 // ===========================================================================
 async function main() {
   console.log("Worker local tests (dependency-free; real index.js, mocked R2/KV/Cache/fetch)");
@@ -643,8 +504,6 @@ async function main() {
   await testRejections();
   await testRateLimit();
   await testCache();
-  await testCacheObjectKeyVersioning();
-  await testDetailRoute();
   await testRegression();
 
   console.log("\n========================================");

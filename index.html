@@ -868,42 +868,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .building-popup .bp-row .bp-label { color: #777; }
   .building-popup .nav-actions { margin-top: 8px; }
 
-  /* C — per-building detail (lazy-fetched): selectable entrance list linked to
-     entrance markers on the map. Empty box collapses so a building with no
-     detail (or an offline fetch) shows just the tile summary. */
-  .building-popup .bp-detailbox { margin-top: 8px; }
-  .building-popup .bp-detailbox:empty { display: none; }
-  .building-popup .bp-detail-hint { margin-top: 6px; font-size: 12px; color: #999; }
-  .building-popup .bp-ent-head { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 4px; }
-  .building-popup .bp-entrances { display: flex; flex-direction: column; gap: 4px; max-height: 168px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .building-popup .bp-entrance {
-    display: block; width: 100%; text-align: left; cursor: pointer;
-    padding: 6px 8px; border-radius: 8px; border: 1px solid #e0e6ee;
-    background: #f7f9fc; color: #1f2d3d; font: inherit; font-size: 12px;
-  }
-  .building-popup .bp-entrance:active { transform: scale(0.99); }
-  .building-popup .bp-entrance.active { background: #e8f0ff; border-color: #1d4ed8; }
-  .building-popup .bp-ent-sum { font-weight: 600; }
-  .building-popup .bp-ent-detail { display: none; margin-top: 3px; color: #555; font-weight: 400; }
-  .building-popup .bp-entrance.active .bp-ent-detail { display: block; }
-  .building-popup .bp-ent-warning {
-    margin: 0 0 6px; padding: 6px 8px; border-radius: 8px;
-    border: 1px solid #f3d08a; background: #fff7df; color: #6b4f00;
-    font-size: 12px; font-weight: 600;
-  }
-
-  /* Entrance markers (shown ONLY for the selected building; cleared on close /
-     new click / layer-off). divIcon per house style; active = orange + larger. */
-  .entrance-pin-wrap { background: transparent; border: none; }
-  .entrance-pin {
-    display: flex; align-items: center; justify-content: center;
-    width: 20px; height: 20px; border-radius: 50%;
-    background: #1d4ed8; color: #fff; border: 2px solid #fff;
-    font-size: 11px; font-weight: 700; line-height: 1;
-    box-shadow: 0 1px 4px rgba(0,0,0,.4);
-  }
-  .entrance-pin.active { background: #f97316; transform: scale(1.25); }
-
   /* Hydrant popup (Leaflet popup) — modeled on .building-popup. Compact; the
      nav-action chips wrap at 375px via .nav-actions flex-wrap. Replaces the old
      bottom-sheet compact card. */
@@ -1605,14 +1569,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         icon: userIcon, zIndexOffset: 1000, interactive: false
       }).addTo(map);
       userAccuracyCircle = L.circle([lastFix.lat, lastFix.lon], {
-        // interactive:false — the GPS-accuracy circle is a visual only. Left
-        // interactive (the Leaflet default) it swallows taps over buildings that
-        // fall inside the radius (most visible in "Близо <100м" mode, where the
-        // user is surrounded by nearby hydrants AND buildings), so building clicks
-        // never reach the building layer. Non-interactive = clicks pass through;
-        // the circle still renders identically.
-        radius: lastFix.acc || 0, color:'#1976d2', weight:1, fillOpacity:0.1,
-        interactive: false
+        radius: lastFix.acc || 0, color:'#1976d2', weight:1, fillOpacity:0.1
       }).addTo(map);
     } else {
       userMarker.setLatLng([lastFix.lat, lastFix.lon]);
@@ -1936,10 +1893,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const at = getActiveTarget();
     if (!at) return;
     lineToTarget = L.polyline([[lastFix.lat, lastFix.lon], [at.h.coords[1], at.h.coords[0]]],
-      // interactive:false — visual route line only (no click handler). Left interactive
-      // it is a .leaflet-interactive path that can swallow building-layer clicks where it
-      // crosses a footprint (same click-through fix as userAccuracyCircle).
-      { color:'#ff9800', weight: 3, opacity: 0.8, dashArray: '8,6', interactive: false }).addTo(map);
+      { color:'#ff9800', weight: 3, opacity: 0.8, dashArray: '8,6' }).addTo(map);
   }
 
   // GPS tick path under the cluster guard: user marker already moved; only the
@@ -3431,15 +3385,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let tileToken = null, tileTokenExp = 0, tokenRefreshTimer = null;
   let vectorGridLoadPromise = null, buildingLayer = null, buildingsEnabled = false;
   let satelliteOn = false;
-  // C — per-building detail (on-click). In-memory cache by bd; entrance markers
-  // for the currently-open building only; a request token guards against a stale
-  // fetch resolving after the user clicked elsewhere / closed the popup.
-  const buildingDetailCache = new Map();
-  let entranceMarkers = [];
-  let currentBuildingPopup = null;
-  let buildingDetailReq = 0;
-  const BD_RE = /^b[0-9a-f]{16}$/;
-  const BUILDING_DETAIL_URL = WORKER_URL + 'tiles/buildings/v1/detail/';
 
   // --- shared nav/action buttons (building popup + hydrant card) ------------
   // URL templates ported verbatim from Varna_buildings sectionUnits.js
@@ -3506,249 +3451,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const en = buildingPosInt(p.en);
     if (en) addRow('Входове', String(en));
     const u = buildingPosInt(p.u);
-    // Tile "u" is an object count (≈ Σ object_count), not SOIS apartments — label
-    // it as "Обекти" so the summary stops overstating apartments. Value unchanged.
-    if (u) addRow('Обекти', String(u));
-    // Lazy per-building detail (entrance list + linked markers) lands here once
-    // fetched; stays collapsed (CSS :empty) for tile-summary-only buildings.
-    const detailBox = document.createElement('div');
-    detailBox.className = 'bp-detailbox';
-    wrap.appendChild(detailBox);
+    if (u) addRow('Апартаменти', String(u));
     const nav = buildNavActions(lat, lng);
     if (nav) wrap.appendChild(nav);
     return wrap;
-  }
-
-  // --- per-building detail: fetch + render (C) ------------------------------
-  // Bulgarian object-type labels for an entrance breakdown (counts only).
-  const BREAKDOWN_LABEL_BG = {
-    apartment: 'ап.', studio: 'студио', office: 'офис', commercial: 'търговски',
-    garage: 'гараж', storage: 'склад', basement: 'мазе', other: 'друго'
-  };
-  function escAttr(s) {
-    return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  }
-  function formatBreakdownBg(b) {
-    if (!b || typeof b !== 'object') return null;
-    const order = ['apartment', 'studio', 'office', 'commercial', 'garage', 'storage', 'basement', 'other'];
-    const parts = [];
-    for (const k of order) if (Number.isInteger(b[k]) && b[k] > 0) parts.push(b[k] + ' ' + (BREAKDOWN_LABEL_BG[k] || k));
-    return parts.length ? parts.join(' · ') : null;
-  }
-  function entranceLabel(e, i) {
-    return (e && typeof e.en === 'string' && e.en) ? ('вх. ' + e.en) : ('вход ' + (i + 1));
-  }
-  function entranceSummary(e) {
-    const parts = [];
-    if (Number.isInteger(e.floors) && e.floors > 0) parts.push(e.floors + ' ет');
-    if (Number.isInteger(e.apartment_count) && e.apartment_count > 0) parts.push(e.apartment_count + ' ап');
-    return parts.length ? ' · ' + parts.join(' · ') : '';
-  }
-  // Display-only ordering for the entrance list (F3, render-only — the emit-side
-  // compareEntrances is intentionally left untouched, as re-sorting there would
-  // require a detail-JSON re-emit). Purely numeric "en" labels come first, sorted
-  // as integers (so вх. 2 precedes вх. 10), then other labelled entrances by a
-  // locale-aware compare, then pin-only / unlabelled entrances last. Stable by
-  // original array index within each group.
-  function compareEntranceDisplay(a, b) {
-    const aEn = (a.e && typeof a.e.en === 'string') ? a.e.en.trim() : '';
-    const bEn = (b.e && typeof b.e.en === 'string') ? b.e.en.trim() : '';
-    const aRank = /^\d+$/.test(aEn) ? 0 : (aEn ? 1 : 2);
-    const bRank = /^\d+$/.test(bEn) ? 0 : (bEn ? 1 : 2);
-    if (aRank !== bRank) return aRank - bRank;
-    if (aRank === 0) {
-      const d = parseInt(aEn, 10) - parseInt(bEn, 10);
-      return d !== 0 ? d : (a.sourceIndex - b.sourceIndex);
-    }
-    if (aRank === 1) {
-      const c = aEn.localeCompare(bEn, 'bg', { numeric: true, sensitivity: 'base' });
-      return c !== 0 ? c : (a.sourceIndex - b.sourceIndex);
-    }
-    return a.sourceIndex - b.sourceIndex;
-  }
-  // F9 — building-level "entrance breakdown incomplete" warning. Reads only fields
-  // the detail JSON already carries (no new data, no re-emit); mirrors the local
-  // app's coverage badge at a coarser (building) granularity.
-  function getEntranceCoverage(detail) {
-    return (detail && detail.data_confidence) ? detail.data_confidence.entrance_coverage : undefined;
-  }
-  function hasEntranceFact(e) {
-    if (!e) return false;
-    if (e.en) return true;
-    if (Number.isFinite(e.floors) && e.floors > 0) return true;
-    if (Number.isFinite(e.apartment_count) && e.apartment_count > 0) return true;
-    return false;
-  }
-  function shouldShowEntranceCoverageWarning(detail, entrances) {
-    const coverage = getEntranceCoverage(detail);
-    if (Number.isFinite(coverage) && coverage < 0.5) return true;
-    if (entrances.length && entrances.every((e) => !hasEntranceFact(e))) return true;
-    return false;
-  }
-  function entranceIcon(label, active) {
-    return L.divIcon({
-      className: 'entrance-pin-wrap',
-      html: '<div class="entrance-pin' + (active ? ' active' : '') + '">' + escAttr(label) + '</div>',
-      iconSize: [20, 20], iconAnchor: [10, 10]
-    });
-  }
-  function clearEntranceMarkers() {
-    if (entranceMarkers.length) { entranceMarkers.forEach((m) => map.removeLayer(m)); entranceMarkers = []; }
-  }
-  async function fetchBuildingDetail(bd) {
-    if (buildingDetailCache.has(bd)) return buildingDetailCache.get(bd);
-    const token = await ensureTileToken(false);
-    const url = BUILDING_DETAIL_URL + encodeURIComponent(bd) + '.json?token=' + encodeURIComponent(token);
-    const resp = await fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit' });
-    if (!resp.ok) throw new Error('detail http ' + resp.status);
-    const data = await resp.json();
-    buildingDetailCache.set(bd, data);   // cache successes only (errors stay retryable)
-    return data;
-  }
-  // Render the selectable entrance list into the popup's detail box AND drop a
-  // linked marker per entrance with a pin. Row<->marker selection is two-way.
-  function renderBuildingEntrances(detailBox, detail) {
-    clearEntranceMarkers();   // self-sufficient: never accumulate markers across renders
-    const entrances = (detail && Array.isArray(detail.entrances)) ? detail.entrances : [];
-    if (!entrances.length) return;
-    detailBox.replaceChildren();
-    const head = document.createElement('div');
-    head.className = 'bp-ent-head';
-    head.textContent = 'Входове';
-    detailBox.appendChild(head);
-    if (shouldShowEntranceCoverageWarning(detail, entrances)) {
-      const warn = document.createElement('div');
-      warn.className = 'bp-ent-warning';
-      warn.textContent = 'Входната разбивка е непълна (СОИС).';
-      detailBox.appendChild(warn);
-    }
-    const list = document.createElement('div');
-    list.className = 'bp-entrances';
-    detailBox.appendChild(list);
-
-    // Render-only display ordering: sort by compareEntranceDisplay, then re-index
-    // so entries[i].i === i stays true (selectEntrance relies on both entries[i]
-    // and en.i === i). sourceIndex keeps the sort stable.
-    const entries = entrances
-      .map((e, sourceIndex) => ({ e, sourceIndex }))
-      .sort(compareEntranceDisplay)
-      .map((entry, i) => ({ ...entry, i, row: null, marker: null }));
-    function selectEntrance(i) {
-      for (const en of entries) {
-        const on = en.i === i;
-        if (en.row) en.row.classList.toggle('active', on);
-        if (en.marker) {
-          const el = en.marker.getElement();
-          const pin = el && el.querySelector('.entrance-pin');
-          if (pin) pin.classList.toggle('active', on);
-        }
-      }
-      const sel = entries[i];
-      if (sel && sel.row && sel.row.scrollIntoView) sel.row.scrollIntoView({ block: 'nearest' });
-    }
-
-    for (const entry of entries) {
-      const { e, i } = entry;
-      const row = document.createElement('button');
-      row.type = 'button';
-      row.className = 'bp-entrance';
-      const sum = document.createElement('div');
-      sum.className = 'bp-ent-sum';
-      sum.textContent = entranceLabel(e, i) + entranceSummary(e);
-      row.appendChild(sum);
-      const bd = formatBreakdownBg(e.breakdown);
-      if (bd) {
-        const det = document.createElement('div');
-        det.className = 'bp-ent-detail';
-        det.textContent = bd;
-        row.appendChild(det);
-      }
-      row.addEventListener('click', () => selectEntrance(i));
-      list.appendChild(row);
-      entry.row = row;
-
-      const pin = e && e.pin;
-      if (pin && isFinite(pin.lat) && isFinite(pin.lng)) {
-        const m = L.marker([pin.lat, pin.lng], {
-          icon: entranceIcon((e.en || String(i + 1)), false),
-          zIndexOffset: 1200, keyboard: false
-        });
-        m.on('click', () => selectEntrance(i));
-        m.addTo(map);
-        entranceMarkers.push(m);
-        entry.marker = m;
-      }
-    }
-  }
-  // Open a building popup: tile summary immediately, then lazy-fetch the detail
-  // and render entrances/markers. Fail-closed: a missing/invalid bd or an offline
-  // fetch leaves the popup usable with the summary only.
-  function openBuildingDetailPopup(props, lat, lng) {
-    clearEntranceMarkers();                       // clear the previous building's markers
-    const p = props || {};
-    const wrap = buildBuildingPopup(p, lat, lng);
-    const detailBox = wrap.querySelector('.bp-detailbox');
-    const popup = L.popup({
-      closeButton: true, autoPan: true,
-      autoPanPaddingTopLeft: POPUP_AUTOPAN_TL,
-      autoPanPaddingBottomRight: POPUP_AUTOPAN_BR
-    }).setLatLng([lat, lng]).setContent(wrap).openOn(map);
-    currentBuildingPopup = popup;
-    popup.on('remove', () => {
-      if (currentBuildingPopup === popup) currentBuildingPopup = null;
-      clearEntranceMarkers();
-    });
-
-    const bd = (typeof p.bd === 'string' && BD_RE.test(p.bd)) ? p.bd : null;
-    if (!bd || !detailBox) return;
-    const reqToken = ++buildingDetailReq;
-    if (detailBox) {
-      const hint = document.createElement('div');
-      hint.className = 'bp-detail-hint';
-      hint.textContent = 'Зареждане на детайли…';
-      detailBox.appendChild(hint);
-    }
-    fetchBuildingDetail(bd).then((detail) => {
-      // stale-guard: only render if this is still the open building popup + request
-      if (reqToken !== buildingDetailReq || currentBuildingPopup !== popup) return;
-      detailBox.replaceChildren();
-      renderBuildingEntrances(detailBox, detail);
-      popup.update();   // recompute popup size/position for the new content
-    }).catch(() => {
-      // offline / error: drop the hint, keep the summary popup usable (quiet)
-      if (reqToken === buildingDetailReq && currentBuildingPopup === popup) detailBox.replaceChildren();
-    });
-  }
-
-  // Search->detail (C) BEST-EFFORT proximity bridge. A search result carries no bd,
-  // so we open the building detail ONLY when exactly ONE building feature is rendered
-  // under the result pin — by replaying a real tap on that feature's SVG path
-  // (identical to a user click; no VectorGrid internals). This is best-effort, NOT
-  // exact: a geocoder pin can fall on an adjacent footprint, so the opened building
-  // may differ from the searched address. When there is no single building under the
-  // pin we fall back to the plain address popup. Returns true iff a NEW building popup
-  // actually opened.
-  function tryOpenBuildingDetailAt(lat, lng) {
-    if (!buildingsEnabled || !buildingLayer || !map.hasLayer(buildingLayer)) return false;
-    if (placementActive || manualMode) return false;
-    let pt;
-    try { pt = map.latLngToContainerPoint([lat, lng]); } catch (_) { return false; }
-    const rect = map.getContainer().getBoundingClientRect();
-    const cx = rect.left + pt.x, cy = rect.top + pt.y;
-    let paths;
-    try {
-      const els = document.elementsFromPoint(cx, cy) || [];
-      paths = els.filter((el) => el && el.tagName && el.tagName.toLowerCase() === 'path' &&
-        el.classList && el.classList.contains('leaflet-interactive'));
-    } catch (_) { return false; }
-    if (paths.length !== 1) return false;   // 0 = no building under pin; >1 = ambiguous -> no guess
-    const before = currentBuildingPopup;
-    try {
-      paths[0].dispatchEvent(new MouseEvent('click', {
-        bubbles: true, cancelable: true, view: window, clientX: cx, clientY: cy
-      }));
-    } catch (_) { return false; }
-    return !!currentBuildingPopup && currentBuildingPopup !== before;  // a new building popup opened
   }
 
   // --- shared popup auto-pan padding ---------------------------------------
@@ -3910,7 +3616,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // also pop a building popup over it.
       if (placementActive || manualMode) return;
       const props = e.layer && e.layer.properties ? e.layer.properties : {};
-      openBuildingDetailPopup(props, e.latlng.lat, e.latlng.lng);
+      const node = buildBuildingPopup(props, e.latlng.lat, e.latlng.lng);
+      L.popup({
+        closeButton: true, autoPan: true,
+        autoPanPaddingTopLeft: POPUP_AUTOPAN_TL,
+        autoPanPaddingBottomRight: POPUP_AUTOPAN_BR
+      }).setLatLng(e.latlng).setContent(node).openOn(map);
     });
     // Tile-level fetch errors stay contained to the building layer (fail closed).
     layer.on('tileerror', () => {});
@@ -3953,10 +3664,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
     reflectBuildingsButton();
     if (buildingLayer && map.hasLayer(buildingLayer)) map.removeLayer(buildingLayer);
     if (tokenRefreshTimer) { clearTimeout(tokenRefreshTimer); tokenRefreshTimer = null; }
-    // Building layer off -> clear the on-map entrance markers + close any open
-    // building popup (its 'remove' also clears markers; belt-and-suspenders here).
-    if (currentBuildingPopup) map.closePopup(currentBuildingPopup);
-    clearEntranceMarkers();
   }
 
   // --- basemap toggle (OSM default <-> Esri satellite) ---------------------
@@ -4398,39 +4105,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
       clearSearchMarker(); // replace any previous result marker
       searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
       searchMarker.on('click', function () { openSearchPopup(label, lat, lng); });
-      hideResults();
-
-      // SEARCH -> DETAIL (C). Priority: (1) a direct bd on the result (the geocoder
-      // index carries none today, but honor it if ever added); (2) for a building
-      // result ('mf') with the building layer on, a BEST-EFFORT proximity match — open
-      // the C detail only if exactly one building sits under the pin; (3) otherwise the
-      // plain address popup (unchanged). Best-effort: the pin may sit over an adjacent
-      // footprint, so the match can be approximate; on any doubt it falls back to the
-      // address popup.
-      const directBd = (typeof r.bd === 'string' && BD_RE.test(r.bd)) ? r.bd : null;
-      if (directBd) {
-        map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
-        clearSearchMarker();                         // building detail supersedes the address pin
-        // Pass the resolved address (never cadnum) as a title fallback so the popup
-        // still shows context if the detail fetch is offline/404.
-        openBuildingDetailPopup({ bd: directBd, bt_text: label }, lat, lng);
-        return;
-      }
-      const canUpgrade = r.kind === 'mf' && buildingsEnabled && !placementActive && !manualMode;
       map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
-      if (!canUpgrade) { openSearchPopup(label, lat, lng); return; }
-
-      // Defer until the fly settles + tiles render, then try the unambiguous match.
-      let done = false;
-      const attempt = () => {
-        if (done) return; done = true;
-        let opened = false;
-        try { opened = tryOpenBuildingDetailAt(lat, lng); } catch (_) { opened = false; }
-        if (opened) clearSearchMarker();             // building popup replaces the address pin
-        else openSearchPopup(label, lat, lng);       // fallback: plain address popup
-      };
-      map.once('moveend', () => setTimeout(attempt, 180));
-      setTimeout(attempt, 1200);                      // safety net if moveend never fires
+      openSearchPopup(label, lat, lng);
+      hideResults();
     }
 
     // ---- query runner (debounced; stale-guarded) ----
