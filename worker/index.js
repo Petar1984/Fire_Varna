@@ -43,6 +43,18 @@ const TILE_PATH_RE = /^\/tiles\/buildings\/v1\/(\d+)\/(\d+)\/(\d+)\.mvt$/;
 const TILE_CONTENT_TYPE = "application/vnd.mapbox-vector-tile";
 const TILE_CACHE_CONTROL = "public, max-age=86400, s-maxage=604800, immutable";
 
+// C — per-building detail objects: GET /tiles/buildings/v1/detail/{bd}.json
+// Served from R2 alongside the PMTiles, under the SAME token/origin/rate-limit
+// gate as the tiles. Exactly ONE bd per request — no bulk/list route (anti-scrape).
+// `bd` is the opaque key minted by the Varna_buildings detail build (HMAC of the
+// internal cluster_id): always "b" + 16 lowercase hex. The route regex stays loose
+// ([a-z0-9]+) so a malformed bd is rejected by DETAIL_BD_RE as a fail-closed 404
+// rather than falling through to other routes.
+const DETAIL_PATH_RE = /^\/tiles\/buildings\/v1\/detail\/([a-z0-9]+)\.json$/;
+const DETAIL_BD_RE = /^b[0-9a-f]{16}$/;
+const DETAIL_R2_PREFIX = "details/buildings/v1/";
+const DETAIL_CONTENT_TYPE = "application/json; charset=utf-8";
+
 // Varna x/y bounds for the pre-R2 anti-scrape gate. Derived from the E1
 // safe_min archive's own data extent (probe 2026-06-22: z15 x[18917..18937]
 // y[12002..12026]) plus a 2-tile margin, scaled by 2^(z-15). This rejects
@@ -78,6 +90,9 @@ export default {
     }
     if (request.method === "GET" && TILE_PATH_RE.test(url.pathname)) {
       return handleBuildingTile(request, env, ctx, url);
+    }
+    if (request.method === "GET" && DETAIL_PATH_RE.test(url.pathname)) {
+      return handleBuildingDetail(request, env, ctx, url);
     }
     // ===== end E2 block =====
 
@@ -805,11 +820,14 @@ async function handleBuildingTile(request, env, ctx, url) {
 
   if (!tileObjectKey(env) || !env.BUILDING_TILES) return tilesError(origin, 500, "tiles_not_configured");
 
-  // Worker Cache API — key is pathname only (excludes the token query + origin),
-  // so one cached tile serves every allowed origin / token. Per-request CORS is
-  // layered on at send time and never stored in the cache.
+  // Worker Cache API — key is pathname + the active object-key version (it
+  // EXCLUDES the token query + request Origin, so one cached tile still serves
+  // every allowed origin / token). Versioning by the object key means a new
+  // PMTiles (a BUILDING_TILES_OBJECT_KEY bump) produces a NEW cache key, so the
+  // previous build's tiles are never served stale after a redeploy. Per-request
+  // CORS is layered on at send time and never stored in the cache.
   const cache = caches.default;
-  const cacheKey = new Request(url.origin + url.pathname);
+  const cacheKey = new Request(url.origin + url.pathname + "?v=" + encodeURIComponent(tileObjectKey(env)));
   const cached = await cache.match(cacheKey);
   if (cached) {
     return tileResponse(new Uint8Array(await cached.arrayBuffer()), origin, "HIT");
@@ -864,6 +882,85 @@ function tileContentHeaders() {
 
 function tileResponse(bytes, origin, cacheStatus) {
   const headers = tileContentHeaders();
+  headers.set("Access-Control-Allow-Origin", origin);
+  headers.set("Vary", "Origin");
+  headers.set("X-Cache", cacheStatus);
+  return new Response(bytes, { status: 200, headers });
+}
+
+// --- per-building detail endpoint (C) -------------------------------------
+
+async function handleBuildingDetail(request, env, ctx, url) {
+  // Validation order mirrors the tile route EXACTLY: origin -> rate-limit ->
+  // token -> bd format, ALL before any cache or R2 access. Every failure is a
+  // fail-closed tilesError (no-store), so a bad request has zero effect on the
+  // hydrant/tile paths. The bd never indexes anything but a single R2 object.
+  const origin = effectiveAllowedOrigin(request);
+  if (!origin) return tilesError(null, 403, "origin_not_allowed");
+
+  const limit = tileRateLimit("tile", clientIp(request), env);
+  if (!limit.ok) return tilesError(origin, 429, "rate_limited", limit.retryAfter);
+
+  const verdict = await verifyTileToken(env, url.searchParams.get("token"));
+  if (!verdict.ok) return tilesError(origin, 401, "invalid_token");
+  const payload = verdict.payload;
+  if (payload.v !== 1 || payload.scope !== TILE_SCOPE) return tilesError(origin, 401, "invalid_scope");
+  if (payload.origin !== origin) return tilesError(origin, 401, "origin_mismatch");
+  if (typeof payload.exp !== "number" || Math.floor(Date.now() / 1000) > payload.exp) {
+    return tilesError(origin, 401, "token_expired");
+  }
+
+  const match = url.pathname.match(DETAIL_PATH_RE);
+  const bd = match ? match[1] : "";
+  if (!DETAIL_BD_RE.test(bd)) return tilesError(origin, 404, "not_found");
+
+  if (!env.BUILDING_TILES) return tilesError(origin, 500, "tiles_not_configured");
+
+  // Worker Cache API — pathname-only key (excludes the token query + origin), so
+  // one cached detail object serves every allowed origin / token. Per-request CORS
+  // is layered on at send time and never stored in the cache.
+  const cache = caches.default;
+  const cacheKey = new Request(url.origin + url.pathname);
+  const cached = await cache.match(cacheKey);
+  if (cached) {
+    return detailResponse(new Uint8Array(await cached.arrayBuffer()), origin, "HIT");
+  }
+
+  let object;
+  try {
+    object = await env.BUILDING_TILES.get(DETAIL_R2_PREFIX + bd + ".json");
+  } catch (_) {
+    return tilesError(origin, 503, "tiles_unavailable");
+  }
+  if (!object) return tilesError(origin, 404, "not_found");
+
+  let bytes;
+  try {
+    bytes = new Uint8Array(await object.arrayBuffer());
+  } catch (_) {
+    return tilesError(origin, 503, "tiles_unavailable");
+  }
+
+  ctx.waitUntil(cache.put(cacheKey, new Response(bytes, { headers: detailContentHeaders() })));
+  return detailResponse(bytes, origin, "MISS");
+}
+
+function detailContentHeaders() {
+  const headers = new Headers();
+  headers.set("Content-Type", DETAIL_CONTENT_TYPE);
+  // Immutable per the C plan. CAVEAT (not "same contract as tiles"): the bd URL is
+  // STABLE across rebuilds (bd = HMAC of cluster_id), unlike the content-addressed
+  // PMTiles object key. So if a rebuild changes a building's detail under the same bd,
+  // the edge/browser/Worker-cache can serve the OLD JSON until s-maxage. A
+  // content-changing redeploy must therefore PURGE /tiles/buildings/v1/detail/* at the
+  // CDN (deploy runbook), the detail analogue of bumping BUILDING_TILES_OBJECT_KEY.
+  headers.set("Cache-Control", TILE_CACHE_CONTROL);
+  headers.set("X-Robots-Tag", "noindex");
+  return headers;
+}
+
+function detailResponse(bytes, origin, cacheStatus) {
+  const headers = detailContentHeaders();
   headers.set("Access-Control-Allow-Origin", origin);
   headers.set("Vary", "Origin");
   headers.set("X-Cache", cacheStatus);
