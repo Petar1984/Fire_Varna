@@ -1478,6 +1478,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // ===== State =====
   let userMarker = null, userAccuracyCircle = null, lineToTarget = null;
   let watchId = null;
+  let trackingGeneration = 0;
   let visibleMarkers = [];
   let markersById = {};         // hydrant id -> array of L.marker (cluster member + active overlay can coexist in 'all' mode)
   let allClusterLayer = null;
@@ -1513,21 +1514,36 @@ window._hydrantDataReady = (async function loadHydrantData() {
   function hidePill() { pill.classList.add('hidden'); }
 
   // ===== Geolocation =====
-  function startTracking() {
+  function startTracking(onFirstFix) {
+    if (typeof onFirstFix !== 'function') onFirstFix = function () {};
     if (!('geolocation' in navigator)) {
       showErrorPill('Този браузър не поддържа геолокация', false); return;
     }
+    const gen = ++trackingGeneration;
     showLoadingPill();
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        if (gen !== trackingGeneration) return;
         hidePill();
         onLocation(pos);
+        onFirstFix(pos);
         if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-        watchId = navigator.geolocation.watchPosition(onLocation, onLocErr, {
-          enableHighAccuracy: true, maximumAge: 5000, timeout: 20000
-        });
+        watchId = navigator.geolocation.watchPosition(
+          (watchPos) => {
+            if (gen !== trackingGeneration) return;
+            onLocation(watchPos);
+          },
+          (err) => {
+            if (gen !== trackingGeneration) return;
+            onLocErr(err);
+          },
+          { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+        );
       },
-      (err) => showErrorPill(locErrText(err), true),
+      (err) => {
+        if (gen !== trackingGeneration) return;
+        showErrorPill(locErrText(err), true);
+      },
       { enableHighAccuracy: true, timeout: 20000 }
     );
   }
@@ -1557,6 +1573,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
       map.setView([lastFix.lat, lastFix.lon], map.getZoom(),
                   { animate: true, duration: 0.3 });
     }
+  }
+  function pauseTrackingForStaticAnchor() {
+    trackingGeneration += 1;
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+    followMode = false;
+    const btn = document.getElementById('locateBtn');
+    if (btn) btn.classList.remove('tracking');
+    isInitialFix = false;
+    hidePill();
   }
   function placeUser() {
     if (!lastFix) return;
@@ -1698,8 +1726,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
 
   // ===== Refresh / render =====
-  function refresh(autoFit) {
-    if (!lastFix) return;
+  function recomputeCurrentRankedFromAnchor() {
+    if (!lastFix) return false;
 
     // Compute distances to all
     const allRanked = HYDRANTS.map(h => ({
@@ -1712,13 +1740,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
     } else if (mode === 'top') {
       currentRanked = allRanked.slice(0, TOP_K);
     } else {
-      // 'all' — currentRanked is just nearest 1 for active target tracking,
+      // 'all' - currentRanked is just nearest 1 for active target tracking,
       // visual list will show top 10 for context
       currentRanked = allRanked.slice(0, 10);
     }
 
-    if (activeTargetIdx >= currentRanked.length) activeTargetIdx = 0;
+    if (activeTargetIdx < 0 || activeTargetIdx >= currentRanked.length) activeTargetIdx = 0;
     activeTargetId = currentRanked.length ? currentRanked[activeTargetIdx].h.id : null;
+    return true;
+  }
+
+  function refresh(autoFit) {
+    if (!recomputeCurrentRankedFromAnchor()) return;
 
     // Clear existing markers/line
     visibleMarkers.forEach(m => map.removeLayer(m));
@@ -1902,6 +1935,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // placeUser(); there is no longer a sheet card/arrow to refresh).
   function onUserMovedLightweight() {
     redrawActiveLine();
+  }
+
+  function refreshCurrentModeFromAnchorResetActive() {
+    activeTargetIdx = 0;
+    if (mode === 'all' && allClusterInteractionOpen) {
+      if (recomputeCurrentRankedFromAnchor()) updateAllModeActiveOverlay();
+      else onUserMovedLightweight();
+    } else {
+      refresh(false);
+    }
   }
 
   // ===== Compass bearing / cardinal helpers =====
@@ -2994,14 +3037,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return;
     }
     if (!manualMode) return;
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-    followMode = false;
-    document.getElementById('locateBtn').classList.remove('tracking');
+    pauseTrackingForStaticAnchor();
     lastFix = { lat: e.latlng.lat, lon: e.latlng.lng, acc: 0 };
     placeUser();
+    activeTargetIdx = 0;
     refresh(true);
     exitManualMode();
     hidePill();
@@ -3010,6 +3049,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
   // ===== Misc controls =====
   const locateBtn = document.getElementById('locateBtn');
+  function centerOnCurrentFix() {
+    if (!lastFix) return;
+    refreshCurrentModeFromAnchorResetActive();
+    map.setView([lastFix.lat, lastFix.lon], Math.max(map.getZoom(), 17),
+                { animate: true });
+    followMode = true;
+    locateBtn.classList.add('tracking');
+    flashStatus('Следване на локацията');
+  }
   locateBtn.addEventListener('click', () => {
     // Compass permission (iOS Safari) is user-gesture-gated. The bottom-sheet
     // card that used to host the "Активирай компас" button is gone, so the
@@ -3018,16 +3066,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // locate. attachOrientation() clears needsCompassPerm on grant, so later
     // taps skip straight to locate.
     if (needsCompassPerm) requestCompassPerm();
-    if (!lastFix) {
+    if (watchId === null || !lastFix) {
       flashStatus('Локацията не е известна — опитвам пак');
-      startTracking();
+      startTracking(centerOnCurrentFix);
       return;
     }
-    map.setView([lastFix.lat, lastFix.lon], Math.max(map.getZoom(), 17),
-                { animate: true });
-    followMode = true;
-    locateBtn.classList.add('tracking');
-    flashStatus('Следване на локацията');
+    centerOnCurrentFix();
   });
 
   // Pan map → exit follow mode
@@ -3336,7 +3380,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     let shouldShow;
     if (hash === WELCOME_FORCE_HASH)      shouldShow = true;
     else if (hash === WELCOME_SKIP_HASH)  shouldShow = false;
-    else shouldShow = !welcomeShownThisSession && !welcomeSeenRead();
+    else shouldShow = false;
 
     if (shouldShow) showWelcome(startTracking);
     else            startTracking();
@@ -4103,11 +4147,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const lat = Number(r.pin[0]), lng = Number(r.pin[1]);
       if (!isFinite(lat) || !isFinite(lng)) return; // validate pin
       const label = formatAddressHit(r);            // resolved address (never cadnum)
+      pauseTrackingForStaticAnchor();
+      lastFix = { lat, lon: lng, acc: 0 };
+      placeUser();
+      refreshCurrentModeFromAnchorResetActive();
       clearSearchMarker(); // replace any previous result marker
       searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
       searchMarker.on('click', function () { openSearchPopup(label, lat, lng); });
-      map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
       openSearchPopup(label, lat, lng);
+      map.setView([lat, lng], Math.max(map.getZoom(), 17), { animate: true });
       hideResults();
     }
 
