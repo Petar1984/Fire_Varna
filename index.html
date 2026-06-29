@@ -3431,9 +3431,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let vectorGridLoadPromise = null, buildingLayer = null, buildingsEnabled = false;
   let satelliteOn = false;
 
-  // --- shared nav/action buttons (building popup + hydrant card) ------------
-  // URL templates ported verbatim from Varna_buildings sectionUnits.js
-  // (googleMapsUrl / streetViewUrl / googleMapsDirUrl / wazeUrl). Keyless
+  // --- shared nav/action buttons (building popup + hydrant card + search) ---
+  // Intent split (Phase-2 plan §9): CAR -> Waze (better last-100m / entrance
+  // routing for trucks), WALKING -> Google Maps directions with
+  // travelmode=walking, plus a plain map view ("Карта") and Street View. Keyless
   // link-outs only (ToS-clean); finite-coord guard -> null row, never a broken
   // link. Coords are always the point's own lat/lng — never geocoded.
   function buildNavActions(lat, lng) {
@@ -3442,10 +3443,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const row = document.createElement('div');
     row.className = 'nav-actions';
     const specs = [
-      ['Street View', 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + la + ',' + lo],
-      ['Google Maps', 'https://www.google.com/maps?q=' + la + ',' + lo],
-      ['Закарай ме с Google Maps', 'https://www.google.com/maps/dir/?api=1&destination=' + la + ',' + lo],
-      ['Закарай ме с Waze',        'https://waze.com/ul?ll=' + la + ',' + lo + '&navigate=yes']
+      ['Кола (Waze)',   'https://waze.com/ul?ll=' + la + ',' + lo + '&navigate=yes'],
+      ['Пеша (Google)', 'https://www.google.com/maps/dir/?api=1&destination=' + la + ',' + lo + '&travelmode=walking'],
+      ['Карта',         'https://www.google.com/maps?q=' + la + ',' + lo],
+      ['Street View',   'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + la + ',' + lo]
     ];
     for (const spec of specs) {
       const a = document.createElement('a');
@@ -3556,8 +3557,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       wrap.appendChild(note);
     }
 
-    // Reuse the shared nav link-outs (Street View · Google Maps · Закарай ме с
-    // Google Maps · Waze). coords are [lon, lat]; buildNavActions takes (lat, lng).
+    // Reuse the shared nav link-outs (Кола (Waze) · Пеша (Google) · Карта ·
+    // Street View). coords are [lon, lat]; buildNavActions takes (lat, lng).
     const nav = buildNavActions(h.coords[1], h.coords[0]);
     if (nav) wrap.appendChild(nav);
 
@@ -4137,7 +4138,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       t.className = 'sp-title';
       t.textContent = label;
       wrap.appendChild(t);
-      const nav = buildNavActions(lat, lng); // Street View · Google Maps · nav — NO "Докладвай"
+      const nav = buildNavActions(lat, lng); // Кола (Waze) · Пеша (Google) · Карта · Street View — NO "Докладвай"
       if (nav) wrap.appendChild(nav);
       L.popup({ closeButton: true, autoPan: true, autoPanPaddingTopLeft: POPUP_AUTOPAN_TL, autoPanPaddingBottomRight: POPUP_AUTOPAN_BR })
         .setLatLng([lat, lng]).setContent(wrap).openOn(map);
@@ -4219,6 +4220,5 @@ window._hydrantDataReady = (async function loadHydrantData() {
   bootApp();
 })();
 </script>
-
 </body>
 </html>
