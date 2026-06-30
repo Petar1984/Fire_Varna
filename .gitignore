@@ -29,6 +29,11 @@ temp_*
 # Generated audit runs
 audit/run_*/
 
+# Local-dev building detail JSONs (PRIVATE; served statically on localhost only — copied
+# from Varna_buildings/output/.../details/buildings/v1/. NEVER commit; uploaded to R2 by
+# Petar. See docs/local_dev_detail.md).
+details/
+
 # Address backfill script ephemera (cache + progress state)
 data/.address_backfill_cache.json
 data/.address_backfill_progress.json

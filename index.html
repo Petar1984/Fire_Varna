@@ -994,6 +994,21 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .detail-sheet .nav-actions { margin-top: 10px; }
 
+  /* Responsive: on a wide viewport the detail surface is a RIGHT SIDE PANEL (does not
+     cover the centred pin, which sits in the left band); on narrow it stays the
+     mobile-first bottom sheet above. Same content either way. */
+  @media (min-width: 768px) {
+    .detail-sheet {
+      left: auto; right: 12px; bottom: auto; top: 150px;
+      width: 360px; max-width: 38vw;
+      max-height: calc(100vh - 150px - 24px);
+      border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      animation: slideInRight 0.2s ease-out;
+    }
+  }
+  @keyframes slideInRight { from { transform: translateX(16px); opacity: 0.4; } to { transform: translateX(0); opacity: 1; } }
+
   /* Report modal */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 5000;
@@ -4183,8 +4198,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       wrap.appendChild(t);
       const nav = buildNavActions(lat, lng); // Кола (Waze) · Пеша (Google) · Карта · Street View — NO "Докладвай"
       if (nav) wrap.appendChild(nav);
-      L.popup({ closeButton: true, autoPan: true, autoPanPaddingTopLeft: POPUP_AUTOPAN_TL, autoPanPaddingBottomRight: POPUP_AUTOPAN_BR })
-        .setLatLng([lat, lng]).setContent(wrap).openOn(map);
+      // autoPan:false — Leaflet's autoPan would shove the pin off-centre (the regression).
+      // Centring has the last word: we deliberately place the pin in the visible band below
+      // the header (the small popup opens above it, clear of the header stack).
+      L.popup({ closeButton: true, autoPan: false }).setLatLng([lat, lng]).setContent(wrap).openOn(map);
+      positionPinInBand(lat, lng, 0, 0);
     }
 
     // ---- search -> building detail bottom sheet (C4) ----
@@ -4270,22 +4288,52 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (nav) el.appendChild(nav);
 
       el.hidden = false;
-      panPinAboveSheet(lat, lng, el);
+      positionPinForSheet(lat, lng, el);   // keep the pin clear of the sheet/side-panel
     }
 
-    // Pan the map so the centered pin lands in the visible band between the header stack
-    // and the sheet top — so the entrance pin is never hidden behind the sheet.
-    function panPinAboveSheet(lat, lng, el) {
+    // Deliberately place the pin at the centre of the VISIBLE band — the rectangle left
+    // after reserving the header stack (top), an overlay at the bottom (bottom-sheet) and/or
+    // an overlay on the right (side panel). ABSOLUTE (panTo), so it works no matter where the
+    // pin currently sits (a fresh select OR a marker re-click after the user panned away).
+    // This is what gives "centring the last word" instead of Leaflet's autoPan.
+    function positionPinInBand(lat, lng, reserveBottom, reserveRight) {
       try {
-        const sheetH = el.getBoundingClientRect().height || 0;
         const size = map.getSize();
         const headerH = 150;                       // header stack height (matches POPUP_AUTOPAN_TL[1])
-        const bandTop = headerH, bandBottom = size.y - sheetH;
-        if (bandBottom - bandTop < 60) return;     // band too small (very short screen) -> leave centered
-        const desiredY = (bandTop + bandBottom) / 2;
-        const dy = size.y / 2 - desiredY;          // > 0 => shift content up so the pin rises
-        if (Math.abs(dy) > 4) map.panBy([0, dy], { animate: true });
-      } catch (_) { /* panning is best-effort */ }
+        const bandBottom = size.y - (reserveBottom || 0);
+        const bandRight = size.x - (reserveRight || 0);
+        if (bandBottom - headerH < 60 || bandRight < 60) return; // band too small -> leave as-is
+        const desiredX = bandRight / 2;            // centre of [0, bandRight]
+        const desiredY = (headerH + bandBottom) / 2;
+        const z = map.getZoom();
+        const pinPt = map.project([lat, lng], z);
+        const centerPt = pinPt.subtract([desiredX - size.x / 2, desiredY - size.y / 2]);
+        map.panTo(map.unproject(centerPt, z), { animate: true });
+      } catch (_) { /* positioning is best-effort */ }
+    }
+
+    // Place the pin clear of the detail surface, whichever responsive form it took:
+    // bottom-sheet (full width, anchored bottom) -> reserve its height at the bottom;
+    // side panel (narrow, anchored right) -> reserve its width on the right.
+    function positionPinForSheet(lat, lng, el) {
+      const size = map.getSize();
+      const r = el.getBoundingClientRect();
+      const isSide = r.width < size.x - 8;
+      const reserveBottom = isSide ? 0 : (size.y - r.top);
+      const reserveRight = isSide ? (size.x - r.left) : 0;
+      positionPinInBand(lat, lng, reserveBottom, reserveRight);
+    }
+
+    // Detail source: the Worker /detail/{g} in production; a LOCAL static file on localhost
+    // (so the panel works without deploying the Worker — Petar copies the built details into
+    // Fire_Varna/details/buildings/v1/ and serves them via http.server; see
+    // docs/local_dev_detail.md). details/ is gitignored (private).
+    function detailUrlFor(g) {
+      const h = location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1' || h === '') {
+        return 'details/buildings/v1/' + encodeURIComponent(g) + '.json';
+      }
+      return DETAIL_URL_BASE + encodeURIComponent(g);
     }
 
     // Fetch + show the detail sheet for building key g. Fail-soft to the nav popup.
@@ -4296,7 +4344,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       detailAbort = ac;
       let data = null;
       try {
-        const res = await fetch(DETAIL_URL_BASE + encodeURIComponent(g), ac ? { signal: ac.signal } : undefined);
+        const res = await fetch(detailUrlFor(g), ac ? { signal: ac.signal } : undefined);
         if (res && res.ok) data = await res.json();
       } catch (_) { data = null; }
       if (ac && ac.signal.aborted) return;         // a newer selection superseded this fetch
