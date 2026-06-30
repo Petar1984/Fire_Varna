@@ -960,6 +960,40 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .search-popup .sp-title { font-weight: 700; margin-bottom: 6px; color: #1f2d3d; }
   .search-popup .nav-actions { margin-top: 6px; }
 
+  /* Search -> building detail bottom sheet (C4). Fixed at the screen bottom, compact
+     and scrollable; the map is panned up on open so the centered search pin stays
+     visible ABOVE the sheet (never covered). Mobile-first; chips wrap at 375px. */
+  .detail-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1500;
+    background: #fff; border-radius: 14px 14px 0 0;
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.18);
+    max-height: 45vh; overflow-y: auto;
+    padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+    font-size: 13px; line-height: 1.45; color: #333;
+    animation: slideUp 0.2s ease-out;
+  }
+  .detail-sheet[hidden] { display: none; }
+  .detail-sheet .ds-close {
+    position: absolute; top: 8px; right: 10px; width: 30px; height: 30px;
+    border: none; background: #eef2f7; border-radius: 8px; font-size: 20px;
+    line-height: 1; color: #555; cursor: pointer;
+  }
+  .detail-sheet .ds-title { font-weight: 700; font-size: 15px; color: #1f2d3d; margin: 0 36px 2px 0; }
+  .detail-sheet .ds-sub { color: #777; margin-bottom: 8px; }
+  .detail-sheet .ds-meta { margin: 3px 0; }
+  .detail-sheet .ds-meta .ds-label { color: #777; }
+  .detail-sheet .ds-ent-h { font-weight: 600; margin: 10px 0 4px; color: #1f2d3d; }
+  .detail-sheet table.ds-ent { width: 100%; border-collapse: collapse; }
+  .detail-sheet table.ds-ent th, .detail-sheet table.ds-ent td {
+    text-align: left; padding: 4px 6px; border-bottom: 1px solid #eef2f7; font-weight: normal;
+  }
+  .detail-sheet table.ds-ent th { color: #777; font-size: 11px; }
+  .detail-sheet .ds-note {
+    margin: 8px 0 2px; color: #8a5a00; background: #fff7e6;
+    border: 1px solid #ffe2a8; border-radius: 8px; padding: 6px 8px;
+  }
+  .detail-sheet .nav-actions { margin-top: 10px; }
+
   /* Report modal */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 5000;
@@ -4127,7 +4161,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     // ---- result selection: fly + single marker + standalone popup ----
     let searchMarker = null;
-    function clearSearchMarker() { if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; } }
+    // C4 detail-sheet state (declared up-front so clearSearchMarker can reset it).
+    const DETAIL_URL_BASE = WORKER_URL + 'detail/';
+    let detailSheetEl = null, detailAbort = null, lastDetail = null;
+    function closeDetailSheet() {
+      if (detailSheetEl) { detailSheetEl.hidden = true; detailSheetEl.replaceChildren(); }
+    }
+    function clearSearchMarker() {
+      if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
+      closeDetailSheet(); lastDetail = null;
+    }
     function searchPinIcon() {
       return L.divIcon({ className: 'search-pin-wrapper', html: '<div class="search-pin"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
     }
@@ -4143,20 +4186,148 @@ window._hydrantDataReady = (async function loadHydrantData() {
       L.popup({ closeButton: true, autoPan: true, autoPanPaddingTopLeft: POPUP_AUTOPAN_TL, autoPanPaddingBottomRight: POPUP_AUTOPAN_BR })
         .setLatLng([lat, lng]).setContent(wrap).openOn(map);
     }
+
+    // ---- search -> building detail bottom sheet (C4) ----
+    // The detail JSON is served by the Worker at /detail/{g} (g == the search key) from
+    // private R2. Rendered into a compact bottom sheet that does NOT cover the pin (the
+    // map is panned up on open). Fail-soft: any fetch/parse error falls back to the nav
+    // popup so the marker + navigation always work. textContent/DOM only — never innerHTML.
+    function ensureDetailSheet() {
+      if (detailSheetEl) return detailSheetEl;
+      const el = document.createElement('div');
+      el.className = 'detail-sheet'; el.id = 'detailSheet';
+      el.setAttribute('role', 'dialog');
+      el.setAttribute('aria-label', 'Информация за сградата');
+      el.hidden = true;
+      document.body.appendChild(el);
+      detailSheetEl = el;
+      return el;
+    }
+    function isFiniteNum(v) { return typeof v === 'number' && isFinite(v); }
+
+    function renderDetailSheet(detail, label, lat, lng) {
+      const el = ensureDetailSheet();
+      el.replaceChildren();
+      const close = document.createElement('button');
+      close.type = 'button'; close.className = 'ds-close';
+      close.setAttribute('aria-label', 'Затвори'); close.textContent = '×';
+      close.addEventListener('click', closeDetailSheet);
+      el.appendChild(close);
+
+      const title = document.createElement('div');
+      title.className = 'ds-title'; title.textContent = label;
+      el.appendChild(title);
+
+      const d = detail || {};
+      const typeLabel = d.type && (d.type.label || d.type.code) ? (d.type.label || d.type.code) : null;
+      if (typeLabel) {
+        const s = document.createElement('div'); s.className = 'ds-sub'; s.textContent = typeLabel;
+        el.appendChild(s);
+      }
+      const addMeta = (lab, val) => {
+        const row = document.createElement('div'); row.className = 'ds-meta';
+        const l = document.createElement('span'); l.className = 'ds-label'; l.textContent = lab + ': ';
+        row.appendChild(l); row.appendChild(document.createTextNode(val)); el.appendChild(row);
+      };
+      // SOIS and the legal KAIS count are shown as SEPARATE building-level lines.
+      if (isFiniteNum(d.apartment_count)) addMeta('Апартаменти (SOIS)', String(d.apartment_count));
+      if (isFiniteNum(d.apartment_count_kais)) addMeta('Апартаменти (КАИС)', String(d.apartment_count_kais));
+
+      const entrances = Array.isArray(d.entrances) ? d.entrances : [];
+      const coverage = d.data_confidence && isFiniteNum(d.data_confidence.entrance_coverage)
+        ? d.data_confidence.entrance_coverage : null;
+
+      if (entrances.length === 0) {
+        const note = document.createElement('div'); note.className = 'ds-note';
+        note.textContent = 'Няма данни за входове за тази сграда.';
+        el.appendChild(note);
+      } else {
+        const h = document.createElement('div'); h.className = 'ds-ent-h';
+        h.textContent = 'Входове (' + entrances.length + ')';
+        el.appendChild(h);
+        const table = document.createElement('table'); table.className = 'ds-ent';
+        const head = document.createElement('tr');
+        for (const txt of ['Вход', 'Етажи', 'Ап. (SOIS)']) {
+          const th = document.createElement('th'); th.textContent = txt; head.appendChild(th);
+        }
+        table.appendChild(head);
+        for (const e of entrances) {
+          const tr = document.createElement('tr');
+          const c1 = document.createElement('td'); c1.textContent = (e && e.en != null) ? String(e.en) : '—'; tr.appendChild(c1);
+          const c2 = document.createElement('td'); c2.textContent = (e && isFiniteNum(e.floors)) ? String(e.floors) : '—'; tr.appendChild(c2);
+          const c3 = document.createElement('td'); c3.textContent = (e && isFiniteNum(e.apartment_count)) ? String(e.apartment_count) : '—'; tr.appendChild(c3);
+          table.appendChild(tr);
+        }
+        el.appendChild(table);
+        if (coverage != null && coverage < 1) {
+          const note = document.createElement('div'); note.className = 'ds-note';
+          note.textContent = 'Непълни данни за входове (' + Math.round(coverage * 100) + '% покритие).';
+          el.appendChild(note);
+        }
+      }
+
+      const nav = buildNavActions(lat, lng);
+      if (nav) el.appendChild(nav);
+
+      el.hidden = false;
+      panPinAboveSheet(lat, lng, el);
+    }
+
+    // Pan the map so the centered pin lands in the visible band between the header stack
+    // and the sheet top — so the entrance pin is never hidden behind the sheet.
+    function panPinAboveSheet(lat, lng, el) {
+      try {
+        const sheetH = el.getBoundingClientRect().height || 0;
+        const size = map.getSize();
+        const headerH = 150;                       // header stack height (matches POPUP_AUTOPAN_TL[1])
+        const bandTop = headerH, bandBottom = size.y - sheetH;
+        if (bandBottom - bandTop < 60) return;     // band too small (very short screen) -> leave centered
+        const desiredY = (bandTop + bandBottom) / 2;
+        const dy = size.y / 2 - desiredY;          // > 0 => shift content up so the pin rises
+        if (Math.abs(dy) > 4) map.panBy([0, dy], { animate: true });
+      } catch (_) { /* panning is best-effort */ }
+    }
+
+    // Fetch + show the detail sheet for building key g. Fail-soft to the nav popup.
+    async function showBuildingDetail(g, label, lat, lng) {
+      if (lastDetail && lastDetail.g === g && lastDetail.data) { renderDetailSheet(lastDetail.data, label, lat, lng); return; }
+      if (detailAbort) { try { detailAbort.abort(); } catch (_) {} }
+      const ac = ('AbortController' in window) ? new AbortController() : null;
+      detailAbort = ac;
+      let data = null;
+      try {
+        const res = await fetch(DETAIL_URL_BASE + encodeURIComponent(g), ac ? { signal: ac.signal } : undefined);
+        if (res && res.ok) data = await res.json();
+      } catch (_) { data = null; }
+      if (ac && ac.signal.aborted) return;         // a newer selection superseded this fetch
+      if (data && typeof data === 'object') {
+        lastDetail = { g: g, data: data };
+        renderDetailSheet(data, label, lat, lng);
+      } else {
+        lastDetail = null;                          // fail-soft: marker + nav popup still work
+        openSearchPopup(label, lat, lng);
+      }
+    }
+
     function selectResult(r) {
       if (!r || !Array.isArray(r.pin) || r.pin.length !== 2) return;
       const lat = Number(r.pin[0]), lng = Number(r.pin[1]);
       if (!isFinite(lat) || !isFinite(lng)) return; // validate pin
       const label = formatAddressHit(r);            // resolved address (never cadnum)
+      const g = (typeof r.g === 'string') ? r.g : null;  // Phase-2 detail key (block / MF rows only)
       pauseTrackingForStaticAnchor();
       lastFix = { lat, lon: lng, acc: 0 };
       placeUser();
       refreshCurrentModeFromAnchorResetActive();
-      clearSearchMarker(); // replace any previous result marker
+      clearSearchMarker(); // replace any previous result marker + close any open sheet
       searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
-      searchMarker.on('click', function () { openSearchPopup(label, lat, lng); });
-      openSearchPopup(label, lat, lng);
+      // Re-click re-opens the same surface: the detail sheet for a building (g), else the popup.
+      searchMarker.on('click', function () { if (g) showBuildingDetail(g, label, lat, lng); else openSearchPopup(label, lat, lng); });
       map.setView([lat, lng], Math.max(map.getZoom(), 17), { animate: true });
+      // After the marker is placed: fetch + show the building detail (fail-soft to the nav
+      // popup). Address/parcel rows (no g) keep the existing nav popup.
+      if (g) showBuildingDetail(g, label, lat, lng);
+      else openSearchPopup(label, lat, lng);
       hideResults();
     }
 
