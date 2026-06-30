@@ -32,6 +32,19 @@ const BAD_ORIGIN = "https://evil.example";
 const WORKER_BASE = "https://worker.example";
 const ALLOWED_KEYS = new Set(["bt", "en", "fl", "fl_min", "fl_max", "u"]);
 
+// C4 detail-endpoint fixtures: a valid bd-pattern key + a safe detail record.
+const DETAIL_PREFIX = "details/buildings/v1/";
+const DETAIL_G = "b0123456789abcdef";   // 'b' + 16 lowercase hex
+const DETAIL_OBJ = {
+  v: 2, bd: DETAIL_G, type: { code: "110", label: "Жилищна сграда - многофамилна", class: "block" },
+  apartment_count: 24, apartment_count_kais: 30,
+  data_confidence: { entrance_coverage: 0.5 },
+  entrances: [
+    { en: "А", pin: { lat: 43.2061, lng: 27.8921 }, floors: 5, apartment_count: 12 },
+    { en: "Б", pin: { lat: 43.2062, lng: 27.8922 }, floors: 5, apartment_count: 12 },
+  ],
+};
+
 // Known-present tiles (from the PMTiles probe, 2026-06-22).
 const T15 = "/tiles/buildings/v1/15/18926/12026.mvt";
 const T16 = "/tiles/buildings/v1/16/37852/24052.mvt";
@@ -55,8 +68,9 @@ function check(name, cond, detail) {
   else { failed++; failures.push(name + (detail ? " — " + detail : "")); console.log("  FAIL  " + name + (detail ? " — " + detail : "")); }
 }
 
-function makeR2(buffer, key) {
+function makeR2(buffer, key, extras) {
   const store = new Map([[key, buffer]]);
+  if (Array.isArray(extras)) for (const [k, b] of extras) store.set(k, b);
   return {
     reads: 0,
     async get(objectKey, options) {
@@ -75,7 +89,12 @@ function makeR2(buffer, key) {
 }
 
 function makeEnv(opts = {}) {
-  const r2 = makeR2(PMTILES_BYTES, opts.objectKey || OBJECT_KEY);
+  // Seed extra R2 objects for the /detail/{g} route: opts.details = { g: jsonString }.
+  const extras = [];
+  if (opts.details) {
+    for (const [g, json] of Object.entries(opts.details)) extras.push([DETAIL_PREFIX + g + ".json", Buffer.from(json)]);
+  }
+  const r2 = makeR2(PMTILES_BYTES, opts.objectKey || OBJECT_KEY, extras);
   const kv = opts.kv || { async get() { return null; }, async put() {} };
   const env = {
     BUILDING_TILES: opts.noR2 ? undefined : r2,
@@ -88,6 +107,7 @@ function makeEnv(opts = {}) {
     TILES_RATE_WINDOW_S: String(opts.window || 60),
     TILES_TOKEN_RATE_MAX: String(opts.tokenMax || 1000),
     TILES_TILE_RATE_MAX: String(opts.tileMax || 1000),
+    TILES_DETAIL_RATE_MAX: String(opts.detailMax || 1000),
   };
   if ("pat" in opts) env.GITHUB_PAT = opts.pat;
   return { env, r2, kv };
@@ -394,6 +414,69 @@ async function testRateLimit() {
     check("tile: 3rd -> 429", c.status === 429, "status=" + c.status);
     check("tile: 429 has Retry-After", !!c.headers.get("Retry-After"));
   }
+
+  // detail endpoint
+  {
+    const mod = await loadFreshModule("rl-detail");
+    installCaches();
+    const { env } = makeEnv({ detailMax: 2, window: 60, details: { [DETAIL_G]: JSON.stringify(DETAIL_OBJ) } });
+    const ip = "5.5.5.3";
+    const a = await callWorker(mod, env, "/detail/" + DETAIL_G, { origin: ORIGIN, ip });
+    const b = await callWorker(mod, env, "/detail/" + DETAIL_G, { origin: ORIGIN, ip });
+    const c = await callWorker(mod, env, "/detail/" + DETAIL_G, { origin: ORIGIN, ip });
+    check("detail: 1st ok", a.status === 200, "status=" + a.status);
+    check("detail: 2nd ok", b.status === 200, "status=" + b.status);
+    check("detail: 3rd -> 429", c.status === 429, "status=" + c.status);
+    check("detail: 429 has Retry-After", !!c.headers.get("Retry-After"));
+  }
+}
+
+async function testDetail() {
+  console.log("\n[detail] /detail/{g} happy + 400/404/403 + OPTIONS + 500");
+  const mod = await loadFreshModule("detail");
+  installCaches();
+  const { env } = makeEnv({ details: { [DETAIL_G]: JSON.stringify(DETAIL_OBJ) } });
+
+  // happy path: valid g -> 200 JSON with tile-style headers
+  const ok = await callWorker(mod, env, "/detail/" + DETAIL_G, { origin: ORIGIN, ip: "8.8.8.1" });
+  check("detail 200", ok.status === 200, "status=" + ok.status);
+  check("detail Content-Type json", ok.headers.get("Content-Type") === "application/json; charset=utf-8");
+  check("detail Cache-Control public max-age=3600", ok.headers.get("Cache-Control") === "public, max-age=3600");
+  check("detail X-Robots-Tag noindex", ok.headers.get("X-Robots-Tag") === "noindex");
+  check("detail ACAO echoes origin", ok.headers.get("Access-Control-Allow-Origin") === ORIGIN);
+  const body = await ok.json();
+  check("detail body bd == g", body.bd === DETAIL_G, "bd=" + body.bd);
+  check("detail body has 2 entrances", Array.isArray(body.entrances) && body.entrances.length === 2, "n=" + (body.entrances || []).length);
+
+  // valid pattern but object not seeded -> 404 not_found
+  const miss = await callWorker(mod, env, "/detail/b0000000000000000", { origin: ORIGIN, ip: "8.8.8.2" });
+  check("detail missing object -> 404 not_found", miss.status === 404 && (await miss.json()).error === "not_found", "status=" + miss.status);
+
+  // malformed keys -> 400 bad_key (rejected before any R2 read; no enumeration)
+  const bad1 = await callWorker(mod, env, "/detail/NOT-HEX", { origin: ORIGIN, ip: "8.8.8.3" });
+  check("detail non-hex key -> 400 bad_key", bad1.status === 400 && (await bad1.json()).error === "bad_key", "status=" + bad1.status);
+  const bad2 = await callWorker(mod, env, "/detail/" + DETAIL_G + "/x", { origin: ORIGIN, ip: "8.8.8.4" });
+  check("detail extra path segment -> 400", bad2.status === 400, "status=" + bad2.status);
+  const bad3 = await callWorker(mod, env, "/detail/", { origin: ORIGIN, ip: "8.8.8.5" });
+  check("detail empty key -> 400", bad3.status === 400, "status=" + bad3.status);
+  const bad4 = await callWorker(mod, env, "/detail/bABCDEF0123456789", { origin: ORIGIN, ip: "8.8.8.6" });
+  check("detail UPPERCASE hex -> 400 (producer mints lowercase)", bad4.status === 400, "status=" + bad4.status);
+
+  // origin gating mirrors /tiles
+  const badOrigin = await callWorker(mod, env, "/detail/" + DETAIL_G, { origin: BAD_ORIGIN, ip: "8.8.8.7" });
+  check("detail disallowed origin -> 403", badOrigin.status === 403, "status=" + badOrigin.status);
+  const noOrigin = await callWorker(mod, env, "/detail/" + DETAIL_G, { origin: null, ip: "8.8.8.8" });
+  check("detail no origin/referer -> 403", noOrigin.status === 403, "status=" + noOrigin.status);
+
+  // OPTIONS preflight (shared with /tiles)
+  const opt = await callWorker(mod, env, "/detail/" + DETAIL_G, { method: "OPTIONS", origin: ORIGIN });
+  check("OPTIONS /detail 204", opt.status === 204, "status=" + opt.status);
+  check("OPTIONS /detail allow GET, OPTIONS", opt.headers.get("Access-Control-Allow-Methods") === "GET, OPTIONS");
+
+  // R2 binding absent -> 500 details_not_configured
+  const { env: envNoR2 } = makeEnv({ noR2: true });
+  const noR2 = await callWorker(mod, envNoR2, "/detail/" + DETAIL_G, { origin: ORIGIN, ip: "8.8.8.9" });
+  check("detail no R2 binding -> 500", noR2.status === 500, "status=" + noR2.status);
 }
 
 async function testCache() {
@@ -502,6 +585,7 @@ async function main() {
   console.log("PMTiles seed:", PMTILES);
   await testHappyPath();
   await testRejections();
+  await testDetail();
   await testRateLimit();
   await testCache();
   await testRegression();

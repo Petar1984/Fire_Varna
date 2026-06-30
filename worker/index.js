@@ -63,6 +63,19 @@ const tileRateBuckets = new Map();
 // per object key) so a warm isolate ranged-reads only the tile body.
 let tileArchiveCache = { key: null, header: null, rootEntries: null };
 
+// ===========================================================================
+// C4 — Safe building-DETAIL gateway (/detail/{g}). Additive, isolated; serves the
+// per-building safe detail JSON keyed by the opaque search key `g` (Phase-2:
+// g == detail key). The object lives in the SAME private R2 bucket as the tiles
+// (binding BUILDING_TILES) under details/buildings/v1/{g}.json — Petar uploads it.
+// No listing/enumeration endpoint; `g` is an unguessable HMAC, validated against the
+// SAME bd-pattern the producer mints, so a bad key is rejected (400) before any R2
+// read. CORS mirrors the /tiles/* policy (same ALLOWED_ORIGINS allowlist).
+// ===========================================================================
+const DETAIL_PATH_RE = /^\/detail\/(b[0-9a-f]{16})$/;     // g = 'b' + 16 lowercase hex
+const DETAIL_KEY_PREFIX = "details/buildings/v1/";        // R2 object key prefix
+const DETAIL_CACHE_CONTROL = "public, max-age=3600";      // detail content is stable per g but mutable on rebuild
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -80,6 +93,15 @@ export default {
       return handleBuildingTile(request, env, ctx, url);
     }
     // ===== end E2 block =====
+
+    // ===== C4 building-detail gateway — additive, BEFORE the existing routes. =====
+    if (request.method === "OPTIONS" && url.pathname.startsWith("/detail/")) {
+      return handleTilesOptions(request);   // same GET/OPTIONS, origin-gated preflight
+    }
+    if (request.method === "GET" && url.pathname.startsWith("/detail/")) {
+      return handleBuildingDetail(request, env, url);
+    }
+    // ===== end C4 block =====
 
     if (request.method === "OPTIONS") {
       return handleOptions(request);
@@ -722,7 +744,9 @@ function tileRateLimit(kind, ip, env) {
   const windowMs = tileEnvInt(env, "TILES_RATE_WINDOW_S", 60) * 1000;
   const max = kind === "token"
     ? tileEnvInt(env, "TILES_TOKEN_RATE_MAX", 30)
-    : tileEnvInt(env, "TILES_TILE_RATE_MAX", 600);
+    : kind === "detail"
+      ? tileEnvInt(env, "TILES_DETAIL_RATE_MAX", 300)
+      : tileEnvInt(env, "TILES_TILE_RATE_MAX", 600);
   const mapKey = kind + ":" + ip;
   let bucket = tileRateBuckets.get(mapKey);
   if (!bucket || now - bucket.start >= windowMs) {
@@ -881,6 +905,50 @@ function tilesError(origin, status, code, retryAfter) {
   }
   if (retryAfter) headers.set("Retry-After", String(retryAfter));
   return new Response(JSON.stringify({ error: code }), { status, headers });
+}
+
+// --- detail endpoint (C4) -------------------------------------------------
+// GET /detail/{g}: validate g against the bd-pattern -> fetch
+// details/buildings/v1/{g}.json from the private R2 bucket -> return JSON with the
+// /tiles/* CORS policy. 400 on a malformed key (rejected pre-R2, so the route can never
+// be used to probe/enumerate), 404 on a missing object. No Worker-cache layer: detail
+// content is stable per g but MUTABLE across producer rebuilds, so we lean on R2 + the
+// Cache-Control max-age only (an immutable cache would pin a stale rebuild).
+async function handleBuildingDetail(request, env, url) {
+  const origin = effectiveAllowedOrigin(request);
+  if (!origin) return tilesError(null, 403, "origin_not_allowed");
+
+  const limit = tileRateLimit("detail", clientIp(request), env);
+  if (!limit.ok) return tilesError(origin, 429, "rate_limited", limit.retryAfter);
+
+  const match = url.pathname.match(DETAIL_PATH_RE);
+  if (!match) return tilesError(origin, 400, "bad_key");   // not the bd-pattern -> reject before any R2 read
+  const g = match[1];
+
+  if (!env.BUILDING_TILES) return tilesError(origin, 500, "details_not_configured");
+
+  let object;
+  try {
+    object = await env.BUILDING_TILES.get(DETAIL_KEY_PREFIX + g + ".json");
+  } catch (_) {
+    return tilesError(origin, 503, "details_unavailable");
+  }
+  if (!object) return tilesError(origin, 404, "not_found");
+
+  let bytes;
+  try {
+    bytes = new Uint8Array(await object.arrayBuffer());
+  } catch (_) {
+    return tilesError(origin, 503, "details_unavailable");
+  }
+
+  const headers = new Headers();
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  headers.set("Cache-Control", DETAIL_CACHE_CONTROL);
+  headers.set("X-Robots-Tag", "noindex");
+  headers.set("Access-Control-Allow-Origin", origin);
+  headers.set("Vary", "Origin");
+  return new Response(bytes, { status: 200, headers });
 }
 
 // --- HMAC token (compact base64url(payload).base64url(hmac-sha256)) ---------
