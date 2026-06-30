@@ -4032,7 +4032,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
           const bareDistrictCount = new Map(); const groupList = [];
           for (const pair of repByGroup) { const key = pair[0], rep = pair[1]; const children = (childrenByGroup.get(key) || []).slice().sort(childSort); groupList.push({ key: key, rep: rep, children: children }); const d = rep.e.d; if (d != null) bareDistrictCount.set(d, (bareDistrictCount.get(d)||0)+1); }
           groupList.sort(function (a, b) { const da = a.rep.e.d == null ? Infinity : a.rep.e.d, db = b.rep.e.d == null ? Infinity : b.rep.e.d; if (da !== db) return da - db; return (a.rep.e._ord||0) - (b.rep.e._ord||0); });
-          const projectRow = function (s, role) { const e = s.e; return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy, bareRole: role, block: qBlkDisplay }; };
+          const projectRow = function (s, role) { const e = s.e; return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, g: e.g, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy, bareRole: role, block: qBlkDisplay }; };
           const bareOut = [];
           for (const g of groupList) { bareOut.push(projectRow(g.rep, 'parent')); for (const c of g.children) bareOut.push(projectRow(c, 'child')); }
           bareOut.bareBlockHeader = { block: qBlkDisplay, groups: groupList.length, districts: Array.from(bareDistrictCount, function (p) { return { district_enum: p[0], count: p[1] }; }).sort(function (a, b) { return a.district_enum - b.district_enum; }) };
@@ -4042,7 +4042,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
       const out = ranked.slice(0, SEARCH_LIMIT).map(function (s) {
         const e = s.e;
-        return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy };
+        return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, g: e.g, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy };
       });
       if (blockHeader) out.blockHeader = blockHeader;
       return out;
