@@ -4262,20 +4262,20 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // C4 detail-sheet state (declared up-front so clearSearchMarker can reset it).
     const DETAIL_URL_BASE = WORKER_URL + 'detail/';
     let detailSheetEl = null, detailAbort = null, lastDetail = null;
-    let detailNavEl = null;     // the current nav link-out row inside the detail sheet (re-pointable)
+    let entrancePopup = null;   // the open entrance detail popup (Leaflet) — closed on teardown
     // Вариант B: entrance markers placed on the real map while the panel is open.
     // Aligned 1:1 with the panel's entrance rows (shared index) for two-way tap linking.
     // marker/iconEl are null for an entrance that has no pin (row still renders, no marker).
-    let entranceMarkers = [];   // [{ marker, iconEl, lat, lng, rowEl, en }]
+    let entranceMarkers = [];   // [{ marker, iconEl, lat, lng, rowEl, en, ent }]
     let activeEntranceIdx = -1;
     function clearEntranceMarkers() {
       for (const rec of entranceMarkers) { if (rec.marker) { try { map.removeLayer(rec.marker); } catch (_) {} } }
       entranceMarkers = []; activeEntranceIdx = -1;
+      if (entrancePopup) { try { map.closePopup(entrancePopup); } catch (_) {} entrancePopup = null; }
     }
     function closeDetailSheet() {
       clearEntranceMarkers();
       if (detailSheetEl) { detailSheetEl.hidden = true; detailSheetEl.replaceChildren(); }
-      detailNavEl = null;
     }
     function clearSearchMarker() {
       if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
@@ -4354,10 +4354,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return L.divIcon({ className: 'ent-pin-wrapper', html: '<div class="ent-pin"><span class="ent-pin-num"></span></div>', iconSize: [22, 22], iconAnchor: [11, 22] });
     }
 
-    // Highlight entrance i: accent its map marker + list row, dim the rest, centre the map
-    // on it (clear of the panel via positionPinForSheet) and scroll its row into view. The
-    // panel stays open so the user clicks through entrances. Two-way: a row tap and a marker
-    // tap both call this.
+    // Select entrance i: accent its map marker + list row, dim the rest, centre the map on it
+    // (clear of the panel via positionPinForSheet), scroll its row into view, and open its detail
+    // popup on the marker. The full list panel stays open the whole time. Two-way: a row tap and a
+    // marker tap both call this; a new selection moves the popup and closes the previous one.
     function setActiveEntrance(i) {
       if (i < 0 || i >= entranceMarkers.length) return;
       activeEntranceIdx = i;
@@ -4372,44 +4372,55 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (rec.marker && isFiniteNum(rec.lat) && isFiniteNum(rec.lng) && detailSheetEl) {
         positionPinForSheet(rec.lat, rec.lng, detailSheetEl);
       }
-      // Re-point the nav link-outs at THIS вход's own door, so Waze/Google navigate to the
-      // exact entrance rather than the block centroid. (Never "Докладвай" — that's hydrant-only.)
-      if (isFiniteNum(rec.lat) && isFiniteNum(rec.lng)) setDetailNav(rec.lat, rec.lng);
+      openEntrancePopup(rec);
       if (rec.rowEl && rec.rowEl.scrollIntoView) { try { rec.rowEl.scrollIntoView({ block: 'nearest' }); } catch (_) { rec.rowEl.scrollIntoView(); } }
     }
 
-    // Swap the detail sheet's nav link-out row so it targets (lat,lng), keeping it as the
-    // sheet's LAST child. Called once on render (block pin, or the scoped вход's own pin) and
-    // again by setActiveEntrance when a вход is tapped in the full panel. buildNavActions
-    // returns null on non-finite coords -> the row is simply removed.
-    function setDetailNav(lat, lng) {
-      if (!detailSheetEl) return;
-      const nav = buildNavActions(lat, lng);
-      if (detailNavEl && detailNavEl.parentNode === detailSheetEl) {
-        if (nav) detailSheetEl.replaceChild(nav, detailNavEl);
-        else detailSheetEl.removeChild(detailNavEl);
-      } else if (nav) {
-        detailSheetEl.appendChild(nav);
-      }
-      detailNavEl = nav;
+    // Entrance detail popup — reuses the .hydrant-popup card styling (в стил хидрантния popup):
+    // "вх. N" + Етажи + Ап. (SOIS) + nav link-outs to that вход's OWN door. NO "Докладвай" (that's
+    // hydrant-only). textContent/DOM only, never innerHTML.
+    function buildEntrancePopup(rec) {
+      const wrap = document.createElement('div');
+      wrap.className = 'hydrant-popup entrance-popup';
+      const title = document.createElement('div');
+      title.className = 'hp-title';
+      title.textContent = 'вх. ' + (rec.en != null ? rec.en : '');
+      wrap.appendChild(title);
+      const e = rec.ent || {};
+      const addRow = (label, value) => {
+        const r = document.createElement('div'); r.className = 'hp-row';
+        const l = document.createElement('span'); l.className = 'hp-label'; l.textContent = label + ': ';
+        r.appendChild(l); r.appendChild(document.createTextNode(value)); wrap.appendChild(r);
+      };
+      if (isFiniteNum(e.floors)) addRow('Етажи', String(e.floors));
+      if (isFiniteNum(e.apartment_count)) addRow('Ап. (SOIS)', String(e.apartment_count));
+      const nav = buildNavActions(rec.lat, rec.lng);   // Waze/Пеша/Карта/Street View -> the вход's door
+      if (nav) wrap.appendChild(nav);
+      return wrap;
     }
 
-    // Detail panel entry point. ctx = { label, blockLabel, lat, lng, scopeEn, activeEn }.
-    //   scopeEn set + that entrance exists -> ENTRANCE view (only that вход + "Виж всички входове").
-    //   otherwise                         -> full Вариант B panel (all entrances + map markers).
-    // lat/lng are the selected pin (entrance pin for an entrance result; block pin otherwise)
-    // and drive both the nav actions and the "keep the pin clear of the panel" centring.
+    // Open (or move) the entrance popup on rec's marker. openOn(map) closes any previously open
+    // popup, so clicking a new вход moves it. autoPan:false — setActiveEntrance already centred the
+    // pin clear of the panel (positionPinForSheet), mirroring openSearchPopup.
+    function openEntrancePopup(rec) {
+      if (!rec || !isFiniteNum(rec.lat) || !isFiniteNum(rec.lng)) return;
+      entrancePopup = L.popup({ closeButton: true, autoPan: false })
+        .setLatLng([rec.lat, rec.lng]).setContent(buildEntrancePopup(rec)).openOn(map);
+    }
+
+    // Detail panel entry point. ctx = { label, blockLabel, lat, lng, activeEn }. Always renders the
+    // full Вариант B panel (list of all entrances + numbered map markers) and keeps it open.
+    // activeEn (set by an entrance-level search "бл N вх M", or a re-select) auto-selects that вход
+    // — highlighting it + opening its detail popup — consistent with a click. lat/lng are the
+    // selected pin (drives the block-level nav row + the "keep the pin clear of the panel" centring).
     function renderDetailSheet(detail, ctx) {
       ctx = ctx || {};
       const el = ensureDetailSheet();
-      clearEntranceMarkers();      // a fresh render drops any markers from the previous view
+      clearEntranceMarkers();      // a fresh render drops any markers + popup from the previous view
       el.replaceChildren();
-      detailNavEl = null;          // replaceChildren detached the old nav row
 
       const d = detail || {};
       const entrances = Array.isArray(d.entrances) ? d.entrances : [];
-      const scopeEn = ctx.scopeEn != null ? String(ctx.scopeEn) : null;
-      const scoped = scopeEn !== null && entrances.some(function (e) { return e && e.en != null && String(e.en) === scopeEn; });
 
       const close = document.createElement('button');
       close.type = 'button'; close.className = 'ds-close';
@@ -4427,36 +4438,27 @@ window._hydrantDataReady = (async function loadHydrantData() {
         el.appendChild(s);
       }
 
-      if (scoped) renderScopedEntrance(el, d, entrances, scopeEn, ctx);
-      else renderFullBuilding(el, d, entrances, ctx);
+      renderFullBuilding(el, d, entrances, ctx);
 
-      // Nav target: scoped вход view -> that entrance's OWN door pin (so Waze drives to the
-      // exact вход); full block view -> the block pin. A later setActiveEntrance re-points it
-      // when a вход is tapped in the full panel.
-      let navLat = ctx.lat, navLng = ctx.lng;
-      if (scoped) {
-        for (const e of entrances) {
-          if (e && e.en != null && String(e.en) === scopeEn && e.pin &&
-              isFiniteNum(e.pin.lat) && isFiniteNum(e.pin.lng)) { navLat = e.pin.lat; navLng = e.pin.lng; break; }
-        }
-      }
-      setDetailNav(navLat, navLng);
+      // Block-level nav row at the panel foot (each вход's own nav lives in its popup).
+      const nav = buildNavActions(ctx.lat, ctx.lng);
+      if (nav) el.appendChild(nav);
 
       el.hidden = false;
-      // Centre the selected pin clear of the panel (full view: block pin). When expanding
-      // from a single entrance, the active-entrance highlight below re-centres on it.
+      // Centre the selected pin clear of the panel. An entrance-level result / re-select then
+      // re-centres on its вход + opens the popup via setActiveEntrance below.
       positionPinForSheet(ctx.lat, ctx.lng, el);
-      if (!scoped && ctx.activeEn != null) {
+      if (ctx.activeEn != null) {
         for (let i = 0; i < entranceMarkers.length; i++) {
           if (String(entranceMarkers[i].en) === String(ctx.activeEn)) { setActiveEntrance(i); break; }
         }
       }
     }
 
-    // Full Вариант B panel: building type + SOIS/КАИС totals, then the natural-ordered
-    // entrance list. Every вход with a pin gets a numbered map marker; tapping a row, its
-    // locator icon, or its marker opens that вход's scoped view (renderScopedEntrance) — the
-    // same single-вход surface a "бл N вх M" search opens.
+    // Full Вариант B panel: building type + SOIS/КАИС totals, then the natural-ordered entrance
+    // list. Every вход with a pin gets a numbered map marker; tapping a row, its locator icon, or
+    // its marker selects that вход (setActiveEntrance) — highlighting it + opening its detail popup
+    // on the map. The panel stays open throughout.
     function renderFullBuilding(el, d, entrances, ctx) {
       const addMeta = (lab, val) => {
         const row = document.createElement('div'); row.className = 'ds-meta';
@@ -4481,21 +4483,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
       h.textContent = 'Входове (' + entrances.length + ')';
       el.appendChild(h);
 
-      // Tapping an вход drills into its scoped view (single вход + nav to its own door +
-      // "Виж всички входове" back). markEntrance tells renderScopedEntrance to keep this вход's
-      // numbered marker + centring. The вход's own pin drives nav/centring; block pin is the
-      // fallback for a pin-less вход. Title stays the block address; "Вход N" is the subheader.
-      const openScoped = function (en, lat, lng) {
-        renderDetailSheet(d, {
-          label: ctx.label,
-          blockLabel: ctx.blockLabel || ctx.label,
-          lat: isFiniteNum(lat) ? lat : ctx.lat,
-          lng: isFiniteNum(lng) ? lng : ctx.lng,
-          scopeEn: en,
-          markEntrance: true
-        });
-      };
-
       const sorted = entrances.slice().sort(compareEntrances);
       const table = document.createElement('table'); table.className = 'ds-ent';
       const head = document.createElement('tr');
@@ -4519,20 +4506,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const c4 = document.createElement('td'); c4.className = 'ds-loc'; tr.appendChild(c4);
         table.appendChild(tr);
 
-        const rec = { marker: null, iconEl: null, lat: lat, lng: lng, rowEl: tr, en: en };
+        const rec = { marker: null, iconEl: null, lat: lat, lng: lng, rowEl: tr, en: en, ent: e };
         const idx = i;   // stable per-row index into entranceMarkers for the tap handlers
         if (hasPin) {
-          // Row / locator icon / marker all open this вход's scoped view. An вход with a pin
-          // but no number can't be scoped -> fall back to the old locate-on-map highlight.
-          const onTap = function () { if (en != null) openScoped(en, lat, lng); else setActiveEntrance(idx); };
+          // Row / locator icon / marker all select this вход: highlight + centre + open its popup.
           const locBtn = document.createElement('button');
           locBtn.type = 'button'; locBtn.className = 'ds-loc-btn';
-          locBtn.setAttribute('aria-label', 'Отвори вход ' + (en || '') + ' на картата');
+          locBtn.setAttribute('aria-label', 'Покажи вход ' + (en || '') + ' на картата');
           locBtn.appendChild(makeLocateIcon());
-          locBtn.addEventListener('click', function (ev) { ev.stopPropagation(); onTap(); });
+          locBtn.addEventListener('click', function (ev) { ev.stopPropagation(); setActiveEntrance(idx); });
           c4.appendChild(locBtn);
           tr.classList.add('clickable');
-          tr.addEventListener('click', onTap);
+          tr.addEventListener('click', function () { setActiveEntrance(idx); });
 
           const marker = L.marker([lat, lng], { icon: entrancePinIcon(), zIndexOffset: 1400, keyboard: false }).addTo(map);
           const wrap = marker.getElement();
@@ -4540,7 +4525,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
             const num = wrap.querySelector('.ent-pin-num'); if (num) num.textContent = en || '';
             rec.iconEl = wrap.querySelector('.ent-pin');
           }
-          marker.on('click', onTap);
+          marker.on('click', function () { setActiveEntrance(idx); });
           rec.marker = marker;
         }
         entranceMarkers.push(rec);
@@ -4552,51 +4537,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
         note.textContent = 'Непълни данни за входове (' + Math.round(coverage * 100) + '% покритие).';
         el.appendChild(note);
       }
-    }
-
-    // Entrance view: ONE вход only (type above; floors + apartments here). Reached from a
-    // "бл N вх M" search (keeps its search pin, no extra marker) OR a tap on an вход row/marker
-    // in the full panel (ctx.markEntrance -> drop a single ACTIVE numbered pin on that вход's
-    // own door). renderDetailSheet centres on ctx.lat/lng once the sheet is shown. "Виж всички
-    // входове" re-renders the full block with that вход active.
-    function renderScopedEntrance(el, d, entrances, scopeEn, ctx) {
-      let ent = null;
-      for (const e of entrances) if (e && e.en != null && String(e.en) === scopeEn) { ent = e; break; }
-      const h = document.createElement('div'); h.className = 'ds-ent-h';
-      h.textContent = 'Вход ' + scopeEn;
-      el.appendChild(h);
-      const addMeta = (lab, val) => {
-        const row = document.createElement('div'); row.className = 'ds-meta';
-        const l = document.createElement('span'); l.className = 'ds-label'; l.textContent = lab + ': ';
-        row.appendChild(l); row.appendChild(document.createTextNode(val)); el.appendChild(row);
-      };
-      addMeta('Етажи', (ent && isFiniteNum(ent.floors)) ? String(ent.floors) : '—');
-      addMeta('Апартаменти (SOIS)', (ent && isFiniteNum(ent.apartment_count)) ? String(ent.apartment_count) : '—');
-
-      // Tap-driven scope: keep the selected вход's numbered marker on the map (active styling),
-      // so the door the user tapped stays marked + centred while the other входове drop away.
-      const pin = ctx.markEntrance && ent && ent.pin ? ent.pin : null;
-      const mlat = pin && isFiniteNum(pin.lat) ? pin.lat : NaN;
-      const mlng = pin && isFiniteNum(pin.lng) ? pin.lng : NaN;
-      if (isFiniteNum(mlat) && isFiniteNum(mlng)) {
-        const marker = L.marker([mlat, mlng], { icon: entrancePinIcon(), zIndexOffset: 1600, keyboard: false }).addTo(map);
-        const wrap = marker.getElement();
-        let iconEl = null;
-        if (wrap) {
-          const num = wrap.querySelector('.ent-pin-num'); if (num) num.textContent = scopeEn || '';
-          iconEl = wrap.querySelector('.ent-pin');
-        }
-        if (iconEl) iconEl.classList.add('active');
-        entranceMarkers.push({ marker: marker, iconEl: iconEl, lat: mlat, lng: mlng, rowEl: null, en: scopeEn });
-      }
-
-      const expand = document.createElement('button');
-      expand.type = 'button'; expand.className = 'ds-expand';
-      expand.textContent = 'Виж всички входове';
-      expand.addEventListener('click', function () {
-        renderDetailSheet(d, { label: ctx.blockLabel || ctx.label, blockLabel: ctx.blockLabel, lat: ctx.lat, lng: ctx.lng, scopeEn: null, activeEn: scopeEn });
-      });
-      el.appendChild(expand);
     }
 
     // Deliberately place the pin at the centre of the VISIBLE band — the rectangle left
@@ -4645,8 +4585,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     // Fetch + show the detail sheet for building key g. ctx = { label, blockLabel, lat,
-    // lng, scopeEn } carries the display context (entrance-scoped vs full). Fail-soft to
-    // the nav popup.
+    // lng, activeEn } carries the display context (which вход to auto-select, if any).
+    // Fail-soft to the nav popup.
     async function showBuildingDetail(g, ctx) {
       if (lastDetail && lastDetail.g === g && lastDetail.data) { renderDetailSheet(lastDetail.data, ctx); return; }
       if (detailAbort) { try { detailAbort.abort(); } catch (_) {} }
@@ -4672,12 +4612,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const lat = Number(r.pin[0]), lng = Number(r.pin[1]);
       if (!isFinite(lat) || !isFinite(lng)) return; // validate pin
       const label = formatAddressHit(r);            // resolved address (never cadnum)
-      const blockLabel = baseAddressLabel(r);       // block base (no "· вх." suffix) for the full-panel title / expand link
+      const blockLabel = baseAddressLabel(r);       // block base (no "· вх." suffix) — the full-panel title
       const g = (typeof r.g === 'string') ? r.g : null;  // Phase-2 detail key (block / MF rows only)
-      // Entrance-level result ("бл 408 вх 13") -> scope the panel to that вход; the shared
-      // detail JSON (same g) is just displayed differently. Block-level result -> full panel.
-      const scopeEn = (r.kind === 'mf' && r.en != null) ? String(r.en) : null;
-      const ctx = { label: label, blockLabel: blockLabel, lat: lat, lng: lng, scopeEn: scopeEn };
+      // Entrance-level result ("бл 408 вх 13") -> open the FULL panel (whole block) and auto-select
+      // that вход (highlight + detail popup), consistent with a click. Block-level result -> full
+      // panel, no auto-selection. The panel title is the block address either way.
+      const activeEn = (r.kind === 'mf' && r.en != null) ? String(r.en) : null;
+      const panelLabel = activeEn ? (blockLabel || label) : label;
+      const ctx = { label: panelLabel, blockLabel: blockLabel, lat: lat, lng: lng, activeEn: activeEn };
       pauseTrackingForStaticAnchor();
       lastFix = { lat, lon: lng, acc: 0 };
       placeUser();
