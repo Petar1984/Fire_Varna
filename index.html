@@ -1009,6 +1009,47 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   @keyframes slideInRight { from { transform: translateX(16px); opacity: 0.4; } to { transform: translateX(0); opacity: 1; } }
 
+  /* Вариант B: the entrance list leads, the map helps. Each entrance row is tappable;
+     the active row is accented and its map marker is highlighted (two-way link). */
+  .detail-sheet table.ds-ent td.ds-loc { width: 30px; text-align: right; padding-right: 2px; }
+  .detail-sheet tr.ds-ent-row.clickable { cursor: pointer; }
+  .detail-sheet tr.ds-ent-row.clickable:hover td { background: #f5f9ff; }
+  .detail-sheet tr.ds-ent-row.active td { background: #fff3d6; }
+  .detail-sheet .ds-loc-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; padding: 0; border: none; background: transparent;
+    color: #2f7bd6; cursor: pointer; border-radius: 6px;
+  }
+  .detail-sheet .ds-loc-btn:hover { background: #eaf2fd; }
+  .detail-sheet tr.ds-ent-row.active .ds-loc-btn { color: #b8860b; }
+  .detail-sheet .ds-loc-ic { display: block; }
+  .detail-sheet .ds-expand {
+    margin-top: 10px; padding: 8px 10px; width: 100%;
+    border: 1px solid #dbe4ee; background: #f5f9ff; color: #1f5fae;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .detail-sheet .ds-expand:hover { background: #eaf2fd; }
+
+  /* Entrance map markers: small numbered blue teardrops (divIcon like every other
+     marker, never L.icon). The active entrance turns amber with a glow ring; the
+     rest dim. Body size stays constant so the bottom tip (iconAnchor) never shifts. */
+  .ent-pin-wrapper { background: transparent; border: none; }
+  .ent-pin {
+    width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    background: #2f7bd6; border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ent-pin .ent-pin-num {
+    transform: rotate(45deg); color: #fff; font-size: 11px; font-weight: 700; line-height: 1;
+  }
+  .ent-pin.dim { background: #9db4cc; opacity: 0.85; }
+  .ent-pin.active {
+    background: #f0a500;
+    box-shadow: 0 0 0 3px rgba(240,165,0,0.45), 0 2px 7px rgba(0,0,0,0.5);
+  }
+
   /* Report modal */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 5000;
@@ -4179,7 +4220,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // C4 detail-sheet state (declared up-front so clearSearchMarker can reset it).
     const DETAIL_URL_BASE = WORKER_URL + 'detail/';
     let detailSheetEl = null, detailAbort = null, lastDetail = null;
+    // Вариант B: entrance markers placed on the real map while the panel is open.
+    // Aligned 1:1 with the panel's entrance rows (shared index) for two-way tap linking.
+    // marker/iconEl are null for an entrance that has no pin (row still renders, no marker).
+    let entranceMarkers = [];   // [{ marker, iconEl, lat, lng, rowEl, en }]
+    let activeEntranceIdx = -1;
+    function clearEntranceMarkers() {
+      for (const rec of entranceMarkers) { if (rec.marker) { try { map.removeLayer(rec.marker); } catch (_) {} } }
+      entranceMarkers = []; activeEntranceIdx = -1;
+    }
     function closeDetailSheet() {
+      clearEntranceMarkers();
       if (detailSheetEl) { detailSheetEl.hidden = true; detailSheetEl.replaceChildren(); }
     }
     function clearSearchMarker() {
@@ -4223,9 +4274,79 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
     function isFiniteNum(v) { return typeof v === 'number' && isFinite(v); }
 
-    function renderDetailSheet(detail, label, lat, lng) {
+    // Natural entrance order: numeric entrances ascending (1,2,…,9,10,11,13), THEN
+    // lettered ones (bg collation). Never the lexicographic 1,10,11,…,2,3. Entrances
+    // with no `en` sort last. Same rule the matcher uses for its bare-block children.
+    function compareEntrances(a, b) {
+      const ea = a && a.en != null ? String(a.en) : null;
+      const eb = b && b.en != null ? String(b.en) : null;
+      if (ea === null || eb === null) { return ea === eb ? 0 : (ea === null ? 1 : -1); }
+      const na = /^[0-9]+$/.test(ea) ? parseInt(ea, 10) : NaN;
+      const nb = /^[0-9]+$/.test(eb) ? parseInt(eb, 10) : NaN;
+      const an = !Number.isNaN(na), bn = !Number.isNaN(nb);
+      if (an && bn) { if (na !== nb) return na - nb; }
+      else if (an !== bn) { return an ? -1 : 1; }   // numeric entrances before lettered ones
+      return ea.localeCompare(eb, 'bg');
+    }
+
+    // ti-map-pin locate glyph, built through the SVG DOM (this render path never uses
+    // innerHTML). Returned as a detached <svg> the caller appends into the row button.
+    function makeLocateIcon() {
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('class', 'ds-loc-ic');
+      svg.setAttribute('width', '18'); svg.setAttribute('height', '18');
+      svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '2'); svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round');
+      const p1 = document.createElementNS(NS, 'path'); p1.setAttribute('d', 'M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0');
+      const p2 = document.createElementNS(NS, 'path'); p2.setAttribute('d', 'M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z');
+      svg.appendChild(p1); svg.appendChild(p2);
+      return svg;
+    }
+
+    // The number is set as textContent AFTER the marker renders (keeps entrance data out
+    // of the divIcon html string). iconAnchor is the teardrop tip (bottom).
+    function entrancePinIcon() {
+      return L.divIcon({ className: 'ent-pin-wrapper', html: '<div class="ent-pin"><span class="ent-pin-num"></span></div>', iconSize: [22, 22], iconAnchor: [11, 22] });
+    }
+
+    // Highlight entrance i: accent its map marker + list row, dim the rest, centre the map
+    // on it (clear of the panel via positionPinForSheet) and scroll its row into view. The
+    // panel stays open so the user clicks through entrances. Two-way: a row tap and a marker
+    // tap both call this.
+    function setActiveEntrance(i) {
+      if (i < 0 || i >= entranceMarkers.length) return;
+      activeEntranceIdx = i;
+      for (let k = 0; k < entranceMarkers.length; k++) {
+        const rec = entranceMarkers[k];
+        const on = k === i;
+        if (rec.iconEl) { rec.iconEl.classList.toggle('active', on); rec.iconEl.classList.toggle('dim', !on); }
+        if (rec.rowEl) rec.rowEl.classList.toggle('active', on);
+        if (rec.marker) rec.marker.setZIndexOffset(on ? 1600 : 1400);  // active entrance above the rest
+      }
+      const rec = entranceMarkers[i];
+      if (rec.marker && isFiniteNum(rec.lat) && isFiniteNum(rec.lng) && detailSheetEl) {
+        positionPinForSheet(rec.lat, rec.lng, detailSheetEl);
+      }
+      if (rec.rowEl && rec.rowEl.scrollIntoView) { try { rec.rowEl.scrollIntoView({ block: 'nearest' }); } catch (_) { rec.rowEl.scrollIntoView(); } }
+    }
+
+    // Detail panel entry point. ctx = { label, blockLabel, lat, lng, scopeEn, activeEn }.
+    //   scopeEn set + that entrance exists -> ENTRANCE view (only that вход + "Виж всички входове").
+    //   otherwise                         -> full Вариант B panel (all entrances + map markers).
+    // lat/lng are the selected pin (entrance pin for an entrance result; block pin otherwise)
+    // and drive both the nav actions and the "keep the pin clear of the panel" centring.
+    function renderDetailSheet(detail, ctx) {
+      ctx = ctx || {};
       const el = ensureDetailSheet();
+      clearEntranceMarkers();      // a fresh render drops any markers from the previous view
       el.replaceChildren();
+
+      const d = detail || {};
+      const entrances = Array.isArray(d.entrances) ? d.entrances : [];
+      const scopeEn = ctx.scopeEn != null ? String(ctx.scopeEn) : null;
+      const scoped = scopeEn !== null && entrances.some(function (e) { return e && e.en != null && String(e.en) === scopeEn; });
+
       const close = document.createElement('button');
       close.type = 'button'; close.className = 'ds-close';
       close.setAttribute('aria-label', 'Затвори'); close.textContent = '×';
@@ -4233,25 +4354,45 @@ window._hydrantDataReady = (async function loadHydrantData() {
       el.appendChild(close);
 
       const title = document.createElement('div');
-      title.className = 'ds-title'; title.textContent = label;
+      title.className = 'ds-title'; title.textContent = ctx.label || '';
       el.appendChild(title);
 
-      const d = detail || {};
       const typeLabel = d.type && (d.type.label || d.type.code) ? (d.type.label || d.type.code) : null;
       if (typeLabel) {
         const s = document.createElement('div'); s.className = 'ds-sub'; s.textContent = typeLabel;
         el.appendChild(s);
       }
+
+      if (scoped) renderScopedEntrance(el, d, entrances, scopeEn, ctx);
+      else renderFullBuilding(el, d, entrances, ctx);
+
+      const nav = buildNavActions(ctx.lat, ctx.lng);
+      if (nav) el.appendChild(nav);
+
+      el.hidden = false;
+      // Centre the selected pin clear of the panel (full view: block pin). When expanding
+      // from a single entrance, the active-entrance highlight below re-centres on it.
+      positionPinForSheet(ctx.lat, ctx.lng, el);
+      if (!scoped && ctx.activeEn != null) {
+        for (let i = 0; i < entranceMarkers.length; i++) {
+          if (String(entranceMarkers[i].en) === String(ctx.activeEn)) { setActiveEntrance(i); break; }
+        }
+      }
+    }
+
+    // Full Вариант B panel: building type + SOIS/КАИС totals, then the natural-ordered
+    // entrance list. Every entrance with a pin also gets a numbered map marker; rows and
+    // markers share an index in entranceMarkers so a tap on either highlights both.
+    function renderFullBuilding(el, d, entrances, ctx) {
       const addMeta = (lab, val) => {
         const row = document.createElement('div'); row.className = 'ds-meta';
         const l = document.createElement('span'); l.className = 'ds-label'; l.textContent = lab + ': ';
         row.appendChild(l); row.appendChild(document.createTextNode(val)); el.appendChild(row);
       };
-      // SOIS and the legal KAIS count are shown as SEPARATE building-level lines.
+      // SOIS and the legal KAIS count are SEPARATE building-level lines.
       if (isFiniteNum(d.apartment_count)) addMeta('Апартаменти (SOIS)', String(d.apartment_count));
       if (isFiniteNum(d.apartment_count_kais)) addMeta('Апартаменти (КАИС)', String(d.apartment_count_kais));
 
-      const entrances = Array.isArray(d.entrances) ? d.entrances : [];
       const coverage = d.data_confidence && isFiniteNum(d.data_confidence.entrance_coverage)
         ? d.data_confidence.entrance_coverage : null;
 
@@ -4259,36 +4400,92 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const note = document.createElement('div'); note.className = 'ds-note';
         note.textContent = 'Няма данни за входове за тази сграда.';
         el.appendChild(note);
-      } else {
-        const h = document.createElement('div'); h.className = 'ds-ent-h';
-        h.textContent = 'Входове (' + entrances.length + ')';
-        el.appendChild(h);
-        const table = document.createElement('table'); table.className = 'ds-ent';
-        const head = document.createElement('tr');
-        for (const txt of ['Вход', 'Етажи', 'Ап. (SOIS)']) {
-          const th = document.createElement('th'); th.textContent = txt; head.appendChild(th);
-        }
-        table.appendChild(head);
-        for (const e of entrances) {
-          const tr = document.createElement('tr');
-          const c1 = document.createElement('td'); c1.textContent = (e && e.en != null) ? String(e.en) : '—'; tr.appendChild(c1);
-          const c2 = document.createElement('td'); c2.textContent = (e && isFiniteNum(e.floors)) ? String(e.floors) : '—'; tr.appendChild(c2);
-          const c3 = document.createElement('td'); c3.textContent = (e && isFiniteNum(e.apartment_count)) ? String(e.apartment_count) : '—'; tr.appendChild(c3);
-          table.appendChild(tr);
-        }
-        el.appendChild(table);
-        if (coverage != null && coverage < 1) {
-          const note = document.createElement('div'); note.className = 'ds-note';
-          note.textContent = 'Непълни данни за входове (' + Math.round(coverage * 100) + '% покритие).';
-          el.appendChild(note);
-        }
+        return;
       }
 
-      const nav = buildNavActions(lat, lng);
-      if (nav) el.appendChild(nav);
+      const h = document.createElement('div'); h.className = 'ds-ent-h';
+      h.textContent = 'Входове (' + entrances.length + ')';
+      el.appendChild(h);
 
-      el.hidden = false;
-      positionPinForSheet(lat, lng, el);   // keep the pin clear of the sheet/side-panel
+      const sorted = entrances.slice().sort(compareEntrances);
+      const table = document.createElement('table'); table.className = 'ds-ent';
+      const head = document.createElement('tr');
+      for (const txt of ['Вход', 'Етажи', 'Ап. (SOIS)', '']) {
+        const th = document.createElement('th'); th.textContent = txt; head.appendChild(th);
+      }
+      table.appendChild(head);
+
+      for (let i = 0; i < sorted.length; i++) {
+        const e = sorted[i];
+        const en = (e && e.en != null) ? String(e.en) : null;
+        const pin = e && e.pin ? e.pin : null;
+        const lat = pin && isFiniteNum(pin.lat) ? pin.lat : NaN;
+        const lng = pin && isFiniteNum(pin.lng) ? pin.lng : NaN;
+        const hasPin = isFiniteNum(lat) && isFiniteNum(lng);
+
+        const tr = document.createElement('tr'); tr.className = 'ds-ent-row';
+        const c1 = document.createElement('td'); c1.textContent = en != null ? en : '—'; tr.appendChild(c1);
+        const c2 = document.createElement('td'); c2.textContent = (e && isFiniteNum(e.floors)) ? String(e.floors) : '—'; tr.appendChild(c2);
+        const c3 = document.createElement('td'); c3.textContent = (e && isFiniteNum(e.apartment_count)) ? String(e.apartment_count) : '—'; tr.appendChild(c3);
+        const c4 = document.createElement('td'); c4.className = 'ds-loc'; tr.appendChild(c4);
+        table.appendChild(tr);
+
+        const rec = { marker: null, iconEl: null, lat: lat, lng: lng, rowEl: tr, en: en };
+        const idx = i;   // stable per-row index into entranceMarkers for the tap handlers
+        if (hasPin) {
+          const locBtn = document.createElement('button');
+          locBtn.type = 'button'; locBtn.className = 'ds-loc-btn';
+          locBtn.setAttribute('aria-label', 'Покажи вход ' + (en || '') + ' на картата');
+          locBtn.appendChild(makeLocateIcon());
+          locBtn.addEventListener('click', function (ev) { ev.stopPropagation(); setActiveEntrance(idx); });
+          c4.appendChild(locBtn);
+          tr.classList.add('clickable');
+          tr.addEventListener('click', function () { setActiveEntrance(idx); });
+
+          const marker = L.marker([lat, lng], { icon: entrancePinIcon(), zIndexOffset: 1400, keyboard: false }).addTo(map);
+          const wrap = marker.getElement();
+          if (wrap) {
+            const num = wrap.querySelector('.ent-pin-num'); if (num) num.textContent = en || '';
+            rec.iconEl = wrap.querySelector('.ent-pin');
+          }
+          marker.on('click', function () { setActiveEntrance(idx); });
+          rec.marker = marker;
+        }
+        entranceMarkers.push(rec);
+      }
+      el.appendChild(table);
+
+      if (coverage != null && coverage < 1) {
+        const note = document.createElement('div'); note.className = 'ds-note';
+        note.textContent = 'Непълни данни за входове (' + Math.round(coverage * 100) + '% покритие).';
+        el.appendChild(note);
+      }
+    }
+
+    // Entrance view: an entrance-level result ("бл 408 вх 13") shows ONLY that вход
+    // (type above, floors + apartments here). No map markers — the main search pin already
+    // sits on the entrance. "Виж всички входове" re-renders the full block, that вход active.
+    function renderScopedEntrance(el, d, entrances, scopeEn, ctx) {
+      let ent = null;
+      for (const e of entrances) if (e && e.en != null && String(e.en) === scopeEn) { ent = e; break; }
+      const h = document.createElement('div'); h.className = 'ds-ent-h';
+      h.textContent = 'Вход ' + scopeEn;
+      el.appendChild(h);
+      const addMeta = (lab, val) => {
+        const row = document.createElement('div'); row.className = 'ds-meta';
+        const l = document.createElement('span'); l.className = 'ds-label'; l.textContent = lab + ': ';
+        row.appendChild(l); row.appendChild(document.createTextNode(val)); el.appendChild(row);
+      };
+      addMeta('Етажи', (ent && isFiniteNum(ent.floors)) ? String(ent.floors) : '—');
+      addMeta('Апартаменти (SOIS)', (ent && isFiniteNum(ent.apartment_count)) ? String(ent.apartment_count) : '—');
+
+      const expand = document.createElement('button');
+      expand.type = 'button'; expand.className = 'ds-expand';
+      expand.textContent = 'Виж всички входове';
+      expand.addEventListener('click', function () {
+        renderDetailSheet(d, { label: ctx.blockLabel || ctx.label, blockLabel: ctx.blockLabel, lat: ctx.lat, lng: ctx.lng, scopeEn: null, activeEn: scopeEn });
+      });
+      el.appendChild(expand);
     }
 
     // Deliberately place the pin at the centre of the VISIBLE band — the rectangle left
@@ -4336,9 +4533,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return DETAIL_URL_BASE + encodeURIComponent(g);
     }
 
-    // Fetch + show the detail sheet for building key g. Fail-soft to the nav popup.
-    async function showBuildingDetail(g, label, lat, lng) {
-      if (lastDetail && lastDetail.g === g && lastDetail.data) { renderDetailSheet(lastDetail.data, label, lat, lng); return; }
+    // Fetch + show the detail sheet for building key g. ctx = { label, blockLabel, lat,
+    // lng, scopeEn } carries the display context (entrance-scoped vs full). Fail-soft to
+    // the nav popup.
+    async function showBuildingDetail(g, ctx) {
+      if (lastDetail && lastDetail.g === g && lastDetail.data) { renderDetailSheet(lastDetail.data, ctx); return; }
       if (detailAbort) { try { detailAbort.abort(); } catch (_) {} }
       const ac = ('AbortController' in window) ? new AbortController() : null;
       detailAbort = ac;
@@ -4350,10 +4549,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (ac && ac.signal.aborted) return;         // a newer selection superseded this fetch
       if (data && typeof data === 'object') {
         lastDetail = { g: g, data: data };
-        renderDetailSheet(data, label, lat, lng);
+        renderDetailSheet(data, ctx);
       } else {
         lastDetail = null;                          // fail-soft: marker + nav popup still work
-        openSearchPopup(label, lat, lng);
+        openSearchPopup(ctx.label, ctx.lat, ctx.lng);
       }
     }
 
@@ -4362,7 +4561,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const lat = Number(r.pin[0]), lng = Number(r.pin[1]);
       if (!isFinite(lat) || !isFinite(lng)) return; // validate pin
       const label = formatAddressHit(r);            // resolved address (never cadnum)
+      const blockLabel = baseAddressLabel(r);       // block base (no "· вх." suffix) for the full-panel title / expand link
       const g = (typeof r.g === 'string') ? r.g : null;  // Phase-2 detail key (block / MF rows only)
+      // Entrance-level result ("бл 408 вх 13") -> scope the panel to that вход; the shared
+      // detail JSON (same g) is just displayed differently. Block-level result -> full panel.
+      const scopeEn = (r.kind === 'mf' && r.en != null) ? String(r.en) : null;
+      const ctx = { label: label, blockLabel: blockLabel, lat: lat, lng: lng, scopeEn: scopeEn };
       pauseTrackingForStaticAnchor();
       lastFix = { lat, lon: lng, acc: 0 };
       placeUser();
@@ -4370,11 +4574,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       clearSearchMarker(); // replace any previous result marker + close any open sheet
       searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
       // Re-click re-opens the same surface: the detail sheet for a building (g), else the popup.
-      searchMarker.on('click', function () { if (g) showBuildingDetail(g, label, lat, lng); else openSearchPopup(label, lat, lng); });
+      searchMarker.on('click', function () { if (g) showBuildingDetail(g, ctx); else openSearchPopup(label, lat, lng); });
       map.setView([lat, lng], Math.max(map.getZoom(), 17), { animate: true });
       // After the marker is placed: fetch + show the building detail (fail-soft to the nav
       // popup). Address/parcel rows (no g) keep the existing nav popup.
-      if (g) showBuildingDetail(g, label, lat, lng);
+      if (g) showBuildingDetail(g, ctx);
       else openSearchPopup(label, lat, lng);
       hideResults();
     }
