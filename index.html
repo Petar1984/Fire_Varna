@@ -849,16 +849,18 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .status.show { opacity: 1; }
 
   /* ===== E3a — shared navigation/action buttons (building popup + hydrant popup) ===== */
-  /* Plain link-outs (textContent, target=_blank, rel=noopener) in the ADR 031
-     C12 pattern; URL templates ported verbatim from Varna_buildings
+  /* Icon + label link-outs (Option A): an inline Tabler outline glyph (SVG DOM,
+     no CDN/font — same approach as the ti-map-pin locate glyph) + short text, in
+     the ADR 031 C12 pattern; URL templates ported verbatim from Varna_buildings
      sectionUnits.js. Mobile-compact pill style with flex-wrap so the 4 actions
      wrap cleanly at 375px. */
   .nav-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .nav-action {
-    display: inline-block; padding: 7px 11px; border-radius: 8px;
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 8px;
     background: #eef2f7; color: #1f2d3d; font-size: 12px; font-weight: 600;
     text-decoration: none; border: 1px solid #d4dce6; white-space: nowrap;
   }
+  .nav-action svg { width: 18px; height: 18px; flex: 0 0 auto; display: block; }
   .nav-action:active { transform: scale(0.96); }
 
   /* Building popup (Leaflet popup): safe tile props only. */
@@ -3527,24 +3529,64 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // travelmode=walking, plus a plain map view ("Карта") and Street View. Keyless
   // link-outs only (ToS-clean); finite-coord guard -> null row, never a broken
   // link. Coords are always the point's own lat/lng — never geocoded.
+  //
+  // Option A presentation: each action is an inline Tabler outline icon (24×24
+  // viewBox, stroke=currentColor, no CDN/font — the same DOM-built approach as
+  // the ti-map-pin locate glyph) + a short text label. One shared helper, so the
+  // icons appear everywhere the row is used (hydrant / search / building / вход).
+  // Path data copied verbatim from Tabler Icons (MIT): ti-car, ti-walk, ti-map,
+  // ti-eye.
+  const NAV_ICON_PATHS = {
+    car:  ['M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+           'M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+           'M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5'],
+    walk: ['M12 4a1 1 0 1 0 2 0a1 1 0 1 0 -2 0',
+           'M7 21l3 -4', 'M16 21l-2 -4l-3 -3l1 -6', 'M6 12l2 -3l4 -1l3 3l3 1'],
+    map:  ['M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13', 'M9 4v13', 'M15 7v13'],
+    eye:  ['M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0',
+           'M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6']
+  };
+  // Build a detached <svg> Tabler glyph from its path list (SVG DOM only, never
+  // innerHTML) — mirrors makeLocateIcon so the two icon paths stay consistent.
+  function makeNavIcon(key) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', '18'); svg.setAttribute('height', '18');
+    svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2');
+    svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    for (const d of (NAV_ICON_PATHS[key] || [])) {
+      const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); svg.appendChild(p);
+    }
+    return svg;
+  }
   function buildNavActions(lat, lng) {
     const la = Number(lat), lo = Number(lng);
     if (!isFinite(la) || !isFinite(lo)) return null;
     const row = document.createElement('div');
     row.className = 'nav-actions';
+    // [iconKey, visible label, href, full aria/title text (keeps the pre-icon context)]
     const specs = [
-      ['Кола (Waze)',   'https://waze.com/ul?ll=' + la + ',' + lo + '&navigate=yes'],
-      ['Пеша (Google)', 'https://www.google.com/maps/dir/?api=1&destination=' + la + ',' + lo + '&travelmode=walking'],
-      ['Карта',         'https://www.google.com/maps?q=' + la + ',' + lo],
-      ['Street View',   'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + la + ',' + lo]
+      ['car',  'Waze',        'https://waze.com/ul?ll=' + la + ',' + lo + '&navigate=yes',                                  'Навигация с кола (Waze)'],
+      ['walk', 'Пеша',        'https://www.google.com/maps/dir/?api=1&destination=' + la + ',' + lo + '&travelmode=walking', 'Пеша (Google Maps)'],
+      ['map',  'Карта',       'https://www.google.com/maps?q=' + la + ',' + lo,                                              'Виж на картата'],
+      ['eye',  'Street View', 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + la + ',' + lo,             'Street View']
     ];
     for (const spec of specs) {
       const a = document.createElement('a');
       a.className = 'nav-action';
-      a.href = spec[1];
+      a.href = spec[2];
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
-      a.textContent = spec[0];
+      a.setAttribute('aria-label', spec[3]);
+      a.title = spec[3];
+      a.appendChild(makeNavIcon(spec[0]));
+      const lbl = document.createElement('span');
+      lbl.className = 'nav-action-label';
+      lbl.textContent = spec[1];
+      a.appendChild(lbl);
       row.appendChild(a);
     }
     return row;
@@ -4220,6 +4262,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // C4 detail-sheet state (declared up-front so clearSearchMarker can reset it).
     const DETAIL_URL_BASE = WORKER_URL + 'detail/';
     let detailSheetEl = null, detailAbort = null, lastDetail = null;
+    let detailNavEl = null;     // the current nav link-out row inside the detail sheet (re-pointable)
     // Вариант B: entrance markers placed on the real map while the panel is open.
     // Aligned 1:1 with the panel's entrance rows (shared index) for two-way tap linking.
     // marker/iconEl are null for an entrance that has no pin (row still renders, no marker).
@@ -4232,6 +4275,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     function closeDetailSheet() {
       clearEntranceMarkers();
       if (detailSheetEl) { detailSheetEl.hidden = true; detailSheetEl.replaceChildren(); }
+      detailNavEl = null;
     }
     function clearSearchMarker() {
       if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
@@ -4328,7 +4372,26 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (rec.marker && isFiniteNum(rec.lat) && isFiniteNum(rec.lng) && detailSheetEl) {
         positionPinForSheet(rec.lat, rec.lng, detailSheetEl);
       }
+      // Re-point the nav link-outs at THIS вход's own door, so Waze/Google navigate to the
+      // exact entrance rather than the block centroid. (Never "Докладвай" — that's hydrant-only.)
+      if (isFiniteNum(rec.lat) && isFiniteNum(rec.lng)) setDetailNav(rec.lat, rec.lng);
       if (rec.rowEl && rec.rowEl.scrollIntoView) { try { rec.rowEl.scrollIntoView({ block: 'nearest' }); } catch (_) { rec.rowEl.scrollIntoView(); } }
+    }
+
+    // Swap the detail sheet's nav link-out row so it targets (lat,lng), keeping it as the
+    // sheet's LAST child. Called once on render (block pin, or the scoped вход's own pin) and
+    // again by setActiveEntrance when a вход is tapped in the full panel. buildNavActions
+    // returns null on non-finite coords -> the row is simply removed.
+    function setDetailNav(lat, lng) {
+      if (!detailSheetEl) return;
+      const nav = buildNavActions(lat, lng);
+      if (detailNavEl && detailNavEl.parentNode === detailSheetEl) {
+        if (nav) detailSheetEl.replaceChild(nav, detailNavEl);
+        else detailSheetEl.removeChild(detailNavEl);
+      } else if (nav) {
+        detailSheetEl.appendChild(nav);
+      }
+      detailNavEl = nav;
     }
 
     // Detail panel entry point. ctx = { label, blockLabel, lat, lng, scopeEn, activeEn }.
@@ -4341,6 +4404,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const el = ensureDetailSheet();
       clearEntranceMarkers();      // a fresh render drops any markers from the previous view
       el.replaceChildren();
+      detailNavEl = null;          // replaceChildren detached the old nav row
 
       const d = detail || {};
       const entrances = Array.isArray(d.entrances) ? d.entrances : [];
@@ -4366,8 +4430,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (scoped) renderScopedEntrance(el, d, entrances, scopeEn, ctx);
       else renderFullBuilding(el, d, entrances, ctx);
 
-      const nav = buildNavActions(ctx.lat, ctx.lng);
-      if (nav) el.appendChild(nav);
+      // Nav target: scoped вход view -> that entrance's OWN door pin (so Waze drives to the
+      // exact вход); full block view -> the block pin. A later setActiveEntrance re-points it
+      // when a вход is tapped in the full panel.
+      let navLat = ctx.lat, navLng = ctx.lng;
+      if (scoped) {
+        for (const e of entrances) {
+          if (e && e.en != null && String(e.en) === scopeEn && e.pin &&
+              isFiniteNum(e.pin.lat) && isFiniteNum(e.pin.lng)) { navLat = e.pin.lat; navLng = e.pin.lng; break; }
+        }
+      }
+      setDetailNav(navLat, navLng);
 
       el.hidden = false;
       // Centre the selected pin clear of the panel (full view: block pin). When expanding
