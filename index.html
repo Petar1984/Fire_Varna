@@ -4454,8 +4454,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     // Full Вариант B panel: building type + SOIS/КАИС totals, then the natural-ordered
-    // entrance list. Every entrance with a pin also gets a numbered map marker; rows and
-    // markers share an index in entranceMarkers so a tap on either highlights both.
+    // entrance list. Every вход with a pin gets a numbered map marker; tapping a row, its
+    // locator icon, or its marker opens that вход's scoped view (renderScopedEntrance) — the
+    // same single-вход surface a "бл N вх M" search opens.
     function renderFullBuilding(el, d, entrances, ctx) {
       const addMeta = (lab, val) => {
         const row = document.createElement('div'); row.className = 'ds-meta';
@@ -4479,6 +4480,21 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const h = document.createElement('div'); h.className = 'ds-ent-h';
       h.textContent = 'Входове (' + entrances.length + ')';
       el.appendChild(h);
+
+      // Tapping an вход drills into its scoped view (single вход + nav to its own door +
+      // "Виж всички входове" back). markEntrance tells renderScopedEntrance to keep this вход's
+      // numbered marker + centring. The вход's own pin drives nav/centring; block pin is the
+      // fallback for a pin-less вход. Title stays the block address; "Вход N" is the subheader.
+      const openScoped = function (en, lat, lng) {
+        renderDetailSheet(d, {
+          label: ctx.label,
+          blockLabel: ctx.blockLabel || ctx.label,
+          lat: isFiniteNum(lat) ? lat : ctx.lat,
+          lng: isFiniteNum(lng) ? lng : ctx.lng,
+          scopeEn: en,
+          markEntrance: true
+        });
+      };
 
       const sorted = entrances.slice().sort(compareEntrances);
       const table = document.createElement('table'); table.className = 'ds-ent';
@@ -4506,14 +4522,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const rec = { marker: null, iconEl: null, lat: lat, lng: lng, rowEl: tr, en: en };
         const idx = i;   // stable per-row index into entranceMarkers for the tap handlers
         if (hasPin) {
+          // Row / locator icon / marker all open this вход's scoped view. An вход with a pin
+          // but no number can't be scoped -> fall back to the old locate-on-map highlight.
+          const onTap = function () { if (en != null) openScoped(en, lat, lng); else setActiveEntrance(idx); };
           const locBtn = document.createElement('button');
           locBtn.type = 'button'; locBtn.className = 'ds-loc-btn';
-          locBtn.setAttribute('aria-label', 'Покажи вход ' + (en || '') + ' на картата');
+          locBtn.setAttribute('aria-label', 'Отвори вход ' + (en || '') + ' на картата');
           locBtn.appendChild(makeLocateIcon());
-          locBtn.addEventListener('click', function (ev) { ev.stopPropagation(); setActiveEntrance(idx); });
+          locBtn.addEventListener('click', function (ev) { ev.stopPropagation(); onTap(); });
           c4.appendChild(locBtn);
           tr.classList.add('clickable');
-          tr.addEventListener('click', function () { setActiveEntrance(idx); });
+          tr.addEventListener('click', onTap);
 
           const marker = L.marker([lat, lng], { icon: entrancePinIcon(), zIndexOffset: 1400, keyboard: false }).addTo(map);
           const wrap = marker.getElement();
@@ -4521,7 +4540,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
             const num = wrap.querySelector('.ent-pin-num'); if (num) num.textContent = en || '';
             rec.iconEl = wrap.querySelector('.ent-pin');
           }
-          marker.on('click', function () { setActiveEntrance(idx); });
+          marker.on('click', onTap);
           rec.marker = marker;
         }
         entranceMarkers.push(rec);
@@ -4535,9 +4554,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       }
     }
 
-    // Entrance view: an entrance-level result ("бл 408 вх 13") shows ONLY that вход
-    // (type above, floors + apartments here). No map markers — the main search pin already
-    // sits on the entrance. "Виж всички входове" re-renders the full block, that вход active.
+    // Entrance view: ONE вход only (type above; floors + apartments here). Reached from a
+    // "бл N вх M" search (keeps its search pin, no extra marker) OR a tap on an вход row/marker
+    // in the full panel (ctx.markEntrance -> drop a single ACTIVE numbered pin on that вход's
+    // own door). renderDetailSheet centres on ctx.lat/lng once the sheet is shown. "Виж всички
+    // входове" re-renders the full block with that вход active.
     function renderScopedEntrance(el, d, entrances, scopeEn, ctx) {
       let ent = null;
       for (const e of entrances) if (e && e.en != null && String(e.en) === scopeEn) { ent = e; break; }
@@ -4551,6 +4572,23 @@ window._hydrantDataReady = (async function loadHydrantData() {
       };
       addMeta('Етажи', (ent && isFiniteNum(ent.floors)) ? String(ent.floors) : '—');
       addMeta('Апартаменти (SOIS)', (ent && isFiniteNum(ent.apartment_count)) ? String(ent.apartment_count) : '—');
+
+      // Tap-driven scope: keep the selected вход's numbered marker on the map (active styling),
+      // so the door the user tapped stays marked + centred while the other входове drop away.
+      const pin = ctx.markEntrance && ent && ent.pin ? ent.pin : null;
+      const mlat = pin && isFiniteNum(pin.lat) ? pin.lat : NaN;
+      const mlng = pin && isFiniteNum(pin.lng) ? pin.lng : NaN;
+      if (isFiniteNum(mlat) && isFiniteNum(mlng)) {
+        const marker = L.marker([mlat, mlng], { icon: entrancePinIcon(), zIndexOffset: 1600, keyboard: false }).addTo(map);
+        const wrap = marker.getElement();
+        let iconEl = null;
+        if (wrap) {
+          const num = wrap.querySelector('.ent-pin-num'); if (num) num.textContent = scopeEn || '';
+          iconEl = wrap.querySelector('.ent-pin');
+        }
+        if (iconEl) iconEl.classList.add('active');
+        entranceMarkers.push({ marker: marker, iconEl: iconEl, lat: mlat, lng: mlng, rowEl: null, en: scopeEn });
+      }
 
       const expand = document.createElement('button');
       expand.type = 'button'; expand.className = 'ds-expand';
