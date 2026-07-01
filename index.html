@@ -996,6 +996,19 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .detail-sheet .nav-actions { margin-top: 10px; }
 
+  /* Mobile peek/expand: a grabber + chevron at the sheet top toggles a low PEEK (summary
+     only) and the full list. The handle + peek summary show ONLY on the mobile bottom-sheet
+     breakpoint (below); the .ds-body wrapper holds the collapsible content. Desktop (the
+     side panel) has no peek — handle + peek summary stay hidden and .ds-body always shows. */
+  .detail-sheet .ds-handle {
+    display: none; flex-direction: column; align-items: center; gap: 3px;
+    width: 100%; padding: 4px 0 6px; margin: 0 0 2px;
+    border: none; background: transparent; cursor: pointer;
+  }
+  .detail-sheet .ds-grabber { width: 40px; height: 4px; border-radius: 2px; background: #cbd5e1; }
+  .detail-sheet .ds-chevron { color: #94a3b8; font-size: 11px; line-height: 1; }
+  .detail-sheet .ds-peek-sum { display: none; color: #555; margin: 2px 0 0; }
+
   /* Responsive: on a wide viewport the detail surface is a RIGHT SIDE PANEL (does not
      cover the centred pin, which sits in the left band); on narrow it stays the
      mobile-first bottom sheet above. Same content either way. */
@@ -1010,6 +1023,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
     }
   }
   @keyframes slideInRight { from { transform: translateX(16px); opacity: 0.4; } to { transform: translateX(0); opacity: 1; } }
+
+  /* Mobile bottom-sheet only (exact complement of the ≥768px side panel above): enable the
+     peek handle, and in the peek state collapse the body to just the title/type + вход count. */
+  @media (max-width: 767.98px) {
+    .detail-sheet .ds-handle { display: flex; }
+    .detail-sheet.peek .ds-body { display: none; }
+    .detail-sheet.peek .ds-peek-sum { display: block; }
+  }
 
   /* Вариант B: the entrance list leads, the map helps. Each entrance row is tappable;
      the active row is accented and its map marker is highlighted (two-way link). */
@@ -4263,6 +4284,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const DETAIL_URL_BASE = WORKER_URL + 'detail/';
     let detailSheetEl = null, detailAbort = null, lastDetail = null;
     let entrancePopup = null;   // the open entrance detail popup (Leaflet) — closed on teardown
+    let sheetFocus = null;      // { lat, lng, reserveTop } — coords positionPinForSheet re-centres on (peek toggle)
+    const ENTRANCE_POPUP_RESERVE_TOP = 180;  // ≈ the popup's height — kept above the pin so it clears the header
     // Вариант B: entrance markers placed on the real map while the panel is open.
     // Aligned 1:1 with the panel's entrance rows (shared index) for two-way tap linking.
     // marker/iconEl are null for an entrance that has no pin (row still renders, no marker).
@@ -4370,7 +4393,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       }
       const rec = entranceMarkers[i];
       if (rec.marker && isFiniteNum(rec.lat) && isFiniteNum(rec.lng) && detailSheetEl) {
-        positionPinForSheet(rec.lat, rec.lng, detailSheetEl);
+        sheetFocus = { lat: rec.lat, lng: rec.lng, reserveTop: ENTRANCE_POPUP_RESERVE_TOP };
+        positionPinForSheet(rec.lat, rec.lng, detailSheetEl, ENTRANCE_POPUP_RESERVE_TOP);
       }
       openEntrancePopup(rec);
       if (rec.rowEl && rec.rowEl.scrollIntoView) { try { rec.rowEl.scrollIntoView({ block: 'nearest' }); } catch (_) { rec.rowEl.scrollIntoView(); } }
@@ -4418,9 +4442,29 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const el = ensureDetailSheet();
       clearEntranceMarkers();      // a fresh render drops any markers + popup from the previous view
       el.replaceChildren();
+      el.classList.add('peek');    // mobile default = collapsed peek (neutralised on desktop by CSS)
 
       const d = detail || {};
       const entrances = Array.isArray(d.entrances) ? d.entrances : [];
+
+      // Mobile peek/expand handle (grabber + chevron) — hidden on desktop via CSS. A tap toggles
+      // the collapsed peek (summary only) and the full list, re-centring the current focus pin so
+      // it stays visible under the new sheet height.
+      const handle = document.createElement('button');
+      handle.type = 'button'; handle.className = 'ds-handle';
+      handle.setAttribute('aria-label', 'Разгъни'); handle.setAttribute('aria-expanded', 'false');
+      const grabber = document.createElement('span'); grabber.className = 'ds-grabber';
+      const chevron = document.createElement('span'); chevron.className = 'ds-chevron'; chevron.textContent = '▴';
+      handle.appendChild(grabber); handle.appendChild(chevron);
+      handle.addEventListener('click', function () {
+        const nowPeek = !el.classList.contains('peek');
+        el.classList.toggle('peek', nowPeek);
+        handle.setAttribute('aria-expanded', String(!nowPeek));
+        handle.setAttribute('aria-label', nowPeek ? 'Разгъни' : 'Свий');
+        chevron.textContent = nowPeek ? '▴' : '▾';
+        if (sheetFocus) positionPinForSheet(sheetFocus.lat, sheetFocus.lng, el, sheetFocus.reserveTop);
+      });
+      el.appendChild(handle);
 
       const close = document.createElement('button');
       close.type = 'button'; close.className = 'ds-close';
@@ -4438,16 +4482,26 @@ window._hydrantDataReady = (async function loadHydrantData() {
         el.appendChild(s);
       }
 
-      renderFullBuilding(el, d, entrances, ctx);
+      // Peek summary — вход count, shown only in the collapsed state (below the title/type).
+      if (entrances.length) {
+        const psum = document.createElement('div'); psum.className = 'ds-peek-sum';
+        psum.textContent = (entrances.length === 1 ? '1 вход' : entrances.length + ' входа');
+        el.appendChild(psum);
+      }
 
-      // Block-level nav row at the panel foot (each вход's own nav lives in its popup).
-      const nav = buildNavActions(ctx.lat, ctx.lng);
-      if (nav) el.appendChild(nav);
+      // Collapsible body: building meta + entrance list + block-level nav (hidden in the peek state).
+      const body = document.createElement('div'); body.className = 'ds-body';
+      renderFullBuilding(body, d, entrances, ctx);
+      const nav = buildNavActions(ctx.lat, ctx.lng);   // block-level nav (each вход's own nav lives in its popup)
+      if (nav) body.appendChild(nav);
+      el.appendChild(body);
 
       el.hidden = false;
-      // Centre the selected pin clear of the panel. An entrance-level result / re-select then
+      // Centre the selected pin clear of the panel (positionPinForSheet reads the live sheet height,
+      // so it already accounts for peek vs expanded). An entrance-level result / re-select then
       // re-centres on its вход + opens the popup via setActiveEntrance below.
-      positionPinForSheet(ctx.lat, ctx.lng, el);
+      sheetFocus = { lat: ctx.lat, lng: ctx.lng, reserveTop: 0 };
+      positionPinForSheet(ctx.lat, ctx.lng, el, 0);
       if (ctx.activeEn != null) {
         for (let i = 0; i < entranceMarkers.length; i++) {
           if (String(entranceMarkers[i].en) === String(ctx.activeEn)) { setActiveEntrance(i); break; }
@@ -4544,7 +4598,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // an overlay on the right (side panel). ABSOLUTE (panTo), so it works no matter where the
     // pin currently sits (a fresh select OR a marker re-click after the user panned away).
     // This is what gives "centring the last word" instead of Leaflet's autoPan.
-    function positionPinInBand(lat, lng, reserveBottom, reserveRight) {
+    function positionPinInBand(lat, lng, reserveBottom, reserveRight, reserveTop) {
       try {
         const size = map.getSize();
         const headerH = 150;                       // header stack height (matches POPUP_AUTOPAN_TL[1])
@@ -4552,7 +4606,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const bandRight = size.x - (reserveRight || 0);
         if (bandBottom - headerH < 60 || bandRight < 60) return; // band too small -> leave as-is
         const desiredX = bandRight / 2;            // centre of [0, bandRight]
-        const desiredY = (headerH + bandBottom) / 2;
+        let desiredY = (headerH + bandBottom) / 2;
+        // Popup case: keep at least reserveTop px above the pin (below the header) so a popup
+        // opening above the marker isn't clipped by the header on a tall/expanded sheet. Only
+        // shifts the pin DOWN when the centred position wouldn't leave room (no effect otherwise).
+        if (reserveTop) {
+          const minY = headerH + reserveTop;
+          if (desiredY < minY) desiredY = Math.min(minY, bandBottom - 20);
+        }
         const z = map.getZoom();
         const pinPt = map.project([lat, lng], z);
         const centerPt = pinPt.subtract([desiredX - size.x / 2, desiredY - size.y / 2]);
@@ -4563,13 +4624,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // Place the pin clear of the detail surface, whichever responsive form it took:
     // bottom-sheet (full width, anchored bottom) -> reserve its height at the bottom;
     // side panel (narrow, anchored right) -> reserve its width on the right.
-    function positionPinForSheet(lat, lng, el) {
+    function positionPinForSheet(lat, lng, el, reserveTop) {
       const size = map.getSize();
       const r = el.getBoundingClientRect();
       const isSide = r.width < size.x - 8;
       const reserveBottom = isSide ? 0 : (size.y - r.top);
       const reserveRight = isSide ? (size.x - r.left) : 0;
-      positionPinInBand(lat, lng, reserveBottom, reserveRight);
+      // reserveTop (popup header-clearance) is a bottom-sheet concern only — the desktop side
+      // panel puts the pin in the tall left band, so keep it out of the desktop path entirely.
+      positionPinInBand(lat, lng, reserveBottom, reserveRight, isSide ? 0 : reserveTop);
     }
 
     // Detail source: the Worker /detail/{g} in production; a LOCAL static file on localhost
