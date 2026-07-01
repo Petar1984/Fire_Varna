@@ -2060,6 +2060,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
   }
 
+  // Anchor the hydrant layer to a STATIC point — a search pin (block) OR a selected building
+  // вход. Moves the blue "you" dot there, pauses GPS follow, and recomputes the nearest hydrants
+  // from that anchor in the CURRENT mode (Близо / Топ 5 / Всички). Shared by selectResult (block)
+  // and setActiveEntrance (вход). Does not pan the map. Non-finite coords -> no-op.
+  function anchorHydrantsAt(lat, lng) {
+    if (!isFinite(lat) || !isFinite(lng)) return;
+    pauseTrackingForStaticAnchor();
+    lastFix = { lat: lat, lon: lng, acc: 0 };
+    placeUser();
+    refreshCurrentModeFromAnchorResetActive();
+  }
+
   // ===== Compass bearing / cardinal helpers =====
   function bearing(lat1, lon1, lat2, lon2) {
     const toRad = x => x * Math.PI / 180;
@@ -4285,6 +4297,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     let detailSheetEl = null, detailAbort = null, lastDetail = null;
     let entrancePopup = null;   // the open entrance detail popup (Leaflet) — closed on teardown
     let sheetFocus = null;      // { lat, lng, reserveTop } — coords positionPinForSheet re-centres on (peek toggle)
+    let sheetAnchor = null;     // { lat, lng } — the sheet's block/opening hydrant anchor; restored on close
     const ENTRANCE_POPUP_RESERVE_TOP = 180;  // ≈ the popup's height — kept above the pin so it clears the header
     // Вариант B: entrance markers placed on the real map while the panel is open.
     // Aligned 1:1 with the panel's entrance rows (shared index) for two-way tap linking.
@@ -4396,6 +4409,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
         sheetFocus = { lat: rec.lat, lng: rec.lng, reserveTop: ENTRANCE_POPUP_RESERVE_TOP };
         positionPinForSheet(rec.lat, rec.lng, detailSheetEl, ENTRANCE_POPUP_RESERVE_TOP);
       }
+      // Re-anchor the hydrant layer (+ blue "you" dot) to THIS вход's door, exactly like
+      // selectResult does for the block, so the nearest hydrants follow the selected entrance.
+      // Keeps the current mode (Близо / Топ 5 / Всички); no effect on the panel/popup/markers.
+      if (isFiniteNum(rec.lat) && isFiniteNum(rec.lng)) anchorHydrantsAt(rec.lat, rec.lng);
       openEntrancePopup(rec);
       if (rec.rowEl && rec.rowEl.scrollIntoView) { try { rec.rowEl.scrollIntoView({ block: 'nearest' }); } catch (_) { rec.rowEl.scrollIntoView(); } }
     }
@@ -4469,7 +4486,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const close = document.createElement('button');
       close.type = 'button'; close.className = 'ds-close';
       close.setAttribute('aria-label', 'Затвори'); close.textContent = '×';
-      close.addEventListener('click', closeDetailSheet);
+      close.addEventListener('click', function () {
+        // Leaving the вход focus -> restore the block/opening anchor so the hydrants + blue dot
+        // return to the block (consistent with the search pin). Only when an вход re-anchored.
+        if (activeEntranceIdx >= 0 && sheetAnchor) anchorHydrantsAt(sheetAnchor.lat, sheetAnchor.lng);
+        closeDetailSheet();
+      });
       el.appendChild(close);
 
       const title = document.createElement('div');
@@ -4501,11 +4523,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // so it already accounts for peek vs expanded). An entrance-level result / re-select then
       // re-centres on its вход + opens the popup via setActiveEntrance below.
       sheetFocus = { lat: ctx.lat, lng: ctx.lng, reserveTop: 0 };
+      sheetAnchor = (isFiniteNum(ctx.lat) && isFiniteNum(ctx.lng)) ? { lat: ctx.lat, lng: ctx.lng } : null;
       positionPinForSheet(ctx.lat, ctx.lng, el, 0);
       if (ctx.activeEn != null) {
         for (let i = 0; i < entranceMarkers.length; i++) {
           if (String(entranceMarkers[i].en) === String(ctx.activeEn)) { setActiveEntrance(i); break; }
         }
+      } else if (isFiniteNum(ctx.lat) && isFiniteNum(ctx.lng) &&
+                 (!lastFix || lastFix.lat !== ctx.lat || lastFix.lon !== ctx.lng)) {
+        // Block-level render: keep the hydrant anchor ON the block. Resets a stale вход anchor left
+        // by a previous selection (e.g. re-clicking the search pin after tapping an вход). Guarded on
+        // lastFix drift, so the fresh search path (lastFix already == block pin) skips a redundant refresh.
+        anchorHydrantsAt(ctx.lat, ctx.lng);
       }
     }
 
@@ -4683,10 +4712,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const activeEn = (r.kind === 'mf' && r.en != null) ? String(r.en) : null;
       const panelLabel = activeEn ? (blockLabel || label) : label;
       const ctx = { label: panelLabel, blockLabel: blockLabel, lat: lat, lng: lng, activeEn: activeEn };
-      pauseTrackingForStaticAnchor();
-      lastFix = { lat, lon: lng, acc: 0 };
-      placeUser();
-      refreshCurrentModeFromAnchorResetActive();
+      anchorHydrantsAt(lat, lng);   // anchor hydrants + blue dot to the block/search pin
       clearSearchMarker(); // replace any previous result marker + close any open sheet
       searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
       // Re-click re-opens the same surface: the detail sheet for a building (g), else the popup.
