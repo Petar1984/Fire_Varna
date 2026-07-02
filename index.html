@@ -1053,24 +1053,37 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .detail-sheet .ds-expand:hover { background: #eaf2fd; }
 
-  /* Entrance map markers: small numbered blue teardrops (divIcon like every other
-     marker, never L.icon). The active entrance turns amber with a glow ring; the
-     rest dim. Body size stays constant so the bottom tip (iconAnchor) never shifts. */
-  .ent-pin-wrapper { background: transparent; border: none; }
+  /* Entrance map markers (Variant А): a mini ENTRANCE PLATE — rounded-rect body +
+     bottom pointer — in a FREE colour (#0C447C, not in the hydrant status palette),
+     so the SHAPE (plate vs teardrop) is what tells entrance and hydrant apart. The
+     "вх" micro-label is a STATIC span in the template; only the number/letter flows
+     through textContent. Active entrance uses the SAME amber ring as .first — one
+     highlight convention app-wide. divIcon only, never L.icon. */
+  .ent-pin-wrapper { background: transparent; border: none; display: flex; justify-content: center; align-items: flex-start; }
   .ent-pin {
-    width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    background: #2f7bd6; border: 2px solid #fff;
+    position: relative;
+    min-width: 28px; height: 28px; padding: 2px 6px; box-sizing: border-box;
+    border-radius: 7px;
+    background: #0C447C; border: 1.5px solid #fff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
-  .ent-pin .ent-pin-num {
-    transform: rotate(45deg); color: #fff; font-size: 11px; font-weight: 700; line-height: 1;
+  /* Downward tail: a rotated square with two white edges, seated BELOW the text
+     (top:100%) so it never overlaps the number/letter. The un-bordered upper
+     corner tucks into the plate's bottom edge to hide the seam. */
+  .ent-pin::after {
+    content: ""; position: absolute; left: 50%; top: 100%;
+    width: 9px; height: 9px; background: #0C447C;
+    border-right: 1.5px solid #fff; border-bottom: 1.5px solid #fff;
+    border-bottom-right-radius: 2px;
+    transform: translate(-50%, -4px) rotate(45deg);
   }
-  .ent-pin.dim { background: #9db4cc; opacity: 0.85; }
+  .ent-pin .ent-lbl { color: #B5D4F4; font-size: 8px; font-weight: 700; line-height: 1; letter-spacing: 0.3px; }
+  .ent-pin .ent-pin-num { color: #fff; font-size: 13px; font-weight: 700; line-height: 1; margin-top: 1px; }
+  .ent-pin.dim { background: #6b86a6; opacity: 0.9; }
+  .ent-pin.dim::after { background: #6b86a6; }
   .ent-pin.active {
-    background: #f0a500;
-    box-shadow: 0 0 0 3px rgba(240,165,0,0.45), 0 2px 7px rgba(0,0,0,0.5);
+    box-shadow: 0 0 0 3px rgba(255,152,0,0.55), 0 2px 7px rgba(0,0,0,0.5);
   }
 
   /* Report modal */
@@ -1308,14 +1321,26 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
 
   /* ===== Map markers ===== */
+  /* Hydrant pins keep the status-coloured teardrop; the rank number moved OUT of
+     the body into a neutral corner badge (.h-rank) so colour carries STATUS only.
+     The hydrant glyph is a single shared CSS mask (one rule, ZERO per-pin SVG DOM
+     — safe for the 7,238 pins in "Всички") painted in currentColor, so .reported's
+     #333 text colour darkens its glyph automatically while every other status
+     paints it white. No image asset, no network resource: the shape lives in the
+     stylesheet as a data URI. */
   .h-pin {
     width: 28px; height: 28px; border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg);
     border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     display:flex; align-items:center; justify-content:center;
-    font-weight:700; font-size:13px;
   }
-  .h-pin span { transform: rotate(45deg); }
+  .h-pin::before {
+    content: ""; width: 15px; height: 15px;
+    transform: rotate(45deg);            /* undo the pin's -45deg so the glyph is upright */
+    background-color: currentColor;      /* .reported -> #333, every other status -> white */
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='10.25' y='2' width='3.5' height='2.2' rx='1.1'/%3E%3Crect x='6.5' y='3.8' width='11' height='2.6' rx='1.3'/%3E%3Crect x='9' y='5.8' width='6' height='13' rx='3'/%3E%3Crect x='3.8' y='8.8' width='4.7' height='3' rx='1.5'/%3E%3Crect x='15.5' y='8.8' width='4.7' height='3' rx='1.5'/%3E%3Crect x='5.8' y='18' width='12.4' height='3.2' rx='1.4'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='10.25' y='2' width='3.5' height='2.2' rx='1.1'/%3E%3Crect x='6.5' y='3.8' width='11' height='2.6' rx='1.3'/%3E%3Crect x='9' y='5.8' width='6' height='13' rx='3'/%3E%3Crect x='3.8' y='8.8' width='4.7' height='3' rx='1.5'/%3E%3Crect x='15.5' y='8.8' width='4.7' height='3' rx='1.5'/%3E%3Crect x='5.8' y='18' width='12.4' height='3.2' rx='1.4'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
   .h-pin.canonical   { background:#757575; color:white; }
   .h-pin.verified    { background:#c41e3a; color:white; }
   .h-pin.reported    { background:#fdd835; color:#333;  }
@@ -1325,6 +1350,18 @@ svg.leaflet-image-layer.leaflet-interactive path {
     box-shadow: 0 0 0 5px rgba(255,152,0,0.55), 0 2px 6px rgba(0,0,0,0.4);
   }
   .h-pin.dim { opacity:0.7; }
+  /* Топ-5 / Близо rank badge: a neutral white chip in the pin's corner, NEVER
+     coloured, so it can't collide with any status fill. Rendered as a sibling of
+     .h-pin (outside the rotated body) and positioned against the Leaflet marker
+     root, which is itself position:absolute. Omitted entirely in "Всички". */
+  .h-rank {
+    position: absolute; top: -6px; right: -6px;
+    min-width: 16px; height: 16px; padding: 0 3px; box-sizing: border-box;
+    background: #fff; color: #212121; border: 1px solid #9e9e9e;
+    border-radius: 8px; font-size: 10px; font-weight: 700;
+    line-height: 14px; text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.35); pointer-events: none;
+  }
   /* User marker: blue dot + heading cone */
   .user-marker-wrap { position: relative; width: 100px; height: 100px; pointer-events: none; }
   .user-cone {
@@ -1573,17 +1610,23 @@ window._hydrantDataReady = (async function loadHydrantData() {
   function makePin(rank, hydrant, isActive) {
     const status = hydrantStatusClass(hydrant);
     const cls = 'h-pin ' + status + (isActive ? ' first' : '');
+    // "Всички" is glyph-only — no rank badge, even for the active overlay (which
+    // still gets the amber .first ring). The ranked modes (Топ-5 / Близо) carry
+    // the rank in the neutral corner badge. Read from the live `mode` so the
+    // polling setIcon path (refreshMarkerIconsForHydrant) also honours it.
+    const badge = mode !== 'all' ? '<div class="h-rank">' + rank + '</div>' : '';
     return L.divIcon({
       className: 'h-pin-wrapper',
-      html: '<div class="' + cls + '"><span>' + rank + '</span></div>',
+      html: '<div class="' + cls + '"></div>' + badge,
       iconSize: [28,28], iconAnchor: [14,28]
     });
   }
   function dimPin(hydrant) {
     const status = hydrantStatusClass(hydrant);
+    // Cluster-member pin in "Всички": glyph-only, dimmed, no number and no badge.
     return L.divIcon({
       className: 'h-pin-wrapper',
-      html: '<div class="h-pin dim ' + status + '"><span>·</span></div>',
+      html: '<div class="h-pin dim ' + status + '"></div>',
       iconSize:[22,22], iconAnchor:[11,22]
     });
   }
@@ -4453,10 +4496,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return svg;
     }
 
-    // The number is set as textContent AFTER the marker renders (keeps entrance data out
-    // of the divIcon html string). iconAnchor is the teardrop tip (bottom).
+    // The number/letter is set as textContent AFTER the marker renders (keeps entrance
+    // data out of the divIcon html string). The "вх" micro-label is a STATIC span in the
+    // template — a fixed UI string, not entrance data. iconAnchor is the plate's bottom tip.
     function entrancePinIcon() {
-      return L.divIcon({ className: 'ent-pin-wrapper', html: '<div class="ent-pin"><span class="ent-pin-num"></span></div>', iconSize: [22, 22], iconAnchor: [11, 22] });
+      return L.divIcon({ className: 'ent-pin-wrapper', html: '<div class="ent-pin"><span class="ent-lbl">вх</span><span class="ent-pin-num"></span></div>', iconSize: [40, 38], iconAnchor: [20, 34] });
     }
 
     // Select entrance i: accent its map marker + list row, dim the rest, centre the map on it
