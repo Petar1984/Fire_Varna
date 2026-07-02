@@ -3981,6 +3981,52 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return isEntrance ? base + ' · вх. ' + hit.en : base;
     }
 
+    // F2 (search-quality cycle, frame §6 2026-07-02; ported from searchLogic.js
+    // dedupeDisplayRows/labelBlockNumber) — dropdown DISPLAY dedup, applied by
+    // renderResults over the RANKED rows. Fixes two display defects without touching
+    // the matcher: (a) identical rows — an entrance-token query bypasses grouping,
+    // so one block's N footprint sections render N identical rows; key =
+    // (normalized rendered label, g-or-null), first (highest-ranked) wins. Distinct
+    // groups with a colliding bare label have distinct g and never fold. (b) a
+    // redundant адрес row (no g, never consolidated) is suppressed ONLY when a
+    // сграда row (mf, no en) whose label carries the SAME block number is present in
+    // the same list. Block extraction mirrors the producer's canon(): norm -> skel,
+    // the token after "bl" holding a digit — Cyrillic and Latin labels judge alike.
+    function labelBlockNumber(label) {
+      const toks = norm(String(label == null ? '' : label)).split(/\s+/).filter(Boolean).map(skel);
+      const i = toks.indexOf('bl');
+      const nx = i >= 0 && i + 1 < toks.length ? toks[i + 1] : null;
+      return nx && /[0-9]/.test(nx) ? nx : null;
+    }
+    function dedupeDisplayRows(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) return rows;
+      const labels = rows.map(function (r) { return String(formatAddressHit(r)); });
+      const sgradaBlocks = new Set();
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        if (r && r.kind === 'mf' && (r.en == null || r.en === undefined)) {
+          const bn = labelBlockNumber(labels[i]);
+          if (bn != null) sgradaBlocks.add(bn);
+        }
+      }
+      const seen = new Set();
+      const out = [];
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        if (r && r.kind === 'address') {
+          const bn = labelBlockNumber(labels[i]);
+          if (bn != null && sgradaBlocks.has(bn)) continue; // same-block сграда present
+        }
+        const key = norm(labels[i]) + '||' + (r && r.g != null ? String(r.g) : '');
+        if (seen.has(key)) continue;                        // identical rendered row
+        seen.add(key);
+        out.push(r);
+      }
+      if (rows.blockHeader) out.blockHeader = rows.blockHeader;
+      if (rows.bareBlockHeader) out.bareBlockHeader = rows.bareBlockHeader;
+      return out;
+    }
+
     // ---- ported runGeocoderSearch (public-safe geocoder route) ------------------
     // Transplanted from Varna_buildings app/modules/search/searchLogic.js. The ONLY
     // adaptations: the group key `bg||complex_id` -> the opaque `g`; the cadnum /
@@ -4036,6 +4082,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const areaBlockTyped = qBlk != null && areaPresent;
       const bareBlockTyped = qBlk != null && !areaPresent && !toks.includes('vh') && toks.every(function (t) { return t === 'bl' || t === qBlk; });
       const blockTyped = areaBlockTyped;
+
+      // F1 (search-quality cycle, frame §6 2026-07-02; ported from searchLogic.js) —
+      // entrance-TYPED query detection: an EXPLICIT вх/vh token FOLLOWED by an
+      // entrance designator (a number "9"/"11", number+letter "1а", or a single
+      // letter "а"/"b"). A dangling "вх" or "вх <word>" is NOT entrance-typed.
+      // Consumed ONLY by comparator slot (4) below: an entrance-typed query ranks
+      // the matched entrance child ABOVE an equal-relevance non-entrance row, so
+      // Enter on "бл 307 вх 9" selects the вход child, not the "вх 9-11" адрес row.
+      // Every other query keeps slot (4) byte-identical.
+      const vhIdx = toks.indexOf('vh'); // skel('вх') === skel('vh') === 'vh'
+      const entranceTyped =
+        vhIdx >= 0 && vhIdx + 1 < rawToks.length &&
+        /^(?:[0-9]+[a-zа-я]?|[a-zа-я])$/.test(rawToks[vhIdx + 1]);
 
       let vocab = index.vocab;
       if (!Array.isArray(vocab)) { const set = new Set(); for (const e of index.entries) for (const t of (e.tk||[])) if (t) set.add(t); vocab = Array.from(set); }
@@ -4096,7 +4155,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const bRank = b.e.life_safety_rank == null ? 2 : b.e.life_safety_rank;
         if (aRank !== bRank) return aRank - bRank;
         const aEnt = a.e.en !== undefined, bEnt = b.e.en !== undefined;
-        if (aEnt !== bEnt) return aEnt ? 1 : -1;
+        // F1 — direction-gated slot (4): typed-entrance queries rank the entrance
+        // child first at equal relevance; all other queries keep the pre-existing
+        // "precise before entrance" demotion byte-identical.
+        if (aEnt !== bEnt) {
+          if (entranceTyped) return aEnt ? -1 : 1;
+          return aEnt ? 1 : -1;
+        }
         const al = (a.e.tk||[]).length + (a.e.qtk ? a.e.qtk.length : 0);
         const bl = (b.e.tk||[]).length + (b.e.qtk ? b.e.qtk.length : 0);
         if (al !== bl) return al - bl;
@@ -4235,6 +4300,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return { cls: 'complex', label: 'адрес' };
     }
     function renderResults(rows) {
+      // F2 — display dedup BEFORE the visible-state assignment: currentResults IS
+      // the deduped list, so Enter (currentResults[0]) and click (data-idx) select
+      // exactly the rows the user sees.
+      rows = dedupeDisplayRows(rows);
       currentResults = rows;
       if (!rows.length) { showStatus('Няма съвпадения'); return; }
       const frag = document.createDocumentFragment();
