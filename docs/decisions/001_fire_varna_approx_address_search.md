@@ -47,17 +47,31 @@ added for approximate addresses.
 fetch fails, the JSON/schema is invalid, a leak/coordinate check fails, Fire_Varna
 search behaves exactly as it does today ("Няма съвпадения").
 
-**D6 — Lazy loading (B0 = lazy).** B0 measured lazy over inline. The approx
-bundle is **not** fetched on focus and **not** fetched while exact search returns
-matches. It loads only after exact search returns zero matches, is parsed once,
-and is cached through the Cache API under a **new** namespace
-`fire-varna-approx-addresses-v1`. It is never appended to `index.html` or to the
-first-load hydrant data.
+**D6 — Lazy loading + trigger (B0 = lazy; trigger revised 2026-07-03).** B0
+measured lazy over inline. The approx bundle is **not** fetched on focus and
+**not** fetched while an exact all-tokens match exists. Trigger (§9.4 of the B2
+plan, Petar-signed after the chat-Claude visual audit): the bundle loads — and
+approx results show — ONLY when exact search returns **no row covering ALL query
+tokens**. A token is "covered" by an **exact/prefix** match, not a fuzzy one
+(`allTokens && fuzzy===0`): a query «…153» must not be suppressed by a confirmed
+«…155» (Levenshtein 1), which would hide the officially-missing №153 behind a
+different building. The original "only on zero exact" gate was proven unreachable —
+a house-number token like `10` always kept the exact list non-empty (e.g.
+"добруджанска 10" returned foreign `№10` rows), so approx never fired
+(0/40 reachability). The bundle is parsed once, cached through the Cache API under
+a **new** namespace `fire-varna-approx-addresses-v1`, and never appended to
+`index.html` or the first-load hydrant data. Measured reachability of the revised
+trigger is ~88% (street+number over a 50-street row-spread); the residual ~12% are
+approx addresses that ALSO exist in the exact index as a real сграда/парцел/block
+at that street+number, where exact correctly wins (see the B2 STOP report). A
+strict ≥90% would require distinguishing a house number from a block/entrance
+number in the exact matcher — deferred as a follow-up.
 
-**D7 — Ranking.** Exact address/building/entrance/parcel results rank above
-approximate results. Approximate results appear only when there is no exact
-match. Within the approx set, ranking is match quality, then confidence, then
-source, then stable order.
+**D7 — Ranking (unchanged).** Exact address/building/entrance/parcel results rank
+above approximate results — approx rows are always appended **below** the exact
+rows. Approximate results appear only when no exact row covers all query tokens
+(the D6 trigger), and carry only all-tokens approx matches. Within the approx set,
+ranking is match quality, then confidence, then source, then stable order.
 
 **D8 — Alias rows (`target_g`: approved v1.1 extension, PENDING re-sign).** Strict
 v1 ships no public target id — the 176 alias rows render as approximate-address
@@ -86,7 +100,8 @@ unchanged; fallback = today's behaviour. See the B2 commit series below.
 - Public bundle contains no cadnum/КАИС/raw/private fields (B1 leak scan + a
   client-side re-validation on load).
 - Missing file or disabled flag equals today's behaviour; exact search never
-  regresses (approx fires only on zero exact, and never fetches otherwise).
+  regresses — an all-tokens exact match renders exact alone and never fetches the
+  approx bundle; approx only appends below when no exact row covers all tokens.
 - First-load mobile budget unchanged: the approx bundle is lazy, never first-load
   or inlined into `index.html`.
 - B2 commit series (LOCAL, not pushed): commit 0 baseline docs, commit 1 this

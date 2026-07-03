@@ -4357,17 +4357,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (hit.kind === 'mf') return { cls: 'complex', label: 'сграда' };
       return { cls: 'complex', label: 'адрес' };
     }
-    function renderResults(rows) {
-      // F2 — display dedup BEFORE the visible-state assignment: currentResults IS
-      // the deduped list, so Enter (currentResults[0]) and click (data-idx) select
-      // exactly the rows the user sees.
-      rows = dedupeDisplayRows(rows);
-      currentResults = rows;
-      if (!rows.length) { showStatus('Няма съвпадения'); return; }
-      const frag = document.createDocumentFragment();
-      // Optional район/block group header (display-only; no personal data). Set by
-      // runGeocoderSearch for an area+block query (blockHeader) or a bare-block query
-      // (bareBlockHeader). district_names[*] is the public район enum table.
+    // Optional район/block group header (display-only; no personal data). Set by
+    // runGeocoderSearch for an area+block query (blockHeader) or a bare-block query
+    // (bareBlockHeader). district_names[*] is the public район enum table.
+    function appendExactHeader(frag, rows) {
       if (rows.blockHeader && rows.blockHeader.count > 0) {
         const bh = rows.blockHeader;
         const noun = bh.count === 1 ? 'блок' : 'блока';
@@ -4383,36 +4376,36 @@ window._hydrantDataReady = (async function loadHydrantData() {
         h.textContent = bbh.groups + ' ' + noun + ' № ' + bbh.block + (nd > 1 ? (' в ' + nd + ' района') : '');
         frag.appendChild(h);
       }
+    }
+    // One exact-result dropdown row. idx = its position in currentResults so the
+    // shared click/Enter handlers resolve it (used by renderResults + renderCombined).
+    function buildExactItem(r, idx) {
+      const item = document.createElement('div');
+      item.className = 'asr-item'; item.setAttribute('role', 'option'); item.dataset.idx = String(idx);
+      const spec = hitChip(r);
+      const chip = document.createElement('span'); chip.className = 'asr-kind ' + spec.cls; chip.textContent = spec.label;
+      const body = document.createElement('span'); body.className = 'asr-body';
+      const title = document.createElement('span'); title.className = 'asr-title'; title.textContent = formatAddressHit(r);
+      body.appendChild(title);
+      const raionName = r.d != null && districtNames[r.d] ? districtNames[r.d] : '';
+      if (raionName) { const meta = document.createElement('span'); meta.className = 'asr-meta'; meta.textContent = 'район ' + raionName; body.appendChild(meta); }
+      item.appendChild(chip); item.appendChild(body);
+      return item;
+    }
+    function renderResults(rows) {
+      // F2 — display dedup BEFORE the visible-state assignment: currentResults IS
+      // the deduped list, so Enter (currentResults[0]) and click (data-idx) select
+      // exactly the rows the user sees.
+      rows = dedupeDisplayRows(rows);
+      currentResults = rows;
+      if (!rows.length) { showStatus('Няма съвпадения'); return; }
+      const frag = document.createDocumentFragment();
+      appendExactHeader(frag, rows);
       // runGeocoderSearch caps a normal query at 8; a bare-block surface can return
       // many rows, so the dropdown render is bounded by RESULT_LIMIT (data-idx stays
       // aligned to currentResults for click resolution).
       const n = Math.min(rows.length, RESULT_LIMIT);
-      for (let i = 0; i < n; i++) {
-        const r = rows[i];
-        const item = document.createElement('div');
-        item.className = 'asr-item';
-        item.setAttribute('role', 'option');
-        item.dataset.idx = String(i);
-        const spec = hitChip(r);
-        const chip = document.createElement('span');
-        chip.className = 'asr-kind ' + spec.cls;
-        chip.textContent = spec.label;
-        const body = document.createElement('span');
-        body.className = 'asr-body';
-        const title = document.createElement('span');
-        title.className = 'asr-title';
-        title.textContent = formatAddressHit(r);
-        body.appendChild(title);
-        const raionName = r.d != null && districtNames[r.d] ? districtNames[r.d] : '';
-        if (raionName) {
-          const meta = document.createElement('span');
-          meta.className = 'asr-meta';
-          meta.textContent = 'район ' + raionName;
-          body.appendChild(meta);
-        }
-        item.appendChild(chip); item.appendChild(body);
-        frag.appendChild(item);
-      }
+      for (let i = 0; i < n; i++) frag.appendChild(buildExactItem(rows[i], i));
       resultsEl.replaceChildren(frag);
       resultsEl.classList.add('visible');
     }
@@ -5067,48 +5060,62 @@ window._hydrantDataReady = (async function loadHydrantData() {
       hideResults();
     }
 
-    // Render approx rows in the SAME dropdown with the "прибл. адрес" chip. data-idx
-    // stays aligned to currentResults so the shared click handler selects them; kind
-    // 'approx' makes selectResult dispatch to selectApproxResult.
-    function renderApproxResults(entries) {
-      currentResults = entries;
+    // One approx-result dropdown row ("прибл. адрес" chip). idx = position in
+    // currentResults so the shared click/Enter handler selects it; kind 'approx'
+    // makes selectResult dispatch to selectApproxResult.
+    function buildApproxItem(e, idx) {
+      const item = document.createElement('div');
+      item.className = 'asr-item'; item.setAttribute('role', 'option'); item.dataset.idx = String(idx);
+      const chip = document.createElement('span'); chip.className = 'asr-kind approx'; chip.textContent = 'прибл. адрес';
+      const body = document.createElement('span'); body.className = 'asr-body';
+      const title = document.createElement('span'); title.className = 'asr-title'; title.textContent = approxTitle(e);
+      body.appendChild(title);
+      if (e.quarter && e.quarter !== 'unassigned') { const meta = document.createElement('span'); meta.className = 'asr-meta'; meta.textContent = e.quarter; body.appendChild(meta); }
+      item.appendChild(chip); item.appendChild(body);
+      return item;
+    }
+    // Combined dropdown: exact rows FIRST (D7 ranking unchanged), the (all-tokens)
+    // approx matches BELOW. currentResults = deduped exact ++ approx so the shared
+    // click/Enter data-idx resolves to the right row and selectResult dispatches by
+    // kind. Total render bounded by RESULT_LIMIT; empty -> today's "Няма съвпадения".
+    function renderCombined(exactRows, approxEntries) {
+      const ex = dedupeDisplayRows(exactRows);
+      currentResults = ex.concat(approxEntries);
+      if (!currentResults.length) { showStatus('Няма съвпадения'); return; }
       const frag = document.createDocumentFragment();
-      const n = Math.min(entries.length, RESULT_LIMIT);
-      for (let i = 0; i < n; i++) {
-        const e = entries[i];
-        const item = document.createElement('div');
-        item.className = 'asr-item'; item.setAttribute('role', 'option'); item.dataset.idx = String(i);
-        const chip = document.createElement('span'); chip.className = 'asr-kind approx'; chip.textContent = 'прибл. адрес';
-        const body = document.createElement('span'); body.className = 'asr-body';
-        const title = document.createElement('span'); title.className = 'asr-title'; title.textContent = approxTitle(e);
-        body.appendChild(title);
-        if (e.quarter && e.quarter !== 'unassigned') {
-          const meta = document.createElement('span'); meta.className = 'asr-meta'; meta.textContent = e.quarter;
-          body.appendChild(meta);
-        }
-        item.appendChild(chip); item.appendChild(body);
-        frag.appendChild(item);
-      }
+      appendExactHeader(frag, ex);
+      const nEx = Math.min(ex.length, RESULT_LIMIT);
+      for (let i = 0; i < nEx; i++) frag.appendChild(buildExactItem(ex[i], i));
+      const nAp = Math.max(0, Math.min(approxEntries.length, RESULT_LIMIT - nEx));
+      for (let j = 0; j < nAp; j++) frag.appendChild(buildApproxItem(approxEntries[j], ex.length + j));
       resultsEl.replaceChildren(frag);
       resultsEl.classList.add('visible');
     }
 
-    // Exact-first resolver: exact rows win and approx is NEVER fetched. Only a zero
-    // exact result triggers the lazy approx fetch + match. Empty approx (or a
-    // disabled/failed bundle) falls back to the exact empty state (today's "Няма
-    // съвпадения"). Async: re-guard against a newer keystroke after the approx await.
+    // Trigger (§9.4, Petar-signed 2026-07-03; ADR 001 D6 revised): exact ranks first;
+    // approx is fetched + shown ONLY when exact has NO row covering ALL query tokens.
+    // An all-tokens exact hit renders exact alone and NEVER fetches the approx bundle
+    // (the old "zero-exact" gate was unreachable — the number token always kept exact
+    // non-empty). Otherwise the (all-tokens) approx matches are appended BELOW the
+    // exact rows (D7 ranking unchanged). Disabled/failed bundle -> exact rows alone.
     async function resolveAndRender(q, index) {
       const exact = runGeocoderSearch(q, index);
-      if (exact.length) { renderResults(exact); return; }
+      // "covering ALL tokens" = an exact row matching every query token via an
+      // exact/prefix match (fuzzy===0). A fuzzy number match does NOT cover its
+      // token — e.g. a query "…153" must not be suppressed by a confirmed "…155"
+      // (lev 1); that would hide the officially-missing №153 behind a different
+      // building. So approx is suppressed only by a NON-fuzzy all-tokens exact hit.
+      const exactComplete = exact.some(function (r) { return r && r.allTokens && r.fuzzy === 0; });
+      if (exactComplete) { renderResults(exact); return; } // exact wins; approx NOT fetched
       if (APPROX_ADDRESS_SEARCH_ENABLED) {
         const aidx = await ensureApproxData();
         if (inputEl.value.trim() !== q) return;   // superseded during the approx fetch
         if (aidx) {
           const approxHits = runApproxSearch(q, aidx);
-          if (approxHits.length) { renderApproxResults(approxHits); return; }
+          if (approxHits.length) { renderCombined(exact, approxHits); return; }
         }
       }
-      renderResults(exact);   // exact empty -> "Няма съвпадения" (unchanged)
+      renderResults(exact);   // no approx -> exact rows alone (or "Няма съвпадения")
     }
 
     // ---- query runner (debounced; stale-guarded) ----
