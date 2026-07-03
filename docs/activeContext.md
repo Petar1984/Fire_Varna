@@ -3,20 +3,20 @@
 > **Audience:** Petar and AI agents resuming work.
 > **Purpose:** canonical current repo/runtime state. If this conflicts with README, AGENTS.md, or CLAUDE.md on current state, this file wins.
 
-Last updated: 2026-06-22 at commit 38ebbad
+Last updated: 2026-07-03 (baseline docs sync for Address-fill B2)
 Sprint: post-Sprint 1.5. Shipped since: Phase 2 verbose-schema migration, compact-schema compatibility removal, dataset cleanup (6,082 -> 5,911), address backfill, Worker source extraction to `worker/`, label-gated issue ingest, line-ending (EOL) hygiene, and H1 shared-core + spatial dedup. Phase 2 Fire_Varna reintegration into the Varna_buildings map is in planning under ADR 020 Amendment 2 (tracked in the Varna_buildings repo).
 
 ## Current State
 
-- Branch: `main`; `origin/main == HEAD` at `38ebbad` (2026-06-22).
-- index.html: 314,484 worktree bytes (UI shell + libs + app logic + 15 s polling + Sprint 1.5 cluster guard / ID-based active target / report modal type display / welcome modal text + 2026-05-08 bug fixes: polling dedupe / card+row type display / polled new-hydrant status + 2026-05-09 Phase 1 schema bridge: normalizeHydrantRecord / resolveHydrantById / dual-schema reading / .h-pin.operational+.h-pin.broken / EXISTENCE_LABELS+OPERATIONAL_LABELS / semantic hydrantStatusClass / legacy_ids polling dedupe)
-- data/hydrants.json: 5,911 records, 874,593 worktree bytes (git blob 874,592). The previous 968,365-byte / 6,082-record file was the pre-cleanup snapshot, not current data.
+- Branch: `main`; HEAD at `020db19` (baseline for Address-fill B2). The `38ebbad` snapshot below predates the local E3b address-search / popup-pivot / marker-redesign / entrance-nav commits that grew `index.html`.
+- index.html: 400,524 worktree bytes (gzip level-9 113,531). Grown post-`38ebbad` by the local search + popup + marker + entrance-nav work through `020db19` (the earlier 314,484-byte figure was the Sprint 1.5 snapshot).
+- data/hydrants.json: **7,238 records**, 1,221,809 worktree bytes (gzip level-9 218,351). **Dataset growth 5,911 → 7,238 (+1,327): post-2026-06-21 ЕТР imports** (`etr_varna` 764 + `etr_provadia` 245 + `etr_dolni_chiflik` 219 + `etr_devnya` 78 = 1,306) plus `field_report` 24 → 45 (+21). The earlier 5,911-record / 874,593-byte figure was the pre-import snapshot; the 968,365-byte / 6,082-record file was the older pre-cleanup snapshot.
 - data/hydrants_provenance.json: 1,364,172 worktree bytes (cleanup/migration provenance archive).
 - `field_reports.json`: not present in the current repo. New `field_*` records live in `data/hydrants.json` only. (Historical mentions of `field_reports.json` in dated docs/plans are point-in-time records.)
 - Current schema: verbose hydrant records — `id`, `coords` `[lon,lat]` WGS84, `origin` (`vik`/`national`/`field_report`), `legacy_ids` (all present), plus sparse `type` / `region` / `address` / `existence_status` / `operational_status` / `review_status` / `report_id` / `reported_at`. Compact-schema compatibility has been removed. See [AGENTS.md § Data Model](../AGENTS.md#data-model).
-- Status counts (in repo): 45 verified (`existence_status`), 4 reported/review (`review_status`), 5,862 canonical/unreviewed. Runtime can grow via polled new_hydrant reports.
-- Origin counts: `vik` 3,542; `national` 2,345; `field_report` 24.
-- Enrichment counts: 555 with address; 2,313 with type; 16 with operational status.
+- Status counts (in repo, 7,238-record baseline): 75 verified (`existence_status`), 6 reported/review (`review_status`), 7,157 canonical/unreviewed. Runtime can grow via polled new_hydrant reports.
+- Origin counts (7,238-record baseline): `vik` 3,542; `national` 2,345; `etr_varna` 764; `etr_provadia` 245; `etr_dolni_chiflik` 219; `etr_devnya` 78; `field_report` 45. (The `etr_*` origins are the post-2026-06-21 ЕТР imports; AGENTS.md § Data Model still lists only `vik`/`national`/`field_report` — a follow-up doc pass should widen it.)
+- Enrichment counts (7,238-record baseline): 555 with address; 2,336 with type; 47 with operational status.
 - Deploy: GitHub Pages from main -> https://petar1984.github.io/Fire_Varna/
 - Worker: varna-hydrants-proxy.petar-dikov2019.workers.dev
   - POST `/` endpoint: creates labeled GitHub issues.
