@@ -4858,7 +4858,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // parity with an exact address) via the shared anchorHydrantsAt — a READ-ONLY
     // use; the hydrant layer/data is untouched (D9). No "Докладвай".
     // =====================================================================
-    const APPROX_ADDRESS_SEARCH_ENABLED = true;                 // D5 feature flag
+    const APPROX_ADDRESS_SEARCH_ENABLED = false;                // D5 flag OFF — FF-002 kill switch (v1 near false-merged pins); re-enable ONLY after the v1.0.2 hotfix + blind-sample gate
     const APPROX_ADDRESS_URL = 'data/approx_addresses_v1.json'; // D6 lazy bundle
     const APPROX_CACHE = 'fire-varna-approx-addresses-v1';      // D6 own cache ns
     const APPROX_FIELD_ORDER = ['street_name_bg', 'number', 'quarter', 'lat', 'lng', 'confidence', 'source'];
