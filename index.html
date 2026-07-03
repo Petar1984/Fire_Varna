@@ -961,6 +961,21 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .search-popup { font-size: 13px; line-height: 1.45; min-width: 160px; max-width: 240px; }
   .search-popup .sp-title { font-weight: 700; margin-bottom: 6px; color: #1f2d3d; }
   .search-popup .nav-actions { margin-top: 6px; }
+  /* Approximate-address result (ADR 001) — a distinct amber ≈ marker + chip, so it
+     never reads as a verified building, exact address, or hydrant. Fires only on
+     zero exact match; the dashed ring signals an uncertain (official-but-unconfirmed)
+     position. */
+  .asr-kind.approx { background: #b26a00; }
+  .approx-pin-wrapper { background: transparent; border: none; }
+  .approx-pin {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #b26a00; color: #fff; border: 2px dashed #fff;
+    box-shadow: 0 0 0 1.5px #b26a00, 0 2px 5px rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; line-height: 1;
+  }
+  .search-popup .sp-sub { font-size: 12px; color: #6b7785; margin-bottom: 6px; }
+  .search-popup .sp-approx-low { color: #b26a00; font-weight: 600; }
 
   /* Search -> building detail bottom sheet (C4). Fixed at the screen bottom, compact
      and scrollable; the map is panned up on open so the centered search pin stays
@@ -4813,6 +4828,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     function selectResult(r) {
+      if (r && r.kind === 'approx') { selectApproxResult(r); return; } // ADR 001 approx path
       if (!r || !Array.isArray(r.pin) || r.pin.length !== 2) return;
       const lat = Number(r.pin[0]), lng = Number(r.pin[1]);
       if (!isFinite(lat) || !isFinite(lng)) return; // validate pin
@@ -4838,6 +4854,263 @@ window._hydrantDataReady = (async function loadHydrantData() {
       hideResults();
     }
 
+    // =====================================================================
+    // ADR 001 — approximate-address search (kind:"approx"). ADDITIVE, isolated,
+    // flag-gated. Fires ONLY when exact search returns zero rows; the bundle is
+    // fetched lazily at that point (never on focus, never while exact matches),
+    // cached under its OWN namespace, and matched with the SAME norm/skel/
+    // matchKindSet the exact route uses. Any failure (flag off / 404 / bad JSON /
+    // bad schema / leaked id / bad coords) falls back to today's behaviour.
+    // Selecting a result re-anchors the Top-5 hydrants at the candidate pin (§9.2
+    // parity with an exact address) via the shared anchorHydrantsAt — a READ-ONLY
+    // use; the hydrant layer/data is untouched (D9). No "Докладвай".
+    // =====================================================================
+    const APPROX_ADDRESS_SEARCH_ENABLED = true;                 // D5 feature flag
+    const APPROX_ADDRESS_URL = 'data/approx_addresses_v1.json'; // D6 lazy bundle
+    const APPROX_CACHE = 'fire-varna-approx-addresses-v1';      // D6 own cache ns
+    const APPROX_FIELD_ORDER = ['street_name_bg', 'number', 'quarter', 'lat', 'lng', 'confidence', 'source'];
+    const APPROX_CONF_RANK = { high: 0, medium: 1, low: 2 };
+    const APPROX_SRC_RANK = { alias: 0, interp: 1, nearest: 2 };
+    const APPROX_STREET_TYPE_TOKENS = { ul: 1, bul: 1, pl: 1 };
+    // Varna WGS84 bbox — a coordinate outside it fails the on-load coords gate
+    // (matches the B1 emitter's validate_wgs bounds).
+    const APPROX_BBOX = { minLat: 43.00, maxLat: 43.45, minLng: 27.60, maxLng: 28.15 };
+
+    let approxIndex = null;      // prepared approx index (memory cache)
+    let approxPromise = null;    // in-flight load (dedupes concurrent zero-exact)
+    let approxDisabled = false;  // a FATAL failure (bad schema/leak/coords) -> never retry
+
+    // Fetch + Cache-API persist for the approx bundle (own namespace, offline fallback).
+    async function fetchApproxJson(url) {
+      try {
+        const resp = await fetch(url, { cache: 'no-cache' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        if (typeof caches !== 'undefined') {
+          try { const c = await caches.open(APPROX_CACHE); await c.put(url, resp.clone()); } catch (e) {}
+        }
+        return await resp.json();
+      } catch (netErr) {
+        if (typeof caches !== 'undefined') {
+          try { const c = await caches.open(APPROX_CACHE); const hit = await c.match(url); if (hit) return await hit.json(); } catch (e) {}
+        }
+        throw netErr;
+      }
+    }
+    function approxFatal(msg) { const e = new Error(msg); e.approxFatal = true; return e; }
+
+    // Public street name -> match tokens: norm+skel, drop the leading УЛ./БУЛ./ПЛ.
+    // type token (mirrors the B0 search_entry projection), then append the number.
+    function approxStreetTokens(street) {
+      const toks = norm(street).split(/\s+/).filter(Boolean).map(skel).filter(Boolean);
+      while (toks.length && APPROX_STREET_TYPE_TOKENS[toks[0]]) toks.shift();
+      return toks;
+    }
+    function approxQuarterTokens(quarter) {
+      if (!quarter || quarter === 'unassigned') return [];
+      return norm(quarter).split(/\s+/).filter(Boolean).map(skel).filter(Boolean);
+    }
+
+    // Validate the public bundle (schema + leaked-id + coords) and project each row
+    // to {kind:'approx', pin:[lat,lng], tk, qtk, street, number, quarter, conf, src,
+    // _ord}. Column positions come from field_order (never hardcoded). Throws
+    // approxFatal on a bad schema / leaked identifier -> the whole feature disables
+    // for the session (fallback to today). A single out-of-bbox / pin-less row is dropped.
+    function buildApproxIndex(payload) {
+      if (!payload || payload.kind !== 'fire_varna_approx_addresses_v1' ||
+          !Array.isArray(payload.field_order) || !Array.isArray(payload.rows)) {
+        throw approxFatal('approx bundle: bad schema');
+      }
+      const order = payload.field_order;
+      const col = {};
+      for (const name of APPROX_FIELD_ORDER) {
+        const i = order.indexOf(name);
+        if (i === -1) throw approxFatal('approx bundle: field_order missing ' + name);
+        col[name] = i;
+      }
+      const CAD = /\b10135\.\d+\.\d+(?:\.\d+)?\b/;   // a leaked cadnum -> disable
+      const entries = [];
+      for (let r = 0; r < payload.rows.length; r++) {
+        const row = payload.rows[r];
+        if (!Array.isArray(row)) throw approxFatal('approx bundle: row not an array');
+        const street = String(row[col.street_name_bg] == null ? '' : row[col.street_name_bg]);
+        const number = String(row[col.number] == null ? '' : row[col.number]);
+        const quarter = String(row[col.quarter] == null ? '' : row[col.quarter]);
+        const lat = Number(row[col.lat]);
+        const lng = Number(row[col.lng]);
+        if (CAD.test(street) || CAD.test(quarter)) throw approxFatal('approx bundle: leaked identifier');
+        if (!isFinite(lat) || !isFinite(lng)) continue;                      // no pin -> skip
+        if (lat < APPROX_BBOX.minLat || lat > APPROX_BBOX.maxLat ||
+            lng < APPROX_BBOX.minLng || lng > APPROX_BBOX.maxLng) continue;  // outside Varna -> skip
+        const tk = approxStreetTokens(street);
+        const nk = skel(number.toLowerCase());
+        if (nk) tk.push(nk);
+        entries.push({
+          kind: 'approx', pin: [lat, lng], tk: tk, qtk: approxQuarterTokens(quarter),
+          street: street, number: number, quarter: quarter,
+          conf: row[col.confidence], src: row[col.source], _ord: r,
+        });
+      }
+      // vocab + inverted index over tk+qtk (fast candidate lookup, like prepareIndex).
+      const vocabSet = new Set();
+      for (const e of entries) { for (const t of e.tk) vocabSet.add(t); for (const t of e.qtk) vocabSet.add(t); }
+      const vocab = Array.from(vocabSet).sort();
+      const inverted = {};
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        const toks = e.qtk.length ? e.tk.concat(e.qtk) : e.tk;
+        for (const t of toks) { let ids = inverted[t]; if (!ids) inverted[t] = ids = []; if (ids[ids.length - 1] !== i) ids.push(i); }
+      }
+      return { entries: entries, vocab: vocab, inverted: inverted };
+    }
+
+    async function ensureApproxData() {
+      if (!APPROX_ADDRESS_SEARCH_ENABLED || approxDisabled) return null;
+      if (approxIndex) return approxIndex;
+      if (approxPromise) return approxPromise;
+      approxPromise = (async function () {
+        try {
+          const payload = await fetchApproxJson(APPROX_ADDRESS_URL);
+          const idx = buildApproxIndex(payload);   // throws approxFatal on a bad file
+          approxIndex = idx;
+          return idx;
+        } catch (err) {
+          approxPromise = null;
+          if (err && err.approxFatal) approxDisabled = true; // bad file -> today's behaviour, no retry
+          return null;                                       // transient (network) -> retry next zero-exact
+        }
+      })();
+      return approxPromise;
+    }
+
+    // Match an approx query: require EVERY query token to hit some tk/qtk token
+    // (approx is a fallback — keep it tight). Rank by match quality, then confidence,
+    // then source, then stable _ord (plan §Commit 3 ranking).
+    function runApproxSearch(query, aidx) {
+      if (!aidx || !Array.isArray(aidx.entries)) return [];
+      const qn = norm(query);
+      if (qn.length < 1) return [];
+      const toks = qn.split(/\s+/).filter(Boolean).map(skel).filter(Boolean);
+      if (!toks.length) return [];
+      const ms = toks.map(function (t) { return matchKindSet(t, aidx.vocab); });
+      const cand = new Set();
+      for (const m of ms) for (const vt in m) { const ids = aidx.inverted[vt]; if (ids) for (let i = 0; i < ids.length; i++) cand.add(ids[i]); }
+      const scored = [];
+      for (const id of cand) {
+        const e = aidx.entries[id];
+        let matched = 0, exact = 0, prefix = 0, fuzzy = 0, all = true;
+        for (let qi = 0; qi < toks.length; qi++) {
+          const m = ms[qi]; let best = 0;
+          for (let ti = 0; ti < e.tk.length; ti++) { const k = m[e.tk[ti]] || 0; if (k > best) { best = k; if (best === 3) break; } }
+          if (best < 3 && e.qtk.length) { for (let ti = 0; ti < e.qtk.length; ti++) { const k = m[e.qtk[ti]] || 0; if (k > best) { best = k; if (best === 3) break; } } }
+          if (best === 0) { all = false; break; }
+          matched += 1;
+          if (best === 3) exact += 1; else if (best === 2) prefix += 1; else fuzzy += 1;
+        }
+        if (all && matched > 0) scored.push({ e: e, matched: matched, exact: exact, prefix: prefix, fuzzy: fuzzy });
+      }
+      scored.sort(function (a, b) {
+        if (b.matched !== a.matched) return b.matched - a.matched;
+        if (b.exact !== a.exact) return b.exact - a.exact;
+        if (b.prefix !== a.prefix) return b.prefix - a.prefix;
+        if (a.fuzzy !== b.fuzzy) return a.fuzzy - b.fuzzy;
+        const ca = APPROX_CONF_RANK[a.e.conf] == null ? 9 : APPROX_CONF_RANK[a.e.conf];
+        const cb = APPROX_CONF_RANK[b.e.conf] == null ? 9 : APPROX_CONF_RANK[b.e.conf];
+        if (ca !== cb) return ca - cb;
+        const sa = APPROX_SRC_RANK[a.e.src] == null ? 9 : APPROX_SRC_RANK[a.e.src];
+        const sb = APPROX_SRC_RANK[b.e.src] == null ? 9 : APPROX_SRC_RANK[b.e.src];
+        if (sa !== sb) return sa - sb;
+        return (a.e._ord || 0) - (b.e._ord || 0);
+      });
+      return scored.slice(0, SEARCH_LIMIT).map(function (s) { return s.e; });
+    }
+
+    function approxTitle(e) { return e.street + ' №' + e.number; }
+    function approxPinIcon() {
+      return L.divIcon({ className: 'approx-pin-wrapper', html: '<div class="approx-pin">≈</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
+    }
+
+    // Approx popup: "≈ улица №N" + honest subtitle + (low) "ориентировъчна" note +
+    // the shared nav row (Waze/Пеша/Карта/Street View). NO "Докладвай". autoPan:false
+    // — positionPinInBand centres the pin, mirroring openSearchPopup.
+    function openApproxPopup(e, lat, lng) {
+      const wrap = document.createElement('div');
+      wrap.className = 'search-popup approx-popup';
+      const t = document.createElement('div'); t.className = 'sp-title';
+      t.textContent = '≈ ' + approxTitle(e);
+      wrap.appendChild(t);
+      const sub = document.createElement('div'); sub.className = 'sp-sub';
+      sub.textContent = 'Официален адрес без потвърдена сграда';
+      wrap.appendChild(sub);
+      if (e.conf === 'low') {
+        const lo = document.createElement('div'); lo.className = 'sp-sub sp-approx-low';
+        lo.textContent = 'Позицията е ориентировъчна.';
+        wrap.appendChild(lo);
+      }
+      const nav = buildNavActions(lat, lng);
+      if (nav) wrap.appendChild(nav);
+      L.popup({ closeButton: true, autoPan: false }).setLatLng([lat, lng]).setContent(wrap).openOn(map);
+      positionPinInBand(lat, lng, 0, 0);
+    }
+
+    // Select an approx result: re-anchor Top-5 hydrants at the candidate pin (§9.2),
+    // drop the single ≈ marker (reusing searchMarker's lifecycle), fly, open popup.
+    function selectApproxResult(e) {
+      if (!e || !Array.isArray(e.pin) || e.pin.length !== 2) return;
+      const lat = Number(e.pin[0]), lng = Number(e.pin[1]);
+      if (!isFinite(lat) || !isFinite(lng)) return;
+      anchorHydrantsAt(lat, lng);   // Top-5 hydrants at the candidate position — parity with exact
+      clearSearchMarker();
+      searchMarker = L.marker([lat, lng], { icon: approxPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
+      searchMarker.on('click', function () { openApproxPopup(e, lat, lng); });
+      map.setView([lat, lng], Math.max(map.getZoom(), 17), { animate: true });
+      openApproxPopup(e, lat, lng);
+      hideResults();
+    }
+
+    // Render approx rows in the SAME dropdown with the "прибл. адрес" chip. data-idx
+    // stays aligned to currentResults so the shared click handler selects them; kind
+    // 'approx' makes selectResult dispatch to selectApproxResult.
+    function renderApproxResults(entries) {
+      currentResults = entries;
+      const frag = document.createDocumentFragment();
+      const n = Math.min(entries.length, RESULT_LIMIT);
+      for (let i = 0; i < n; i++) {
+        const e = entries[i];
+        const item = document.createElement('div');
+        item.className = 'asr-item'; item.setAttribute('role', 'option'); item.dataset.idx = String(i);
+        const chip = document.createElement('span'); chip.className = 'asr-kind approx'; chip.textContent = 'прибл. адрес';
+        const body = document.createElement('span'); body.className = 'asr-body';
+        const title = document.createElement('span'); title.className = 'asr-title'; title.textContent = approxTitle(e);
+        body.appendChild(title);
+        if (e.quarter && e.quarter !== 'unassigned') {
+          const meta = document.createElement('span'); meta.className = 'asr-meta'; meta.textContent = e.quarter;
+          body.appendChild(meta);
+        }
+        item.appendChild(chip); item.appendChild(body);
+        frag.appendChild(item);
+      }
+      resultsEl.replaceChildren(frag);
+      resultsEl.classList.add('visible');
+    }
+
+    // Exact-first resolver: exact rows win and approx is NEVER fetched. Only a zero
+    // exact result triggers the lazy approx fetch + match. Empty approx (or a
+    // disabled/failed bundle) falls back to the exact empty state (today's "Няма
+    // съвпадения"). Async: re-guard against a newer keystroke after the approx await.
+    async function resolveAndRender(q, index) {
+      const exact = runGeocoderSearch(q, index);
+      if (exact.length) { renderResults(exact); return; }
+      if (APPROX_ADDRESS_SEARCH_ENABLED) {
+        const aidx = await ensureApproxData();
+        if (inputEl.value.trim() !== q) return;   // superseded during the approx fetch
+        if (aidx) {
+          const approxHits = runApproxSearch(q, aidx);
+          if (approxHits.length) { renderApproxResults(approxHits); return; }
+        }
+      }
+      renderResults(exact);   // exact empty -> "Няма съвпадения" (unchanged)
+    }
+
     // ---- query runner (debounced; stale-guarded) ----
     let debounceTimer = null;
     async function runQuery(value) {
@@ -4847,7 +5120,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       try { index = await ensureSearchData(); }
       catch (e) { showStatus('Търсачката не е налична офлайн'); return; }
       if (inputEl.value.trim() !== q) return; // a newer keystroke superseded this run
-      renderResults(runGeocoderSearch(q, index));
+      await resolveAndRender(q, index);       // exact first; approx only on zero exact
     }
 
     // ---- events ----
@@ -4870,7 +5143,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         try { index = await ensureSearchData(); }   // works during the cold-load window too
         catch (e) { showStatus('Търсачката не е налична офлайн'); return; }
         if (inputEl.value.trim() !== q) return;      // a newer keystroke superseded this
-        renderResults(runGeocoderSearch(q, index));
+        await resolveAndRender(q, index);            // exact first; approx only on zero exact
         if (currentResults[0]) selectResult(currentResults[0]);
       }
     });
