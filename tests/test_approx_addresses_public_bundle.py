@@ -19,11 +19,13 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 BUNDLE = REPO / "data" / "approx_addresses_v1.json"
 
 # The exact B1-emitted bundle (Address-fill B2 plan §Контекст).
-# v1.0.2 (FF-002 hotfix — 375 street_key false-merge rows withheld; 8,802 -> 8,427).
-EXPECTED_SHA256 = "39b1ad6505128ca0288538b70748c42eca8fc6a0d57587bb349b67c030b9fc39"
-EXPECTED_GZIP9 = 89847
-EXPECTED_RAW = 853791
-EXPECTED_ROWS = 8427
+# v1.0.3 (FF-002 residual sweeps — 28 residual name/ordinal + 38 quarter↔pin rows
+# withheld on top of v1.0.2's 375 collisions; 8,802 -> 8,427 -> 8,361). Emit run
+# r49f7c592d7fe; blind-sample + cross-seed detcheck gates green before flag-on.
+EXPECTED_SHA256 = "97ebe841c9ba45e0f89eee20b5a43eb98a1cbb7f9abe251f4c13346c5de29822"
+EXPECTED_GZIP9 = 89061
+EXPECTED_RAW = 846649
+EXPECTED_ROWS = 8361
 ALLOWED_KEYS = {"schema_version", "kind", "coordinate_order", "field_order", "rows"}
 FIELD_ORDER = ["street_name_bg", "number", "quarter", "lat", "lng", "confidence", "source"]
 ALLOWED_CONF = {"high", "medium", "low"}
@@ -53,7 +55,7 @@ class ApproxBundleTest(unittest.TestCase):
     def test_schema_and_allowed_keys(self):
         self.assertEqual(set(self.doc.keys()), ALLOWED_KEYS)
         self.assertEqual(self.doc["kind"], "fire_varna_approx_addresses_v1")
-        self.assertEqual(self.doc["schema_version"], "1.0.2")
+        self.assertEqual(self.doc["schema_version"], "1.0.3")
         self.assertEqual(self.doc["field_order"], FIELD_ORDER)
         self.assertIsInstance(self.doc["rows"], list)
 
