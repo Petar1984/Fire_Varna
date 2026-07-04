@@ -3,13 +3,14 @@
 > **Audience:** Petar and AI agents resuming work.
 > **Purpose:** canonical current repo/runtime state. If this conflicts with README, AGENTS.md, or CLAUDE.md on current state, this file wins.
 
-Last updated: 2026-07-03 (baseline docs sync for Address-fill B2)
+Last updated: 2026-07-04 (post Address-fill B2 ship + FF-002 cycle; approx search DARK by release doctrine)
 Sprint: post-Sprint 1.5. Shipped since: Phase 2 verbose-schema migration, compact-schema compatibility removal, dataset cleanup (6,082 -> 5,911), address backfill, Worker source extraction to `worker/`, label-gated issue ingest, line-ending (EOL) hygiene, and H1 shared-core + spatial dedup. Phase 2 Fire_Varna reintegration into the Varna_buildings map is in planning under ADR 020 Amendment 2 (tracked in the Varna_buildings repo).
 
 ## Current State
 
-- Branch: `main`; HEAD at `020db19` (baseline for Address-fill B2). The `38ebbad` snapshot below predates the local E3b address-search / popup-pivot / marker-redesign / entrance-nav commits that grew `index.html`.
-- index.html: 400,524 worktree bytes (gzip level-9 113,531). Grown post-`38ebbad` by the local search + popup + marker + entrance-nav work through `020db19` (the earlier 314,484-byte figure was the Sprint 1.5 snapshot).
+- Branch: `main`; HEAD at `72b5bcd` (approx flag OFF). B2 shipped a86eeeb→2e2bb43 (ADR 001, bundle, search integration, revised trigger), then FF-002 hotfix chain: kill switch a3cb0da → v1.0.2 bad8dc0 → flag-on 7aa9129 (+retrigger 06e6006) → final flag OFF 72b5bcd.
+- index.html: ~417,5xx worktree bytes (2e2bb43 measured 417,515 + one-line flag flips). The earlier 400,524-byte figure was the pre-B2 (`020db19`) snapshot.
+- **Approx address search (ADR 001, Accepted): DARK.** `APPROX_ADDRESS_SEARCH_ENABLED = false` — release doctrine (Petar 2026-07-04): feature stays off until B3 distributes clustered positions; re-enable = ONE clean launch through all gates + blind sample. `data/approx_addresses_v1.json` (v1.0.3, 8,361 rows, SHA-guarded by `tests/test_approx_addresses_public_bundle.py`) sits inert in the repo — never fetched while the flag is off (D5 fallback = pre-B2 behavior, verified live). v1.0.4 (8,728 rows, superset after FF-002 root-cause un-merge) exists LOCAL-ONLY in the Varna_buildings pipeline (`m6000_private/r511f289ed552`), NOT published. True-missing baseline after root-cause: 23,632. Canon: `Varna_buildings/scratch/address_fill_phase_b*_codex_plan.md`, `ff002_root_cause_cycle_plan.md`, `field_feedback_log.md` (FF-001/FF-002).
 - data/hydrants.json: **7,238 records**, 1,221,809 worktree bytes (gzip level-9 218,351). **Dataset growth 5,911 → 7,238 (+1,327): post-2026-06-21 ЕТР imports** (`etr_varna` 764 + `etr_provadia` 245 + `etr_dolni_chiflik` 219 + `etr_devnya` 78 = 1,306) plus `field_report` 24 → 45 (+21). The earlier 5,911-record / 874,593-byte figure was the pre-import snapshot; the 968,365-byte / 6,082-record file was the older pre-cleanup snapshot.
 - data/hydrants_provenance.json: 1,364,172 worktree bytes (cleanup/migration provenance archive).
 - `field_reports.json`: not present in the current repo. New `field_*` records live in `data/hydrants.json` only. (Historical mentions of `field_reports.json` in dated docs/plans are point-in-time records.)

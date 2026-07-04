@@ -87,7 +87,7 @@ For frontend / deployable changes, before reporting done:
    - Map renders within 3 seconds.
    - Browser console has no runtime errors.
    - `data/hydrants.json` loads with HTTP 200.
-   - `JSON.parse(document.getElementById('hydrantData').textContent).length` equals the current expected count declared in [`docs/activeContext.md`](docs/activeContext.md#current-state) (currently `5911`).
+   - `JSON.parse(document.getElementById('hydrantData').textContent).length` equals the current expected count declared in [`docs/activeContext.md`](docs/activeContext.md#current-state) (currently `7238`).
    - GPS lock works, or graceful error pill with retry/manual controls appears.
    - All 3 view modes render correctly: "Близо", "Топ 5", "Всички".
    - Cluster mode shows clusters when zoomed out.

@@ -58,7 +58,16 @@ Runtime verbose schema (compact-schema compatibility was removed in `142a494`):
 ```
 
 - `coords` is `[lon, lat]` in WGS84 and is always present.
-- `origin` is `vik`, `national`, or `field_report` and is always present.
+- `origin` is always present. Canonical network origins are `vik` (В и К export) and `national` (national dataset); field-submitted records carry `field_report`. The `etr_*` origins are the post-2026-06-21 ЕТР hydrant-register KMZ imports (`Пожарни хидранти ЕТР ….kmz`), one `origin` per municipality:
+
+  | `origin` | Source register (municipality) |
+  |---|---|
+  | `etr_varna` | ЕТР Варна |
+  | `etr_provadia` | ЕТР Провадия |
+  | `etr_dolni_chiflik` | ЕТР Долни Чифлик |
+  | `etr_devnya` | ЕТР Девня |
+
+  Import mechanics (distance-≤5 m ETR aliases folded into `legacy_ids`; only unmatched ETR points added as standalone records) are in [`docs/plans/h2_kmz_adapter_plan.md`](docs/plans/h2_kmz_adapter_plan.md) and the dry-run audit `docs/audits/h2_kmz_consolidation_dry_run.md`; per-source counts and the current baseline live in [`docs/activeContext.md`](docs/activeContext.md). Further `etr_*` origins may appear as more municipal registers are imported. Older app builds and unknown `origin` values must fall back to canonical/unverified rendering.
 - `legacy_ids` is the array of a record's prior IDs (used for polling dedupe); always present.
 - `type`, `region`, `address` are sparse descriptive fields.
 - Visual / moderation state is split across three sparse fields, not one app-level `status`:
