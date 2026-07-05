@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>E0 probe — raster PMTiles over Leaflet</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  html,body{margin:0;height:100%;font:14px/1.4 system-ui,sans-serif}
+  #map{position:absolute;inset:0;bottom:132px}
+  #panel{position:absolute;left:0;right:0;bottom:0;height:132px;overflow:auto;
+    padding:8px 10px;background:#0b1f33;color:#e8f0f8;box-sizing:border-box}
+  code{color:#ffd27f}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <b>E0 raster PMTiles probe</b> — no new renderer (Leaflet L.tileLayer), but larger
+  files and NO runtime restyle; labels baked at build time.<br>
+  Pass <code>?pmtiles=URL</code> (a RASTER .pmtiles).<br>
+  <div id="out">measuring…</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js"></script>
+<script>
+const t0 = performance.now();
+const q = new URLSearchParams(location.search);
+const PMTILES = q.get('pmtiles') || 'http://127.0.0.1:8000/data/basemaps/varna_raster.pmtiles';
+const out = document.getElementById('out');
+const map = L.map('map', { attributionControl: false }).setView([43.2141, 27.9147], 13);
+L.control.attribution({ prefix: false })
+  .addAttribution('© OpenStreetMap contributors (ODbL) · raster').addTo(map);
+[[43.2141,27.9147],[43.205,27.92]].forEach(c =>
+  L.circleMarker(c, { radius: 7, color: '#e23', weight: 3 }).addTo(map));
+try {
+  const p = new pmtiles.PMTiles(PMTILES);
+  // minimal raster adapter: fetch a tile PNG from the pmtiles archive
+  const layer = L.gridLayer({ minZoom: 12, maxZoom: 17, tileSize: 256 });
+  layer.createTile = function (coords, done) {
+    const img = document.createElement('img');
+    p.getZxy(coords.z, coords.x, coords.y).then(t => {
+      if (t) { img.src = URL.createObjectURL(new Blob([t.data])); img.onload = () => done(null, img); }
+      else done(null, img);
+    }).catch(e => done(e, img));
+    return img;
+  };
+  layer.addTo(map);
+  map.whenReady(() => setTimeout(() => {
+    out.innerHTML = `time-to-first-idle: <code>${Math.round(performance.now() - t0)} ms</code> · ` +
+      `pmtiles: <code>${PMTILES}</code><br>Report: first-interactive ms, file size (largest single ` +
+      `basemap payload of the three), label legibility (fixed raster).`;
+  }, 900));
+} catch (e) { out.innerHTML = 'ERROR: ' + e + '<br>(pass a reachable raster ?pmtiles=URL)'; }
+</script>
+</body>
+</html>

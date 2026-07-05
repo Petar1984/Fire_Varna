@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>E0 probe — MapLibre GL (vector PMTiles)</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+  html,body{margin:0;height:100%;font:14px/1.4 system-ui,sans-serif}
+  #map{position:absolute;inset:0;bottom:132px}
+  #panel{position:absolute;left:0;right:0;bottom:0;height:132px;overflow:auto;
+    padding:8px 10px;background:#0b1f33;color:#e8f0f8;box-sizing:border-box}
+  code{color:#ffd27f}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <b>E0 MapLibre GL probe</b> — full renderer migration (bigger bytes, GL rendering).
+  Hydrants/search/building popups would need re-porting off Leaflet.<br>
+  Pass <code>?pmtiles=URL</code> + <code>?style=styleURL</code>.<br>
+  <div id="out">measuring…</div>
+</div>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js"></script>
+<script>
+const t0 = performance.now();
+const q = new URLSearchParams(location.search);
+const PMTILES = q.get('pmtiles') || 'http://127.0.0.1:8000/data/basemaps/varna_basemap.pmtiles';
+const STYLE = q.get('style') || 'http://127.0.0.1:8000/data/basemaps/style.json';
+const out = document.getElementById('out');
+try {
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol('pmtiles', protocol.tile);
+  const map = new maplibregl.Map({
+    container: 'map', style: STYLE, center: [27.9147, 43.2141], zoom: 12, attributionControl: true,
+  });
+  map.on('idle', () => {
+    const dt = Math.round(performance.now() - t0);
+    out.innerHTML = `time-to-first-idle: <code>${dt} ms</code> · style: <code>${STYLE}</code><br>` +
+      `Report: first-interactive ms, pan/zoom smoothness, Cyrillic labels, memory. ` +
+      `NOTE: overlays (hydrants/search) are NOT shown here — that re-port is the integration cost.`;
+  });
+  map.on('error', e => { out.innerHTML = 'ERROR: ' + (e.error && e.error.message || e) +
+    '<br>(needs a reachable ?style= referencing pmtiles://…)'; });
+} catch (e) { out.innerHTML = 'ERROR: ' + e; }
+</script>
+</body>
+</html>

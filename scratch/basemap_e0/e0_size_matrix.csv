@@ -1,0 +1,11 @@
+kind,item,zoom_band,bytes,note
+real_input_geojson,varna_streets_2026-05-13,clipped,4030921,"10359 features (real clipped OSM)"
+real_input_geojson,varna_buildings_2026-05-13,clipped,13907855,"38124 features (real clipped OSM)"
+real_anchor_pmtiles,buildings_safe_min,z13-z17,5330468,"real, pinned tippecanoe 2.79.0 -> pmtiles 1.30.3"
+real_anchor_pmtiles,buildings_safe_min,z15-z17,4182201,"real same toolchain"
+real_anchor_pmtiles,buildings_geomonly,z13-z17,4495474,"real same toolchain"
+real_anchor_pmtiles,buildings_safe_fulltype,z13-z17,6440742,"real same toolchain (densest building variant)"
+gate,size_target,,20971520,"<= 20 MB target"
+gate,minimal_roads_names_water_parks,z12-z16,,"PENDING tippecanoe build (Docker); inferred << 20MB (streets 3.8MB GeoJSON < buildings, buildings build to ~5.1MB pmtiles)"
+gate,full_context,z13-z17,,"PENDING build; inferred < 20MB (buildings ~5.1MB pmtiles + streets + water/parks)"
+verdict,size_gate,,,"PASS_WITH_MARGIN (inferred from real anchors); exact per-cell bytes pending Docker build. Authoritative matrix: Varna_buildings/scratch/basemap_e0/build_matrix_manifest.json"

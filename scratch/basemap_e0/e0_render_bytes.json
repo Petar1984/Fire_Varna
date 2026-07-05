@@ -1,0 +1,122 @@
+{
+  "measured_utc_note": "pinned versions; content-addressed by version",
+  "assets": [
+    {
+      "stack": "protomaps-leaflet",
+      "role": "renderer",
+      "url": "https://unpkg.com/protomaps-leaflet@4.0.1/dist/protomaps-leaflet.js",
+      "raw_bytes": 100591,
+      "gzip_bytes": 33142,
+      "error": null
+    },
+    {
+      "stack": "protomaps-leaflet",
+      "role": "pmtiles-protocol",
+      "url": "https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js",
+      "raw_bytes": 51739,
+      "gzip_bytes": 12617,
+      "error": null
+    },
+    {
+      "stack": "maplibre-gl",
+      "role": "renderer-js",
+      "url": "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js",
+      "raw_bytes": 803086,
+      "gzip_bytes": 211489,
+      "error": null
+    },
+    {
+      "stack": "maplibre-gl",
+      "role": "renderer-css",
+      "url": "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css",
+      "raw_bytes": 65534,
+      "gzip_bytes": 9206,
+      "error": null
+    },
+    {
+      "stack": "maplibre-gl",
+      "role": "pmtiles-protocol",
+      "url": "https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js",
+      "raw_bytes": 51739,
+      "gzip_bytes": 12617,
+      "error": null
+    },
+    {
+      "stack": "raster-pmtiles-leaflet",
+      "role": "pmtiles-protocol",
+      "url": "https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js",
+      "raw_bytes": 51739,
+      "gzip_bytes": 12617,
+      "error": null
+    },
+    {
+      "stack": "ref-leaflet-vectorgrid",
+      "role": "already-vendored",
+      "url": "https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.min.js",
+      "raw_bytes": 48329,
+      "gzip_bytes": 15044,
+      "error": null
+    }
+  ],
+  "per_stack_added": {
+    "protomaps-leaflet": {
+      "raw": 152330,
+      "gzip": 45759,
+      "assets": [
+        "renderer:protomaps-leaflet.js",
+        "pmtiles-protocol:pmtiles.js"
+      ]
+    },
+    "maplibre-gl": {
+      "raw": 920359,
+      "gzip": 233312,
+      "assets": [
+        "renderer-js:maplibre-gl.js",
+        "renderer-css:maplibre-gl.css",
+        "pmtiles-protocol:pmtiles.js"
+      ]
+    },
+    "raster-pmtiles-leaflet": {
+      "raw": 51739,
+      "gzip": 12617,
+      "assets": [
+        "pmtiles-protocol:pmtiles.js"
+      ]
+    }
+  },
+  "matrix": [
+    {
+      "stack": "protomaps-leaflet",
+      "migration": "minimal (keeps Leaflet+overlays)",
+      "cyrillic": "probe:leaflet_protomaps_probe.html",
+      "satellite_toggle": "independent (L.tileLayer swap kept)",
+      "range_offline": "PMTiles range + Cache API (see measure_range/measure_offline_sw)",
+      "integration_risk": "low (Leaflet overlays unchanged; already run L.vectorGrid path)",
+      "added_raw_bytes": 152330,
+      "added_gzip_bytes": 45759,
+      "added_assets": "renderer:protomaps-leaflet.js + pmtiles-protocol:pmtiles.js"
+    },
+    {
+      "stack": "maplibre-gl",
+      "migration": "full renderer swap (rewrite map shell + overlays)",
+      "cyrillic": "probe:maplibre_probe.html",
+      "satellite_toggle": "reimplement as GL raster source",
+      "range_offline": "native PMTiles protocol + SW cache",
+      "integration_risk": "high (hydrants/search/building popups re-port to GL)",
+      "added_raw_bytes": 920359,
+      "added_gzip_bytes": 233312,
+      "added_assets": "renderer-js:maplibre-gl.js + renderer-css:maplibre-gl.css + pmtiles-protocol:pmtiles.js"
+    },
+    {
+      "stack": "raster-pmtiles-leaflet",
+      "migration": "none (L.tileLayer raster)",
+      "cyrillic": "baked at build time (probe:raster_pmtiles_probe.html)",
+      "satellite_toggle": "independent",
+      "range_offline": "PMTiles range (raster tiles); larger files",
+      "integration_risk": "low, but larger size + no runtime restyle",
+      "added_raw_bytes": 51739,
+      "added_gzip_bytes": 12617,
+      "added_assets": "pmtiles-protocol:pmtiles.js"
+    }
+  ]
+}

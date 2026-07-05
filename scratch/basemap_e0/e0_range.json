@@ -1,0 +1,44 @@
+{
+  "checks": [
+    {
+      "check": "local_range_capable_server",
+      "ok": true,
+      "file": "C:\\git\\Varna_buildings\\output\\building_tiles\\safe_min\\varna_buildings_safe_min_z15_z17.pmtiles",
+      "file_size": 4182201,
+      "head_read": {
+        "status": 206,
+        "content_range": "bytes 0-126/4182201",
+        "accept_ranges": "bytes",
+        "content_length": "127",
+        "content_type": "application/octet-stream",
+        "bytes_returned": 127,
+        "first7": "PMTiles"
+      },
+      "mid_read": {
+        "status": 206,
+        "content_range": "bytes 2091100-2091355/4182201",
+        "accept_ranges": "bytes",
+        "content_length": "256",
+        "content_type": "application/octet-stream",
+        "bytes_returned": 256,
+        "first7": "]ßÝg?i"
+      },
+      "note": "Node Range-capable server + PMTiles v3 magic verified from a 127-byte read"
+    },
+    {
+      "check": "github_pages_range_existing_asset",
+      "ok": true,
+      "url": "https://petar1984.github.io/Fire_Varna/index.html",
+      "result": {
+        "status": 206,
+        "content_range": "bytes 0-126/417700",
+        "accept_ranges": "bytes",
+        "content_length": "127",
+        "content_type": "text/html; charset=utf-8",
+        "bytes_returned": 127,
+        "first7": "<!DOCTY"
+      },
+      "note": "Range behavior of the live Pages CDN on an existing asset (not a .pmtiles). A .pmtiles canary is still needed to confirm content-type + Range for that extension."
+    }
+  ]
+}

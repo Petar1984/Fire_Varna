@@ -1,0 +1,38 @@
+{
+  "checks": [
+    {
+      "check": "offline_fullfile_precache",
+      "ok": true,
+      "file": "C:\\git\\Varna_buildings\\output\\building_tiles\\safe_min\\varna_buildings_safe_min_z15_z17.pmtiles",
+      "file_size": 4182201,
+      "full_file_magic_ok": true,
+      "in_memory_slices": [
+        {
+          "range": "0-127",
+          "bytes": 128
+        },
+        {
+          "range": "2091100-2091611",
+          "bytes": 512
+        },
+        {
+          "range": "4182137-4182200",
+          "bytes": 64
+        }
+      ],
+      "note": "A Cache API full-file hit yields a complete buffer; the PMTiles reader slices tiles from it in memory, so offline works even if Cache does not honor Range on the hit.",
+      "budget": {
+        "first_load_cap_bytes": 5242880,
+        "basemap_target_bytes": 20971520,
+        "within_basemap_target": true,
+        "precache_cost_note": "precaching the full basemap costs ~3.99 MB of Cache quota; MUST stay a SEPARATE payload from the 5 MB first-load (basemap is lazy/opt-in)."
+      },
+      "sw_design_requirements": [
+        "introduce the FIRST service worker (none today) — new surface; must not evict fire-varna-search-v2 / fire-varna-approx-addresses-v1 Cache namespaces",
+        "cache name MUST include basemap_version so a stale basemap + fresh shell cannot mix",
+        "offline = app shell + hydrants.json + search bundles + basemap all answer with network disabled",
+        "range-on-demand cache is an alternative to full precache — must prove returning coverage after partial use"
+      ]
+    }
+  ]
+}
