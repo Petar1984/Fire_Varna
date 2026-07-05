@@ -191,12 +191,14 @@ even with building footprints it is ~7.5–9.5 MB, all far under 20 MB. (water/p
 in the current clip — a small additive delta on the minimal numbers; a full-profile rebuild
 after re-clipping those layers is a B1 step.)
 
-**Determinism finding (important for B1):** the double-build's raw PMTiles bytes **drift**
-run-to-run (tippecanoe's threaded tile/feature ordering); the **tile set is identical**
-(3243 tiles) and the size is stable to a few bytes → **content-equivalent, not
-byte-reproducible**. The plan's "double build byte-identical" gate must be revised for B1
-to assert on **decoded tile content** (canonical per-tile hash) or pin tippecanoe to a
-single worker. This does not affect the size/feasibility verdict.
+**Determinism gate — RESOLVED (STOP A1-close amendment):** raw PMTiles bytes **drift**
+run-to-run (tippecanoe's threaded tile ordering). Per Petar's decision tree, single-thread
+was tried first (`docker run --cpus=1`) → **not byte-identical** (~1-byte drift, ~23 s), so
+rejected. The **canonical content gate** is adopted and proven byte-stable: decode the
+tiles → sort by `(z,x,y)` → `content_sha256` = `11ad8f65…` **identical across builds**
+(incl. both `--cpus=1` builds and the default build; 3243 tiles). Root cause: only the
+container tile ORDER drifts; per-`(z,x,y)` tile bytes are identical. The plan is amended
+(§E0.5 + §B gates). Does not affect the size/feasibility verdict.
 
 **Still pending Petar:** the `.pmtiles` Pages canary is committed
 (`data/basemaps/range_canary.pmtiles`, separate small commit) — push it, then run the

@@ -9,4 +9,4 @@ measured_pmtiles,roads_buildings,z12-z16,7523876,"REAL build (roads + building f
 measured_pmtiles,roads_buildings,z13-z17,9455064,"REAL build (roads + building footprints)"
 gate,size_target,,20971520,"<= 20 MB target"
 verdict,size_gate,,,"PASS_MEASURED — every built cell <= 20 MB with large margin (minimal 2.3-3.6MB; roads+buildings 7.5-9.5MB). water/parks not in current clip = small additive delta."
-determinism,pmtiles_double_build,z13-z17,,"raw bytes DRIFT run-to-run (tippecanoe threaded tile ordering); tile SET identical (3243 tiles), size stable to a few bytes -> content-equivalent. B1 gate must assert on decoded TILE CONTENT or pin single-thread tippecanoe, NOT raw bytes."
+determinism,pmtiles_double_build,z13-z17,,"RESOLVED: raw bytes DRIFT (tippecanoe threaded tile ordering); single-thread (--cpus=1) also NOT byte-identical -> adopted canonical content gate: (z,x,y)-sorted content_sha256=11ad8f65... BYTE-STABLE across builds (3243 tiles). Plan amended (E0.5/B gates)."
