@@ -200,6 +200,10 @@ tiles → sort by `(z,x,y)` → `content_sha256` = `11ad8f65…` **identical acr
 container tile ORDER drifts; per-`(z,x,y)` tile bytes are identical. The plan is amended
 (§E0.5 + §B gates). Does not affect the size/feasibility verdict.
 
-**Still pending Petar:** the `.pmtiles` Pages canary is committed
-(`data/basemaps/range_canary.pmtiles`, separate small commit) — push it, then run the
-`.pmtiles`-extension Range check (command in that commit message).
+**Canary — RESOLVED (pushed + proven live).** `data/basemaps/range_canary.pmtiles` is
+pushed and the live GitHub Pages `.pmtiles`-extension Range check passed: **GET Range =
+206, `content-range: bytes 0-126/130`**. (The initial `-I`/HEAD probe misled — HEAD
+ignores Range; a GET with a Range header is the correct test.) **E0 is fully closed** —
+render stack (protomaps-leaflet), local + Pages Range (206), offline (full-file precache),
+real size matrix (all ≤ 20 MB), determinism (content_sha256 gate), ODbL posture, and
+dependency byte impact are all settled. Nothing E0 remains outstanding.
