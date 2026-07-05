@@ -34,7 +34,7 @@ function rangeServer(filePath) {
     if (range) {
       const m = /bytes=(\d+)-(\d*)/.exec(range);
       const start = Number(m[1]);
-      const end = m[2] ? Number(m[2]) : size - 1;
+      const end = Math.min(m[2] ? Number(m[2]) : size - 1, size - 1);  // clamp to EOF
       res.writeHead(206, {
         'Content-Range': `bytes ${start}-${end}/${size}`,
         'Accept-Ranges': 'bytes',
