@@ -169,3 +169,35 @@ byte-identical. All E0 artifacts use atomic+fsync writes with a disk-reread hash
 4. Acknowledge the ODbL share-alike posture + attribution placement.
 5. On GO, B0 drafts Fire ADR 002 with these numbers; B1 builds the patched basemap; the
    44-label curated-display chat-Claude review is the STOP B1 gate.
+
+## 11. E0-close addendum (2026-07-05) — REAL size matrix built via Docker
+
+Docker daemon started; the pinned image (`varna-building-tiles:pinned`, tippecanoe 2.79.0
+→ pmtiles 1.30.3) was already present. Real PMTiles built from the clipped Varna OSM
+GeoJSON (`tools/public_basemap/e0_real_build.py`;
+`Varna_buildings/scratch/basemap_e0/build_matrix_real.json`):
+
+| profile | zoom set | layers | pmtiles bytes | ≤20 MB |
+|---|---|---|---:|:--:|
+| minimal_roads | z12-z16 | roads+names | 2,333,593 (2.23 MB) | ✅ |
+| minimal_roads | z12-z17 | roads+names | 3,613,513 (3.45 MB) | ✅ |
+| minimal_roads | **z13-z17** | roads+names | **3,322,606 (3.17 MB)** | ✅ |
+| minimal_roads | z14-z17 | roads+names | 2,982,136 (2.84 MB) | ✅ |
+| roads_buildings | z12-z16 | roads+buildings | 7,523,876 (7.18 MB) | ✅ |
+| roads_buildings | z13-z17 | roads+buildings | 9,455,064 (9.02 MB) | ✅ |
+
+**Size gate: PASS (measured), large margin** — the minimal field-use basemap is ~2.3–3.6 MB;
+even with building footprints it is ~7.5–9.5 MB, all far under 20 MB. (water/parks are not
+in the current clip — a small additive delta on the minimal numbers; a full-profile rebuild
+after re-clipping those layers is a B1 step.)
+
+**Determinism finding (important for B1):** the double-build's raw PMTiles bytes **drift**
+run-to-run (tippecanoe's threaded tile/feature ordering); the **tile set is identical**
+(3243 tiles) and the size is stable to a few bytes → **content-equivalent, not
+byte-reproducible**. The plan's "double build byte-identical" gate must be revised for B1
+to assert on **decoded tile content** (canonical per-tile hash) or pin tippecanoe to a
+single worker. This does not affect the size/feasibility verdict.
+
+**Still pending Petar:** the `.pmtiles` Pages canary is committed
+(`data/basemaps/range_canary.pmtiles`, separate small commit) — push it, then run the
+`.pmtiles`-extension Range check (command in that commit message).
