@@ -857,6 +857,23 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .ctrl-btn.active { background: #c41e3a; color:white; border-color:#c41e3a; }
   .ctrl-btn:active { transform: scale(0.95); }
 
+  /* ===== Basemap selector (B2) — only rendered when the PMTiles capability is
+     active (committed flag false). When inactive it never appears. ===== */
+  .basemap-selector {
+    position: absolute; z-index: 1300;
+    background: #fff; border: 1px solid #ccc; border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    padding: 4px; display: flex; flex-direction: column; gap: 2px; min-width: 200px;
+  }
+  .basemap-opt {
+    appearance: none; border: none; background: transparent; text-align: left;
+    padding: 10px 10px; border-radius: 6px; font-size: 14px; color: #222; cursor: pointer;
+  }
+  .basemap-opt:hover, .basemap-opt:active { background: #f0f0f0; }
+  .basemap-opt.sel { font-weight: 600; color: #c41e3a; }
+  .basemap-ready { padding: 2px 10px 4px; font-size: 12px; color: #2e7d32; }
+  .basemap-ready:empty { display: none; }
+
   /* ===== Locate button ===== */
   /* Bottom-right corner. The bottom of the screen is now free (the bottom sheet
      was removed in the popup pivot), so the FAB drops from the old bottom:170px
@@ -4014,6 +4031,264 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
 
   // =========================================================================
+  // Basemap B2 — flag-gated offline OSM/PMTiles third basemap (ADR 002 + B2 plan).
+  //
+  // ── flag / override ──
+  // BASEMAP_PMTILES_ENABLED is committed FALSE. The offline basemap AND its service
+  // worker surface ONLY when a device opts in (sticky ?basemap_pmtiles=1 override) or a
+  // later signed flag flip. While inactive, #basemapToggle behaves EXACTLY like before
+  // (OSM ⇄ satellite): no vendor JS, no PMTiles request, no SW registration.
+  const BASEMAP_PMTILES_ENABLED = false;
+  const BASEMAP_VERSION = 'osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b';
+  const BASEMAP_MANIFEST_URL = 'data/basemaps/basemap_manifest.json';
+  const BASEMAP_OVERRIDE_KEY = 'fire_varna_basemap_pmtiles_override';
+  // ODbL attribution links the public patch/source package that ships beside the tiles.
+  const OFFLINE_BASEMAP_ATTRIB =
+    '<a href="data/basemaps/' + BASEMAP_VERSION + '/odbl/README_ODbL.md" target="_blank" rel="noopener">© OpenStreetMap contributors (ODbL)</a>';
+
+  function isBasemapPmtilesActive() {
+    if (BASEMAP_PMTILES_ENABLED) return true;
+    try { return localStorage.getItem(BASEMAP_OVERRIDE_KEY) === '1'; } catch (e) { return false; }
+  }
+  function basemapWantsOfflineInstall() {
+    try {
+      const qp = new URLSearchParams(location.search);
+      return isBasemapPmtilesActive() && qp.get('offline') === 'install';  // addendum П2
+    } catch (e) { return false; }
+  }
+
+  // ── dependency loader (vendored, same-origin, SRI from manifest; NO runtime CDN) ──
+  let basemapManifestPromise = null, basemapDepsPromise = null;
+  function loadBasemapManifest() {
+    if (basemapManifestPromise) return basemapManifestPromise;
+    basemapManifestPromise = fetch(BASEMAP_MANIFEST_URL, { cache: 'no-store' })
+      .then((r) => { if (!r.ok) throw new Error('basemap manifest ' + r.status); return r.json(); });
+    return basemapManifestPromise;
+  }
+  function loadBasemapScript(src, sri) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src; s.integrity = sri; s.crossOrigin = 'anonymous'; s.async = false;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('basemap dep failed: ' + src));
+      document.head.appendChild(s);
+    });
+  }
+  function loadBasemapDeps() {
+    if (window.protomapsL && window.pmtiles) return Promise.resolve();
+    if (basemapDepsPromise) return basemapDepsPromise;
+    basemapDepsPromise = loadBasemapManifest().then(async (m) => {
+      const byName = {};
+      (m.runtime_deps || []).forEach((d) => { byName[d.name] = d; });
+      const pm = byName['pmtiles'], pl = byName['protomaps-leaflet'];
+      if (!pm || !pl) throw new Error('basemap manifest missing runtime_deps');
+      await loadBasemapScript(pm.path, pm.sri_sha384);   // pmtiles BEFORE protomaps-leaflet
+      await loadBasemapScript(pl.path, pl.sri_sha384);
+      if (!window.protomapsL) throw new Error('protomaps-leaflet missing after load');
+    }).catch((e) => { basemapDepsPromise = null; throw e; });
+    return basemapDepsPromise;
+  }
+
+  // ── offline PMTiles layer + B1 style.json → protomaps-leaflet adapter ──
+  // B1 style.json (hash 62cc123e…) mapped 1:1 (verified end-to-end by the STOP B2 render
+  // smoke): background #f2f0e8 → backgroundColor; buildings fill #e6e1d3 / outline #d3ccb8
+  // (minzoom 14) → PolygonSymbolizer; roads line #ffffff width interp 13:0.6→17:2.2 →
+  // LineSymbolizer; road-labels get(name) 11px #333 halo #fff 1.2 (minzoom 15) →
+  // LineLabelSymbolizer. levelDiff:0 + maxDataZoom:17 map Leaflet zoom 1:1 onto our
+  // z13–z17 tiles, so z17 renders the finest tiles incl. the FF-001 / Venchan labels.
+  let offlineBasemapLayer = null, offlineBasemapPaneReady = false;
+  function ensureOfflineBasemapPane() {
+    if (offlineBasemapPaneReady) return;
+    map.createPane('offlineBasemapPane');
+    const p = map.getPane('offlineBasemapPane');
+    // Base tier — STRICTLY BELOW tilePane (z-index 200). The building overlay
+    // (L.vectorGrid.protobuf, no pane option) lives in tilePane at 200; a tie there would
+    // let this opaque base paint over it (equal z-index → later-DOM pane wins). 150 keeps
+    // the offline base under tilePane AND under overlay(400)/marker(600)/popup(700).
+    p.style.zIndex = 150;
+    p.style.pointerEvents = 'none';   // taps fall through to markers / map (placement etc.)
+    offlineBasemapPaneReady = true;
+  }
+  function offlineRoadWidth(z) {
+    if (z <= 13) return 0.6;
+    if (z >= 17) return 2.2;
+    return 0.6 + (2.2 - 0.6) * (z - 13) / 4;
+  }
+  function createOfflineBasemapLayer() {
+    const P = window.protomapsL;
+    const paintRules = [
+      { dataLayer: 'buildings', minzoom: 14,
+        symbolizer: new P.PolygonSymbolizer({ fill: '#e6e1d3', stroke: '#d3ccb8', width: 1 }) },
+      { dataLayer: 'roads',
+        symbolizer: new P.LineSymbolizer({ color: '#ffffff', width: (z) => offlineRoadWidth(z) }) },
+    ];
+    const labelRules = [
+      { dataLayer: 'roads', minzoom: 15,
+        symbolizer: new P.LineLabelSymbolizer({
+          labelProps: ['name'], fill: '#333333', stroke: '#ffffff', width: 1.2,
+          fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', fontSize: 11,
+        }) },
+    ];
+    return P.leafletLayer({
+      url: 'data/basemaps/' + BASEMAP_VERSION + '/varna_basemap.pmtiles',
+      paintRules: paintRules, labelRules: labelRules, backgroundColor: '#f2f0e8',
+      levelDiff: 0, maxDataZoom: 17, maxZoom: 19,
+      pane: 'offlineBasemapPane', attribution: '© OpenStreetMap contributors (ODbL)',
+    });
+  }
+  function removeOfflineBasemap() {
+    if (offlineBasemapLayer && map.hasLayer(offlineBasemapLayer)) map.removeLayer(offlineBasemapLayer);
+    attribCtrl.removeAttribution(OFFLINE_BASEMAP_ATTRIB);
+  }
+  async function enableOfflineBasemap() {
+    try { await loadBasemapDeps(); }
+    catch (e) { flashStatus('Офлайн картата не е налична в момента', 3500); return false; }
+    ensureOfflineBasemapPane();
+    if (!offlineBasemapLayer) offlineBasemapLayer = createOfflineBasemapLayer();
+    if (map.hasLayer(osmLayer)) map.removeLayer(osmLayer);
+    if (map.hasLayer(satLayer)) map.removeLayer(satLayer);
+    attribCtrl.removeAttribution(OSM_ATTRIB);
+    attribCtrl.removeAttribution(SAT_ATTRIB);
+    if (!map.hasLayer(offlineBasemapLayer)) offlineBasemapLayer.addTo(map);
+    offlineBasemapLayer.bringToBack();                 // hydrants/search/buildings stay above
+    attribCtrl.addAttribution(OFFLINE_BASEMAP_ATTRIB);
+    satelliteOn = false;
+    ensureBasemapServiceWorker(true);                  // opt-in: register SW + install pack
+    return true;
+  }
+
+  // ── three-way selector (only when the capability is active) ──
+  let basemapMode = 'osm', basemapSelectorEl = null, offlinePackReady = false, basemapSwMsgBound = false;
+  function reflectBasemapButton() {
+    const b = document.getElementById('basemapToggle');
+    if (!b) return;
+    b.classList.toggle('active', basemapMode !== 'osm');
+    b.setAttribute('aria-pressed', basemapMode !== 'osm' ? 'true' : 'false');
+  }
+  async function selectBasemap(mode) {
+    if (mode === 'offline') {
+      const ok = await enableOfflineBasemap();
+      if (!ok) return;                                 // failed load: keep current basemap
+      basemapMode = 'offline';
+    } else if (mode === 'satellite') {
+      removeOfflineBasemap(); setBasemap(true); basemapMode = 'satellite';
+    } else {
+      removeOfflineBasemap(); setBasemap(false); basemapMode = 'osm';
+    }
+    reflectBasemapButton();
+  }
+  function closeBasemapSelector() {
+    if (basemapSelectorEl && basemapSelectorEl.parentNode) basemapSelectorEl.parentNode.removeChild(basemapSelectorEl);
+    basemapSelectorEl = null;
+  }
+  function toggleBasemapSelector() {
+    if (basemapSelectorEl) { closeBasemapSelector(); return; }
+    const btn = document.getElementById('basemapToggle');
+    if (!btn) return;
+    const menu = document.createElement('div');
+    menu.className = 'basemap-selector'; menu.setAttribute('role', 'menu');
+    [['osm', 'OSM (онлайн)'], ['satellite', 'Спътник'], ['offline', 'Карта Варна (офлайн)']].forEach(function (pair) {
+      const mode = pair[0], label = pair[1];
+      const o = document.createElement('button');
+      o.type = 'button'; o.className = 'basemap-opt' + (basemapMode === mode ? ' sel' : '');
+      o.textContent = (basemapMode === mode ? '✓ ' : '') + label;
+      o.addEventListener('click', function () { closeBasemapSelector(); selectBasemap(mode); });
+      menu.appendChild(o);
+    });
+    const ready = document.createElement('div');
+    ready.className = 'basemap-ready'; ready.id = 'basemapReadyRow';
+    ready.textContent = offlinePackReady ? '✓ Офлайн пакетът е готов' : '';
+    menu.appendChild(ready);
+    document.body.appendChild(menu);
+    const r = btn.getBoundingClientRect();
+    menu.style.top = (r.bottom + 6) + 'px';
+    menu.style.right = (window.innerWidth - r.right) + 'px';
+    basemapSelectorEl = menu;
+    setTimeout(function () { document.addEventListener('click', onBasemapOutsideClick, { once: true }); }, 0);
+  }
+  function onBasemapOutsideClick(ev) {
+    if (basemapSelectorEl && !basemapSelectorEl.contains(ev.target) && ev.target.id !== 'basemapToggle') closeBasemapSelector();
+  }
+
+  // ── service worker (FIRST SW in Fire_Varna; registered ONLY when capability active) ──
+  function ensureBasemapServiceWorker(installPack) {
+    if (!('serviceWorker' in navigator)) return;
+    if (!isBasemapPmtilesActive()) return;             // never register while inactive (П2)
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      if (!basemapSwMsgBound) {
+        navigator.serviceWorker.addEventListener('message', onBasemapSwMessage);
+        basemapSwMsgBound = true;
+      }
+      navigator.serviceWorker.ready.then(function () {
+        const w = navigator.serviceWorker.controller || reg.active;
+        if (!w) return;
+        if (installPack) { w.postMessage({ type: 'install-offline-pack' }); reportStorageEstimate(); }
+        else { w.postMessage({ type: 'offline-pack-status' }); }
+      });
+    }).catch(function () {});
+  }
+  function onBasemapSwMessage(ev) {
+    const d = ev.data || {};
+    if (d.type === 'offline-pack-ready' || (d.type === 'offline-pack-status' && d.ready)) {
+      offlinePackReady = true;
+      const row = document.getElementById('basemapReadyRow');
+      if (row) row.textContent = '✓ Офлайн пакетът е готов';
+      if (d.type === 'offline-pack-ready') flashStatus('Офлайн пакетът е готов', 2500);
+    } else if (d.type === 'offline-pack-error') {
+      offlinePackReady = false;
+      flashStatus(d.quota ? 'Няма достатъчно място за офлайн пакета' : 'Грешка при сваляне на офлайн пакета', 4000);
+    }
+  }
+  function reportStorageEstimate() {
+    if (navigator.storage && navigator.storage.estimate) {
+      navigator.storage.estimate().then(function (est) {
+        if (navigator.storage.persist) { try { navigator.storage.persist(); } catch (e) {} }
+        console.info('[basemap] storage usage/quota', est && est.usage, est && est.quota);
+      }).catch(function () {});
+    }
+  }
+  function unregisterBasemapServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) {
+          const u = (r.active && r.active.scriptURL) || '';
+          if (/\/sw\.js(\?|$)/.test(u)) r.unregister();
+        });
+      }).catch(function () {});
+    }
+    // Drop only this feature's own caches; the app search namespaces are untouched.
+    ['fire-varna-core-', 'fire-varna-offline-pack-', 'fire-varna-basemap-'].forEach(function (prefix) {
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (names) {
+          names.forEach(function (n) { if (n.indexOf(prefix) === 0) caches.delete(n); });
+        }).catch(function () {});
+      }
+    });
+  }
+
+  // ── load-time init: apply ?basemap_pmtiles / ?offline / test-center; wire the SW ──
+  (function initBasemapB2() {
+    try {
+      const qp = new URLSearchParams(location.search);
+      if (qp.has('basemap_pmtiles')) {
+        const v = qp.get('basemap_pmtiles');
+        if (v === '1') { try { localStorage.setItem(BASEMAP_OVERRIDE_KEY, '1'); } catch (e) {} }
+        else if (v === '0') {
+          try { localStorage.removeItem(BASEMAP_OVERRIDE_KEY); } catch (e) {}
+          unregisterBasemapServiceWorker();            // full revert on this device
+        }
+      }
+      if (isBasemapPmtilesActive()) {
+        if (qp.has('bm_lat') && qp.has('bm_lng') && qp.has('bm_z')) {   // test-center (active only)
+          const la = parseFloat(qp.get('bm_lat')), ln = parseFloat(qp.get('bm_lng')), z = parseInt(qp.get('bm_z'), 10);
+          if (isFinite(la) && isFinite(ln) && isFinite(z)) map.setView([la, ln], z);
+        }
+        ensureBasemapServiceWorker(basemapWantsOfflineInstall());
+      }
+    } catch (e) {}
+  })();
+
+  // =========================================================================
   // E3b — Public address search (additive, isolated). A header search field +
   // dropdown over TWO privacy-projected payloads, both built in Varna_buildings:
   //   * data/search_index.json (the GEOCODER matcher projection — streets,
@@ -5232,7 +5507,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (buildingsEnabled) disableBuildings(); else enableBuildings();
   });
   const basemapBtnEl = document.getElementById('basemapToggle');
-  if (basemapBtnEl) basemapBtnEl.addEventListener('click', () => setBasemap(!satelliteOn));
+  if (basemapBtnEl) basemapBtnEl.addEventListener('click', () => {
+    // Capability inactive ⇒ exactly today's OSM ⇄ satellite toggle. Active ⇒ 3-way selector.
+    if (isBasemapPmtilesActive()) toggleBasemapSelector();
+    else setBasemap(!satelliteOn);
+  });
 
   // ===== Auto-start =====
   bootApp();
