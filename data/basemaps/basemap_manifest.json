@@ -1,0 +1,41 @@
+{
+  "schema_version": "fire_varna_basemap_manifest_v1",
+  "active_version": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+  "cache_version": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+  "basemap": {
+    "pmtiles_path": "data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+    "style_path": "data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/style.json",
+    "b1_manifest_path": "data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap_manifest.json",
+    "odbl_readme_path": "data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/odbl/README_ODbL.md",
+    "odbl_patch_csv_path": "data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/odbl/osm_varna_patch_v1.csv",
+    "pmtiles_bytes": 5748578,
+    "pmtiles_sha256": "29a8dee66465bed3eabaa2afa70efbe703b9e63b9cde84d4dcadb2436435f1b8",
+    "content_sha256": "8a15054e722b12cb31afbc6cc3ff13a4cb7401dda7a8291f139794ac286fc3b8",
+    "style_sha256": "62cc123ee2227c4a95a249a2f788010eee57067a5ce72c594b4318834fc69135"
+  },
+  "runtime_deps": [
+    {
+      "name": "pmtiles",
+      "version": "3.2.1",
+      "path": "vendor/basemap/pmtiles-3.2.1.js",
+      "source_url": "https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js",
+      "bytes": 51739,
+      "sha256": "367c19f8936d1d6c1b1820b0dee053f793fc29277655c3e471f5ed4d37b5f045",
+      "sri_sha384": "sha384-QfbOCebHNw8pQiPAOd2IFee2v2A5VYZxBk0+JGZ5H+3mfzVIp6zsQNkTsfGJot93"
+    },
+    {
+      "name": "protomaps-leaflet",
+      "version": "4.0.1",
+      "path": "vendor/basemap/protomaps-leaflet-4.0.1.js",
+      "source_url": "https://unpkg.com/protomaps-leaflet@4.0.1/dist/protomaps-leaflet.js",
+      "bytes": 100591,
+      "sha256": "8e3d2aa0f5a2fd46871ff9c6ed47fdcdb969bc6ed10bf6719dee507b46a2ec9e",
+      "sri_sha384": "sha384-GmP3jXNYFGjRNEfk47lHCeBRIf+V8dRyuQ6B+yJ6TPhOXIg7vpYy1CTKEnE8B84s"
+    }
+  ],
+  "cache_names": {
+    "core": "fire-varna-core-osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+    "offline_pack": "fire-varna-offline-pack-osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+    "basemap": "fire-varna-basemap-osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b"
+  }
+}

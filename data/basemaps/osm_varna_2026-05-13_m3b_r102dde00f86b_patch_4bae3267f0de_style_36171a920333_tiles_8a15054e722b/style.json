@@ -1,0 +1,81 @@
+{
+  "layers": [
+    {
+      "id": "background",
+      "paint": {
+        "background-color": "#f2f0e8"
+      },
+      "type": "background"
+    },
+    {
+      "id": "buildings",
+      "minzoom": 14,
+      "paint": {
+        "fill-color": "#e6e1d3",
+        "fill-outline-color": "#d3ccb8"
+      },
+      "source": "varna",
+      "source-layer": "buildings",
+      "type": "fill"
+    },
+    {
+      "id": "roads",
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#ffffff",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.6,
+          17,
+          2.2
+        ]
+      },
+      "source": "varna",
+      "source-layer": "roads",
+      "type": "line"
+    },
+    {
+      "id": "road-labels",
+      "layout": {
+        "symbol-placement": "line",
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-size": 11
+      },
+      "minzoom": 15,
+      "paint": {
+        "text-color": "#333333",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      },
+      "source": "varna",
+      "source-layer": "roads",
+      "type": "symbol"
+    }
+  ],
+  "metadata": {
+    "basemap_version": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+    "note": "B1 local release candidate; B2 wires runtime source URL"
+  },
+  "name": "Varna basemap (OSM ODbL, B1)",
+  "sources": {
+    "varna": {
+      "attribution": "© OpenStreetMap contributors (ODbL)",
+      "type": "vector",
+      "url": "pmtiles://varna_basemap.pmtiles"
+    }
+  },
+  "version": 8
+}

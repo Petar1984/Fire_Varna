@@ -1,0 +1,60 @@
+{
+  "acceptance": {
+    "ff001": {
+      "expected": "Влад. Димитров-Майстора",
+      "point": [
+        43.204393,
+        27.896573
+      ],
+      "present": true,
+      "tile": [
+        17,
+        75692,
+        48060
+      ]
+    },
+    "ovech": {
+      "expected": "Овеч",
+      "geojsonseq_present": true,
+      "tile": [
+        17,
+        75725,
+        48037
+      ],
+      "tile_present": true,
+      "way": "161246258"
+    },
+    "venchan": {
+      "expected": "Венчан",
+      "geojsonseq_present": true,
+      "tile": [
+        17,
+        75725,
+        48037
+      ],
+      "tile_present": true,
+      "way": "161246298"
+    }
+  },
+  "basemap_version": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+  "content_sha256": "8a15054e722b12cb31afbc6cc3ff13a4cb7401dda7a8291f139794ac286fc3b8",
+  "content_sha256_method": "decode mbtiles -> sort by (z,x,y) -> sha256(z/x/y/ + tile_bytes)",
+  "determinism": {
+    "content_sha256_build1": "8a15054e722b12cb31afbc6cc3ff13a4cb7401dda7a8291f139794ac286fc3b8",
+    "content_sha256_build2": "8a15054e722b12cb31afbc6cc3ff13a4cb7401dda7a8291f139794ac286fc3b8",
+    "content_sha256_identical": true,
+    "note": "raw pmtiles bytes drift (ADR 002 D6); content_sha256 is the gate",
+    "raw_pmtiles_identical": false
+  },
+  "max_zoom": 17,
+  "min_zoom": 13,
+  "patch_v1_sha256": "4bae3267f0dea83ca753f61ef19750d059967f7dc2e1555ba4848f6b53b0b6d8",
+  "pmtiles_bytes": 5748578,
+  "pmtiles_sha256": "29a8dee66465bed3eabaa2afa70efbe703b9e63b9cde84d4dcadb2436435f1b8",
+  "profile": "roads_buildings",
+  "source_manifest_sha256": "427842588c77264ef8d891294cffbb5a0870f2f873c6a69bbe92cdf73304cf7a",
+  "style_sha256": "62cc123ee2227c4a95a249a2f788010eee57067a5ce72c594b4318834fc69135",
+  "tiles": 3333,
+  "toolchain": "tippecanoe 2.79.0 (felt) -> pmtiles 1.30.3 (pinned docker image)",
+  "under_20mb": true
+}
