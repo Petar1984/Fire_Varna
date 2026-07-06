@@ -760,7 +760,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
      absolutely-positioned wrapper (no magic offsets between rows). The stack is
      ~140px tall (topbar ~40px + mode bar ~46px + search bar ~54px); other
      top-anchored overlays (pill, status, banners, controls) clear it at
-     top:150px below. z-index is 1100 (was 1000) so the address-search dropdown —
+     top:150px below — actually calc(150px + var(--dev-banner-h)), where the
+     dev-notice banner (an optional top row, see .dev-notice) contributes its
+     height; the var is 0 when that banner is absent/dismissed, so the offset
+     collapses back to a bare 150px. z-index is 1100 (was 1000) so the address-search dropdown —
      a child of this wrapper — paints OVER the right-side .controls column (also
      z:1000), while the transient pill/status/banner toasts (z:1500) stay above
      the header as before. */
@@ -783,9 +786,44 @@ svg.leaflet-image-layer.leaflet-interactive path {
     box-shadow: 0 2px 6px rgba(0,0,0,0.18);
   }
 
+  /* ===== Dev-notice banner (UI-only "under development" warning) =====
+     Top row of the header stack, above the topbar; dismissible for the SESSION
+     (sessionStorage, NOT localStorage — reappears next session). Its rendered
+     height is width-dependent (the text wraps on narrow phones), so init JS
+     measures it and writes --dev-banner-h. Every top-anchored overlay below now
+     clears the stack at calc(150px + var(--dev-banner-h)) instead of a bare
+     150px, so nothing is pushed onto the search bar. On dismiss the JS sets
+     --dev-banner-h:0 and hides the banner, snapping every overlay back to its
+     original 150px — the dismissed layout is identical to before this banner. */
+  :root { --dev-banner-h: 60px; }
+  .dev-notice {
+    display: flex; align-items: flex-start; gap: 8px;
+    box-sizing: border-box; padding: 7px 10px;
+    background: #fff4d6; color: #6b5300;
+    border-bottom: 1px solid #f0d270;
+    font-size: 12px; line-height: 1.35;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.14);
+  }
+  .dev-notice[hidden] { display: none; }
+  .dev-notice .dn-text { flex: 1 1 auto; }
+  .dev-notice .dn-close {
+    position: relative; flex: 0 0 auto; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: rgba(0,0,0,0.06); color: #6b5300;
+    border-radius: 6px; font-size: 16px; line-height: 1; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dev-notice .dn-close:active { background: rgba(0,0,0,0.14); }
+  /* Expand the tap target to ~44px without changing the visible 26px chip or the
+     banner height (absolute, out of flow — clicks on it still hit the button). */
+  .dev-notice .dn-close::before {
+    content: ""; position: absolute; top: 50%; left: 50%;
+    width: 44px; height: 44px; transform: translate(-50%, -50%);
+  }
+
   /* ===== Pill (loading / error) ===== */
   .pill {
-    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: calc(150px + var(--dev-banner-h)); left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(0,0,0,0.85); color: white;
     padding: 10px 16px; border-radius: 22px; font-size: 13px;
     display: flex; align-items: center; gap: 10px;
@@ -807,7 +845,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Right-side buttons ===== */
   .controls {
-    position:absolute; top:150px; right:10px; z-index:1000;
+    position:absolute; top:calc(150px + var(--dev-banner-h)); right:10px; z-index:1000;
     display:flex; flex-direction:column; gap:8px;
   }
   .ctrl-btn {
@@ -840,7 +878,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Status pill (transient) ===== */
   .status {
-    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: calc(150px + var(--dev-banner-h)); left: 50%; transform: translateX(-50%);
     z-index:1500; background: rgba(0,0,0,0.85); color:white;
     padding: 10px 18px; border-radius: 20px; font-size: 13px;
     pointer-events:none; opacity: 0; transition: opacity 0.3s;
@@ -1029,9 +1067,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
      mobile-first bottom sheet above. Same content either way. */
   @media (min-width: 768px) {
     .detail-sheet {
-      left: auto; right: 12px; bottom: auto; top: 150px;
+      left: auto; right: 12px; bottom: auto; top: calc(150px + var(--dev-banner-h));
       width: 360px; max-width: 38vw;
-      max-height: calc(100vh - 150px - 24px);
+      max-height: calc(100vh - 150px - var(--dev-banner-h) - 24px);
       border-radius: 12px;
       box-shadow: 0 4px 18px rgba(0,0,0,0.18);
       animation: slideInRight 0.2s ease-out;
@@ -1274,7 +1312,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* ===== Placement mode (long-press) ===== */
   .placement-banner {
-    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: calc(150px + var(--dev-banner-h)); left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(196,30,58,0.95); color: white;
     padding: 10px 16px; border-radius: 20px; font-size: 13px;
     max-width: 92%; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -1284,7 +1322,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
      (cancel button must be tappable). Shown after user picks a report type
      from the global "+" menu and is now waiting to tap a hydrant. */
   .prepick-banner {
-    position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
+    position: absolute; top: calc(150px + var(--dev-banner-h)); left: 50%; transform: translateX(-50%);
     z-index: 1500; background: rgba(196,30,58,0.95); color: white;
     padding: 6px 6px 6px 16px; border-radius: 22px; font-size: 13px;
     max-width: 92%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -1404,6 +1442,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <body>
 
 <header class="app-header">
+  <!-- Dev-notice banner: UI-only "under development" warning; top row of the
+       header stack, dismissible for the session. Height is measured by the init
+       script (see the .dev-notice CSS + the #devNotice script before </body>). -->
+  <div class="dev-notice" id="devNotice" role="note">
+    <span class="dn-text">⚠ Системата е в процес на разработка — данните се проверяват и допълват. Не разчитайте единствено на нея.</span>
+    <button class="dn-close" id="devNoticeClose" type="button" aria-label="Скрий съобщението">✕</button>
+  </div>
   <div class="topbar">
     <div class="title">🚒 Хидранти</div>
     <div class="meta" id="meta">—</div>
@@ -1425,6 +1470,21 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div id="addrSearchResults" class="search-results" role="listbox" aria-label="Резултати от търсенето"></div>
   </div>
 </header>
+<script>
+/* Pre-paint dismissal guard: if the dev-notice was dismissed earlier this
+   session, hide it and zero its offset synchronously (before first paint) so it
+   does not flash on same-session reloads. The full controller (height measure +
+   dismiss handler) runs at the end of <body>. UI-only. */
+(function () {
+  try {
+    if (sessionStorage.getItem('devNoticeDismissed') === '1') {
+      var n = document.getElementById('devNotice');
+      if (n) n.hidden = true;
+      document.documentElement.style.setProperty('--dev-banner-h', '0px');
+    }
+  } catch (e) {}
+})();
+</script>
 
 <div id="map"></div>
 
@@ -5176,6 +5236,37 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
   // ===== Auto-start =====
   bootApp();
+})();
+</script>
+<script>
+/* Dev-notice banner controller — UI-only, fully isolated from the app/search/data.
+   Responsibilities: (1) honour a session-scoped dismissal; (2) keep the top-overlay
+   offsets clear of the banner's width-dependent height by writing --dev-banner-h.
+   Uses sessionStorage (NOT localStorage) so the notice reappears next session. */
+(function () {
+  var KEY = 'devNoticeDismissed';
+  var el = document.getElementById('devNotice');
+  if (!el) return;
+  var root = document.documentElement;
+  function setH(px) { root.style.setProperty('--dev-banner-h', px + 'px'); }
+  function measure() { if (!el.hidden) setH(el.offsetHeight); }
+  function hide(persist) {
+    el.hidden = true;
+    setH(0);
+    if (persist) { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} }
+  }
+  var dismissed = false;
+  try { dismissed = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+  if (dismissed) {
+    hide(false);
+    return;
+  }
+  measure();
+  window.addEventListener('load', measure);
+  window.addEventListener('resize', measure, { passive: true });
+  window.addEventListener('orientationchange', measure);
+  var btn = document.getElementById('devNoticeClose');
+  if (btn) btn.addEventListener('click', function () { hide(true); });
 })();
 </script>
 </body>
