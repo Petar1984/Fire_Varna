@@ -120,6 +120,8 @@ Worker source now lives in the `worker/` directory in this repo (extracted in `9
 | HTTPS-required APIs must work: Geolocation, DeviceOrientation, Worker `fetch` | Core features depend on these |
 | **Scope: Varna oblast only** | National scope explicitly out of v1 |
 | No new runtime or build-time dependencies without Petar approval | Keep static architecture simple |
+| No secrets in the repo — Cloudflare/Worker credentials, `wrangler` secrets, `.dev.vars`, `.env` are gitignored and never committed | Public GitHub Pages repo |
+| No automated commits, no automated pushes — agents commit locally with explicit paths; **Petar alone pushes** | Reversibility & release control |
 
 ---
 
@@ -306,7 +308,7 @@ Defender exclusions applied (2026-05-06):
 - ExclusionPath: `C:\Projects\Varna_hydrants`, `C:\Users\Petar\Desktop\Fire_Varna_deploy2`
 - ExclusionProcess: `git.exe`, `git-remote-https.exe`, `node.exe`
 
-Primary workflow: edit + commit + push from `C:\Projects\Varna_hydrants` directly. Deploy clone `Fire_Varna_deploy2` is deprecated post-fix.
+Primary workflow: agents edit + commit locally in the canonical working directory `C:\git\Fire_Varna`; **Petar alone pushes** after reviewing the diff (Gate 2). Deploy clone `Fire_Varna_deploy2` is deprecated post-fix.
 
 Fallback, only if exclusions fail: Python pre-place blob recovery technique. See git history for full procedure, search "blob corruption".
 
@@ -339,9 +341,13 @@ Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
 
 - The user requests a change that contradicts a hard constraint above.
 - The user requests a change to the canonical/runtime dataset.
-- A planned change would push the build past the 2 MB hard cap.
+- A planned change would push the build past the 5 MB hard cap.
 - You are about to introduce a runtime or build-time dependency.
 - You are about to change Bulgarian UI text.
+- You are about to `git push`, deploy the Worker, or publish — these are Petar's alone; agents never run them.
+- A field report or any dataset carries personal data (PII): reject by default and scrub before persisting or creating an issue.
+- You discover unexpected state — unfamiliar branches, uncommitted changes, or files you did not create: investigate before deleting or overwriting; it may be Petar's in-progress work.
+- A task would touch the `Varna_buildings` checkout or any repo outside `C:\git\Fire_Varna`.
 - You do not have an approved plan and the task is non-trivial.
 
 When in doubt, ask. Petar would rather review a question than revert a commit.

@@ -27,6 +27,27 @@ If you receive a task without an approved plan from the **Planner** (Opus, read-
 
 Project-wide constraints (size budget, static hosting, Bulgarian UI labels, dependencies, mobile-first, HTTPS-required APIs, Varna-only scope) are canonical in [AGENTS.md § Hard Constraints](AGENTS.md#hard-constraints). Stop and ask if an approved plan would violate them.
 
+### Non-negotiable guardrails (harmonized with Varna_buildings)
+
+1. **Never run `git push`.** Petar pushes manually after reviewing commits locally, at Gate 2. This holds with any flag; never use `--no-verify` and never bypass the pre-push hook.
+2. **Never commit secrets.** No Cloudflare API tokens, Worker deploy credentials, `wrangler` secrets, `.dev.vars`, or `.env` files ever enter the repo. Verify `.gitignore` covers them before staging if in doubt.
+3. **Field-report / PII gate.** Treat field-report submissions as personal data: reject by default, and scrub any identifying content before persisting to `data/` or creating a GitHub issue. Stop and ask before persisting anything that could carry PII.
+4. **Destructive-op gate.** If you discover unexpected state — unfamiliar branches, uncommitted changes, files you did not create — investigate before deleting or overwriting. It may be Petar's in-progress work.
+5. **Cross-repo isolation.** Do not touch the `Varna_buildings` checkout, or any other repo, from here. Work stays inside `C:\git\Fire_Varna`.
+6. **No automated commits.** One logical change per commit, staged with explicit paths, using the exact commit message from the approved plan.
+
+### Per-commit execution protocol
+
+For each commit in an approved plan:
+
+1. Read the commit specification in the plan.
+2. Verify dependencies on earlier commits are met.
+3. Create or modify only the files the spec names.
+4. Stage those files with **explicit paths** (never `git add -A` / `git add .`) and commit with the **exact** message from the plan.
+5. Run `git status --short` to confirm only the intended files were committed and pre-existing dirty/untracked files were left untouched.
+6. Report commit number, hash, files, and acceptance-check result.
+7. If an acceptance check fails, **stop and ask Petar.** Do not roll forward with a broken commit.
+
 ---
 
 ## Code Style
