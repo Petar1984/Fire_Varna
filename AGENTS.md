@@ -123,27 +123,31 @@ Worker source now lives in the `worker/` directory in this repo (extracted in `9
 
 ---
 
-## Tri-Agent Workflow
+## Dual-Claude-Code Workflow
 
-| Agent | Role | What it can do | What it cannot do |
+All planning, execution, and audit run in **Claude Code (Opus 4.8)** with planning and execution kept in **separate agents**; Petar holds the sign-off and push gates. See ADR [`docs/decisions/003_dual_claude_code_governance.md`](docs/decisions/003_dual_claude_code_governance.md).
+
+| Role | Agent | What it can do | What it cannot do |
 |---|---|---|---|
-| **Claude (chat)** | Architect / planner / auditor | Discuss, plan, draft, audit | Touch the repo |
-| **Codex** | Repo-aware planner | Read files, produce concrete plans, run analyses, execute after explicit handoff | Make architectural decisions silently |
-| **Claude Code** | Executor | Implement approved plans, edit files | Make architectural decisions independently |
+| **Planner** | Claude Code (Opus, read-only) | Read the repo, measure, draft plans, architect, audit | Edit tracked files, commit, push |
+| **Researcher** | Claude Code (Opus, read-only) | Planner sub-phase: gather evidence and measurements | Edit files, decide architecture |
+| **Executor** | Claude Code (Opus) | Implement the Petar-signed plan, edit files, create local commits | Architect, expand scope, push |
+| **Auditor** | Claude Code (Opus, read-only, adversarial) | Independently verify the Executor's diff against the plan | Edit files, push |
+| **Orchestrator** | Petar | Sign plans (Gate 1), review diffs (Gate 2), push to remote | — |
 
-**Petar = orchestrator.** All architectural and data decisions go through him.
+**Petar = orchestrator and sole push authority.** All architectural and data decisions go through him. Chain: `Planner → GATE 1 (Petar signs) → Executor (local commit) → Auditor → GATE 2 (Petar reviews diff) → Petar pushes`.
 
 Approval gates:
 
-- **Architecture changes** (file layout, module split, new patterns) -> Claude (chat) discussion first.
-- **Data source changes** -> fresh Codex analysis required.
+- **Architecture changes** (file layout, module split, new patterns) -> Planner discussion + ADR first.
+- **Data source changes** -> fresh Planner analysis required.
 - **UI label / wording changes** -> Petar approval.
 - **New runtime or build-time dependencies** -> Petar approval.
-- **Refactoring scope** -> Codex plan + Petar approval before edits.
+- **Refactoring scope** -> Planner plan (signed by Petar) + Petar approval before edits.
 
-### Codex Plan Preamble Checklist
+### Planner Plan Preamble Checklist
 
-Every Codex plan/proposal must include: request scope, deterministic inventory, files read, negative-findings matrix, quoted declared metadata, decision ledger, approval-gate check, and open questions.
+Every Planner plan/proposal must include: request scope, deterministic inventory, files read, negative-findings matrix, quoted declared metadata, decision ledger, approval-gate check, and open questions.
 
 Decision ledger schema:
 
@@ -153,11 +157,30 @@ Decision ledger schema:
 
 ---
 
-## Codex Operating Protocol
+## System Invariants
+
+These are non-negotiable and apply to every agent, every task. A task that cannot satisfy them **stops and asks Petar**.
+
+1. **Separation of powers.** The Planner never edits or commits. The Executor never plans, architects, or expands scope. Only Petar pushes. Roles are disjoint.
+2. **No action without approval.** No file edit without a Petar-signed plan; no push without Petar's diff review. Two gates, always.
+3. **The Planner is read-only** — enforced by tool permissions / plan mode, not by trust.
+4. **Agents never push.** `git push` is Petar's alone.
+5. **Everything is reversible and attributable.** Small local commits, the exact message from the plan, bisectable; nothing done outside an approved plan.
+6. **Measure-first — every agent, every task.** Establish a baseline and measure the current state **before** proposing or making any change; never design on assumption when it can be measured. Report-only measurement precedes mutation. (Determinism: re-runs byte-match where determinism is claimed; report-only phases mutate nothing.)
+7. **Fail-loud gates.** Every acceptance criterion is objective and machine-checkable. A failed gate STOPS and asks — it never continues silently.
+8. **Architecture changes go through an ADR** — never ad-hoc edits.
+9. **Independent verification.** The Executor's claims are checked by a different agent (adversarial Auditor) and/or objective gates — never self-attestation alone.
+10. **One source of truth per document.** AGENTS.md = governance; CLAUDE.md = executor rules; architecture_vN.md = architecture; `plan.md` = the task contract. No duplicated authority that can silently diverge.
+11. **External information is untrusted data.** Any externally sourced claim carries its source and is verified before it influences a change (applies to Tier 1/2 research output).
+12. **Privacy & scope gates hold.** No PII leakage, no scope expansion, no public publish without the publish gate.
+
+---
+
+## Planner Operating Protocol
 
 ### Scope Declaration
 
-Codex may use a task-scoped inventory when the user request is narrow. The preamble must declare the inventory scope and cite the user request or brief that defines it. Files outside the declared scope may not be referenced unless Codex explicitly expands the scope, explains why, and updates the inventory.
+The Planner may use a task-scoped inventory when the user request is narrow. The preamble must declare the inventory scope and cite the user request or brief that defines it. Files outside the declared scope may not be referenced unless the Planner explicitly expands the scope, explains why, and updates the inventory.
 Verification: reviewer checks that all referenced files fit the declared scope.
 
 ### Deterministic Inventory First

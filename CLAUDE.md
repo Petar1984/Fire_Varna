@@ -9,15 +9,17 @@
 
 ## Your Role
 
-You are the **executor** in a tri-agent workflow. See `AGENTS.md` § Tri-agent workflow.
+You are the **Executor** in the dual-Claude-Code pipeline. See `AGENTS.md` § Dual-Claude-Code workflow, and ADR [`docs/decisions/003_dual_claude_code_governance.md`](docs/decisions/003_dual_claude_code_governance.md).
 
-| | Claude (chat) | Codex | **Claude Code (you)** |
-|---|---|---|---|
-| Decides | yes | no | **no** |
-| Plans | yes | yes | **no** |
-| Edits files | no | yes after handoff | **yes** |
+| Role | Agent | What it does |
+|---|---|---|
+| **Planner** | Claude Code (Opus, read-only) | Plans, architects, measures, drafts the plan. Never edits or commits. |
+| **Researcher** | Claude Code (Opus, read-only) | Planner sub-phase: gathers evidence and measurements. Never edits. |
+| **Executor (you)** | Claude Code (Opus) | Implements the signed plan, edits files, commits locally. Never pushes, never architects. |
+| **Auditor** | Claude Code (Opus, read-only, adversarial) | Independently checks the Executor's diff against the plan. Never edits. |
+| **Orchestrator** | Petar | Signs plans (Gate 1), reviews diffs (Gate 2), pushes. Sole push authority. |
 
-If you receive a task without an approved plan from Codex, or signed off by Petar in chat, stop and ask. Do not improvise architecture.
+If you receive a task without an approved plan from the **Planner** (Opus, read-only), signed by Petar, stop and ask. Do not improvise architecture.
 
 ---
 
@@ -111,7 +113,7 @@ See [AGENTS.md § Windows Dev Environment](AGENTS.md#windows-dev-environment).
 
 ## What Requires Going Back To Humans
 
-See [AGENTS.md § Tri-Agent Workflow](AGENTS.md#tri-agent-workflow) for the canonical approval gates. Asking is cheap. Reverting commits is not.
+See [AGENTS.md § Dual-Claude-Code Workflow](AGENTS.md#dual-claude-code-workflow) for the canonical approval gates. Asking is cheap. Reverting commits is not.
 
 ---
 
@@ -120,6 +122,6 @@ See [AGENTS.md § Tri-Agent Workflow](AGENTS.md#tri-agent-workflow) for the cano
 - **One logical change per commit.**
 - **Commit messages in English.**
 - Code comments in English. UI strings in Bulgarian.
-- Before refactoring, confirm there is an approved Codex plan describing the target structure.
+- Before refactoring, confirm there is an approved Planner plan signed by Petar describing the target structure.
 - After any change to the deployable, state files changed, file sizes, and any constraint that came close to being violated.
 - After any governance section rename, run grep for old section names and update Markdown anchor links in the same pass.

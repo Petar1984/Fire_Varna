@@ -82,17 +82,17 @@ Frontend: статичен `index.html` с вградени Leaflet, MarkerClust
 
 Преди промяна по кода — прочети:
 
-- **[AGENTS.md](./AGENTS.md)** — каноничен контекст: проектни решения, dataset избор, ограничения, workflow между Claude / Codex / Claude Code, известни tech debt
-- **[CLAUDE.md](./CLAUDE.md)** — оперативни правила специфични за Claude Code
+- **[AGENTS.md](./AGENTS.md)** — каноничен контекст: проектни решения, dataset избор, ограничения, workflow между Planner и Executor (Claude Code), известни tech debt
+- **[CLAUDE.md](./CLAUDE.md)** — оперативни правила специфични за Claude Code (Executor)
 
 ### Workflow
 
-Проектът работи с три AI агента:
-- **Claude (chat)** — архитектура, планиране, одит
-- **Codex** — repo-aware планове и read-only анализи
-- **Claude Code** — изпълнение на одобрени планове
+Проектът работи с два разделени Claude Code (Opus) агента, под ръководството на собственика:
+- **Planner** (Claude Code, само за четене) — планиране, архитектура, одит; не редактира кода
+- **Executor** (Claude Code) — изпълнява подписания план, редактира файлове, прави локални commit-и; никога не push-ва
+- **Petar** — подписва плана, преглежда diff-а и push-ва (единственият с това право)
 
-Всички архитектурни решения и промени по dataset-а изискват потвърждение от собственика на проекта.
+Всички архитектурни решения и промени по dataset-а изискват потвърждение от собственика на проекта. Виж ADR [`docs/decisions/003_dual_claude_code_governance.md`](docs/decisions/003_dual_claude_code_governance.md).
 
 ### Локално
 
