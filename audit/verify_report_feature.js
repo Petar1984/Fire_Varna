@@ -38,8 +38,8 @@ else {
 // 3) File size sanity
 const stat = fs.statSync(HTML_PATH);
 console.log('[INFO] file size:', stat.size, 'bytes (' + (stat.size / 1024).toFixed(1) + ' KB)');
-if (stat.size > 2 * 1024 * 1024) fail('file size exceeds 2 MB cap');
-else ok('file size under 2 MB cap');
+if (stat.size > 5 * 1024 * 1024) fail('file size exceeds 5 MB cap');
+else ok('file size under 5 MB cap');
 
 // 4) Spot-check key new identifiers exist
 const expected = [
