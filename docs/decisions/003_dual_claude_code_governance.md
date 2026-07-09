@@ -22,7 +22,7 @@ Chain: `Planner → GATE 1 (Petar signs) → Executor (local commit) → Auditor
 - **Planner ≠ Executor** is enforced structurally (separate contexts + tool permissions), not by discipline.
 - **Independent perspective** (formerly Codex's value) is recovered via the adversarial Auditor and, in rare high-stakes/low-confidence research, a Tier-2 multi-model research escalation (ChatGPT/Gemini via claude-in-chrome), treated as untrusted data.
 
-Full operating manual: `scratch/pipeline_reconfig_plan.md`. System Invariants: added to AGENTS.md (see `scratch/system_invariants_section.md`).
+Full operating manual: `scratch/pipeline_reconfig_plan.md` (Varna_buildings repo, committed there). System Invariants: added to AGENTS.md (see `scratch/system_invariants_section.md` — also in the Varna_buildings repo).
 
 ## Consequences
 
