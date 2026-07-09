@@ -305,7 +305,7 @@ Tap on a pin selects/activates it. Long-press on a pin opens the report menu. Th
 
 Defender exclusions applied (2026-05-06):
 
-- ExclusionPath: `C:\Projects\Varna_hydrants`, `C:\Users\Petar\Desktop\Fire_Varna_deploy2`
+- ExclusionPath: `C:\git\Fire_Varna`
 - ExclusionProcess: `git.exe`, `git-remote-https.exe`, `node.exe`
 
 Primary workflow: agents edit + commit locally in the canonical working directory `C:\git\Fire_Varna`; **Petar alone pushes** after reviewing the diff (Gate 2). Deploy clone `Fire_Varna_deploy2` is deprecated post-fix.
