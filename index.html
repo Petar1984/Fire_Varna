@@ -857,6 +857,24 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .ctrl-btn.active { background: #c41e3a; color:white; border-color:#c41e3a; }
   .ctrl-btn:active { transform: scale(0.95); }
 
+  /* ===== Status legend (colour key) — toggled by #legendBtn. Swatch colours
+     mirror the .h-pin.<status> fills above; keep the two in sync if a colour
+     ever changes. UI-only, no dependency on map/data. ===== */
+  .legend {
+    position:absolute; top:calc(150px + var(--dev-banner-h)); right:64px; z-index:1600;
+    background:#fff; border:1px solid #ccc; border-radius:10px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+    padding:10px 12px; max-width:min(78vw, 300px);
+    font-size:13px; color:#222; line-height:1.35;
+  }
+  .legend[hidden] { display:none; }
+  .legend-head { display:flex; align-items:center; justify-content:space-between; font-weight:700; margin-bottom:6px; }
+  .legend-close { border:none; background:transparent; font-size:16px; cursor:pointer; color:#666; padding:0 2px; line-height:1; }
+  .legend-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+  .legend-list li { display:flex; align-items:flex-start; gap:8px; }
+  .legend-dot { flex:0 0 auto; width:14px; height:14px; border-radius:50%; margin-top:2px; border:1px solid rgba(0,0,0,0.25); }
+  .legend-note { margin:8px 0 0; font-size:11.5px; color:#666; }
+
   /* ===== Basemap selector (B2) — only rendered when the PMTiles capability is
      active (committed flag false). When inactive it never appears. ===== */
   .basemap-selector {
@@ -1514,7 +1532,46 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <!-- Сграден слой скрит до Т2 (консолидация + етикети). Re-enable: махни коментара. -->
   <!-- <button class="ctrl-btn" id="buildingsToggle" title="Сгради вкл/изкл" aria-label="Сгради вкл/изкл" aria-pressed="false">🏢</button> -->
   <button class="ctrl-btn" id="basemapToggle" title="Спътникова карта вкл/изкл" aria-label="Спътникова карта" aria-pressed="false">🛰️</button>
+  <button class="ctrl-btn" id="legendBtn" title="Легенда — какво значат цветовете" aria-label="Легенда на цветовете" aria-expanded="false">🎨</button>
 </div>
+
+<!-- Status legend: what the pin colours mean. Toggled by #legendBtn. The swatch
+     colours mirror the .h-pin.<status> fills (see the CSS note there). UI-only. -->
+<div class="legend" id="legend" hidden role="dialog" aria-label="Легенда на цветовете">
+  <div class="legend-head">
+    <span>Легенда на хидрантите</span>
+    <button class="legend-close" id="legendClose" type="button" aria-label="Затвори легендата">✕</button>
+  </div>
+  <ul class="legend-list">
+    <li><span class="legend-dot" style="background:#757575"></span><span><b>Сив</b> — непроверен (никой още не е потвърдил, че го има)</span></li>
+    <li><span class="legend-dot" style="background:#fdd835"></span><span><b>Жълт</b> — докладван, чака преглед</span></li>
+    <li><span class="legend-dot" style="background:#c41e3a"></span><span><b>Червен</b> — на място (работоспособността не е проверявана)</span></li>
+    <li><span class="legend-dot" style="background:#2e7d32"></span><span><b>Зелен</b> — проверен и работи</span></li>
+    <li><span class="legend-dot" style="background:#212121"></span><span><b>Черен</b> — проверен, но не работи</span></li>
+  </ul>
+  <p class="legend-note">Целта: сивите (непроверени) точки да станат потвърдени.</p>
+</div>
+<script>
+/* Status-legend toggle. Plain DOM wiring, independent of the map/data IIFE. */
+(function () {
+  var btn = document.getElementById('legendBtn');
+  var panel = document.getElementById('legend');
+  var closeBtn = document.getElementById('legendClose');
+  if (!btn || !panel) return;
+  function show(open) {
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.classList.toggle('active', open);
+  }
+  btn.addEventListener('click', function (e) { e.stopPropagation(); show(panel.hidden); });
+  if (closeBtn) closeBtn.addEventListener('click', function () { show(false); });
+  // Dismiss on outside tap or Escape so it never traps the map.
+  document.addEventListener('click', function (e) {
+    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) show(false);
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') show(false); });
+})();
+</script>
 
 <div class="placement-banner" id="placementBanner" hidden>Постави pin-а на мястото на хидранта.</div>
 
