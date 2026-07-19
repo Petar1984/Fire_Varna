@@ -1,0 +1,131 @@
+{
+ "_comment": "Durable, reversible archive of hydrants removed from data/hydrants.json (confirmed missing on the ground). Restore = move a record back into hydrants.json. Appended over time; never rewritten.",
+ "removed": [
+  {
+   "issue_number": 42,
+   "removed_at": "2026-07-19T00:00:00+03:00",
+   "reason": "reported missing, removed by petar",
+   "record": {
+    "id": "coord_27.90011_43.21857",
+    "coords": [
+     27.900113,
+     43.218571
+    ],
+    "origin": "vik",
+    "legacy_ids": [
+     "676",
+     "etr_varna:27.90011305,43.21857144"
+    ],
+    "region": "26 ПОДРАЙОН; ЧАСТ 9",
+    "review_status": "reported"
+   }
+  },
+  {
+   "issue_number": 101,
+   "removed_at": "2026-07-19T00:00:00+03:00",
+   "reason": "reported missing, removed by petar",
+   "record": {
+    "id": "coord_27.83684_43.18484",
+    "coords": [
+     27.836837,
+     43.184842
+    ],
+    "origin": "vik",
+    "legacy_ids": [
+     "VIK-VARNA_ZAPAD-0144"
+    ],
+    "review_status": "reported"
+   }
+  },
+  {
+   "issue_number": 130,
+   "removed_at": "2026-07-19T00:00:00+03:00",
+   "reason": "reported missing, removed by petar",
+   "record": {
+    "id": "coord_27.89459_43.22508",
+    "coords": [
+     27.89459400031347,
+     43.22508099994077
+    ],
+    "origin": "national",
+    "legacy_ids": [
+     "NAT-14794"
+    ],
+    "type": "надземен",
+    "review_status": "reported"
+   }
+  },
+  {
+   "issue_number": 151,
+   "removed_at": "2026-07-19T00:00:00+03:00",
+   "reason": "reported missing, removed by petar",
+   "record": {
+    "id": "coord_27.92274_43.20792",
+    "coords": [
+     27.922736,
+     43.207922
+    ],
+    "origin": "vik",
+    "legacy_ids": [
+     "166",
+     "etr_varna:27.92273623,43.20792169"
+    ],
+    "region": "3 ПОДРАЙОН",
+    "review_status": "reported"
+   }
+  },
+  {
+   "issue_number": 163,
+   "removed_at": "2026-07-19T00:00:00+03:00",
+   "reason": "reported missing, removed by petar",
+   "record": {
+    "id": "coord_27.47859_43.38990",
+    "coords": [
+     27.47859400378544,
+     43.38990147742332
+    ],
+    "origin": "etr_provadia",
+    "legacy_ids": [
+     "etr_provadia:27.47859400,43.38990148"
+    ],
+    "review_status": "reported"
+   }
+  },
+  {
+   "issue_number": 176,
+   "removed_at": "2026-07-19T00:00:00+03:00",
+   "reason": "reported missing, removed by petar",
+   "record": {
+    "id": "coord_27.73892_43.25450",
+    "coords": [
+     27.738921899439585,
+     43.25449510904353
+    ],
+    "origin": "national",
+    "legacy_ids": [
+     "NAT-5860"
+    ],
+    "type": "надземен",
+    "review_status": "reported"
+   }
+  },
+  {
+   "issue_number": 186,
+   "removed_at": "2026-07-19T00:00:00+03:00",
+   "reason": "reported missing, removed by petar",
+   "record": {
+    "id": "coord_27.91834_43.20811",
+    "coords": [
+     27.918335914520643,
+     43.208105770119545
+    ],
+    "origin": "national",
+    "legacy_ids": [
+     "NAT-5435"
+    ],
+    "type": "надземен",
+    "review_status": "reported"
+   }
+  }
+ ]
+}
