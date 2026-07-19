@@ -436,12 +436,17 @@ def apply_damaged(state, report, timestamp, approver_id):
     if rec is None:
         return _skip(report, "target_not_found")
     changes, old_values = {}, {}
+    # A damaged report both confirms the hydrant exists (the reporter stood at it)
+    # and that it is not functional. Mark it verified + not_working and CLEAR the
+    # review gate so it renders as the 'broken' (black) status — the most
+    # actionable state for a fire crew. This supersedes the old B6 rule that kept
+    # review_status='reported' (which left damaged hydrants stuck yellow forever,
+    # since no resolution flow was ever built to clear it).
+    diff_set(rec, "existence_status", "verified", changes, old_values)
     rop = report.get("operational_status")
     if rop in CANONICAL_OPERATIONAL:
         diff_set(rec, "operational_status", rop, changes, old_values)
-    # damaged keeps review_status='reported' per Section B6: a follow-up
-    # resolution flow (future sprint) clears it, not ingest.
-    diff_set(rec, "review_status", "reported", changes, old_values)
+    diff_del(rec, "review_status", changes, old_values)
     _append_ref(state, rec["id"], report=report, report_type="damaged",
                 old_id=rec["id"], old_coord=list(rec["coords"]),
                 changes=changes, old_values=old_values,

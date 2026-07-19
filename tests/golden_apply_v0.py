@@ -243,10 +243,15 @@ def apply_damaged(state, report, timestamp, approver_id):
     if rec is None:
         return _skip(report, "target_not_found")
     changes, old_values = {}, {}
+    # Kept byte-identical with lib/hydrant_core.apply_damaged: a damaged report
+    # marks the target verified + not_working and clears the review gate so it
+    # renders 'broken' (black). Updated in lockstep when the B6 "keep reported"
+    # rule was superseded; the parity test guards the two against drift.
+    diff_set(rec, "existence_status", "verified", changes, old_values)
     rop = report.get("operational_status")
     if rop in CANONICAL_OPERATIONAL:
         diff_set(rec, "operational_status", rop, changes, old_values)
-    diff_set(rec, "review_status", "reported", changes, old_values)
+    diff_del(rec, "review_status", changes, old_values)
     _append_ref(state, rec["id"], report=report, report_type="damaged",
                 old_id=rec["id"], old_coord=list(rec["coords"]),
                 changes=changes, old_values=old_values,

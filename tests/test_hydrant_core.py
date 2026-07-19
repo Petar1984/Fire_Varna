@@ -341,6 +341,58 @@ class IdempotencyTest(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------
+# Damaged handler (renders 'broken' / black)
+# --------------------------------------------------------------------------
+
+class DamagedTest(unittest.TestCase):
+    """apply_damaged marks the target verified + not_working and clears the
+    review gate so it renders as the 'broken' (black) status. Supersedes the old
+    B6 behaviour that left damaged hydrants stuck at review_status='reported'
+    (yellow) with no path to black."""
+
+    def _run(self, existing):
+        state = make_state([existing])
+        report = {"issue_number": 55, "report_type": "damaged",
+                  "hydrant_id": existing["id"], "operational_status": "not_working"}
+        res = core.apply_damaged(state, report, TIMESTAMP, APPROVER)
+        return res, state["records"][0]
+
+    @staticmethod
+    def _status_class(h):
+        # Mirrors index.html hydrantStatusClass precedence.
+        if h.get("review_status") in ("reported", "pending_review"):
+            return "reported"
+        if h.get("existence_status") == "verified" and h.get("operational_status") == "works":
+            return "operational"
+        if h.get("existence_status") == "verified" and h.get("operational_status") == "not_working":
+            return "broken"
+        if h.get("existence_status") == "verified":
+            return "verified"
+        return "canonical"
+
+    def test_sets_verified_and_not_working(self):
+        res, rec = self._run(
+            {"id": "coord_27.90000_43.20000", "coords": [27.9, 43.2],
+             "origin": "vik", "legacy_ids": []})
+        self.assertEqual(res["action"], "applied")
+        self.assertEqual(rec["existence_status"], "verified")
+        self.assertEqual(rec["operational_status"], "not_working")
+
+    def test_clears_review_status(self):
+        # A previously reported (yellow) hydrant loses the review gate.
+        _, rec = self._run(
+            {"id": "coord_27.90000_43.20000", "coords": [27.9, 43.2],
+             "origin": "vik", "legacy_ids": [], "review_status": "reported"})
+        self.assertNotIn("review_status", rec)
+
+    def test_renders_broken_black(self):
+        _, rec = self._run(
+            {"id": "coord_27.90000_43.20000", "coords": [27.9, 43.2],
+             "origin": "vik", "legacy_ids": [], "review_status": "reported"})
+        self.assertEqual(self._status_class(rec), "broken")
+
+
+# --------------------------------------------------------------------------
 # Safety invariants
 # --------------------------------------------------------------------------
 
