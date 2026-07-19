@@ -2639,7 +2639,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       let html = '';
       html += '<div class="field" id="fld_hydrant_type">' +
         '<label>Тип хидрант <span class="req">*</span> (потвърди или поправи)</label>' +
-        radioRowHTML('hydrant_type', ['надземен','подземен','не знам'], d.hydrant_type) +
+        radioRowHTML('hydrant_type', ['надземен','подземен'], d.hydrant_type) +
         '<div class="err">Моля избери тип.</div>' +
       '</div>';
       if (showOpPicker) {
@@ -2668,7 +2668,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (t === 'new_hydrant') {
       return '<div class="field" id="fld_hydrant_type">' +
         '<label>Тип хидрант <span class="req">*</span></label>' +
-        radioRowHTML('hydrant_type', ['надземен','подземен','не знам'], d.hydrant_type) +
+        radioRowHTML('hydrant_type', ['надземен','подземен'], d.hydrant_type) +
         '<div class="err">Моля избери тип.</div>' +
       '</div>' +
       '<div class="field" id="fld_operational">' +
