@@ -2629,20 +2629,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
   }
   function typeFieldsHTML(t, d) {
     if (t === 'exists_confirmed') {
-      // Hide pickers whose target field is already populated on the hydrant
-      // record. With both fields populated, the modal collapses back to its
-      // original reporter + free-text friction level.
+      // The type picker is ALWAYS shown: many imported (still-grey) hydrants
+      // already carry a type from the source data, and an on-site verifier must
+      // be able to confirm or correct it. The current value is pre-selected in
+      // showReportModal, so confirming is one tap. The operational picker keeps
+      // the original "hide when already populated" behavior.
       const h = d.hydrant;
-      const showTypePicker = !(h && h.type);
-      const showOpPicker   = !(h && h.operational_status);
+      const showOpPicker = !(h && h.operational_status);
       let html = '';
-      if (showTypePicker) {
-        html += '<div class="field" id="fld_hydrant_type">' +
-          '<label>Тип хидрант <span class="req">*</span></label>' +
-          radioRowHTML('hydrant_type', ['надземен','подземен','не знам'], d.hydrant_type) +
-          '<div class="err">Моля избери тип.</div>' +
-        '</div>';
-      }
+      html += '<div class="field" id="fld_hydrant_type">' +
+        '<label>Тип хидрант <span class="req">*</span> (потвърди или поправи)</label>' +
+        radioRowHTML('hydrant_type', ['надземен','подземен','не знам'], d.hydrant_type) +
+        '<div class="err">Моля избери тип.</div>' +
+      '</div>';
       if (showOpPicker) {
         html += '<div class="field" id="fld_operational">' +
           '<label>Работи ли? <span class="req">*</span></label>' +
@@ -2732,7 +2731,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // exists_confirmed (when visible) and new_hydrant. Default to empty so
       // no chip is pre-selected and submit validation forces a choice. The
       // damaged and missing flows keep their existing default selections.
-      hydrant_type: draft.hydrant_type != null ? draft.hydrant_type : '',
+      // Exception: exists_confirmed on a hydrant that already carries a type
+      // pre-selects that value, so an on-site verifier confirms it in one tap
+      // (or corrects it). The picker is now always shown — see typeFieldsHTML.
+      hydrant_type: draft.hydrant_type != null ? draft.hydrant_type
+        : ((reportType === 'exists_confirmed' && hydrant && hydrant.type) ? hydrant.type : ''),
       hydrant_type_at_location: draft.hydrant_type_at_location || 'не знам',
       operational: draft.operational != null
         ? draft.operational
@@ -2849,7 +2852,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // those fields populated). Opt-out picker values are valid choices.
     if (reportType === 'exists_confirmed') {
       const h = reportDraft.hydrant;
-      const typeVisible = !(h && h.type);
+      // Type picker is always shown now (see typeFieldsHTML), so it is always
+      // required; pre-selection from the existing type satisfies it in one tap.
+      const typeVisible = true;
       const opVisible   = !(h && h.operational_status);
       if (typeVisible && !reportDraft.hydrant_type) {
         const f = document.getElementById('fld_hydrant_type'); if (f) f.classList.add('invalid');
