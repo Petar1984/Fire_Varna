@@ -148,6 +148,44 @@
     "report_id": "30ffbf52-5885-4256-877a-c069dec484bf",
     "reported_at": "2026-07-20T16:22:02+03:00"
    }
+  },
+  {
+   "issue_number": 29,
+   "removed_at": "2026-07-21T04:39:34+03:00",
+   "reason": "Докладван като липсващ (issue #29, missing): 'Не намирам хидрант, няма и знак за хидрант'. Премахнат от Петър.",
+   "record": {
+    "id": "coord_27.90343_43.21876",
+    "coords": [
+     27.903432,
+     43.218761
+    ],
+    "origin": "vik",
+    "legacy_ids": [
+     "VIK-VARNA_ZAPAD-0256",
+     "etr_varna:27.90343250,43.21876067"
+    ],
+    "review_status": "reported"
+   }
+  },
+  {
+   "issue_number": 30,
+   "removed_at": "2026-07-21T04:39:34+03:00",
+   "reason": "Докладван като липсващ (issues #30 + #34, missing; УЛ. 'ТОПОЛА'). Премахнат от Петър.",
+   "record": {
+    "id": "coord_27.90162_43.21829",
+    "coords": [
+     27.901624,
+     43.218286
+    ],
+    "origin": "vik",
+    "legacy_ids": [
+     "187",
+     "etr_varna:27.90162352,43.21828579"
+    ],
+    "address": "УЛ. \"ТОПОЛА\"",
+    "review_status": "reported",
+    "region": "26 ПОДРАЙОН; ЧАСТ 7"
+   }
   }
  ]
 }
