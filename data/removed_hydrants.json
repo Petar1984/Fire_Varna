@@ -126,6 +126,28 @@
     "type": "надземен",
     "review_status": "reported"
    }
+  },
+  {
+   "issue_number": 217,
+   "removed_at": "2026-07-21T03:22:09+03:00",
+   "reason": "Не е хидрант — спирателен кран (проверено от Петър на място). Докладчик Георги, без бележка. Issue #217.",
+   "record": {
+    "id": "coord_27.90373_43.21485",
+    "coords": [
+     27.90373,
+     43.214849
+    ],
+    "origin": "field_report",
+    "existence_status": "verified",
+    "legacy_ids": [
+     "30ffbf52-5885-4256-877a-c069dec484bf",
+     "field_30ffbf52"
+    ],
+    "type": "подземен",
+    "operational_status": "not_tested",
+    "report_id": "30ffbf52-5885-4256-877a-c069dec484bf",
+    "reported_at": "2026-07-20T16:22:02+03:00"
+   }
   }
  ]
 }
