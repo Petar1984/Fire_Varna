@@ -1214,6 +1214,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
     color: #444; margin-bottom: 6px;
   }
   .field label .req { color: #c41e3a; }
+  /* Sits under a free-text label to say plainly that the text becomes a public
+     note on the hydrant — it is persisted at ingest, not just read by the moderator. */
+  .field .hint {
+    font-size: 12px; line-height: 1.35; color: #777;
+    margin: -2px 0 6px;
+  }
   .field select, .field textarea {
     width: 100%; padding: 10px 12px; border: 1px solid #ccc;
     border-radius: 8px; font-size: 14px; font-family: inherit;
@@ -1684,6 +1690,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
     };
     if (raw.report_id   != null) h.report_id   = raw.report_id;
     if (raw.reported_at != null) h.reported_at = raw.reported_at;
+    // Moderated free-text note carried in the dataset. Without this the popup
+    // would only ever show notes injected by the live /issues poll, and every
+    // note persisted at ingest would be silently dropped on load.
+    if (typeof raw.verifier_note === 'string' && raw.verifier_note.trim()) {
+      h.verifier_note = raw.verifier_note;
+    }
     return h;
   }
 
@@ -1793,6 +1805,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let markersById = {};         // hydrant id -> array of L.marker (cluster member + active overlay can coexist in 'all' mode)
   let allClusterLayer = null;
   let allClusterInteractionOpen = false; // true while a cluster is spiderfied; suppresses routine refresh() during GPS updates
+  let deepLinkFramed = false;    // a ?h= link framed the map on one hydrant; the first-fix auto-fit must not undo that
   let allModeActiveOverlay = null;       // single all-mode active overlay marker; tracked separately from visibleMarkers so updateAllModeActiveOverlay can replace it without a full refresh
   let lastFix = null;
   let userHeading = null;
@@ -1872,7 +1885,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     placeUser();
     if (isInitialFix) {
       isInitialFix = false;
-      refresh(true);  // one-time auto-fit on first GPS lock
+      // Normally the first lock frames the user and the nearby pins. When a ?h=
+      // link opened the map on one specific hydrant, fitting to the GPS position
+      // here would throw that framing away the moment the fix arrives.
+      refresh(!deepLinkFramed);
       return;
     }
     // Cluster guard: a spiderfy is open in all-mode. Skip refresh() so child
@@ -2627,6 +2643,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       ).join('') +
     '</div>';
   }
+  // Every free-text field in a report is a candidate note: ingest persists it on
+  // the hydrant, where it shows in the popup. Publication is not automatic — a
+  // moderator reads each one first — so the hint promises review, not posting.
+  const NOTE_HINT_HTML =
+    '<div class="hint">Полезното за екипа на място — състояние, достъп, ориентир. ' +
+    'Преглеждаме бележките и полезните оставаме на хидранта.</div>';
+
   function typeFieldsHTML(t, d) {
     if (t === 'exists_confirmed') {
       // The type picker is ALWAYS shown: many imported (still-grey) hydrants
@@ -2650,8 +2673,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
         '</div>';
       }
       html += '<div class="field">' +
-        '<label>Свободен текст (опционално)</label>' +
-        '<textarea data-field="free_text" maxlength="2000">' + escapeHtml(d.free_text) + '</textarea>' +
+        '<label>Бележка за хидранта (по желание)</label>' +
+        NOTE_HINT_HTML +
+        '<textarea data-field="free_text" maxlength="2000" placeholder="напр. деформиран · капакът е затрупан · в шахта до входа">' +
+          escapeHtml(d.free_text) +
+        '</textarea>' +
       '</div>';
       return html;
     }
@@ -2661,8 +2687,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
         radioRowHTML('hydrant_type_at_location', ['надземен','подземен','не знам'], d.hydrant_type_at_location) +
       '</div>' +
       '<div class="field">' +
-        '<label>Описание на терена (опционално)</label>' +
-        '<textarea data-field="terrain_description" maxlength="2000">' + escapeHtml(d.terrain_description) + '</textarea>' +
+        '<label>Бележка за терена (по желание)</label>' +
+        NOTE_HINT_HTML +
+        '<textarea data-field="terrain_description" maxlength="2000" placeholder="напр. няма и следа от шахта · залято с асфалт">' + escapeHtml(d.terrain_description) + '</textarea>' +
       '</div>';
     }
     if (t === 'new_hydrant') {
@@ -2677,13 +2704,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
         '<div class="err">Моля избери дали работи.</div>' +
       '</div>' +
       '<div class="field">' +
-        '<label>Описание (опционално)</label>' +
-        '<textarea data-field="description" maxlength="2000">' + escapeHtml(d.description) + '</textarea>' +
+        '<label>Бележка за хидранта (по желание)</label>' +
+        NOTE_HINT_HTML +
+        '<textarea data-field="description" maxlength="2000" placeholder="напр. до входа на паркинга · в храсти">' + escapeHtml(d.description) + '</textarea>' +
       '</div>';
     }
     if (t === 'wrong_location') {
       return '<div class="field" id="fld_description">' +
         '<label>Описание <span class="req">*</span></label>' +
+        NOTE_HINT_HTML +
         '<textarea data-field="description" maxlength="2000" placeholder="Защо локацията в базата е грешна; къде всъщност е хидрантът">' + escapeHtml(d.description) + '</textarea>' +
         '<div class="err">Моля въведи описание.</div>' +
       '</div>';
@@ -2691,6 +2720,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (t === 'damaged') {
       return '<div class="field" id="fld_damage">' +
         '<label>Описание на повредата <span class="req">*</span></label>' +
+        NOTE_HINT_HTML +
         '<textarea data-field="damage_description" maxlength="2000" placeholder="Какво точно е повредено">' + escapeHtml(d.damage_description) + '</textarea>' +
         '<div class="err">Моля опиши повредата.</div>' +
       '</div>' +
@@ -5579,6 +5609,36 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (isBasemapPmtilesActive()) toggleBasemapSelector();
     else setBasemap(!satelliteOn);
   });
+
+  // ===== Deep link =====
+  // `?h=<id>` frames the map on one hydrant and opens its popup, so a specific
+  // pin can be linked to — in a report thread, to a volunteer, from a note.
+  // `?lat=&lon=` does the same for a bare coordinate. `&z=` overrides the zoom.
+  // Additive by construction: with no parameters nothing here runs, and the whole
+  // call is guarded so a malformed link can never stop the map from loading.
+  const DEEP_LINK_ZOOM = 18;
+  function applyDeepLink() {
+    const qp = new URLSearchParams(location.search);
+    const id = qp.get('h');
+    const rawLat = parseFloat(qp.get('lat')), rawLon = parseFloat(qp.get('lon'));
+    if (!id && !(isFinite(rawLat) && isFinite(rawLon))) return;
+
+    let zoom = parseInt(qp.get('z'), 10);
+    if (!isFinite(zoom)) zoom = DEEP_LINK_ZOOM;
+    zoom = Math.max(3, Math.min(19, zoom));
+
+    if (id) {
+      const h = resolveHydrantById(id);
+      if (!h) { flashStatus('Хидрантът от връзката не е намерен', 4000); return; }
+      map.setView([h.coords[1], h.coords[0]], zoom);
+      deepLinkFramed = true;
+      openHydrantPopup(h);
+      return;
+    }
+    map.setView([rawLat, rawLon], zoom);
+    deepLinkFramed = true;
+  }
+  try { applyDeepLink(); } catch (e) { /* a bad link must never break the map */ }
 
   // ===== Auto-start =====
   bootApp();
