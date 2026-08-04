@@ -546,5 +546,88 @@ class EncodingTest(unittest.TestCase):
             core.mojibake_scan("bad", {"t": bad})
 
 
+# --------------------------------------------------------------------------
+# verifier_note: the reporter's free text has to survive ingest
+# --------------------------------------------------------------------------
+
+class VerifierNoteTest(unittest.TestCase):
+    """Before this, a reporter's note only lived in the transient open-issue
+    feed and vanished the moment the report was ingested and the issue closed.
+    The handlers now persist it as `verifier_note`, which the frontend popup
+    already knows how to render."""
+
+    BASE = [{"id": "coord_27.90000_43.20000", "coords": [27.9, 43.2],
+             "origin": "vik", "legacy_ids": []}]
+
+    def _apply(self, report, records=None):
+        state = make_state(records if records is not None else self.BASE)
+        res = core.apply_exists_confirmed(state, report, TIMESTAMP, APPROVER)
+        return state, res
+
+    def test_note_is_persisted(self):
+        state, _ = self._apply({"issue_number": 1, "hydrant_id": self.BASE[0]["id"],
+                                "report_type": "exists_confirmed",
+                                "comment": "деформиран, но работи"})
+        self.assertEqual(state["records"][0]["verifier_note"], "деформиран, но работи")
+
+    def test_note_is_trimmed(self):
+        state, _ = self._apply({"issue_number": 1, "hydrant_id": self.BASE[0]["id"],
+                                "report_type": "exists_confirmed",
+                                "comment": "  капакът е затрупан  "})
+        self.assertEqual(state["records"][0]["verifier_note"], "капакът е затрупан")
+
+    def test_absent_or_blank_note_writes_nothing(self):
+        for comment in (None, "", "   ", 42):
+            with self.subTest(comment=comment):
+                state, _ = self._apply({"issue_number": 1, "hydrant_id": self.BASE[0]["id"],
+                                        "report_type": "exists_confirmed", "comment": comment})
+                self.assertNotIn("verifier_note", state["records"][0])
+
+    def test_later_note_replaces_earlier(self):
+        """Petar's rule (2026-08-01): newest information wins; the old value
+        stays recoverable through the provenance entry."""
+        existing = copy.deepcopy(self.BASE)
+        existing[0]["verifier_note"] = "стара бележка"
+        state, res = self._apply({"issue_number": 2, "hydrant_id": existing[0]["id"],
+                                  "report_type": "exists_confirmed",
+                                  "comment": "нова бележка"}, records=existing)
+        self.assertEqual(state["records"][0]["verifier_note"], "нова бележка")
+        self.assertEqual(res["changes"]["verifier_note"]["old"], "стара бележка")
+
+    def test_missing_report_keeps_note_with_yellow_flag(self):
+        state = make_state(self.BASE)
+        core.apply_missing(state, {"issue_number": 3, "hydrant_id": self.BASE[0]["id"],
+                                   "report_type": "missing",
+                                   "comment": "няма и следа от шахта"}, TIMESTAMP, APPROVER)
+        rec = state["records"][0]
+        self.assertEqual(rec["review_status"], "reported")
+        self.assertEqual(rec["verifier_note"], "няма и следа от шахта")
+
+    def test_new_hydrant_add_carries_note(self):
+        state = make_state(self.BASE)
+        far = point_north(27.9, 43.2, 500)
+        res = core.apply_new_hydrant(state, {"issue_number": 4, "report_type": "new_hydrant",
+                                             "reported_coord": [far[0], far[1]],
+                                             "comment": "зад трафопоста"}, TIMESTAMP, APPROVER)
+        created = res["changes"]["created"]
+        self.assertEqual(created["verifier_note"], "зад трафопоста")
+
+    def test_golden_and_core_agree_on_notes(self):
+        """The parity fixtures do not exercise notes, so pin the two
+        implementations together explicitly — an edit to one without the other
+        would otherwise slip through."""
+        import golden_apply_v0 as golden
+        report = {"issue_number": 5, "hydrant_id": self.BASE[0]["id"],
+                  "report_type": "exists_confirmed", "comment": "  еднакво  "}
+        c_state = make_state(self.BASE)
+        core.apply_exists_confirmed(c_state, report, TIMESTAMP, APPROVER)
+        g_records = copy.deepcopy(self.BASE)
+        g_state = {"records": g_records, "provenance": {r["id"]: {"source_refs": []} for r in g_records},
+                   "alias": golden.build_alias_index(g_records)}
+        golden.apply_exists_confirmed(g_state, report, TIMESTAMP, APPROVER)
+        self.assertEqual(json.dumps(c_state["records"], ensure_ascii=False, sort_keys=True),
+                         json.dumps(g_state["records"], ensure_ascii=False, sort_keys=True))
+
+
 if __name__ == "__main__":
     unittest.main()

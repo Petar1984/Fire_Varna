@@ -111,6 +111,22 @@ def diff_del(rec, field, changes, old_values):
         changes[field] = {"old": old_values[field], "new": None}
 
 
+def report_note(report):
+    """The reporter's free-text note, as collapsed by the Worker into `comment`
+    (firstText of damage_description / description / terrain_description /
+    free_text). Returned trimmed; missing or blank becomes None so handlers can
+    skip it. Persisting it as `verifier_note` is what makes an explanatory note
+    survive ingest — the frontend already renders that field in the popup, but
+    before this the note only lived in the transient open-issue feed and was
+    lost once the report was ingested and closed. A later note replaces an
+    earlier one (Petar, 2026-08-01); the previous value stays in provenance."""
+    note = report.get("comment")
+    if not isinstance(note, str):
+        return None
+    note = note.strip()
+    return note or None
+
+
 def make_source_ref(*, issue_number, report_type, old_id, old_coord,
                     changes, old_values, approver_id, timestamp):
     if len(changes) == 0:
@@ -181,6 +197,9 @@ def apply_exists_confirmed(state, report, timestamp, approver_id):
     rop = report.get("operational_status")
     if rop in CANONICAL_OPERATIONAL:
         diff_set(rec, "operational_status", rop, changes, old_values)
+    note = report_note(report)
+    if note:
+        diff_set(rec, "verifier_note", note, changes, old_values)
     diff_del(rec, "review_status", changes, old_values)
     _append_ref(state, rec["id"], report=report, report_type="exists_confirmed",
                 old_id=rec["id"], old_coord=list(rec["coords"]),
@@ -217,6 +236,9 @@ def apply_new_hydrant(state, report, timestamp, approver_id):
         new_record["type"] = report["type"]
     if report.get("operational_status") in CANONICAL_OPERATIONAL:
         new_record["operational_status"] = report["operational_status"]
+    note = report_note(report)
+    if note:
+        new_record["verifier_note"] = note
     if isinstance(full, str) and full:
         new_record["report_id"] = full
     if isinstance(report.get("reported_at"), str):
@@ -251,6 +273,9 @@ def apply_damaged(state, report, timestamp, approver_id):
     rop = report.get("operational_status")
     if rop in CANONICAL_OPERATIONAL:
         diff_set(rec, "operational_status", rop, changes, old_values)
+    note = report_note(report)
+    if note:
+        diff_set(rec, "verifier_note", note, changes, old_values)
     diff_del(rec, "review_status", changes, old_values)
     _append_ref(state, rec["id"], report=report, report_type="damaged",
                 old_id=rec["id"], old_coord=list(rec["coords"]),
@@ -265,6 +290,9 @@ def apply_missing(state, report, timestamp, approver_id):
         return _skip(report, "target_not_found")
     changes, old_values = {}, {}
     diff_set(rec, "review_status", "reported", changes, old_values)
+    note = report_note(report)
+    if note:
+        diff_set(rec, "verifier_note", note, changes, old_values)
     _append_ref(state, rec["id"], report=report, report_type="missing",
                 old_id=rec["id"], old_coord=list(rec["coords"]),
                 changes=changes, old_values=old_values,
@@ -301,6 +329,9 @@ def apply_wrong_location(state, report, timestamp, approver_id):
         state["provenance"][new_id] = state["provenance"].pop(old_id, {"source_refs": []})
         state["alias"][new_id] = rec
     diff_set(rec, "existence_status", "verified", changes, old_values)
+    note = report_note(report)
+    if note:
+        diff_set(rec, "verifier_note", note, changes, old_values)
     diff_del(rec, "review_status", changes, old_values)
 
     _append_ref(state, rec["id"], report=report, report_type="wrong_location",
