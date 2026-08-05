@@ -824,7 +824,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* ===== Pill (loading / error) ===== */
   .pill {
     position: absolute; top: calc(150px + var(--dev-banner-h)); left: 50%; transform: translateX(-50%);
-    z-index: 1500; background: rgba(0,0,0,0.85); color: white;
+    /* Above .modal-backdrop (5000): these pills fire while a modal is open, so a
+       lower stacking order rendered them behind the backdrop — present but unseeable. */
+    z-index: 6000; background: rgba(0,0,0,0.85); color: white;
     padding: 10px 16px; border-radius: 22px; font-size: 13px;
     display: flex; align-items: center; gap: 10px;
     max-width: 92%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -914,7 +916,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* ===== Status pill (transient) ===== */
   .status {
     position: absolute; top: calc(150px + var(--dev-banner-h)); left: 50%; transform: translateX(-50%);
-    z-index:1500; background: rgba(0,0,0,0.85); color:white;
+    z-index:6000; background: rgba(0,0,0,0.85); color:white;   /* over .modal-backdrop (5000) — see .pill */
     padding: 10px 18px; border-radius: 20px; font-size: 13px;
     pointer-events:none; opacity: 0; transition: opacity 0.3s;
     max-width: 90%; text-align:center;
