@@ -1255,6 +1255,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .modal-btn.submit:disabled { background: #ccc; cursor: not-allowed; }
   .modal-btn.secondary { background: #1976d2; color: white; }
 
+  /* Submit-cooldown notice: sits at the end of .modal-body, directly above the
+     sticky footer, so the reason for the wait is next to the button showing it. */
+  .cooldown-note {
+    margin-top: 14px; padding: 9px 12px; border-radius: 8px;
+    background: #fff4d6; color: #6b5300; border: 1px solid #f0d270;
+    font-size: 13px; line-height: 1.4; text-align: center;
+  }
+  .cooldown-note.hidden { display: none; }
+
   /* ===== Welcome modal (first-launch onboarding) ===== */
   .modal.welcome-mode .modal-header,
   .modal.welcome-mode .modal-footer { display: none; }
@@ -2480,10 +2489,59 @@ window._hydrantDataReady = (async function loadHydrantData() {
     modalBackdrop.classList.add('show');
   }
   function closeReportModal() {
+    stopCooldownUi();
     modalBackdrop.classList.remove('show');
     modalBody.innerHTML = '';
     modalFooter.innerHTML = '';
     reportDraft = null;
+  }
+
+  // ----- Submit-cooldown UI -------------------------------------------------
+  // SUBMIT_THROTTLE_MS is enforced inside onSubmitClicked, but the only feedback
+  // was a flashStatus pill that fires while the modal is open — so the volunteer
+  // filing several reports in a row saw nothing and read it as a dead button.
+  // The countdown now lands on the submit button itself and is painted when the
+  // modal OPENS, so the wait is visible before the first tap rather than after.
+  // Enforcement is unchanged; this only makes the existing rule legible.
+  let cooldownTimer = null;
+
+  function remainingCooldownMs() {
+    const left = SUBMIT_THROTTLE_MS - (Date.now() - lastSubmitTs);
+    return left > 0 ? left : 0;
+  }
+
+  function stopCooldownUi() {
+    if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+  }
+
+  // Paint the current cooldown state onto the open modal. Safe to call with no
+  // cooldown running and safe after the modal closed — it restores the normal
+  // button and stops its own timer.
+  function refreshCooldownUi() {
+    const btn = modalFooter.querySelector('[data-act="submit"]');
+    if (!btn) { stopCooldownUi(); return; }
+    const note = document.getElementById('cooldownNote');
+    const left = remainingCooldownMs();
+    if (left <= 0) {
+      stopCooldownUi();
+      btn.disabled = false;
+      btn.textContent = 'Изпрати ▶';
+      if (note) note.classList.add('hidden');
+      return;
+    }
+    const sec = Math.ceil(left / 1000);
+    btn.disabled = true;
+    btn.textContent = 'Изчакай ' + sec + ' с';
+    if (note) {
+      note.textContent = 'Изчакай ' + sec + ' сек преди следващ доклад';
+      note.classList.remove('hidden');
+    }
+  }
+
+  function startCooldownUi() {
+    stopCooldownUi();
+    refreshCooldownUi();
+    if (remainingCooldownMs() > 0) cooldownTimer = setInterval(refreshCooldownUi, 1000);
   }
   document.getElementById('modalClose').addEventListener('click', closeReportModal);
   modalBackdrop.addEventListener('click', (ev) => {
@@ -2782,13 +2840,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
       nameFieldHTML(reportDraft.reporter) +
       typeFieldsHTML(reportType, reportDraft) +
       locationFieldHTML(reportType, reportDraft.placedCoord) +
-      '<input type="text" class="honeypot" name="website" id="hp_website" tabindex="-1" autocomplete="off" aria-hidden="true">';
+      '<input type="text" class="honeypot" name="website" id="hp_website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<div class="cooldown-note hidden" id="cooldownNote"></div>';
     modalFooter.innerHTML =
       '<button class="modal-btn cancel" data-act="cancel">Отказ</button>' +
       '<button class="modal-btn submit"  data-act="submit">Изпрати ▶</button>';
 
     wireReporterBar();
     wireFormHandlers(reportType);
+    startCooldownUi();   // show any running wait before the first tap, not after it
   }
 
   function readDraftFromForm() {
@@ -2906,6 +2966,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (now - lastSubmitTs < SUBMIT_THROTTLE_MS) {
       const sec = Math.ceil((SUBMIT_THROTTLE_MS - (now - lastSubmitTs)) / 1000);
       flashStatus('Изчакай ' + sec + ' сек преди следващ доклад', 3000);
+      startCooldownUi();   // the tap already happened — leave the countdown on screen
       return;
     }
 
