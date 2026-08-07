@@ -1041,6 +1041,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
      zero exact match; the dashed ring signals an uncertain (official-but-unconfirmed)
      position. */
   .asr-kind.approx { background: #b26a00; }
+  /* GPS — a coordinate pasted from a smartphone call. Red because it is a live
+     incident position, not a catalogued address. */
+  .asr-kind.gps { background: #b02a37; }
   .approx-pin-wrapper { background: transparent; border: none; }
   .approx-pin {
     width: 26px; height: 26px; border-radius: 50%;
@@ -4534,6 +4537,178 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return isEntrance ? base + ' · вх. ' + hit.en : base;
     }
 
+    // =====================================================================
+    // GPS coordinate input (kind:"coord"). ADDITIVE, isolated, no payload.
+    // A call to the operations room arrives from a smartphone as a POSITION, not
+    // an address. Pasting that position into the SAME search box must do what an
+    // address does: land the pin, re-anchor the Top-5 hydrants, and name the
+    // nearest address — no second tool, no mode switch, no network.
+    //
+    // The branch fires BEFORE the geocoder and never touches it: a query the
+    // parser rejects (anything without two coordinate components) falls through
+    // to today's behaviour untouched. Works offline — the coordinate itself needs
+    // no index; the nearest-address line is enrichment that degrades to nothing.
+    // =====================================================================
+    // Mirrors APPROX_BBOX deliberately: this feature must not depend on a
+    // flag-dark one's constant, and the window is the same operational Varna.
+    const COORD_BBOX = { minLat: 43.00, maxLat: 43.45, minLng: 27.60, maxLng: 28.15 };
+    const COORD_NEAR_STREET_MAX_M = 250;  // beyond this a street label stops being "the address here"
+    function coordInVarna(lat, lng) {
+      return lat >= COORD_BBOX.minLat && lat <= COORD_BBOX.maxLat &&
+             lng >= COORD_BBOX.minLng && lng <= COORD_BBOX.maxLng;
+    }
+    // Equirectangular metres — exact enough at city scale and far cheaper than
+    // haversine when it runs over 80k rows per keystroke.
+    function coordMetres(aLat, aLng, bLat, bLng) {
+      const R = 6371000, RAD = Math.PI / 180;
+      const y = (bLat - aLat) * RAD;
+      const x = (bLng - aLng) * RAD * Math.cos(((aLat + bLat) / 2) * RAD);
+      return Math.round(Math.sqrt(x * x + y * y) * R);
+    }
+
+    // parseCoordQuery — one entry point for every shape a coordinate reaches a
+    // dispatcher in. Strategy: pull a pair out of the known map-link formats
+    // first, then read the remaining text as an ordered list of NUMBERS plus
+    // hemisphere letters. The number COUNT decides the notation (2 = decimal
+    // degrees, 4 = degrees+decimal minutes, 6 = degrees/minutes/seconds), so one
+    // path covers "43.2141, 27.9147", "43°12'50.8\"N 27°54'52.9\"E" and
+    // "43 12.846N 27 54.882E" without three separate regexes.
+    // Returns { lat, lng, swapped, outside } or null.
+    function parseCoordQuery(raw) {
+      let s = String(raw == null ? '' : raw).trim();
+      if (!s || s.length > 300) return null;
+
+      // (1) map links — Google place (!3d/!4d), Google view (@lat,lng),
+      //     ?q=/?ll=/?query=, and the geo: URI phones hand over.
+      let m = s.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/);
+      if (!m) m = s.match(/@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/);
+      if (!m) m = s.match(/[?&](?:q|ll|query|daddr|sll)=(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (!m) m = s.match(/^geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) s = m[1] + ' ' + m[2];
+      else if (/https?:\/\//i.test(s)) return null;  // a link we cannot read is not a coordinate
+
+      // (2) Bulgarian decimal comma ("43,2141 27,9147"): commas are separators
+      //     ONLY when a dot is already doing the decimal work.
+      if (!/\./.test(s) && (s.match(/\d,\d/g) || []).length >= 2) s = s.replace(/,/g, '.');
+
+      // (3) symbols -> spaces; keep signs, digits, dots and hemisphere letters
+      const cleaned = s.replace(/[°º'′"″]/g, ' ').replace(/[,;]/g, ' ');
+      if (/[A-Za-zА-Яа-я]/.test(cleaned.replace(/[NSEWnsewСЮИЗсюиз]/g, ''))) return null; // words -> it is an address
+      const nums = cleaned.match(/-?\d+(?:\.\d+)?/g);
+      if (!nums || (nums.length !== 2 && nums.length !== 4 && nums.length !== 6)) return null;
+
+      // hemisphere letters in the order they appear; N/S fix latitude, E/W longitude
+      const HEMI = { n: ['lat', 1], s: ['lat', -1], e: ['lng', 1], w: ['lng', -1],
+                     с: ['lat', 1], ю: ['lat', -1], и: ['lng', 1], з: ['lng', -1] };
+      const letters = (cleaned.match(/[NSEWnsewСЮИЗсюиз]/g) || []).map(function (c) { return HEMI[c.toLowerCase()]; });
+      if (letters.length && letters.length !== 2) return null;
+      if (letters.length === 2 && letters[0][0] === letters[1][0]) return null;  // "N … N" names no pair
+
+      const per = nums.length / 2;
+      function component(part) {
+        let v = 0;
+        for (let i = 0; i < per; i++) v += Math.abs(parseFloat(part[i])) / Math.pow(60, i);
+        if (parseFloat(part[0]) < 0) v = -v;
+        return v;
+      }
+      let a = component(nums.slice(0, per));
+      let b = component(nums.slice(per));
+      if (!isFinite(a) || !isFinite(b)) return null;
+
+      // (4) which is which. Hemisphere letters have the last word; otherwise the
+      //     first number is latitude. A pair that is nonsense one way round but
+      //     lands in Varna the other IS the swap a dispatcher just made.
+      let lat = a, lng = b, swapped = false;
+      if (letters.length === 2 && letters[0] && letters[1]) {
+        if (letters[0][0] === 'lng' && letters[1][0] === 'lat') { lat = b; lng = a; swapped = true; }
+        lat = Math.abs(lat) * letters[letters[0][0] === 'lat' ? 0 : 1][1];
+        lng = Math.abs(lng) * letters[letters[0][0] === 'lng' ? 0 : 1][1];
+      } else if (!coordInVarna(lat, lng) && coordInVarna(lng, lat)) {
+        const t = lat; lat = lng; lng = t; swapped = true;
+      }
+      if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+      // A bare "12 5" is a block number, not a position. Only a value that is
+      // plausibly a WGS84 pair (has a fraction, or carries hemisphere letters,
+      // or lands in Varna) is treated as a coordinate.
+      const precise = /\d\.\d/.test(cleaned) || letters.length === 2 || per > 1;
+      if (!precise) return null;
+      return { lat: lat, lng: lng, swapped: swapped, outside: !coordInVarna(lat, lng) };
+    }
+
+    // nearestAddressTo — the operational half. Scans the display payload for the
+    // closest address to a dropped position and, separately, the closest one that
+    // actually carries a street number (a bare quarter name does not help a crew).
+    // Null when the payload is not loaded (offline) — the coordinate still works.
+    function nearestAddressTo(lat, lng) {
+      if (!Array.isArray(addressRows) || !addrFieldIdx) return null;
+      const iA = addrFieldIdx.normalized_address, iLa = addrFieldIdx.lat, iLo = addrFieldIdx.lng;
+      let best = null, bestD = Infinity, street = null, streetD = Infinity;
+      for (let i = 0; i < addressRows.length; i++) {
+        const row = addressRows[i];
+        if (!Array.isArray(row)) continue;
+        const la = row[iLa], lo = row[iLo];
+        if (typeof la !== 'number' || typeof lo !== 'number') continue;
+        if (Math.abs(la - lat) > 0.02 || Math.abs(lo - lng) > 0.03) continue;  // cheap reject before the sqrt
+        const d = coordMetres(lat, lng, la, lo);
+        const label = row[iA];
+        if (!label) continue;
+        if (d < bestD) { bestD = d; best = label; }
+        // "streetish" = carries a REAL house number and is not the bare
+        // район/квартал line. A trailing " 0" is the payload's placeholder for
+        // "street known, number not" (499 rows) — it must not read as №0.
+        if (d < streetD && /\d/.test(label) && !/\s0$/.test(label) && !/^гр\s+варна/.test(label)) { streetD = d; street = label; }
+      }
+      if (best === null) return null;
+      const useStreet = street !== null && streetD <= COORD_NEAR_STREET_MAX_M;
+      const label = String(useStreet ? street : best).replace(/\s0$/, '');
+      return { label: label.charAt(0).toUpperCase() + label.slice(1), metres: useStreet ? streetD : bestD };
+    }
+
+    function coordTitle(r) { return r.lat.toFixed(5) + ', ' + r.lng.toFixed(5); }
+    function coordMeta(r) {
+      const bits = [];
+      if (r.outside) bits.push('⚠ извън Варна');
+      if (r.swapped) bits.push('координатите са разменени');
+      if (r.near) bits.push('≈ ' + r.near.metres + ' м от ' + r.near.label);
+      else if (!r.outside) bits.push('няма адрес наблизо');
+      return bits.join(' · ');
+    }
+    function buildCoordItem(r, idx) {
+      const item = document.createElement('div');
+      item.className = 'asr-item'; item.setAttribute('role', 'option'); item.dataset.idx = String(idx);
+      const chip = document.createElement('span'); chip.className = 'asr-kind gps'; chip.textContent = 'GPS';
+      const body = document.createElement('span'); body.className = 'asr-body';
+      const title = document.createElement('span'); title.className = 'asr-title'; title.textContent = coordTitle(r);
+      body.appendChild(title);
+      const meta = coordMeta(r);
+      if (meta) { const el = document.createElement('span'); el.className = 'asr-meta'; el.textContent = meta; body.appendChild(el); }
+      item.appendChild(chip); item.appendChild(body);
+      return item;
+    }
+    // Renders the single coordinate row and makes it currentResults[0], so Enter
+    // and click resolve through the SAME handlers every other row uses.
+    function renderCoordRow(parsed) {
+      const row = { kind: 'coord', lat: parsed.lat, lng: parsed.lng,
+                    swapped: parsed.swapped, outside: parsed.outside,
+                    near: nearestAddressTo(parsed.lat, parsed.lng) };
+      currentResults = [row];
+      const frag = document.createDocumentFragment();
+      frag.appendChild(buildCoordItem(row, 0));
+      resultsEl.replaceChildren(frag);
+      resultsEl.classList.add('visible');
+      return row;
+    }
+    // Returns true when the query WAS a coordinate (handled; the geocoder is
+    // skipped). The index load is best-effort: it only enriches the address line.
+    async function tryCoordQuery(q) {
+      const parsed = parseCoordQuery(q);
+      if (!parsed) return false;
+      try { await ensureSearchData(); } catch (e) { /* offline -> coordinate alone */ }
+      if (inputEl.value.trim() !== q) return true;   // superseded, but still a coord query
+      renderCoordRow(parsed);
+      return true;
+    }
+
     // F2 (search-quality cycle, frame §6 2026-07-02; ported from searchLogic.js
     // dedupeDisplayRows/labelBlockNumber) — dropdown DISPLAY dedup, applied by
     // renderResults over the RANKED rows. Fixes two display defects without touching
@@ -5316,6 +5491,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     function selectResult(r) {
+      if (r && r.kind === 'coord') { selectCoordResult(r); return; }   // GPS coordinate path
       if (r && r.kind === 'approx') { selectApproxResult(r); return; } // ADR 001 approx path
       if (!r || !Array.isArray(r.pin) || r.pin.length !== 2) return;
       const lat = Number(r.pin[0]), lng = Number(r.pin[1]);
@@ -5339,6 +5515,41 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // popup). Address/parcel rows (no g) keep the existing nav popup.
       if (g) showBuildingDetail(g, ctx);
       else openSearchPopup(label, lat, lng);
+      hideResults();
+    }
+
+    // Selecting a GPS coordinate does exactly what selecting an address does —
+    // same pin, same hydrant re-anchor, same nav link-outs — because for a crew
+    // the caller's position IS the incident address. No "Докладвай": a phone
+    // position is not a hydrant observation.
+    function openCoordPopup(r) {
+      const wrap = document.createElement('div');
+      wrap.className = 'search-popup';
+      const t = document.createElement('div');
+      t.className = 'sp-title'; t.textContent = 'GPS ' + coordTitle(r);
+      wrap.appendChild(t);
+      const meta = coordMeta(r);
+      if (meta) {
+        const s = document.createElement('div');
+        s.className = 'sp-sub';
+        if (r.outside) s.classList.add('sp-approx-low');   // the existing warning colour
+        s.textContent = meta;
+        wrap.appendChild(s);
+      }
+      const nav = buildNavActions(r.lat, r.lng);
+      if (nav) wrap.appendChild(nav);
+      L.popup({ closeButton: true, autoPan: false }).setLatLng([r.lat, r.lng]).setContent(wrap).openOn(map);
+      positionPinInBand(r.lat, r.lng, 0, 0);
+    }
+    function selectCoordResult(r) {
+      const lat = Number(r.lat), lng = Number(r.lng);
+      if (!isFinite(lat) || !isFinite(lng)) return;
+      anchorHydrantsAt(lat, lng);   // Top-5 hydrants re-anchor to the caller's position
+      clearSearchMarker();
+      searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
+      searchMarker.on('click', function () { openCoordPopup(r); });
+      map.setView([lat, lng], Math.max(map.getZoom(), 17), { animate: true });
+      openCoordPopup(r);
       hideResults();
     }
 
@@ -5618,6 +5829,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     async function runQuery(value) {
       const q = (value || '').trim();
       if (q.length < 1) { hideResults(); clearSearchMarker(); return; }
+      if (await tryCoordQuery(q)) return;   // a pasted position short-circuits the geocoder
       let index;
       try { index = await ensureSearchData(); }
       catch (e) { showStatus('Търсачката не е налична офлайн'); return; }
@@ -5641,6 +5853,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
         const q = inputEl.value.trim();
         if (!q) return;                              // empty box -> no stale selection
+        if (await tryCoordQuery(q)) {                // pasted position: select it straight away
+          if (currentResults[0]) selectResult(currentResults[0]);
+          return;
+        }
         let index;
         try { index = await ensureSearchData(); }   // works during the cold-load window too
         catch (e) { showStatus('Търсачката не е налична офлайн'); return; }
