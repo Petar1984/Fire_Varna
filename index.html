@@ -877,6 +877,68 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .legend-dot { flex:0 0 auto; width:14px; height:14px; border-radius:50%; margin-top:2px; border:1px solid rgba(0,0,0,0.25); }
   .legend-note { margin:8px 0 0; font-size:11.5px; color:#666; }
 
+  /* ===== Coordinate card — toggled by #geoBtn. Same white-card language as
+     the legend, and anchored the same way (right:64px, under the header stack)
+     so the two never fight for the corner. Only one of them is open at a time;
+     see the toggles in the script. ===== */
+  .geo-card {
+    position:absolute; top:calc(150px + var(--dev-banner-h)); right:64px; z-index:1600;
+    background:#fff; border:1px solid #ccc; border-radius:10px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+    padding:10px 12px 11px; max-width:min(84vw, 320px);
+    font-size:13px; color:#222; line-height:1.35;
+  }
+  .geo-card[hidden] { display:none; }
+  .geo-head { display:flex; align-items:center; justify-content:space-between;
+              font-weight:700; margin-bottom:6px; }
+  .geo-close { border:none; background:transparent; font-size:16px; cursor:pointer;
+               color:#666; padding:0 2px; line-height:1; }
+  /* Monospace so the digits do not dance as the pointer moves. */
+  .geo-dd { font:600 16px/1.4 ui-monospace, Consolas, monospace; color:#c41e3a;
+            cursor:pointer; letter-spacing:.2px; }
+  .geo-dms { font:12.5px/1.4 ui-monospace, Consolas, monospace; color:#666; }
+  .geo-acts { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .geo-acts + .geo-acts { margin-top:6px; }
+  /* 44 px is the touch-target floor in AGENTS.md § Hard Constraints — gloves,
+     sweat, one hand. Set once, on the height, so padding cannot inflate it. */
+  .geo-b {
+    flex:1 1 auto; min-width:84px; min-height:44px; line-height:44px;
+    padding:0 10px; border:1px solid #ccc; border-radius:8px; background:#fff;
+    color:#222; font-size:13px; cursor:pointer; text-align:center;
+  }
+  .geo-b:active { transform: scale(0.97); }
+  .geo-hint { margin-top:8px; font-size:11.5px; color:#666; }
+  /* Marked state: the coordinate is frozen, and that has to be visible at a
+     glance rather than read. */
+  .geo-card.pinned { border-color:#c41e3a; box-shadow:0 0 0 1px #c41e3a inset, 0 4px 14px rgba(0,0,0,0.25); }
+  .geo-card.pinned #geoMark { background:#c41e3a; color:#fff; border-color:#c41e3a; }
+  /* Centre crosshair. A finger cannot hover, and during a one-finger pan the
+     ground under it does not move — so on touch the fixed point is the centre
+     of the screen and the map moves to it. */
+  .geo-xh { position:absolute; left:50%; top:50%; z-index:1200; pointer-events:none;
+            width:23px; height:23px; margin:-12px 0 0 -12px; }
+  .geo-xh[hidden] { display:none; }
+  .geo-xh::before, .geo-xh::after {
+    content:""; position:absolute; background:#c41e3a;
+    box-shadow:0 0 0 1px rgba(255,255,255,.9);
+  }
+  .geo-xh::before { left:11px; top:0; width:1px; height:23px; }
+  .geo-xh::after  { top:11px; left:0; height:1px; width:23px; }
+  /* On a narrow screen the card is nearly as wide as the viewport, so anchoring
+     it to the top-right corner still reaches the middle — where the status pill
+     lives (.pill is centred at the same top offset). Measured at 375 px: the
+     "Достъпът е отказан" pill lay across the coordinates and both became
+     unreadable. So on a phone the card goes to the BOTTOM instead: clear of the
+     pill and the header, above the zoom control and the locate FAB, and where a
+     thumb can reach its buttons. */
+  @media (max-width: 640px) {
+    .geo-card {
+      top:auto; right:8px; left:8px;
+      bottom:calc(env(safe-area-inset-bottom, 0px) + 96px);
+      max-width:none;
+    }
+  }
+
   /* ===== Basemap selector (B2) — only rendered when the PMTiles capability is
      active (committed flag false). When inactive it never appears. ===== */
   .basemap-selector {
@@ -1558,7 +1620,35 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <!-- <button class="ctrl-btn" id="buildingsToggle" title="Сгради вкл/изкл" aria-label="Сгради вкл/изкл" aria-pressed="false">🏢</button> -->
   <button class="ctrl-btn" id="basemapToggle" title="Спътникова карта вкл/изкл" aria-label="Спътникова карта" aria-pressed="false">🛰️</button>
   <button class="ctrl-btn" id="legendBtn" title="Легенда — какво значат цветовете" aria-label="Легенда на цветовете" aria-expanded="false">🎨</button>
+  <button class="ctrl-btn" id="geoBtn" title="Координати — покажи и сподели точка" aria-label="Координати" aria-expanded="false">🎯</button>
 </div>
+
+<!-- Coordinate readout. OFF by default: while it is off nothing on this page
+     behaves differently, so it cannot disturb the hydrant, placement or manual-
+     position flows that the app is actually for. Turned on, it reads out where
+     the pointer (or, on a phone, the centre crosshair) is, and hands that point
+     to the clipboard, the share sheet, Google Maps, Street View or Waze.
+     The app already ACCEPTS coordinates in the search box; this produces them. -->
+<div class="geo-card" id="geoCard" hidden role="dialog" aria-label="Координати">
+  <div class="geo-head">
+    <span>Координати</span>
+    <button class="geo-close" id="geoClose" aria-label="Затвори">✕</button>
+  </div>
+  <div class="geo-dd" id="geoDD" title="докосни, за да копираш">—</div>
+  <div class="geo-dms" id="geoDMS">&nbsp;</div>
+  <div class="geo-acts">
+    <button class="geo-b" id="geoMark">маркирай</button>
+    <button class="geo-b" id="geoCopy">копирай</button>
+    <button class="geo-b" id="geoShare" hidden>сподели</button>
+  </div>
+  <div class="geo-acts">
+    <button class="geo-b" id="geoGgl">Google</button>
+    <button class="geo-b" id="geoSv">Street View</button>
+    <button class="geo-b" id="geoWaze">Waze</button>
+  </div>
+  <div class="geo-hint" id="geoHint">Докосни картата, за да заковеш точка.</div>
+</div>
+<div class="geo-xh" id="geoXh" hidden></div>
 
 <!-- Status legend: what the pin colours mean. Toggled by #legendBtn. The swatch
      colours mirror the .h-pin.<status> fills (see the CSS note there). UI-only. -->
@@ -3468,6 +3558,219 @@ window._hydrantDataReady = (async function loadHydrantData() {
     exitManualMode();
     hidePill();
     flashStatus('Позицията е зададена ръчно');
+  });
+
+  // ===== Coordinate readout =====
+  //
+  // Says where a point on the map is, in WGS84 — the same numbers a phone, a
+  // handheld GPS or a dispatcher on the radio uses. The search box already
+  // ACCEPTS coordinates; this is the other direction.
+  //
+  // WHY IT IS OFF BY DEFAULT. This screen already spends every click: placement
+  // mode places a report pin, manual mode sets the user's own position, and a
+  // hydrant marker opens its popup. A fourth meaning for a click would be a
+  // trap in exactly the moment the app exists for. So the readout is a
+  // toggle: while `geoOn` is false nothing here runs and the page behaves
+  // exactly as it did before. Turned on, it still refuses to act while either
+  // of the other two modes is live — they win, always.
+  const geoBtn   = document.getElementById('geoBtn');
+  const geoCard  = document.getElementById('geoCard');
+  const geoXh    = document.getElementById('geoXh');
+  const geoDD    = document.getElementById('geoDD');
+  const geoDMS   = document.getElementById('geoDMS');
+  const geoHint  = document.getElementById('geoHint');
+  const geoMarkB = document.getElementById('geoMark');
+  const geoShareB = document.getElementById('geoShare');
+
+  let geoOn = false;          // is the readout showing at all
+  let geoMode = 'cursor';     // 'cursor' | 'center' — last input wins
+  let geoLL = null;           // the point currently displayed
+  let geoPinLL = null;        // the marked point, or null
+  let geoMarker = null;       // its marker on the map
+  let geoBusyAtPress = false; // was one of the app's own modes live at press?
+                              // (see the note on the click handler below)
+
+  function geoDms(v, pos, neg) {
+    const hemi = v < 0 ? neg : pos;
+    const a = Math.abs(v);
+    const d = Math.floor(a);
+    const m = Math.floor((a - d) * 60);
+    const s = ((a - d - m / 60) * 3600).toFixed(1);
+    return d + '°' + String(m).padStart(2, '0') + "'" + s.padStart(4, '0') + '"' + hemi;
+  }
+
+  // Six decimals is about 11 cm — finer than anything upstream, but it is the
+  // form Google Maps and the app's own search box expect when pasted.
+  function geoText() {
+    return geoLL ? (geoLL.lat.toFixed(6) + ', ' + geoLL.lng.toFixed(6)) : '';
+  }
+
+  function geoSet(ll) {
+    if (!ll || geoPinLL) return;   // a marked point is frozen on purpose
+    geoLL = ll;
+    geoDD.textContent = ll.lat.toFixed(6) + ', ' + ll.lng.toFixed(6);
+    geoDMS.textContent = geoDms(ll.lat, 'N', 'S') + ' ' + geoDms(ll.lng, 'E', 'W');
+  }
+
+  function geoSetPin(ll) {
+    geoPinLL = ll;
+    if (geoMarker) { map.removeLayer(geoMarker); geoMarker = null; }
+    if (ll) {
+      const keep = geoPinLL; geoPinLL = null; geoSet(ll); geoPinLL = keep;
+      geoMarker = L.marker(ll, {
+        icon: L.divIcon({ className: 'geo-pin-marker',
+                          html: '<div style="width:16px;height:16px;border-radius:50%;'
+                              + 'background:#c41e3a;border:3px solid #fff;'
+                              + 'box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>',
+                          iconSize: [22, 22], iconAnchor: [11, 11] }),
+        interactive: false, zIndexOffset: 900,
+      }).addTo(map);
+    }
+    geoCard.classList.toggle('pinned', !!ll);
+    geoMarkB.textContent = ll ? 'пусни' : 'маркирай';
+    geoHint.textContent = ll ? 'Точката е закована — числото няма да се промени.'
+                             : 'Докосни картата, за да заковеш точка.';
+  }
+
+  function geoShow(open) {
+    geoOn = open;
+    geoCard.hidden = !open;
+    geoBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    geoBtn.classList.toggle('active', open);
+    if (!open) { geoSetPin(null); geoXh.hidden = true; geoMode = 'cursor'; }
+    else {
+      // The legend lives in the same corner; only one of them at a time.
+      const lg = document.getElementById('legend');
+      const lb = document.getElementById('legendBtn');
+      if (lg && !lg.hidden) {
+        lg.hidden = true;
+        if (lb) { lb.setAttribute('aria-expanded', 'false'); lb.classList.remove('active'); }
+      }
+      geoSet(map.getCenter());
+    }
+  }
+
+  geoBtn.addEventListener('click', (e) => { e.stopPropagation(); geoShow(geoCard.hidden); });
+  document.getElementById('geoClose').addEventListener('click', () => geoShow(false));
+  // Opening the legend closes this one, so they cannot stack in the corner.
+  const _lb = document.getElementById('legendBtn');
+  if (_lb) _lb.addEventListener('click', () => { if (geoOn) geoShow(false); });
+
+  map.on('mousemove', (e) => {
+    if (!geoOn) return;
+    if (geoMode !== 'cursor') { geoMode = 'cursor'; geoXh.hidden = true; }
+    geoSet(e.latlng);
+  });
+
+  // A finger cannot hover, and during a one-finger pan the ground under it does
+  // not move — following it would show a frozen number. So on touch the fixed
+  // point becomes the centre of the screen and the map moves under a crosshair.
+  map.getContainer().addEventListener('touchstart', () => {
+    geoBusyAtPress = placementActive || manualMode;
+    if (!geoOn) return;
+    if (geoMode !== 'center') { geoMode = 'center'; geoXh.hidden = false; }
+    geoSet(map.getCenter());
+  }, { passive: true });
+  map.on('move', () => { if (geoOn && geoMode === 'center') geoSet(map.getCenter()); });
+
+  // WHY THE STATE IS SAMPLED AT PRESS, NOT AT CLICK.
+  //
+  // Leaflet fires handlers in registration order, and this one is registered
+  // after the app's. The app's handler ENDS manual-position mode — it calls
+  // exitManualMode(), which sets `manualMode = false` — so by the time control
+  // reaches here the flag that was supposed to protect the click is already
+  // cleared, and the same tap both set the user's position AND dropped a
+  // coordinate pin. Measured: the gate caught it on the first run.
+  //
+  // mousedown and touchstart both fire before the click resolves, so the mode
+  // is read while it is still true. Both the snapshot and the live flags are
+  // checked: the snapshot catches a mode that ended during this very click,
+  // the live ones catch a mode that is still running.
+  map.on('mousedown', () => { geoBusyAtPress = placementActive || manualMode; });
+
+  // A hydrant pin keeps its own click.
+  //
+  // HONEST NOTE ON THIS GUARD. It was written believing a marker tap also
+  // reached the map — a gate failure said so. It did not: the failing tap had
+  // landed on an SVG path, because the map had recentred between measuring the
+  // pin's position and clicking it. With this guard removed, tapping a hydrant
+  // still does not drop a coordinate pin; Leaflet stops it first.
+  //
+  // It stays as belt and braces, not as a fix for an observed defect: that
+  // Leaflet behaviour is internal, and the one thing this feature must never do
+  // is put a marker on top of a hydrant in the moment someone is reaching for
+  // it. Every marker here is an L.divIcon (CLAUDE.md § Specific Gotchas), so a
+  // press on a pin lands inside .leaflet-marker-icon.
+  function geoHitsMarker(e) {
+    const t = e && e.originalEvent && e.originalEvent.target;
+    return !!(t && t.closest &&
+              t.closest('.leaflet-marker-icon, .leaflet-marker-pane, .leaflet-popup'));
+  }
+
+  map.on('click', (e) => {
+    if (!geoOn || geoBusyAtPress || placementActive || manualMode) return;
+    if (geoHitsMarker(e)) return;
+    geoSetPin(e.latlng);
+  });
+  geoMarkB.addEventListener('click', () => geoSetPin(geoPinLL ? null : geoLL));
+
+  async function geoCopyText(btn) {
+    const t = geoText();
+    if (!t) return;
+    try {
+      await navigator.clipboard.writeText(t);
+    } catch (err) {
+      // The Clipboard API needs a secure context. Pages is HTTPS and localhost
+      // counts, but fall back rather than fail silently.
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e2) {}
+      ta.remove();
+    }
+    const was = btn.textContent;
+    btn.textContent = 'копирано';
+    setTimeout(() => { btn.textContent = was; }, 1200);
+  }
+  const geoCopyB = document.getElementById('geoCopy');
+  geoCopyB.addEventListener('click', () => geoCopyText(geoCopyB));
+  geoDD.addEventListener('click', () => geoCopyText(geoCopyB));
+
+  // navigator.share exists on phones and needs a real user gesture — a tap is
+  // one. On a desktop browser without it the button simply never appears.
+  if (navigator.share) {
+    geoShareB.hidden = false;
+    geoShareB.addEventListener('click', async () => {
+      const t = geoText();
+      if (!t) return;
+      try {
+        await navigator.share({
+          title: 'Координати',
+          text: t,
+          url: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(t),
+        });
+      } catch (err) { /* the user dismissed the sheet — not an error */ }
+    });
+  }
+
+  document.getElementById('geoGgl').addEventListener('click', () => {
+    if (!geoLL) return;
+    window.open('https://www.google.com/maps/search/?api=1&query='
+      + geoLL.lat.toFixed(6) + ',' + geoLL.lng.toFixed(6), '_blank', 'noopener');
+  });
+  // Street View, opened for a person to look at. Nothing is read back, traced,
+  // cached or fed into the dataset — the same posture the sister repo records
+  // for Street View. Google may have no panorama at the point; then its own
+  // viewer lands on the nearest one or says there is none.
+  document.getElementById('geoSv').addEventListener('click', () => {
+    if (!geoLL) return;
+    window.open('https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='
+      + geoLL.lat.toFixed(6) + ',' + geoLL.lng.toFixed(6), '_blank', 'noopener');
+  });
+  document.getElementById('geoWaze').addEventListener('click', () => {
+    if (!geoLL) return;
+    window.open('https://waze.com/ul?ll=' + geoLL.lat.toFixed(6) + ','
+      + geoLL.lng.toFixed(6) + '&navigate=yes', '_blank', 'noopener');
   });
 
   // ===== Misc controls =====
