@@ -1724,9 +1724,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     console.error('Hydrant data load failed:', err);
     document.body.innerHTML = `
       <div style="padding:24px;text-align:center;font-family:system-ui,sans-serif;max-width:420px;margin:60px auto;line-height:1.5">
-        <h2 style="color:#c00;margin:0 0 12px">?? ?????? ??? ?????????</h2>
-        <p style="margin:0 0 20px">??????? ?? ?????????? ?? ?? ????????. ???? ????????? ???????? ????????.</p>
-        <button onclick="location.reload()" style="padding:14px 28px;font-size:16px;background:#c00;color:white;border:none;border-radius:8px;cursor:pointer">?????????</button>
+        <h2 style="color:#c00;margin:0 0 12px">Грешка при зареждане на данните</h2>
+        <p style="margin:0 0 20px">Данните за хидрантите не се заредиха. Провери интернет връзката и опитай отново.</p>
+        <button onclick="location.reload()" style="padding:14px 28px;font-size:16px;background:#c00;color:white;border:none;border-radius:8px;cursor:pointer">Презареди</button>
       </div>`;
     throw err;
   }
