@@ -54,3 +54,31 @@ UTF-8-as-cp1252 garbage (`[ÐÑÂ]`-class), not plain '?'.
   re-copied after commit.
 
 **Rollback:** `git revert` of the fix commit.
+
+## Audit outcome (12.08.2026, adversarial Auditor over 0ab72b8 + 3366c06)
+
+Verdict: diff clean (line-level blob compare: exactly one changed region, lines
+1727-1729), gates genuinely pass (verified by mutation testing incl. the nullish-`??`
+no-false-positive case), messages match, no dirt swept in, no push. Three corrections
+this plan must carry:
+
+1. **CORRECTION (was wrong above):** the `?????` street labels in `data/search_index.json`
+   are NOT only in Petar's uncommitted worktree copy — the same 8 broken labels are in the
+   **committed HEAD blob**, i.e. live on the published site today (a search for those
+   addresses shows „ул. ????? №15"). It is the only browser-shipping file still carrying
+   the defect class. Fix belongs to the Varna_buildings build cycle + a future data gate
+   (`\?{3,}` over built payloads) — extending today's gate to `data/*.json` would fail
+   loudly right now, which is arguably correct but is Petar's call.
+2. **Finding A (medium):** on an opted-in device with the B2 service worker, the pre-fix
+   shell stays cached forever (only `install` writes CACHE_CORE; navigations never re-put)
+   — the fix is inert exactly where the bug was reproduced, until the device runs
+   `?basemap_pmtiles=0` + re-register, or the SW cache-lifecycle plan
+   (`docs/plans/sw_cache_lifecycle_fixes.md`, D1) lands. Live users (flag off) always get
+   the fixed file from the network. The live-check gate above ran with the server UP and
+   structurally cannot catch this branch; a with-server-DOWN variant belongs in the SW plan's tests.
+3. **Finding B (low):** the "classic mojibake scan unchanged" gate above was vacuous —
+   the only classic scanner (`tests/golden_apply_v0.py:60`) covers KMZ apply outputs, not
+   the app shell. The shell had, and still has, no classic-mojibake gate; today's new gate
+   covers the `?`-run class only. Also: the original h2 likely began with a 2-codepoint
+   marker (probably ⚠️), not restored; the p's second sentence is re-authored, not
+   restored — both authorized, recorded here for accuracy.
