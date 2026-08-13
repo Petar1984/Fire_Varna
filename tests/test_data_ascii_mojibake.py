@@ -6,19 +6,19 @@ data/search_index.json and data/address_rows.json. Text that went through a
 '?'-substituting encoder is plain ASCII and slips past a classic mojibake scan, so it
 has to be caught by its own signature: a run of 3+ question marks.
 
-Known-broken baseline (Petar's call, 12.08.2026)
-------------------------------------------------
-Eight address labels in data/search_index.json already ship with the street name
-replaced by '?????' (measured live in HEAD 39d6846 and in the uncommitted worktree
-rebuild alike, so the defect predates the street-model-v2 label refresh). The root
-cause is upstream, in the pipeline that reads the address register, and the repaired
-data can only come from a Varna_buildings build cycle -- see
-scratch/basemap_rebuild_pure_osm_handoff_facts.md, section 3.
+Baseline: EMPTY -- the upstream fix landed (13.08.2026)
+------------------------------------------------------
+This gate used to pin eight address labels in data/search_index.json whose street name
+shipped as '?????'. The upstream fix landed with the Varna_buildings quarters-v1.1
+cycle (ADR 062 there: the AGKK export's literal '?????' placeholder is repaired from
+the row's OWN source -- sibling sections on the same parcel plus the parcel's strename
+-- behind a sha256 lock, and a corrupt member no longer speaks for its cluster). The
+regenerated payloads carry ZERO runs, measured over both files, so the baseline is now
+empty and the assertions below read as a plain "zero runs anywhere".
 
-So the gate ships GREEN with those eight pinned as a baseline, and fails the moment a
-ninth run appears, a run shows up in address_rows.json, or a run turns up anywhere
-other than an entry label. When the upstream fix lands, delete KNOWN_BROKEN_LABELS;
-the remaining assertions then read as a plain "zero runs anywhere".
+KNOWN_BROKEN_LABELS is deliberately KEPT as an empty frozenset rather than deleted: the
+byte-exact model stays in place, so re-pinning a future regression is a one-line change
+and the gate's shape still documents how a known defect would be recorded.
 
 Pure stdlib; runnable via `python -m unittest discover -s tests`.
 """
@@ -37,18 +37,10 @@ ADDRESS_ROWS = "data/address_rows.json"
 
 QUESTION_RUN = re.compile(r"\?{3,}")
 
-# Baseline, not an allowance: every one of these is a live defect awaiting the upstream
-# fix. Byte-exact so that a *changed* broken label is reported as a new one.
-KNOWN_BROKEN_LABELS = frozenset([
-    "кв. Аспарухово, ул. ????? №15",
-    "кв. Аспарухово, ул. ????? №17",
-    "кв. Аспарухово, ул. ????? №175",
-    "кв. Розова долина, ул. ????? №0",
-    "кв. Розова долина, ул. ????? №1",
-    "кв. Розова долина, ул. ????? №175",
-    "кв. Розова долина, ул. ????? №71",
-    "кв. Трошево, ул. ????? №32",
-])
+# EMPTY as of 13.08.2026: the eight upstream defects are repaired and the payloads
+# carry no '???' runs at all. Byte-exact by design -- if a run ever comes back, pin the
+# exact label here and the gate reports any OTHER run as new.
+KNOWN_BROKEN_LABELS = frozenset()
 
 
 def read_text(rel_path):
