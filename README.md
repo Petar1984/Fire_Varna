@@ -1,137 +1,192 @@
-# Хидранти Варна
+# Fire_Varna — карта на пожарните хидранти във Варна
 
-> Mobile-first PWA за бързо локализиране на най-близкия пожарен хидрант във Варненска област.
-> *A mobile-first PWA for locating the nearest fire hydrant in the Varna oblast, Bulgaria.*
+**[Български](#български)** · **[English](#english)**
 
-> **Аудитория:** пожарникари, доброволци и хора, които посещават repo-то за първи път.
-> **Цел:** какво прави приложението и как се достъпва/използва. Този README не е каноничният източник за точен брой записи в dataset-а, размери на файлове, версии на Cloudflare Worker-а или статус на спринтове — за тях виж [docs/activeContext.md](docs/activeContext.md#current-state).
+🔗 **<https://petar1984.github.io/Fire_Varna/>**
 
 ---
 
-## За какво е
+## Български
 
-Леко уеб приложение, което показва на телефона позицията на потребителя и най-близките пожарни хидранти на картата. Работи в браузъра, без нужда от инсталация през app store.
+> Mobile-first PWA, което показва на пожарникаря най-близкия работещ
+> пожарен хидрант във Варненска област — в браузъра, без инсталация,
+> без акаунт.
 
-**Целеви потребители:**
-- **Пожарникари във Варна** — основни потребители, използване в реални ситуации
-- **Доброволен отряд на гр. Варна** — за верификация на данните и обратна връзка
+### Какво прави
 
-**Данни:** Данни: близо 5,900 хидранта от ВиК Варна и национален 
-   регистър, обединени и дедуплицирани. Dataset-ът е в процес 
-   на активно добавяне и верификация — нови хидранти се 
-   докладват от терена, грешни записи се коригират или 
-   премахват, координатите се потвърждават при оглед на място от служители на службите на ПБЗН или доброволно формирование гр. Варна.
+- Показва позицията ти и най-близките хидранти, в три режима:
+  **до 100 м**, **топ 5 най-близки** (по подразбиране), **всички**.
+- 🧭 един tap води до избрания хидрант — Google Maps при по-голямо
+  разстояние, вграден компас в последните 100 м.
+- 🚨 **сигнали от терена направо от картата**: повреден/блокиран хидрант,
+  грешна локация, нов хидрант, потвърдено състояние. Сигналите се пазят
+  и офлайн и се изпращат при връзка; всеки минава през човешка модерация,
+  преди да промени данните.
+- **Търсачка на адреси** — улици, номера, квартали, блок + вход
+  (напр. „бл. 402 вх. 3"), и сурови GPS координати.
+- Сателитен изглед (Esri World Imagery) и сграден слой (векторни тайлове).
 
----
+### Данните
 
-## Използване
+Над **7 000 записа за хидранти** (точните текущи бройки:
+[docs/activeContext.md](docs/activeContext.md#current-state)), обединени
+и дедуплицирани от:
 
-### Достъп
+| източник | какво е |
+|---|---|
+| **ВиК Варна** | регистърът на водното дружество, по райони |
+| **Национален регистър** | държавният набор за цялата страна |
+| **ЕТР** | KMZ файлове на районните служби: Варна, Провадия, Долни чифлик, Девня (внесени 06.2026+) |
+| **Полеви сигнали** | хидранти, докладвани, потвърдени или поправени на място през 🚨 |
 
-Отвори линка в браузъра на телефона:
+Координатите са WGS84. Рядката метаданна (тип, адрес, състояние) остава
+точно толкова рядка, колкото е в източниците — нищо не се измисля. Всяка
+приложена промяна е в [docs/moderation_log.md](docs/moderation_log.md),
+провенансът на всеки запис се архивира — наборът е одитируем докрай.
 
-> 🔗 **<https://petar1984.github.io/Fire_Varna/>**
+Търсачните файлове (`data/search_index.json`, `data/address_rows.json`)
+се строят в **отделен конвейер**
+([Varna_buildings](https://github.com/Petar1984/Varna_buildings)) от
+отворените данни на кадастъра и минават гейтове за поверителност и
+цялост преди публикуване — без кадастрални идентификатори, без лични
+данни.
 
-> *Endpoint liveness verified 2026-06-21; deploy version repo-declared. Текущ брой записи и статус-разпределение: виж [docs/activeContext.md](docs/activeContext.md#current-state).*
+### Как се ползва
 
-Изисква се HTTPS — затова приложението е достъпно само през линка по-горе, не като свален файл.
+1. Отвори линка на телефона и разреши достъп до локацията.
+2. Меню (⋮ / ⬆️) → **„Добавяне към началния екран"** — ползва се като
+   приложение.
+3. ⚠️ GPS-ът е несигурен в мазета и тунели — там ползвай 📌 за ръчна
+   позиция.
 
-### Добавяне на началния екран (препоръчително)
+### Архитектура
 
-**Android (Chrome):**
-1. Отвори линка
-2. Меню (⋮) → **„Добавяне към началния екран"**
-3. Появява се иконка като всяко приложение
+Статична страница + един малък worker. Без build система, без runtime
+зависимости, без акаунти, без следене.
 
-**iOS (Safari):**
-1. Отвори линка
-2. Бутон „Сподели" (⬆️) → **„Добавяне към началния екран"**
+- **Frontend** — един `index.html` (Leaflet 1.9.4 + MarkerCluster,
+  ванилен JS/CSS) на GitHub Pages; `data/hydrants.json` се тегли при
+  старт.
+- **Cloudflare Worker** — приема сигналите (стават GitHub issues за
+  модерация), връща одобрените към картата, и сервира сградните тайлове
+  от R2 с токен.
+- **Основа** — OpenStreetMap; Esri World Imagery при превключване.
 
-### Първо стартиране
+Локално: `python -m http.server 8000` → <http://localhost:8000>
+(`file://` не работи — данните се теглят с `fetch`; GPS иска HTTPS).
 
-1. Дай разрешение за **достъп до локацията**, когато браузърът попита.
-2. Картата центрира на твоята позиция и показва най-близките 5 хидранта.
-3. Бутоните долу превключват между режимите:
-   - **Близо <100м** — само хидрантите в радиус 100м
-   - **Топ 5** — петте най-близки (по подразбиране)
-   - **Всички** — всички хидранти от dataset-а на картата (точен брой: виж [docs/activeContext.md](docs/activeContext.md#current-state))
-4. Tap на 🧭 — отваря Google Maps за навигация (ако разстоянието е >100м) или превключва компаса в самото приложение (ако е ≤100м).
-5. Tap на 🚨 — отваря форма за сигнал (повреден/блокиран хидрант, грешна локация, нов хидрант, потвърдено състояние). Сигналът се изпраща директно от приложението към сървъра; ако телефонът е офлайн, сигналът се запазва локално и се изпраща автоматично, когато връзката се възстанови.
+### Управление
 
-### Внимание
+Проектът се разработва с AI агенти под строг човешки контрол:
+**Planner** (само чете) мери и планира; **Executor** изпълнява подписан
+план с локални коммити; **никой от тях никога не пушва**. **Петър**
+подписва всеки план, преглежда всеки диф и единствен пушва и разгръща.
+Виж [docs/decisions/003_dual_claude_code_governance.md](docs/decisions/003_dual_claude_code_governance.md),
+[AGENTS.md](./AGENTS.md) и [CLAUDE.md](./CLAUDE.md).
 
-⚠️ **GPS-ът зависи от сигнала.** В мазета, тунели и големи бетонни сгради може да не работи. В тези случаи използвай 📌 за ръчно поставяне на позицията си на картата.
+### Лиценз
 
----
+Лицензът на кода **още не е избран** — дотогава: всички права запазени.
+Наборът с хидрантите смесва публични източници с полева верификация —
+питай, преди да го преизползваш.
 
-## Стек
+### Благодарности
 
-Frontend: статичен `index.html` с вградени Leaflet, MarkerCluster, CSS и app логика, плюс `data/hydrants.json`, който се зарежда през `fetch` при стартиране на приложението.
+- **Пожарна служба Варна** — обратна връзка от терена
+- **Доброволният отряд на гр. Варна** — тестване и верификация на място
 
-- [Leaflet 1.9.4](https://leafletjs.com/) — карта
-- [MarkerCluster 1.5.3](https://github.com/Leaflet/Leaflet.markercluster) — клъстериране
-- OpenStreetMap — картови плочки
-- Vanilla JS / CSS — без build система, без npm dependencies в runtime
-- Cloudflare Worker — приема сигналите от приложението и ги записва като GitHub issues
-
-Хостинг: GitHub Pages (безплатен, статичен). Текущи размери на файловете в първоначалното зареждане: виж [docs/activeContext.md](docs/activeContext.md#current-state).
-
----
-
-## За разработчици и AI агенти
-
-Преди промяна по кода — прочети:
-
-- **[AGENTS.md](./AGENTS.md)** — каноничен контекст: проектни решения, dataset избор, ограничения, workflow между Planner и Executor (Claude Code), известни tech debt
-- **[CLAUDE.md](./CLAUDE.md)** — оперативни правила специфични за Claude Code (Executor)
-
-### Workflow
-
-Проектът работи с два разделени Claude Code (Opus) агента, под ръководството на собственика:
-- **Planner** (Claude Code, само за четене) — планиране, архитектура, одит; не редактира кода
-- **Executor** (Claude Code) — изпълнява подписания план, редактира файлове, прави локални commit-и; никога не push-ва
-- **Petar** — подписва плана, преглежда diff-а и push-ва (единственият с това право)
-
-Всички архитектурни решения и промени по dataset-а изискват потвърждение от собственика на проекта. Виж ADR [`docs/decisions/003_dual_claude_code_governance.md`](docs/decisions/003_dual_claude_code_governance.md).
-
-### Локално
-
-За локално тестване трябва HTTP сървър — `data/hydrants.json` се зарежда през `fetch` и `file://` режимът блокира това. Стартирай:
-
-```powershell
-python -m http.server 8000
-```
-
-и отвори [http://localhost:8000](http://localhost:8000) в браузъра. Geolocation API също изисква HTTPS, затова за пълно локално тестване с GPS използвай GitHub Pages preview или локален HTTPS dev server.
+За технически въпроси — [отвори issue](../../issues).
 
 ---
 
-## Данни
+## English
 
-Източници: ВиК Варна (по район — Варна Изток, Варна Запад, Девня, Долни чифлик, Провадия) и национален регистър. Записите са обединени и дедуплицирани, плюс тяхно потвърждение и нови записи от полеви сигнали.
+> A mobile-first PWA that shows firefighters the nearest working fire
+> hydrant in the Varna region, Bulgaria — in the browser, no
+> installation, no account.
 
-Координати: WGS84. Метаданни (адрес, тип, състояние): рядко попълнени в източника — около 9.4% (555 от 5,911) от хидрантите имат адрес, останалите само координати.
+### What it does
 
-Текущ общ брой записи и разпределение по статус (verified / reported / canonical) — виж [docs/activeContext.md](docs/activeContext.md#current-state). Тези стойности се променят с всеки полеви сигнал, затова README не ги дублира.
+- Shows your position and the nearest fire hydrants, with three view
+  modes: **within 100 m**, **top 5 nearest** (default), **all**.
+- 🧭 one tap navigates to the chosen hydrant — Google Maps for longer
+  distances, a built-in compass within the last 100 m.
+- 🚨 **field reports straight from the map**: broken/blocked hydrant,
+  wrong location, new hydrant, condition confirmed. Reports queue
+  offline and send when the connection returns; every report passes
+  human moderation before it changes the dataset.
+- **Address search** — streets, house numbers, quarters, block +
+  entrance (e.g. „бл. 402 вх. 3"), plus raw GPS coordinates.
+- Satellite imagery toggle (Esri World Imagery) and a building layer
+  served as vector tiles.
 
----
+### The data
 
-## Лиценз
+Over **7,000 hydrant records** (exact live counts:
+[docs/activeContext.md](docs/activeContext.md#current-state)), merged
+and deduplicated from:
 
-Лицензът на кода е **в процес на избор**. До решение — `All rights reserved`.
+| source | what it is |
+|---|---|
+| **ВиК Варна** | the water utility's hydrant registry, by district |
+| **National registry** | the country-wide hydrant dataset |
+| **ЕТР imports** | district fire-service KMZ files: Varna, Provadia, Dolni Chiflik, Devnya (imported 2026-06+) |
+| **Field reports** | hydrants reported, confirmed, or corrected on site via 🚨 |
 
+Coordinates are WGS84. Sparse metadata (type, address, operational
+status) stays exactly as sparse as the sources are — nothing is
+invented. Every applied change is tracked in
+[docs/moderation_log.md](docs/moderation_log.md) and per-record
+provenance is archived, so the dataset is fully auditable.
 
----
+The address-search payloads (`data/search_index.json`,
+`data/address_rows.json`) are **built in a separate pipeline**
+([Varna_buildings](https://github.com/Petar1984/Varna_buildings)) from
+the national cadastre's open data, and pass privacy and integrity gates
+before publishing — no cadastral identifiers, no personal data.
 
-## Благодарности
+### Usage
 
-- **Пожарна служба Варна** — за обратна връзка от терена
-- Доброволческия спасителен екип — за тестване и верификация
+1. Open the link on your phone and allow location access.
+2. Menu (⋮ / ⬆️) → **"Add to Home Screen"** — works like an app.
+3. ⚠️ GPS is unreliable in basements and tunnels — use 📌 to place your
+   position manually there.
 
----
+### Architecture
 
-## Контакт
+Static single-page app + one small serverless worker. No build system,
+no runtime npm dependencies, no accounts, no tracking.
 
-Собственик: Петър — [контакт TBD]
+- **Frontend** — one `index.html` (Leaflet 1.9.4 + MarkerCluster,
+  vanilla JS/CSS) on GitHub Pages; `data/hydrants.json` fetched at
+  startup.
+- **Cloudflare Worker** — receives field reports (turned into GitHub
+  issues for moderation), polls applied issues back to the map, and
+  serves token-gated building vector tiles from R2.
+- **Basemap** — OpenStreetMap tiles; Esri World Imagery on toggle.
 
-За технически въпроси и проблеми с приложението — отвори [issue](../../issues) в този repo.
+Local dev: `python -m http.server 8000` → <http://localhost:8000>
+(`file://` won't work — data is fetched; geolocation needs HTTPS).
+
+### Governance
+
+Developed with AI agents under strict human control: a **Planner**
+(read-only) measures and drafts plans; an **Executor** implements a
+signed plan with local commits; **neither ever pushes**. **Petar** signs
+every plan, reviews every diff, and is the only one who pushes or
+deploys. See
+[docs/decisions/003_dual_claude_code_governance.md](docs/decisions/003_dual_claude_code_governance.md),
+[AGENTS.md](./AGENTS.md) and [CLAUDE.md](./CLAUDE.md).
+
+### License
+
+Code license is **not chosen yet** — until then: all rights reserved.
+The hydrant dataset combines public-sector sources with field
+verification; ask before reusing it.
+
+### Acknowledgements
+
+- **Varna Fire Service** — field feedback
+- **Varna volunteer rescue team** — testing and on-site verification
+
+For technical questions — [open an issue](../../issues).
