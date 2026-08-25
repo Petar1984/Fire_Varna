@@ -5,6 +5,12 @@ token_*.txt
 .env
 .env.*
 
+# Private reporter lookup (issue number -> name). Generated locally from the
+# GitHub issues; NEVER commit — it carries personal names and the PII gate in
+# AGENTS.md forbids identifying content in the repo. The published dataset
+# names only the service plus the issue number.
+/reporters_private.md
+
 # IDE / OS state
 .claude/
 .vscode/
