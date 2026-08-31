@@ -1,13 +1,13 @@
 {
  "kind": "fire_varna_generation_manifest",
  "manifest_schema_version": "1.0",
- "generation_id": "49624da453b83833",
+ "generation_id": "a8fc1ca48bafd503",
  "payloads": {
   "search_index.json": {
-   "sha256": "9ff716e2deda32f7f19202eabfcf341fad93a3cdfb2ad68232211725471532f1",
-   "bytes": 11263404,
+   "sha256": "c12f94259bd986dd8b874f4866a0e9e311ada713e49ff4d67afcd58d48467b0d",
+   "bytes": 11242756,
    "index_schema_version": "2.0",
-   "entry_count": 86330,
+   "entry_count": 86232,
    "address_row_count": 80510,
    "vocab_size": 2889
   },
