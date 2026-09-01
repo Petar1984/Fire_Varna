@@ -1,0 +1,98 @@
+{
+  "source": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+  "target_root": "C:\\git\\Fire_Varna\\data\\basemaps",
+  "version": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+  "manifest_check": {
+    "basemap_version": {
+      "got": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+      "want": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+      "ok": true
+    },
+    "content_sha256": {
+      "got": "8a15054e722b12cb31afbc6cc3ff13a4cb7401dda7a8291f139794ac286fc3b8",
+      "want": "8a15054e722b12cb31afbc6cc3ff13a4cb7401dda7a8291f139794ac286fc3b8",
+      "ok": true
+    },
+    "pmtiles_sha256": {
+      "got": "29a8dee66465bed3eabaa2afa70efbe703b9e63b9cde84d4dcadb2436435f1b8",
+      "want": "29a8dee66465bed3eabaa2afa70efbe703b9e63b9cde84d4dcadb2436435f1b8",
+      "ok": true
+    },
+    "style_sha256": {
+      "got": "62cc123ee2227c4a95a249a2f788010eee57067a5ce72c594b4318834fc69135",
+      "want": "62cc123ee2227c4a95a249a2f788010eee57067a5ce72c594b4318834fc69135",
+      "ok": true
+    }
+  },
+  "files": [
+    {
+      "rel": "varna_basemap.pmtiles",
+      "src": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\varna_basemap.pmtiles",
+      "dst": "C:\\git\\Fire_Varna\\data\\basemaps\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\varna_basemap.pmtiles",
+      "bytes": 5748578,
+      "src_sha256": "29a8dee66465bed3eabaa2afa70efbe703b9e63b9cde84d4dcadb2436435f1b8",
+      "reread_sha256": "29a8dee66465bed3eabaa2afa70efbe703b9e63b9cde84d4dcadb2436435f1b8",
+      "ok": true
+    },
+    {
+      "rel": "varna_basemap_manifest.json",
+      "src": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\varna_basemap_manifest.json",
+      "dst": "C:\\git\\Fire_Varna\\data\\basemaps\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\varna_basemap_manifest.json",
+      "bytes": 1930,
+      "src_sha256": "05dbfcf7d178206a5a89acb6c2e75d444377e8796c2486e74ce7137d00dc98ad",
+      "reread_sha256": "05dbfcf7d178206a5a89acb6c2e75d444377e8796c2486e74ce7137d00dc98ad",
+      "ok": true
+    },
+    {
+      "rel": "style.json",
+      "src": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\style.json",
+      "dst": "C:\\git\\Fire_Varna\\data\\basemaps\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\style.json",
+      "bytes": 1719,
+      "src_sha256": "62cc123ee2227c4a95a249a2f788010eee57067a5ce72c594b4318834fc69135",
+      "reread_sha256": "62cc123ee2227c4a95a249a2f788010eee57067a5ce72c594b4318834fc69135",
+      "ok": true
+    },
+    {
+      "rel": "odbl/ATTRIBUTION.txt",
+      "src": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\ATTRIBUTION.txt",
+      "dst": "C:\\git\\Fire_Varna\\data\\basemaps\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\ATTRIBUTION.txt",
+      "bytes": 37,
+      "src_sha256": "3090178a62e6ecfb19e20931f59609418360d9745963bc4cd91652c30f9431a0",
+      "reread_sha256": "3090178a62e6ecfb19e20931f59609418360d9745963bc4cd91652c30f9431a0",
+      "ok": true
+    },
+    {
+      "rel": "odbl/README_ODbL.md",
+      "src": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\README_ODbL.md",
+      "dst": "C:\\git\\Fire_Varna\\data\\basemaps\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\README_ODbL.md",
+      "bytes": 1276,
+      "src_sha256": "71db0bb8aba80497e47c14467958aeab95d8ca8e91ad439be36172d3245cf620",
+      "reread_sha256": "71db0bb8aba80497e47c14467958aeab95d8ca8e91ad439be36172d3245cf620",
+      "ok": true
+    },
+    {
+      "rel": "odbl/osm_varna_patch_v1.csv",
+      "src": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\osm_varna_patch_v1.csv",
+      "dst": "C:\\git\\Fire_Varna\\data\\basemaps\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\osm_varna_patch_v1.csv",
+      "bytes": 8045,
+      "src_sha256": "4bae3267f0dea83ca753f61ef19750d059967f7dc2e1555ba4848f6b53b0b6d8",
+      "reread_sha256": "4bae3267f0dea83ca753f61ef19750d059967f7dc2e1555ba4848f6b53b0b6d8",
+      "ok": true
+    },
+    {
+      "rel": "odbl/osm_varna_source_manifest.json",
+      "src": "C:\\git\\Varna_buildings\\output\\public_basemap\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\osm_varna_source_manifest.json",
+      "dst": "C:\\git\\Fire_Varna\\data\\basemaps\\osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b\\odbl\\osm_varna_source_manifest.json",
+      "bytes": 1684,
+      "src_sha256": "427842588c77264ef8d891294cffbb5a0870f2f873c6a69bbe92cdf73304cf7a",
+      "reread_sha256": "427842588c77264ef8d891294cffbb5a0870f2f873c6a69bbe92cdf73304cf7a",
+      "ok": true
+    }
+  ],
+  "pruned_dirs": [],
+  "preserved": [
+    "range_canary.pmtiles"
+  ],
+  "parent_dir_fsync": "not_supported_on_windows",
+  "ok": true
+}

@@ -1,0 +1,28 @@
+{
+  "version": "osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b",
+  "deps": [
+    {
+      "name": "pmtiles",
+      "version": "3.2.1",
+      "source_url": "https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js",
+      "path": "vendor/basemap/pmtiles-3.2.1.js",
+      "bytes": 51739,
+      "expect_bytes": 51739,
+      "bytes_match": true,
+      "sha256": "367c19f8936d1d6c1b1820b0dee053f793fc29277655c3e471f5ed4d37b5f045",
+      "sri_sha384": "sha384-QfbOCebHNw8pQiPAOd2IFee2v2A5VYZxBk0+JGZ5H+3mfzVIp6zsQNkTsfGJot93"
+    },
+    {
+      "name": "protomaps-leaflet",
+      "version": "4.0.1",
+      "source_url": "https://unpkg.com/protomaps-leaflet@4.0.1/dist/protomaps-leaflet.js",
+      "path": "vendor/basemap/protomaps-leaflet-4.0.1.js",
+      "bytes": 100591,
+      "expect_bytes": 100591,
+      "bytes_match": true,
+      "sha256": "8e3d2aa0f5a2fd46871ff9c6ed47fdcdb969bc6ed10bf6719dee507b46a2ec9e",
+      "sri_sha384": "sha384-GmP3jXNYFGjRNEfk47lHCeBRIf+V8dRyuQ6B+yJ6TPhOXIg7vpYy1CTKEnE8B84s"
+    }
+  ],
+  "ok": true
+}

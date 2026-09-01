@@ -1,0 +1,214 @@
+{
+  "base": "http://127.0.0.1:8000/Fire_Varna/scratch/basemap_b2/render_probe.html",
+  "cases": [
+    {
+      "name": "z13_default",
+      "histogram": {
+        "background": 1976714,
+        "buildingFill": 0,
+        "road": 120438,
+        "label": 0,
+        "other": 0,
+        "transparent": 0,
+        "total": 2097152,
+        "canvasCount": 8
+      },
+      "probeErrors": [],
+      "consoleErrors": [],
+      "vendorSameOriginReqs": [
+        "http://127.0.0.1:8000/Fire_Varna/vendor/basemap/pmtiles-3.2.1.js",
+        "http://127.0.0.1:8000/Fire_Varna/vendor/basemap/protomaps-leaflet-4.0.1.js"
+      ],
+      "cdnBasemapReqs": [],
+      "pmtilesResponses": [
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        }
+      ],
+      "pmtilesServedOk": true
+    },
+    {
+      "name": "ff001_z17",
+      "histogram": {
+        "background": 1418889,
+        "buildingFill": 571805,
+        "road": 95005,
+        "label": 6922,
+        "other": 4531,
+        "transparent": 0,
+        "total": 2097152,
+        "canvasCount": 8
+      },
+      "probeErrors": [],
+      "consoleErrors": [],
+      "vendorSameOriginReqs": [
+        "http://127.0.0.1:8000/Fire_Varna/vendor/basemap/pmtiles-3.2.1.js",
+        "http://127.0.0.1:8000/Fire_Varna/vendor/basemap/protomaps-leaflet-4.0.1.js"
+      ],
+      "cdnBasemapReqs": [],
+      "pmtilesResponses": [
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        }
+      ],
+      "pmtilesServedOk": true
+    },
+    {
+      "name": "venchan_z17",
+      "histogram": {
+        "background": 1564184,
+        "buildingFill": 461852,
+        "road": 63852,
+        "label": 4440,
+        "other": 2824,
+        "transparent": 0,
+        "total": 2097152,
+        "canvasCount": 8
+      },
+      "probeErrors": [],
+      "consoleErrors": [],
+      "vendorSameOriginReqs": [
+        "http://127.0.0.1:8000/Fire_Varna/vendor/basemap/pmtiles-3.2.1.js",
+        "http://127.0.0.1:8000/Fire_Varna/vendor/basemap/protomaps-leaflet-4.0.1.js"
+      ],
+      "cdnBasemapReqs": [],
+      "pmtilesResponses": [
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        },
+        {
+          "url": "http://127.0.0.1:8000/Fire_Varna/data/basemaps/osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b/varna_basemap.pmtiles",
+          "status": 206,
+          "hadRange": true
+        }
+      ],
+      "pmtilesServedOk": true
+    }
+  ],
+  "ok": true,
+  "checks": {
+    "noCdn": true,
+    "vendored": true,
+    "served": true,
+    "noErrors": true,
+    "z13Roads": true,
+    "ffRoadsLabels": true,
+    "venRoadsLabels": true
+  }
+}

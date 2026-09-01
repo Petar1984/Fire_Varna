@@ -1,0 +1,246 @@
+{
+  "summary": {
+    "fetched_count": 13,
+    "applied_count": 13,
+    "skipped_count": 0,
+    "skipped_reasons": {},
+    "by_report_type": {
+      "exists_confirmed": 10,
+      "missing": 1,
+      "damaged": 1,
+      "new_hydrant": 1
+    },
+    "approver_id": "petar",
+    "timestamp": "2026-07-19T08:58:59+03:00",
+    "input_count": 7273,
+    "output_count": 7274
+  },
+  "records": [
+    {
+      "issue_number": 193,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.44251_43.18365",
+      "target_id_after": "coord_27.44251_43.18365",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 192,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.44293_43.18555",
+      "target_id_after": "coord_27.44293_43.18555",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 191,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.44252_43.18442",
+      "target_id_after": "coord_27.44252_43.18442",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 190,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.39412_43.19586",
+      "target_id_after": "coord_27.39412_43.19586",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 189,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.44518_43.17925",
+      "target_id_after": "coord_27.44518_43.17925",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 188,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91634_43.20757",
+      "target_id_after": "coord_27.91634_43.20757",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 187,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91808_43.20908",
+      "target_id_after": "coord_27.91808_43.20908",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 186,
+      "report_type": "missing",
+      "action": "applied",
+      "target_id_before": "coord_27.91834_43.20811",
+      "target_id_after": "coord_27.91834_43.20811",
+      "changes": {
+        "review_status": {
+          "old": null,
+          "new": "reported"
+        }
+      }
+    },
+    {
+      "issue_number": 185,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91771_43.20769",
+      "target_id_after": "coord_27.91771_43.20769",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 184,
+      "report_type": "damaged",
+      "action": "applied",
+      "target_id_before": "coord_27.91783_43.20827",
+      "target_id_after": "coord_27.91783_43.20827",
+      "changes": {
+        "operational_status": {
+          "old": null,
+          "new": "not_working"
+        },
+        "review_status": {
+          "old": null,
+          "new": "reported"
+        }
+      }
+    },
+    {
+      "issue_number": 183,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.44477_43.11635",
+      "target_id_after": "coord_27.44477_43.11635",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 182,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.44294_43.18450",
+      "target_id_after": "coord_27.44294_43.18450",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 181,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.44348_43.18366",
+      "changes": {
+        "created": {
+          "id": "coord_27.44348_43.18366",
+          "coords": [
+            27.443481,
+            43.183655
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "77700ea5-83ab-4d58-b97a-bb2720683c0f",
+            "field_77700ea5"
+          ],
+          "type": "подземен",
+          "operational_status": "works",
+          "report_id": "77700ea5-83ab-4d58-b97a-bb2720683c0f",
+          "reported_at": "2026-07-13T11:27:59+03:00"
+        }
+      }
+    }
+  ]
+}

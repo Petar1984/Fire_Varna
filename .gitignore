@@ -59,3 +59,22 @@ wfsrequest.txt
 New Text Document.txt
 hydrants_varna (7).html
 hydrants_varna (7).html.bak.*
+# ---- ЛОТ 1 (план от 01.09.2026, подписан 02.09): шумът по подписания списък; нищо не е изтрито ----
+# [fv_all] Цялата папка е шум: галерия, 8 OSM/overpass geojson-а и 66.8 MB копие. Нула доказателства вътре — проверено файл по файл.
+/scratch/boundary_gallery/
+# [fv_all] Хваща само снимките в корена на scratch. Доказателствата там са .md/.json/.py/.mjs — правилото не ги докосва.
+/scratch/*.png
+# [fv_all] Само трите точкови дъмпа. quarters_cleanup_spec/quarters_list са .md и остават извън шаблона.
+/scratch/quarters_*.js
+# [fv_all] Трите прегледни изгледа. Не съвпада с нито един .md от кварталния цикъл.
+/scratch/quarters_*.html
+# [fv_all] Точен път — изглед на регистър, чийто авторитет е тракнат в Varna_buildings/config.
+/scratch/registry_view_20260730.html
+# [fv_all] Точен път; одитът patch_live_osm_audit_20260811.md е .md и остава видим.
+/scratch/patch_compare_20260811.html
+# [fv_all] Точен път към дубликата; никой друг .geojson в корена на scratch не съществува.
+/scratch/varna_quarters_osm_copy.geojson
+# [fv_all] Точен път; тракнатият scratch/probe_geo_fv.mjs не се засяга.
+/scratch/shot_geo_fv.mjs
+# [fv_all] Точен път; отчетите и .mjs харнесите в същата папка остават видими за git add.
+/scratch/basemap_b2/index_html.diff

@@ -1,0 +1,42 @@
+{
+  "app": "http://127.0.0.1:8000/Fire_Varna/",
+  "ok": true,
+  "caseA": {
+    "swRegistrations": 0,
+    "hydrantPins": 0,
+    "hydrantsFetched": true,
+    "forbiddenRequests": [],
+    "consoleErrors": []
+  },
+  "caseB": {
+    "swRegistered": true,
+    "selectorOptions": 3,
+    "pmtilesBeforeSelect": false,
+    "vendorSameOriginReqs": 2,
+    "cdnBasemapReqs": [],
+    "pmtilesRequested": true,
+    "pane": {
+      "basemapCanvases": 8,
+      "basemapZ": 150,
+      "markerZ": 600,
+      "overlayZ": 400,
+      "tileZ": 200
+    },
+    "overlaysAboveBasemap": true,
+    "consoleErrors": []
+  },
+  "checks": {
+    "A_noSW": true,
+    "A_inert": true,
+    "A_hydrants": true,
+    "A_noErrors": true,
+    "B_swRegistered": true,
+    "B_selector3": true,
+    "B_osmDefault": true,
+    "B_vendored": true,
+    "B_noCdn": true,
+    "B_rendered": true,
+    "B_overlaysAbove": true,
+    "B_noErrors": true
+  }
+}

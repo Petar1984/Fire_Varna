@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- chat-Claude audit probe (2026-07-05, локален преглед за Petar).
+     Разлика от leaflet_protomaps_probe.html: явни paintRules за суровите
+     tippecanoe слоеве (roads/buildings) от size-матрицата, вместо theme:'light'
+     (темата очаква protomaps schema и рисува сиво върху сурови слоеве).
+     НЕ е производствен стил — визуализира какво има в плочките. -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Local render probe — сурови roads/buildings PMTiles</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  html,body{margin:0;height:100%;font:14px/1.4 system-ui,sans-serif}
+  #map{position:absolute;inset:0;bottom:56px}
+  #bar{position:absolute;left:0;right:0;bottom:0;height:56px;background:#0b1e2d;color:#fff;
+       padding:6px 10px;box-sizing:border-box;font-size:12px;overflow:hidden}
+  code{color:#ffd479}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="bar"><b>Суров рендер</b> на плочките от днешната size-матрица (roads+buildings z13–17, 9.2 MB)
+· явни paint rules, не финалният стил · <span id="out">зареждане…</span></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js"></script>
+<script src="https://unpkg.com/protomaps-leaflet@4.0.1/dist/protomaps-leaflet.js"></script>
+<script>
+const t0 = performance.now();
+const q = new URLSearchParams(location.search);
+const PMTILES = q.get('pmtiles') ||
+  'http://127.0.0.1:8000/Varna_buildings/scratch/basemap_e0/_build/roads_buildings_z13_z17.pmtiles';
+const out = document.getElementById('out');
+const map = L.map('map', { attributionControl: true }).setView(
+  [parseFloat(q.get('lat')) || 43.2141, parseFloat(q.get('lng')) || 27.9147],
+  parseInt(q.get('z')) || 15);
+map.attributionControl.addAttribution('© OpenStreetMap contributors (ODbL) · суров пробен рендер');
+try {
+  const paintRules = [
+    { dataLayer: 'buildings',
+      symbolizer: new protomapsL.PolygonSymbolizer({ fill: '#d9cfc3', opacity: 0.85 }) },
+    { dataLayer: 'roads',
+      symbolizer: new protomapsL.LineSymbolizer({
+        color: '#4a4a4a',
+        width: (z, f) => {
+          const h = (f.props.highway || '');
+          if (/motorway|trunk|primary/.test(h)) return z >= 15 ? 5 : 3;
+          if (/secondary|tertiary/.test(h))     return z >= 15 ? 3.5 : 2;
+          if (/residential|unclassified|living/.test(h)) return z >= 15 ? 2 : 1;
+          return 0.8;
+        } }) }
+  ];
+  const labelRules = [
+    { dataLayer: 'roads',
+      symbolizer: new protomapsL.LineLabelSymbolizer({
+        labelProps: ['name'], fill: '#1a1a1a', width: 2, stroke: '#ffffff',
+        font: '600 12px system-ui,sans-serif', minzoom: 14 }) }
+  ];
+  const layer = protomapsL.leafletLayer({ url: PMTILES, paintRules, labelRules });
+  layer.addTo(map);
+  // демо оверлей: хидрантният слой съжителства (както в реалното app)
+  [[43.2156, 27.9109], [43.2129, 27.9165], [43.2098, 27.9139]].forEach(ll =>
+    L.circleMarker(ll, { radius: 6, color: '#c00', weight: 2, fillColor: '#f66', fillOpacity: .7 }).addTo(map));
+  let firstIdle = 0;
+  const report = () => { out.innerHTML =
+    'first-idle: <code>' + Math.round(firstIdle - t0) + ' ms</code> · pmtiles: <code>' + PMTILES + '</code>'; };
+  map.on('load moveend', () => { if (!firstIdle) { firstIdle = performance.now(); report(); } });
+  map.whenReady(() => setTimeout(() => { if (!firstIdle) { firstIdle = performance.now(); report(); } }, 800));
+} catch (e) { out.innerHTML = 'ERROR: ' + e; }
+</script>
+</body>
+</html>

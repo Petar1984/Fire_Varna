@@ -1,0 +1,38 @@
+{
+  "summary": {
+    "fetched_count": 1,
+    "applied_count": 1,
+    "skipped_count": 0,
+    "skipped_reasons": {},
+    "by_report_type": {
+      "exists_confirmed": 1
+    },
+    "approver_id": "petar",
+    "timestamp": "2026-07-19T11:26:46+03:00",
+    "input_count": 7274,
+    "output_count": 7274
+  },
+  "records": [
+    {
+      "issue_number": 194,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91859_43.22210",
+      "target_id_after": "coord_27.91859_43.22210",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "подземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    }
+  ]
+}

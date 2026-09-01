@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>B2 render probe — custom-schema protomaps adapter over B1 PMTiles</title>
+<link rel="icon" href="data:,">
+
+<!-- Leaflet from CDN is PROBE-ONLY (the real app has Leaflet 1.9.4 inlined). The B2
+     "no CDN" assertion is scoped to the basemap deps (pmtiles / protomaps-leaflet),
+     which this probe loads SAME-ORIGIN from /Fire_Varna/vendor/basemap/, exactly like
+     the app will. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>html,body,#map{margin:0;height:100%;width:100%}</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- SAME-ORIGIN vendored basemap deps (pmtiles before protomaps-leaflet) -->
+<script src="/Fire_Varna/vendor/basemap/pmtiles-3.2.1.js"></script>
+<script src="/Fire_Varna/vendor/basemap/protomaps-leaflet-4.0.1.js"></script>
+<script>
+const VERSION = 'osm_varna_2026-05-13_m3b_r102dde00f86b_patch_4bae3267f0de_style_36171a920333_tiles_8a15054e722b';
+const PMTILES_URL = '/Fire_Varna/data/basemaps/' + VERSION + '/varna_basemap.pmtiles';
+const errors = [];
+window.addEventListener('error', (e) => errors.push(String(e.message || e.error)));
+window.__probe = { ready: false, errors, dims: null };
+
+const q = new URLSearchParams(location.search);
+const lat = parseFloat(q.get('bm_lat') || '43.2141');
+const lng = parseFloat(q.get('bm_lng') || '27.9147');
+const z = parseInt(q.get('bm_z') || '13', 10);
+
+// ===== B1 style.json -> protomaps-leaflet adapter (MIRRORS index.html) =====
+// style.json (hash 62cc123e) layers -> protomaps-leaflet 4.0.1 symbolizers:
+//   background  #f2f0e8                         -> backgroundColor
+//   buildings   fill #e6e1d3 outline #d3ccb8    -> PolygonSymbolizer, minzoom 14
+//   roads       line #ffffff w interp 13:0.6..17:2.2 -> LineSymbolizer
+//   road-labels get(name) size 11 #333 halo #fff 1.2 -> LineLabelSymbolizer, minzoom 15
+function roadWidth(zoom) {
+  if (zoom <= 13) return 0.6;
+  if (zoom >= 17) return 2.2;
+  return 0.6 + (2.2 - 0.6) * (zoom - 13) / (17 - 13);
+}
+const P = window.protomapsL;
+const paintRules = [
+  { dataLayer: 'buildings', minzoom: 14,
+    symbolizer: new P.PolygonSymbolizer({ fill: '#e6e1d3', stroke: '#d3ccb8', width: 1 }) },
+  { dataLayer: 'roads',
+    symbolizer: new P.LineSymbolizer({ color: '#ffffff', width: (zoom) => roadWidth(zoom) }) },
+];
+const labelRules = [
+  { dataLayer: 'roads', minzoom: 15,
+    symbolizer: new P.LineLabelSymbolizer({
+      labelProps: ['name'], fill: '#333333', stroke: '#ffffff', width: 1.2,
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', fontSize: 11,
+    }) },
+];
+
+const map = L.map('map', { attributionControl: false }).setView([lat, lng], z);
+map.createPane('offlineBasemapPane');
+const bmPane = map.getPane('offlineBasemapPane');
+bmPane.style.zIndex = 150;      // base tier: strictly below tilePane(200)/overlay(400)/marker(600)
+bmPane.style.pointerEvents = 'none';
+
+let layer;
+try {
+  layer = P.leafletLayer({
+    url: PMTILES_URL,
+    paintRules, labelRules,
+    backgroundColor: '#f2f0e8',
+    levelDiff: 0,          // Leaflet zoom == data zoom (our tiles are z13..z17)
+    maxDataZoom: 17,       // use our finest tiles at z17; overzoom above
+    maxZoom: 19,
+    pane: 'offlineBasemapPane',
+    attribution: '© OpenStreetMap contributors (ODbL)',
+  });
+  layer.addTo(map);
+  layer.bringToBack();
+} catch (e) { errors.push('layer ctor: ' + e); }
+
+// Overlay proof: a red marker that must render ABOVE the basemap.
+L.circleMarker([lat, lng], { radius: 8, color: '#e11', weight: 3, fillOpacity: 0.9 }).addTo(map);
+
+// Pixel sampler over the basemap pane canvases. Buckets pixels by nearest B1 style
+// color so we can prove roads (white) and labels (dark) actually paint from OUR rules.
+window.__probe.sample = function () {
+  const canvases = bmPane.querySelectorAll('canvas');
+  const buckets = { background: 0, buildingFill: 0, road: 0, label: 0, other: 0, transparent: 0, total: 0 };
+  const targets = [
+    ['background', 0xf2, 0xf0, 0xe8],
+    ['buildingFill', 0xe6, 0xe1, 0xd3],
+    ['road', 0xff, 0xff, 0xff],
+    ['label', 0x33, 0x33, 0x33],
+  ];
+  canvases.forEach((c) => {
+    if (!c.width || !c.height) return;
+    let ctx;
+    try { ctx = c.getContext('2d'); } catch (e) { return; }
+    let img;
+    try { img = ctx.getImageData(0, 0, c.width, c.height); } catch (e) { errors.push('getImageData: ' + e); return; }
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 4) {
+      buckets.total++;
+      if (d[i + 3] < 8) { buckets.transparent++; continue; }
+      let best = 'other', bestDist = 1e9;
+      for (const [name, r, g, b] of targets) {
+        const dist = (d[i] - r) ** 2 + (d[i + 1] - g) ** 2 + (d[i + 2] - b) ** 2;
+        if (dist < bestDist) { bestDist = dist; best = name; }
+      }
+      // Only count as a named color if reasonably close (<48 per-channel avg^2*3)
+      if (bestDist > 3 * 48 * 48) best = 'other';
+      buckets[best]++;
+    }
+  });
+  buckets.canvasCount = canvases.length;
+  return buckets;
+};
+
+function markReady() { window.__probe.ready = true; window.__probe.dims = { lat, lng, z }; }
+map.whenReady(() => setTimeout(markReady, 2500));
+</script>
+</body>
+</html>

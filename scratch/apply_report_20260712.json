@@ -1,0 +1,1689 @@
+{
+  "summary": {
+    "fetched_count": 93,
+    "applied_count": 71,
+    "skipped_count": 18,
+    "skipped_reasons": {
+      "id_collision": 18
+    },
+    "by_report_type": {
+      "exists_confirmed": 31,
+      "missing": 4,
+      "new_hydrant": 57,
+      "damaged": 1
+    },
+    "approver_id": "petar",
+    "timestamp": "2026-07-12T23:28:10+03:00",
+    "input_count": 7238,
+    "output_count": 7273,
+    "flagged_count": 4,
+    "flagged_reasons": {
+      "spatial_near_match": 4
+    }
+  },
+  "records": [
+    {
+      "issue_number": 180,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91162_43.21991",
+      "target_id_after": "coord_27.91162_43.21991",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 179,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.87222_43.29649",
+      "target_id_after": "coord_27.87222_43.29649",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 178,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.87379_43.29784",
+      "target_id_after": "coord_27.87379_43.29784",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 177,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.73978_43.25426",
+      "target_id_after": "coord_27.73978_43.25426",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "подземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 176,
+      "report_type": "missing",
+      "action": "applied",
+      "target_id_before": "coord_27.73892_43.25450",
+      "target_id_after": "coord_27.73892_43.25450",
+      "changes": {
+        "review_status": {
+          "old": null,
+          "new": "reported"
+        }
+      }
+    },
+    {
+      "issue_number": 175,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.88182_43.02849",
+      "changes": {
+        "created": {
+          "id": "coord_27.88182_43.02849",
+          "coords": [
+            27.881823,
+            43.028492
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "12a233d0-c27c-43bc-9fca-97a522c0a3b1",
+            "field_12a233d0"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "12a233d0-c27c-43bc-9fca-97a522c0a3b1",
+          "reported_at": "2026-07-10T09:27:41+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 174,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.47513_43.49149",
+      "target_id_after": "coord_27.47513_43.49149",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 173,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.47513_43.49149",
+      "target_id_after": "coord_27.47513_43.49149",
+      "changes": {}
+    },
+    {
+      "issue_number": 172,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.44641_43.12087",
+      "changes": {
+        "created": {
+          "id": "coord_27.44641_43.12087",
+          "coords": [
+            27.446414,
+            43.120869
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "6a24a35e-5ab7-46f5-8d74-ceb7e31d5eb9",
+            "field_6a24a35e"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "6a24a35e-5ab7-46f5-8d74-ceb7e31d5eb9",
+          "reported_at": "2026-07-09T12:12:13+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 171,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.41387_43.49092",
+      "target_id_after": "coord_27.41387_43.49092",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 170,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.40799_43.42931",
+      "changes": {
+        "created": {
+          "id": "coord_27.40799_43.42931",
+          "coords": [
+            27.40799,
+            43.429311
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "1bf6a73c-0355-4bd3-aa53-50bedf4c1947",
+            "field_1bf6a73c"
+          ],
+          "type": "подземен",
+          "operational_status": "works",
+          "report_id": "1bf6a73c-0355-4bd3-aa53-50bedf4c1947",
+          "reported_at": "2026-07-09T11:40:08+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 169,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.41269_43.43392",
+      "changes": {
+        "created": {
+          "id": "coord_27.41269_43.43392",
+          "coords": [
+            27.412688,
+            43.43392
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "55142501-eac4-41b5-8787-a1fb105781b3",
+            "field_55142501"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "55142501-eac4-41b5-8787-a1fb105781b3",
+          "reported_at": "2026-07-09T11:29:36+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 168,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.78204_43.39192",
+      "changes": {
+        "created": {
+          "id": "coord_27.78204_43.39192",
+          "coords": [
+            27.782036,
+            43.39192
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "b0ec1674-71ea-44d8-9101-7337feb46172",
+            "field_b0ec1674"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "b0ec1674-71ea-44d8-9101-7337feb46172",
+          "reported_at": "2026-07-09T11:25:50+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 167,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.48011_43.38596",
+      "target_id_after": "coord_27.48011_43.38596",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 166,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.47889_43.38966",
+      "target_id_after": "coord_27.47889_43.38966",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        }
+      }
+    },
+    {
+      "issue_number": 165,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.45959_43.40511",
+      "target_id_after": "coord_27.45959_43.40511",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 164,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.46077_43.40599",
+      "target_id_after": "coord_27.46077_43.40599",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 163,
+      "report_type": "missing",
+      "action": "applied",
+      "target_id_before": "coord_27.47859_43.38990",
+      "target_id_after": "coord_27.47859_43.38990",
+      "changes": {
+        "review_status": {
+          "old": null,
+          "new": "reported"
+        }
+      }
+    },
+    {
+      "issue_number": 162,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.47948_43.39065",
+      "target_id_after": "coord_27.47948_43.39065",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 160,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.47889_43.38966",
+      "target_id_after": "coord_27.47889_43.38966",
+      "changes": {
+        "operational_status": {
+          "old": null,
+          "new": "works"
+        }
+      }
+    },
+    {
+      "issue_number": 159,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.89920_43.22087",
+      "target_id_after": "coord_27.89920_43.22087",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "подземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 158,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.89997_43.22138",
+      "changes": {
+        "created": {
+          "id": "coord_27.89997_43.22138",
+          "coords": [
+            27.899966,
+            43.221381
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "dc28944c-8713-49f7-89fa-0fe0e6124d8e",
+            "field_dc28944c"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "dc28944c-8713-49f7-89fa-0fe0e6124d8e",
+          "reported_at": "2026-07-08T15:44:55+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 157,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90038_43.22175",
+      "target_id_after": "coord_27.90038_43.22175",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 156,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.89740_43.21570",
+      "changes": {
+        "created": {
+          "id": "coord_27.89740_43.21570",
+          "coords": [
+            27.897401,
+            43.2157
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "77a32527-2bec-4d81-ba43-84fdecf61558",
+            "field_77a32527"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "77a32527-2bec-4d81-ba43-84fdecf61558",
+          "reported_at": "2026-07-08T10:26:06+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 155,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90318_43.21897",
+      "target_id_after": "coord_27.90318_43.21897",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 154,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90393_43.21895",
+      "target_id_after": "coord_27.90393_43.21895",
+      "changes": {}
+    },
+    {
+      "issue_number": 153,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90821_43.21832",
+      "changes": {
+        "created": {
+          "id": "coord_27.90821_43.21832",
+          "coords": [
+            27.908212,
+            43.21832
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "ec5cdf3c-e61d-407b-9693-e769ec5c9026",
+            "field_ec5cdf3c"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "ec5cdf3c-e61d-407b-9693-e769ec5c9026",
+          "reported_at": "2026-07-07T18:46:41+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 152,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.92053_43.21013",
+      "changes": {
+        "created": {
+          "id": "coord_27.92053_43.21013",
+          "coords": [
+            27.92053,
+            43.210128
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "de3ff38b-53e9-485d-ae1e-0925a85b0822",
+            "field_de3ff38b"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "de3ff38b-53e9-485d-ae1e-0925a85b0822",
+          "reported_at": "2026-07-07T18:26:44+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 151,
+      "report_type": "missing",
+      "action": "applied",
+      "target_id_before": "coord_27.92274_43.20792",
+      "target_id_after": "coord_27.92274_43.20792",
+      "changes": {
+        "review_status": {
+          "old": null,
+          "new": "reported"
+        }
+      }
+    },
+    {
+      "issue_number": 148,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.91877_43.21109",
+      "changes": {
+        "created": {
+          "id": "coord_27.91877_43.21109",
+          "coords": [
+            27.918771,
+            43.211086
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "e97cf96d-2770-4e46-85b3-df9b56946c08",
+            "field_e97cf96d"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "e97cf96d-2770-4e46-85b3-df9b56946c08",
+          "reported_at": "2026-07-07T18:05:49+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 147,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91729_43.21204",
+      "target_id_after": "coord_27.91729_43.21204",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "подземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 146,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91391_43.21446",
+      "target_id_after": "coord_27.91391_43.21446",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "подземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 145,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.91026_43.21706",
+      "target_id_after": "coord_27.91026_43.21706",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 144,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90915_43.21784",
+      "changes": {
+        "created": {
+          "id": "coord_27.90915_43.21784",
+          "coords": [
+            27.909153,
+            43.217837
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "2f7a8adc-e0f3-47a1-87e8-d089439a4822",
+            "field_2f7a8adc"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "2f7a8adc-e0f3-47a1-87e8-d089439a4822",
+          "reported_at": "2026-07-07T17:50:18+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 143,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90733_43.21900",
+      "target_id_after": "coord_27.90733_43.21900",
+      "changes": {
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 142,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90614_43.21898",
+      "target_id_after": "coord_27.90614_43.21898",
+      "changes": {
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 141,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90493_43.21885",
+      "target_id_after": "coord_27.90493_43.21885",
+      "changes": {
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 140,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90188_43.22265",
+      "target_id_after": "coord_27.90188_43.22265",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 139,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90112_43.22340",
+      "target_id_after": "coord_27.90112_43.22340",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 138,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.88928_43.23275",
+      "changes": {
+        "created": {
+          "id": "coord_27.88928_43.23275",
+          "coords": [
+            27.889279,
+            43.232746
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "d8bf6498-c310-4c9f-91e9-6b753b6f29c1",
+            "field_d8bf6498"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "d8bf6498-c310-4c9f-91e9-6b753b6f29c1",
+          "reported_at": "2026-07-07T17:34:42+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 137,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90034_43.22445",
+      "changes": {
+        "created": {
+          "id": "coord_27.90034_43.22445",
+          "coords": [
+            27.900337,
+            43.224452
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "9986ae83-8e80-41d1-b31d-464c3aa3b0e3",
+            "field_9986ae83"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "9986ae83-8e80-41d1-b31d-464c3aa3b0e3",
+          "reported_at": "2026-07-07T17:33:52+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 136,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.90072_43.22468",
+      "target_id_after": "coord_27.90072_43.22468",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "подземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 135,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90767_43.22546",
+      "changes": {
+        "created": {
+          "id": "coord_27.90767_43.22546",
+          "coords": [
+            27.907669,
+            43.225456
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "6bc077f0-7bce-4473-80f3-40067b0662b4",
+            "field_6bc077f0"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "6bc077f0-7bce-4473-80f3-40067b0662b4",
+          "reported_at": "2026-07-07T17:31:40+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 133,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.89832_43.22503",
+      "target_id_after": "coord_27.89832_43.22503",
+      "changes": {}
+    },
+    {
+      "issue_number": 132,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.89783_43.22353",
+      "target_id_after": "coord_27.89783_43.22353",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 131,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.89724_43.22394",
+      "target_id_after": "coord_27.89724_43.22394",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 130,
+      "report_type": "missing",
+      "action": "applied",
+      "target_id_before": "coord_27.89459_43.22508",
+      "target_id_after": "coord_27.89459_43.22508",
+      "changes": {
+        "review_status": {
+          "old": null,
+          "new": "reported"
+        }
+      }
+    },
+    {
+      "issue_number": 129,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.89453_43.22485",
+      "target_id_after": "coord_27.89453_43.22485",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 128,
+      "report_type": "exists_confirmed",
+      "action": "applied",
+      "target_id_before": "coord_27.89320_43.22637",
+      "target_id_after": "coord_27.89320_43.22637",
+      "changes": {
+        "existence_status": {
+          "old": null,
+          "new": "verified"
+        },
+        "type": {
+          "old": null,
+          "new": "надземен"
+        },
+        "operational_status": {
+          "old": null,
+          "new": "not_tested"
+        }
+      }
+    },
+    {
+      "issue_number": 124,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90875_43.22557",
+      "changes": {
+        "created": {
+          "id": "coord_27.90875_43.22557",
+          "coords": [
+            27.90875,
+            43.225568
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "1fbb4d96-8dc9-4038-8ba4-a9430f3a6535",
+            "field_1fbb4d96"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "1fbb4d96-8dc9-4038-8ba4-a9430f3a6535",
+          "reported_at": "2026-07-07T12:52:33+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 123,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90985_43.22676",
+      "changes": {
+        "created": {
+          "id": "coord_27.90985_43.22676",
+          "coords": [
+            27.909849,
+            43.226758
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "1fae8493-7899-428c-8ee8-37c23fb597b5",
+            "field_1fae8493"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "1fae8493-7899-428c-8ee8-37c23fb597b5",
+          "reported_at": "2026-07-07T12:50:14+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 122,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90828_43.22702",
+      "changes": {
+        "created": {
+          "id": "coord_27.90828_43.22702",
+          "coords": [
+            27.908278,
+            43.227018
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "c869ea3c-7366-4ee3-936a-a7ee4ae7b38f",
+            "field_c869ea3c"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "c869ea3c-7366-4ee3-936a-a7ee4ae7b38f",
+          "reported_at": "2026-07-07T12:49:18+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 121,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90939_43.22705",
+      "changes": {
+        "created": {
+          "id": "coord_27.90939_43.22705",
+          "coords": [
+            27.909385,
+            43.227051
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "0413141d-4e74-454e-8c04-ae1dad73ccef",
+            "field_0413141d"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "0413141d-4e74-454e-8c04-ae1dad73ccef",
+          "reported_at": "2026-07-07T12:48:32+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 120,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.93127_43.22713",
+      "changes": {
+        "created": {
+          "id": "coord_27.93127_43.22713",
+          "coords": [
+            27.931272,
+            43.227125
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "8a01acfc-217b-4dfd-a645-cf9c2cd36462",
+            "field_8a01acfc"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "8a01acfc-217b-4dfd-a645-cf9c2cd36462",
+          "reported_at": "2026-07-07T12:42:57+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 119,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.93151_43.22891",
+      "changes": {
+        "created": {
+          "id": "coord_27.93151_43.22891",
+          "coords": [
+            27.931508,
+            43.228914
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "8b464905-c274-4eb9-b90c-058ec776875e",
+            "field_8b464905"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "8b464905-c274-4eb9-b90c-058ec776875e",
+          "reported_at": "2026-07-07T12:40:53+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 118,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.94777_43.22625",
+      "changes": {
+        "created": {
+          "id": "coord_27.94777_43.22625",
+          "coords": [
+            27.94777,
+            43.226248
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "7cbd5142-fe48-440d-99f1-746ad6fcde5d",
+            "field_7cbd5142"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "7cbd5142-fe48-440d-99f1-746ad6fcde5d",
+          "reported_at": "2026-07-07T12:24:10+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 117,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.94227_43.22492",
+      "changes": {
+        "created": {
+          "id": "coord_27.94227_43.22492",
+          "coords": [
+            27.942272,
+            43.224923
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "f62a1aa5-b29d-45a0-9c9c-169728d7d521",
+            "field_f62a1aa5"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "f62a1aa5-b29d-45a0-9c9c-169728d7d521",
+          "reported_at": "2026-07-07T12:20:18+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 116,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.94223_43.22385",
+      "changes": {
+        "created": {
+          "id": "coord_27.94223_43.22385",
+          "coords": [
+            27.942232,
+            43.223846
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "467c718d-ee52-453c-9635-2644daa45f77",
+            "field_467c718d"
+          ],
+          "type": "подземен",
+          "operational_status": "not_tested",
+          "report_id": "467c718d-ee52-453c-9635-2644daa45f77",
+          "reported_at": "2026-07-07T12:15:53+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 115,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.82730_43.35658",
+      "changes": {
+        "created": {
+          "id": "coord_27.82730_43.35658",
+          "coords": [
+            27.827303,
+            43.356577
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "9d662e1f-9414-4401-afe3-43929b305ddf",
+            "field_9d662e1f"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "9d662e1f-9414-4401-afe3-43929b305ddf",
+          "reported_at": "2026-07-07T11:26:52+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 114,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.88969_43.22070",
+      "changes": {
+        "created": {
+          "id": "coord_27.88969_43.22070",
+          "coords": [
+            27.889693,
+            43.220696
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "1c1d62ef-f234-4827-a731-deb39d9235f6",
+            "field_1c1d62ef"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "1c1d62ef-f234-4827-a731-deb39d9235f6",
+          "reported_at": "2026-07-07T10:14:59+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 113,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.92126_43.19123",
+      "changes": {
+        "created": {
+          "id": "coord_27.92126_43.19123",
+          "coords": [
+            27.921257,
+            43.191228
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "87a5e3db-044d-4586-b9b1-22bccc932c08",
+            "field_87a5e3db"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "87a5e3db-044d-4586-b9b1-22bccc932c08",
+          "reported_at": "2026-07-04T19:03:37+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 112,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.92145_43.19222",
+      "changes": {
+        "created": {
+          "id": "coord_27.92145_43.19222",
+          "coords": [
+            27.921447,
+            43.192217
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "707e2c9f-50ae-44ab-8f69-3a6c09be8481",
+            "field_707e2c9f"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "707e2c9f-50ae-44ab-8f69-3a6c09be8481",
+          "reported_at": "2026-07-04T19:01:35+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 111,
+      "report_type": "damaged",
+      "action": "applied",
+      "target_id_before": "coord_27.89717_43.20503",
+      "target_id_after": "coord_27.89717_43.20503",
+      "changes": {
+        "operational_status": {
+          "old": null,
+          "new": "not_working"
+        },
+        "review_status": {
+          "old": null,
+          "new": "reported"
+        }
+      }
+    },
+    {
+      "issue_number": 110,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.90132_43.20420",
+      "changes": {
+        "created": {
+          "id": "coord_27.90132_43.20420",
+          "coords": [
+            27.901322,
+            43.204204
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "3559fb1e-7c55-4bdd-a4e1-d4fdaf06899b",
+            "field_3559fb1e"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "3559fb1e-7c55-4bdd-a4e1-d4fdaf06899b",
+          "reported_at": "2026-07-03T15:37:39+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 109,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.89704_43.20400",
+      "changes": {
+        "created": {
+          "id": "coord_27.89704_43.20400",
+          "coords": [
+            27.897041,
+            43.204004
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "8c59fdbc-386d-4ab0-8736-a34e99331eb3",
+            "field_8c59fdbc"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "8c59fdbc-386d-4ab0-8736-a34e99331eb3",
+          "reported_at": "2026-07-03T15:34:13+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 108,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.89700_43.21613",
+      "changes": {
+        "created": {
+          "id": "coord_27.89700_43.21613",
+          "coords": [
+            27.897003,
+            43.216132
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "df251643-03fd-42e9-a4e7-0f6de7f6cf0e",
+            "field_df251643"
+          ],
+          "type": "надземен",
+          "operational_status": "works",
+          "report_id": "df251643-03fd-42e9-a4e7-0f6de7f6cf0e",
+          "reported_at": "2026-07-03T15:31:16+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 107,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.95165_43.21766",
+      "changes": {
+        "created": {
+          "id": "coord_27.95165_43.21766",
+          "coords": [
+            27.951649,
+            43.21766
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "7469c5fe-ec73-4025-8ba3-2a4faefae47e",
+            "field_7469c5fe"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "7469c5fe-ec73-4025-8ba3-2a4faefae47e",
+          "reported_at": "2026-07-03T11:06:11+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 106,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.95213_43.21633",
+      "changes": {
+        "created": {
+          "id": "coord_27.95213_43.21633",
+          "coords": [
+            27.952126,
+            43.216334
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "c4afc700-ba39-4a6a-858e-f49fe8d31f8c",
+            "field_c4afc700"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "c4afc700-ba39-4a6a-858e-f49fe8d31f8c",
+          "reported_at": "2026-07-03T11:02:37+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 105,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.98475_43.24141",
+      "changes": {
+        "created": {
+          "id": "coord_27.98475_43.24141",
+          "coords": [
+            27.984755,
+            43.241412
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "3d05d1d6-103e-49a4-abc9-ec8722f6d9bd",
+            "field_3d05d1d6"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "3d05d1d6-103e-49a4-abc9-ec8722f6d9bd",
+          "reported_at": "2026-07-03T10:54:41+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 104,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_28.04319_43.28110",
+      "changes": {
+        "created": {
+          "id": "coord_28.04319_43.28110",
+          "coords": [
+            28.043187,
+            43.281095
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "c1af84d3-a764-4e91-b5ee-f049f2c6ad62",
+            "field_c1af84d3"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "c1af84d3-a764-4e91-b5ee-f049f2c6ad62",
+          "reported_at": "2026-06-28T18:38:52+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 103,
+      "report_type": "new_hydrant",
+      "action": "applied",
+      "target_id_before": null,
+      "target_id_after": "coord_27.91464_43.19713",
+      "changes": {
+        "created": {
+          "id": "coord_27.91464_43.19713",
+          "coords": [
+            27.914642,
+            43.197133
+          ],
+          "origin": "field_report",
+          "existence_status": "verified",
+          "legacy_ids": [
+            "bf2f65d9-a7a4-4a1a-adb4-a3ef4bcd41ea",
+            "field_bf2f65d9"
+          ],
+          "type": "надземен",
+          "operational_status": "not_tested",
+          "report_id": "bf2f65d9-a7a4-4a1a-adb4-a3ef4bcd41ea",
+          "reported_at": "2026-06-26T09:53:52+03:00"
+        }
+      }
+    },
+    {
+      "issue_number": 99,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 95,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 94,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 93,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 92,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 91,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 90,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 89,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 88,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 87,
+      "report_type": "new_hydrant",
+      "action": "flagged",
+      "flag_reason": "spatial_near_match",
+      "nearest_id": "coord_27.88490_43.02228",
+      "distance_m": 5.26,
+      "changes": {}
+    },
+    {
+      "issue_number": 86,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 85,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 84,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 83,
+      "report_type": "new_hydrant",
+      "action": "flagged",
+      "flag_reason": "spatial_near_match",
+      "nearest_id": "coord_27.91473_43.14806",
+      "distance_m": 15.207,
+      "changes": {}
+    },
+    {
+      "issue_number": 82,
+      "report_type": "new_hydrant",
+      "action": "flagged",
+      "flag_reason": "spatial_near_match",
+      "nearest_id": "coord_27.91092_43.14206",
+      "distance_m": 11.561,
+      "changes": {}
+    },
+    {
+      "issue_number": 80,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 78,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 73,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 72,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 71,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    },
+    {
+      "issue_number": 70,
+      "report_type": "new_hydrant",
+      "action": "flagged",
+      "flag_reason": "spatial_near_match",
+      "nearest_id": "coord_27.89490_43.20798",
+      "distance_m": 5.591,
+      "changes": {}
+    },
+    {
+      "issue_number": 69,
+      "report_type": "new_hydrant",
+      "action": "skipped",
+      "skip_reason": "id_collision"
+    }
+  ]
+}
