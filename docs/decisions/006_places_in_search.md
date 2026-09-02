@@ -1,12 +1,12 @@
 # ADR 006 — Places (hotels) as a separate result branch in the Fire_Varna search
 
 **Date:** 2026-09-02 · **Status:** Accepted by Petar's signed prompt of 2026-09-02 (Gate 1: `varna_3d/docs/sessions/ПРОМПТ_нощна_смяна_търсачка_02.09.md`); Gate 2 (diff review + push) pending
+C0–C5 + C4-pre committed locally on 2026-09-02 (07ee724 … 0e563bd); audit C6 ГОДНО; awaiting Gate 2 + Petar's push.
 
 Supersedes nothing. Materialises Д1–Д12 of the signed plan
 [`docs/plans/places_search_plan_2026-09-02.md`](../plans/places_search_plan_2026-09-02.md) —
-v2 plus its amendments §10 (v2.1, after the recall sweep over the 226 records),
-§11 (v2.2, after the Kimi attack) and §12 (v2.3, after Sol's verdict on the
-wiring; where §12 and §2 differ, §12 wins). The plan stays the executable
+v2 plus its amendments §10–§15 (v2.1–v2.6; where §12 and §2 differ, §12 wins).
+The plan stays the executable
 specification; this ADR records *what was decided and why* and the obligations
 that outlive the cycle. It adds one obligation to ADR
 [`005_sw_cache_lifecycle.md`](005_sw_cache_lifecycle.md) (D6, `PROTECTED_CACHES`)
@@ -24,8 +24,8 @@ Petar, 02.09.2026 (the commission, verbatim):
 Measured before the cycle (plan §1; baseline `scratch/places_search/baseline_02.09.md`,
 manifest `scratch/places_search/manifest_before.json`):
 
-- the varna_3d delivery `fire_varna_hotels.json` — **226** records, 83,008 B,
-  sha256 `17800b5d23a6097da351b0b45808074ba9a4ab3d9183503d2fbc28a0f05c7f8f`,
+- the varna_3d delivery `fire_varna_hotels.json` — **226** records, 78,601 B,
+  sha256 `7205544432f8f4c28289da20eea83ab964b1936864e4922532b4cf4df10d4806`,
   12 keys per record, 10 zones, 3 `src` values (НТР УИН 192 · Sol/OSM
   identification 22 · КАИС address field 12), 0 duplicate (name, zone) pairs,
   all three Admirals present including the registry spelling АМИРАЛ;
@@ -61,8 +61,8 @@ instead: **separate branch, own container, own cache, own selection.**
 ## Decision
 
 **D1 — Two byte-copied data files; nothing is hand-edited in this repo.**
-`data/hotels.json` is a byte copy of the delivery (226 records, 83,008 B, sha256
-`17800b5d23a6097da351b0b45808074ba9a4ab3d9183503d2fbc28a0f05c7f8f`, 12 keys).
+`data/hotels.json` is a byte copy of the delivery (226 records, 78,601 B, sha256
+`7205544432f8f4c28289da20eea83ab964b1936864e4922532b4cf4df10d4806`, 12 keys).
 `data/place_categories.json` is a byte copy of `varna_3d/data/place_categories.json`
 (264 forms / 55 chips); its sha256 is measured when the copy is made (commit C2) and
 **pinned in `tests/test_hotels_public_bundle.py`** (commit C3). Both are lazy —
