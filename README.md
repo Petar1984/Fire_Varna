@@ -50,6 +50,8 @@
 | **ЕТР** | KMZ файлове на районните служби: Варна, Провадия, Долни чифлик, Девня (внесени 06.2026+) |
 | **Полеви сигнали** | хидранти, докладвани, потвърдени или поправени на място през 🚨 |
 | **Национален туристически регистър** | местата за настаняване (хотели) — отделни факти, атрибуция в попъпа |
+| **OpenStreetMap** | имената на училищата, университетите, болниците и детските градини — © OpenStreetMap contributors, ODbL 1.0 |
+| **Регистри (МОН/НЕИСПУО, ИАМН, Община Варна)** | регистровите имена на училищата, детските заведения и лечебните заведения — отделни факти, източникът на всеки ред стои в `src` |
 
 Координатите са WGS84. Рядката метаданна (тип, адрес, състояние) остава
 точно толкова рядка, колкото е в източниците — нищо не се измисля. Всяка
@@ -76,6 +78,15 @@
 дословно:
 
 > Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).
+
+В търсачката са и училищата, университетите, болниците, ДКЦ, хосписите и детските градини (броят и sha — в docs/activeContext.md): имената идват от OpenStreetMap (© OpenStreetMap contributors, ODbL 1.0) и от регистрите, посочени в реда-източник на всеки попъп.
+
+Двата лицензни реда на доставката (`data/places.json`, `_meta.licence_osm` и
+`_meta.licence_registry`), дословно:
+
+> Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).
+
+> Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).
 
 Хотелите не са част от офлайн пакета (sw.js): без връзка търсачката на
 места не работи.
@@ -174,6 +185,8 @@ and deduplicated from:
 | **ЕТР imports** | district fire-service KMZ files: Varna, Provadia, Dolni Chiflik, Devnya (imported 2026-06+) |
 | **Field reports** | hydrants reported, confirmed, or corrected on site via 🚨 |
 | **National Tourist Register** | accommodation places (hotels) — separate facts, attribution in the popup |
+| **OpenStreetMap** | the names of the schools, universities, hospitals and kindergartens — © OpenStreetMap contributors, ODbL 1.0 |
+| **Registers (МОН/НЕИСПУО, ИАМН, Община Варна)** | the registry names of the schools, childcare and health establishments — separate facts, the source of every row sits in `src` |
 
 Coordinates are WGS84. Sparse metadata (type, address, operational
 status) stays exactly as sparse as the sources are — nothing is
@@ -200,6 +213,15 @@ The delivery's licence line (`data/hotels.json`, `_meta.licence`),
 verbatim (in Bulgarian, as published):
 
 > Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).
+
+The search also carries the schools, universities, hospitals, ДКЦ (diagnostic and consultation centres), hospices and kindergartens (the count and the sha — in docs/activeContext.md): the names come from OpenStreetMap (© OpenStreetMap contributors, ODbL 1.0) and from the registers named in the source row of every popup.
+
+The delivery's two licence lines (`data/places.json`, `_meta.licence_osm` and
+`_meta.licence_registry`), verbatim (in Bulgarian, as published):
+
+> Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).
+
+> Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).
 
 The hotels bundle is not part of the offline pack (sw.js): without a
 connection the places search does not work.

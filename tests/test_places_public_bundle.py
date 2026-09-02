@@ -17,6 +17,9 @@ identifier, both licence lines verbatim (§6 К8 ships two of them inside `_meta
 for the OSM rows, "separate facts" for the registry rows), no personal data in the free
 text, and unique (skeleton(name), zone).
 
+Plan §5 G9 (phase-2 plan §4 C13) adds one more: both README mirrors (Български /
+English) must quote BOTH licence lines byte for byte.
+
 The doctor rule (§2 Д1 + §6 К7) is the one place this gate cannot copy its sibling. The
 hotel gate treats any "д-р" as a personal datum; here ten of the 135 names carry a doctor's
 name that IS the institution's name (ОУ „Д-р Никола Димитров“, Медицински университет
@@ -185,6 +188,18 @@ class PlacesBundleTest(unittest.TestCase):
         self.assertEqual(self.doc["_meta"]["licence_osm"], LICENCE_OSM)
         self.assertEqual(self.doc["_meta"]["licence_registry"], LICENCE_REGISTRY)
         self.assertIn("ODbL 1.0", LICENCE_OSM)
+
+    def test_readme_carries_licence_lines(self):
+        # §5 G9, phase-2 plan §4 C13. The licence travels with the data: whoever reads the
+        # repo's front page must see the same two sentences the payload carries, in both
+        # mirrors (Български / English), unedited — a paraphrase would be a different
+        # licence. Each README quote therefore sits on ONE line; wrapping it would break
+        # the byte equality this asserts.
+        readme = (REPO / "README.md").read_text(encoding="utf-8")
+        self.assertGreaterEqual(readme.count(self.doc["_meta"]["licence_osm"]), 2,
+                                "OSM licence line quoted in BG and EN")
+        self.assertGreaterEqual(readme.count(self.doc["_meta"]["licence_registry"]), 2,
+                                "registry licence line quoted in BG and EN")
 
     def test_encoding_is_utf8_without_bom_and_free_of_mojibake(self):
         self.assertFalse(self.raw.startswith(b"\xef\xbb\xbf"))
