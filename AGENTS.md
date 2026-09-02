@@ -297,7 +297,7 @@ All working, tested on mobile.
    - "Близо <100м" - hydrants within 100m radius
    - "Топ 5" - default, 5 nearest by Haversine
    - "Всички" - full clustered overlay of every record in the dataset (count in `docs/activeContext.md`)
-4. **Bottom sheet — removed** in the popup pivot (`grep -n 'bottom sheet' index.html` → the comment "the bottom sheet was removed in the popup pivot"; CLAUDE.md § Verification says the same).
+4. **Bottom sheet.** The hydrant bottom sheet was removed in the popup pivot (`tr '\n' ' ' < index.html | grep -c 'bottom sheet *was removed in the popup pivot'` → 1); the building-detail bottom sheet of the C4 search result (`.detail-sheet`, built by `ensureDetailSheet()` in `index.html`) exists and works — CLAUDE.md § Verification says exactly that.
 5. **Compass arrow + heading cone** on user marker.
 6. **Hybrid navigation** - distance >100m opens Google Maps, <=100m uses in-app compass target.
 7. **Follow mode** - centers on user; user pan exits follow mode.
