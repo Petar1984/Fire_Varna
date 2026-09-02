@@ -42,7 +42,11 @@ INDEX = REPO / "index.html"
 
 # G12г — the payloads the places branch is allowed to trust: the constant in
 # index.html, and the tracked file whose bytes it pins (plan §12 В7, §14).
-SHA_PINS = (("HOTELS_SHA256", "data/hotels.json"), ("CATS_SHA256", "data/place_categories.json"))
+SHA_PINS = (
+    ("HOTELS_SHA256", "data/hotels.json"),
+    ("PLACES2_SHA256", "data/places.json"),      # phase 2: the third payload
+    ("CATS_SHA256", "data/place_categories.json"),
+)
 
 # The three private helpers of the address search that the places branch must copy.
 PRIMITIVES = ("norm", "skel", "lev")

@@ -6221,7 +6221,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // =========================================================================
   // МЕСТАТА (хотелите) — a SEPARATE result branch under the address search.
   // Plan docs/plans/places_search_plan_2026-09-02.md §2 Д1-Д12, §3 Т1-М5, §10
-  // А1-А8, §11 Б1-Б3, §12 В1-В8, §13 П2-П5. Nothing here is called from
+  // А1-А8, §11 Б1-Б3, §12 В1-В8, §13 П2-П5 + П6 (фаза 2 §9). Nothing here is called from
   // initAddressSearch and nothing of theirs from here: own container, own cache
   // namespace, own marker/popup, own click/Enter/Escape. The matcher is a 1:1
   // port of scratch/places_search/recall_sweep.py — gate G12в replays 46
@@ -6236,23 +6236,51 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!inputEl || !theirsEl || !box) return;   // header markup missing -> no-op
 
     const PLACES_URL = 'data/hotels.json', CATS_URL = 'data/place_categories.json';
+    const PLACES2_URL = 'data/places.json';            // фаза 2: училища/университети/болници/градини
     const PLACES_CACHE = 'fire-varna-hotels-v2-226';   // our own namespace (Д3)
     const TOP = 8, MIN_Q = 2, DEBOUNCE_MS = 120, FETCH_TIMEOUT_MS = 8000;
-    const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 226;
+    const TOP_TOTAL = 16, GEN_CAP = 300;               // фаза 2 С3: per group / per class
+    const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 226, EXPECT2_COUNT = 135;
     const MX = 81152, MY = 110574;               // metres per degree of lon/lat in Varna (М1)
     const LAT_MIN = 43.13, LAT_MAX = 43.35, LON_MIN = 27.65, LON_MAX = 28.10;  // delivery box (Д2)
     const EXPECT_KEYS = ['beds', 'cat', 'kind', 'lat', 'lon', 'name', 'no_uin', 'old_names', 'src', 'status', 'uins', 'zone'];
     const KINDS = ['Хотел', 'Семеен хотел', 'хотел · без категоризация', 'апарт-хотел'];
+    // Фаза 2 (places_phase2_plan.md Д1/Д3): the second delivery - 8 keys, its own
+    // kind enum. Same box, same status enum, same cadastral refusal as the hotels.
+    const EXPECT2_KEYS = ['kind', 'lat', 'lon', 'name', 'old_names', 'src', 'status', 'zone'];
+    const KINDS2 = ['училище', 'университет', 'болница', 'ДКЦ', 'хоспис', 'детска градина'];
     const STATUSES = ['', 'бивш'];
     const CADASTRAL = /\b\d{4,5}\.\d+\.\d+/;     // a cadastral id never rides a public bundle (Д2)
     // §12 В7 + §14 — the exact bytes the browser may trust (the tracked LF blobs).
     const HOTELS_SHA256 = 'fd4b6989d63c1f8b7563d1ab9b78f72a0ea0d9fe93386a8080ee64211476a15c';
+    const PLACES2_SHA256 = 'bc4022b5d0eac5cef12d216640b3a134817b36debd53989b7e278b96c7a132d3';
     const CATS_SHA256 = '6bf5dd323370cb6be895979ae6a0144da1f29b9231cf684fee696f7cc8d26ce5';
     // Д7 — the source line of a record, worded from the delivery's own licence.
     const SRC_LINE = {
       'НТР УИН': 'име: Национален туристически регистър · координати: КАИС Отворени данни (АГКК)',
       'КАИС адресно поле': 'име: КАИС адресно поле (АГКК) · координати: КАИС Отворени данни (АГКК)',
-      'Sol/OSM идентификация': 'име: публична идентификация (OSM, официални сайтове, общински регистри) · координати: КАИС Отворени данни (АГКК)'
+      'Sol/OSM идентификация': 'име: публична идентификация (OSM, официални сайтове, общински регистри) · координати: КАИС Отворени данни (АГКК)',
+      // Фаза 2 Д3/К8 - the four src values of data/places.json, each naming its own
+      // register word for word. validatePlaces2 refuses a row whose src is not here.
+      'OSM': 'име: © OpenStreetMap contributors (ODbL) · координати: КАИС Отворени данни (АГКК)',
+      'Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08': 'име: Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08 · координати: КАИС Отворени данни (АГКК)',
+      'Регистър на лечебните заведения (ИАМН)': 'име: Регистър на лечебните заведения (ИАМН) · координати: КАИС Отворени данни (АГКК)',
+      'Регистър на училищата и детските заведения (Община Варна)': 'име: Регистър на училищата и детските заведения (Община Варна) · координати: КАИС Отворени данни (АГКК)'
+    };
+    // Фаза 2 С3 - the classes AS THE HUMAN ASKS FOR THEM: the four hotel kinds are
+    // ONE group, every other kind is its own. The group is the render header, the
+    // unit of the "…и още N" tail and the unit of the М3/Б2 generosity gate.
+    const KIND_GROUP = {
+      'Хотел': 'Хотели', 'Семеен хотел': 'Хотели',
+      'хотел · без категоризация': 'Хотели', 'апарт-хотел': 'Хотели',
+      'училище': 'Училища', 'университет': 'Университети', 'болница': 'Болници',
+      'ДКЦ': 'ДКЦ', 'хоспис': 'Хосписи', 'детска градина': 'Детски градини'
+    };
+    const KIND_CHIP = {
+      'Хотел': 'хотел', 'Семеен хотел': 'хотел',
+      'хотел · без категоризация': 'хотел', 'апарт-хотел': 'хотел',
+      'училище': 'училище', 'университет': 'университет', 'болница': 'болница',
+      'ДКЦ': 'ДКЦ', 'хоспис': 'хоспис', 'детска градина': 'детска градина'
     };
 
     // ---- primitives: VERBATIM copies of the address search (index.html:4786-4788).
@@ -6265,7 +6293,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     // ---- Т1/Б1 tokenizer: query and name go through the very same pipe ----------
     const TYPO = /[„“”‚‘’«»–—/()]/g;             // norm() keeps these; they are word breaks
-    const ABBR = [[/д-р/g, 'доктор '], [/х-л/g, 'хотел '], [/к-с/g, 'комплекс ']];
+    // ТА1(2): the markers are a PRE-norm rewrite of the text, so the word that comes
+    // out is the long one and ITS length is the original the cap reads. „св.“/„св“
+    // belong here, not to the token step: as a 2-letter original „св марина“ could
+    // never reach „Света Марина“ (measured 03.09: 25 rows against the
+    // reference's 33, and the УМБАЛ missing altogether). 1:1 with recall_sweep.py MARKERS.
+    const ABBR = [[/д-р/g, 'доктор '], [/х-л/g, 'хотел '], [/к-с/g, 'комплекс '],
+                  [/(?<![а-яa-z])св\./g, ' свети '], [/(?<![а-яa-z])св(?![а-яa-z])/g, ' свети ']];
     const ORD_SUFFIX = /(\d+)\s*-?\s*(ми|ма|мо|ти|та|то|ви|ва|во|ри|ра|ро)(?![а-яa-z])/g;
     const TOKEN_ORD = /^(\d+)(ми|ма|мо|ти|та|то|ви|ва|во|ри|ра|ро)$/;
     const CYRILLIC_I = /[Іі]/g;                  // І/і read as the Latin letter they look like
@@ -6311,7 +6345,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const keyOf = (s) => placeTokens(s).map((t) => t.s).join(' ');
 
     // ---- Д2/Д3/В7: load once, validate before trusting, cache only what validated
-    let RECS = [], FORMS = null, CLASS_OF = null, placesPromise = null;
+    let RECS = [], FORMS = null, CLASS_OF = null, placesPromise = null, GROUP_SIZE = null;
+    const groupOf = (rec) => KIND_GROUP[rec.e.kind] || rec.e.kind;
+    // С3 - the bug Sol found: the <=300 generosity of М3/Б2 was read off the WHOLE
+    // index. With 361 records that would switch the keyless branch off entirely, so
+    // it is decided per CLASS: a record is generous if its own group is <= GEN_CAP.
+    const genOk = (rec) => (GROUP_SIZE.get(groupOf(rec)) || 0) <= GEN_CAP;
     function validateHotels(d, text) {
       if (!d || !d._meta || !Array.isArray(d.hotels)) return false;
       if (d.hotels.length !== EXPECT_COUNT || d._meta.count !== EXPECT_COUNT) return false;
@@ -6325,6 +6364,23 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (KINDS.indexOf(h.kind) < 0 || STATUSES.indexOf(h.status) < 0 || !SRC_LINE[h.src]) return false;
         if (!isFinite(h.lat) || !isFinite(h.lon)) return false;
         if (h.lat < LAT_MIN || h.lat > LAT_MAX || h.lon < LON_MIN || h.lon > LON_MAX) return false;
+      }
+      return true;
+    }
+    function validatePlaces2(d, text) {           // фаза 2 Д3: 8 keys, enums, box, count
+      if (!d || !d._meta || !Array.isArray(d.places)) return false;
+      if (d.places.length !== EXPECT2_COUNT || d._meta.count !== EXPECT2_COUNT) return false;
+      if (typeof d._meta.licence_osm !== 'string' || !d._meta.licence_osm) return false;
+      if (typeof d._meta.licence_registry !== 'string' || !d._meta.licence_registry) return false;
+      if (CADASTRAL.test(text)) return false;
+      for (const p of d.places) {
+        if (Object.keys(p).length !== EXPECT2_KEYS.length) return false;
+        for (const k of EXPECT2_KEYS) if (!(k in p)) return false;
+        if (!Array.isArray(p.old_names)) return false;
+        if (typeof p.name !== 'string' || !p.name || typeof p.zone !== 'string' || !p.zone) return false;
+        if (KINDS2.indexOf(p.kind) < 0 || STATUSES.indexOf(p.status) < 0 || !SRC_LINE[p.src]) return false;
+        if (!isFinite(p.lat) || !isFinite(p.lon)) return false;
+        if (p.lat < LAT_MIN || p.lat > LAT_MAX || p.lon < LON_MIN || p.lon > LON_MAX) return false;
       }
       return true;
     }
@@ -6376,10 +6432,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
     function ensurePlaces() {
       if (placesPromise) return placesPromise;
       placesPromise = (async function () {
-        const both = await Promise.all([fetchValidatedJson(PLACES_URL, HOTELS_SHA256, validateHotels),
-                                        fetchValidatedJson(CATS_URL, CATS_SHA256, validateCats)]);
-        if (!both[0] || !both[1]) throw new Error('places payload unavailable');
-        buildIndex(both[0].hotels, both[1]);
+        // С3: three files, allSettled - one refusal never takes the others down.
+        // Hotels without places, places without hotels; the dictionary is OPTIONAL
+        // (without it there are no keys and every token is a plain name - which is
+        // the 3D marker rule itself: "хотел адмирал" still finds АДМИРАЛ).
+        const got = (await Promise.allSettled([
+          fetchValidatedJson(PLACES_URL, HOTELS_SHA256, validateHotels),
+          fetchValidatedJson(PLACES2_URL, PLACES2_SHA256, validatePlaces2),
+          fetchValidatedJson(CATS_URL, CATS_SHA256, validateCats)
+        ])).map((r) => (r.status === 'fulfilled' ? r.value : null));
+        const hotels = got[0] ? got[0].hotels : [], places2 = got[1] ? got[1].places : [];
+        if (!hotels.length && !places2.length) throw new Error('places payload unavailable');
+        buildIndex(hotels, places2, got[2]);
         return true;
       })();
       // Д2: fail closed to ABSENCE, not to a dead session — the next FOCUS tries again
@@ -6387,8 +6451,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       placesPromise.catch(function (e) { placesPromise = null; warnOnce(e); });
       return placesPromise;
     }
-    function buildIndex(hotels, cats) {
-      RECS = hotels.map(function (h) {
+    function buildIndex(hotels, places2, cats) {
+      RECS = hotels.concat(places2).map(function (h) {
         const ntk = placeTokens(h.name).map((t) => t.s);
         const ztk = placeTokens(h.zone).map((t) => t.s);
         const ktk = placeTokens(h.kind).map((t) => t.s);
@@ -6399,9 +6463,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
         return { e: h, ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, kkey: ktk.join(' '),
                  zkset: new Set(ztk.concat(ktk)) };
       });
+      GROUP_SIZE = new Map();                    // С3: the size of every class
+      for (const rec of RECS) GROUP_SIZE.set(groupOf(rec), (GROUP_SIZE.get(groupOf(rec)) || 0) + 1);
+      FORMS = new Map();
+      CLASS_OF = new Map();
+      if (!cats) return;                         // С3: the dictionary is optional
       const head = {};
       for (const chip of cats.chips) head[chip.chip] = chip.head || chip.chip;
-      FORMS = new Map();
       for (const form of Object.keys(cats.forms)) {
         const fk = keyOf(form);
         if (!fk) continue;
@@ -6409,7 +6477,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (!entry) { entry = { chips: new Set(), heads: new Set() }; FORMS.set(fk, entry); }
         for (const chip of cats.forms[form]) { entry.chips.add(keyOf(chip)); entry.heads.add(keyOf(head[chip] || chip)); }
       }
-      CLASS_OF = new Map();
       for (const fk of FORMS.keys()) CLASS_OF.set(fk, RECS.filter((r) => inClass(r, fk)));
     }
     function inClass(rec, fk) {                  // К2 (а)/(б) + А2 (the chip's head word)
@@ -6422,7 +6489,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return false;
     }
 
-    // ---- the matcher (§3 М1-М4 + §10 А1-А8 + §13 П2-П5), 1:1 with recall_sweep.py
+    // ---- the matcher (§3 М1-М4 + §10 А1-А8 + §13 П2-П5 + §9 П6), 1:1 with recall_sweep.py
     function quality(t, v) {                     // М2: 3 exact / 2 prefix / 1 fuzzy within the cap
       if (t.num) return v === t.s ? 3 : 0;
       const len = t.orig.length;
@@ -6439,13 +6506,25 @@ window._hydrantDataReady = (async function loadHydrantData() {
       for (const v of rec.ntk) { const k = quality(t, v); if (k > best) { best = k; if (best === 2) break; } }
       return best ? { cat: 'name', q: best } : { cat: null, q: 0 };
     }
-    function significant(t, m, hasKey, rec) {    // А5 + П5: what makes a hit worth a row
+    function significant(t, m, hasKey, rec, R) {  // А5 + П5 + П6: what makes a hit worth a row
       if (m.cat !== 'name' && m.cat !== 'alias') return false;
       if (ADDR.indexOf(t.orig) >= 0) return false;
       if (t.num) return hasKey && m.q === 3;
       if (t.orig.length >= 3) return true;
       if (hasKey && m.q >= 2) return true;
-      return !hasKey && m.cat === 'name' && m.q === 3 && rec.ntk.length === 1;
+      if (!hasKey && m.cat === 'name' && m.q === 3 && rec.ntk.length === 1) return true;   // П5
+      // П6 (§9 v1.4, signed): without a key a 2-char token that hits a NAME token
+      // EXACTLY becomes significant when the query carries at least one MORE token
+      // matching THIS record exactly — „7 су“ → VII СУ, „1 ег“ → I ЕГ. The number
+      // is conjunctive anyway (П3), so it is the second exact match, not the first.
+      if (!hasKey && m.cat === 'name' && m.q === 3 && t.orig.length === 2 && R) {
+        for (const t2 of R) {
+          if (t2 === t) continue;
+          const m2 = tokenMatch(rec, t2);
+          if (m2.q === 3 && (m2.cat === 'name' || m2.cat === 'alias')) return true;
+        }
+      }
+      return false;
     }
     function scoreRec(rec, R, hasKey) {
       let bestName = 0, named = 0, total = 0, sum = 0, qual = false, numFail = false;
@@ -6457,7 +6536,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         named++;
         sum += 2 * m.q;
         if (m.q > bestName) bestName = m.q;
-        if (significant(t, m, hasKey, rec)) qual = true;
+        if (significant(t, m, hasKey, rec, R)) qual = true;
       }
       let uncovered = 0;                         // П2: name coverage — untouched own tokens sink
       for (const v of new Set(rec.ntk)) if (!R.some((t) => quality(t, v))) uncovered++;
@@ -6518,52 +6597,85 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return orderNamed(out);
     }
     function search(q) {
-      if (!RECS.length) return { category: false, rows: [] };
+      if (!RECS.length) return { category: false, hasKey: false, rows: [] };
       const qt = placeTokens(q);
-      if (!qt.length) return { category: false, rows: [] };
+      if (!qt.length) return { category: false, hasKey: false, rows: [] };
       const c = centre(), sk = splitKeys(qt), hasKey = sk.keys.length > 0;
-      const cls = hasKey ? CLASS_OF.get(sk.keys[0]) : RECS;   // А1: the leftmost key is the class
+      let cls = hasKey ? CLASS_OF.get(sk.keys[0]) : RECS;     // А1: the leftmost key is the class
       const R = sk.slots.filter((x) => x.ki !== 0).map((x) => x.t);
-      if (!R.length) return { category: true, rows: orderCategory(cls, c) };      // М1: the key alone
-      if (!hasKey && cls.length > 300) return { category: false, rows: [] };      // М3/Б2 generosity gate
+      if (!R.length) return { category: true, hasKey: hasKey, rows: orderCategory(cls, c) };  // М1: the key alone
+      if (!hasKey) {                             // М3/Б2 generosity gate, PER CLASS (С3)
+        cls = cls.filter(genOk);
+        if (!cls.length) return { category: false, hasKey: false, rows: [] };
+      }
       if (hasKey) {                              // А3′: key + a purely zone/kind rest = filtered list
         const zk = new Set(), nm = new Set();
         for (const r of cls) { for (const v of r.zkset) zk.add(v); for (const v of r.nset) nm.add(v); }
         if (R.every((t) => zk.has(t.s)) && !R.some((t) => nm.has(t.s))) {
           const flt = cls.filter((r) => R.every((t) => r.zkset.has(t.s)));
-          if (flt.length) return { category: true, rows: orderCategory(flt, c) };
+          if (flt.length) return { category: true, hasKey: hasKey, rows: orderCategory(flt, c) };
         }
       }
       let rows = runScored(cls, R, hasKey, sk.dead, c);
       if (!rows.length && hasKey)                // А1 fail-open: the keys become plain names
         rows = runScored(RECS, sk.slots.map((x) => x.t), false, sk.dead, c);
-      return { category: false, rows: rows };
+      return { category: false, hasKey: hasKey, rows: rows };
     }
+    // С1: does THIS text carry a key? A few tokens against the dictionary -- cheap
+    // enough to answer SYNCHRONOUSLY on every keystroke, which is what lets the
+    // inline remainder go before their 120 ms debounce mutates anything.
+    const hasKeyFor = (q) => !!(RECS.length && CLASS_OF && splitKeys(placeTokens(q)).keys.length);
 
     // ---- our own dropdown (Д4/Д5/Д6) — textContent only, never an asr-* selector
-    let shown = [], shownFor = null, theirStatusFor = null, tidiedByUs = false;
+    let shown = [], shownFor = null, theirStatusFor = null, tidiedByUs = false, keyed = false;
     let gen = 0, dismissed = false, timer = null, warned = false;
     let placeMk = null, placePopup = null, lastPick = null, mineActive = false;
+    let restoreArmed = false;                    // С4: armed by a pick, spent once
     function warnOnce(e) { if (warned) return; warned = true; console.warn('[places-search] ' + ((e && e.message) || e)); }
     const guarded = (fn) => function (ev) { try { fn(ev); } catch (e) { warnOnce(e); } };   // Д11
     function span(cls, text) { const el = document.createElement('span'); el.className = cls; el.textContent = text; return el; }
     function hideMine() {
       box.classList.remove('visible'); box.replaceChildren();
       box.style.top = ''; box.style.maxHeight = '';
+      keyed = false; bareTheirs();               // С1: an empty list leaves no inline remainder
       shown = []; shownFor = null;
     }
     function clearMine() {
-      mineActive = false; lastPick = null;
+      mineActive = false; lastPick = null; restoreArmed = false;
       if (placePopup) { const p = placePopup; placePopup = null; try { map.closePopup(p); } catch (e) {} }
       if (placeMk) { try { map.removeLayer(placeMk); } catch (e) {} placeMk = null; }
     }
-    function positionMine() {                    // В6: measured off the field, never off a hidden box
-      if (!box.classList.contains('visible')) return;
-      box.style.top = theirsEl.classList.contains('visible') ? (theirsEl.offsetTop + theirsEl.offsetHeight) + 'px' : '';
-      box.style.maxHeight = (window.innerHeight - box.getBoundingClientRect().top - 12) + 'px';
+    // С1: every geometry write is IDEMPOTENT. The observers below react to the
+    // very attributes we write, so a blind write would loop; a write that changes
+    // nothing produces no mutation record and the recompute converges at once.
+    function setStyle(el, prop, value) {
+      if ((el.style[prop] || '') !== value) el.style[prop] = value;
+    }
+    function bareTheirs() {                      // never style.top = '' (that leaves style="")
+      if (theirsEl.getAttribute('style') !== null) theirsEl.removeAttribute('style');
+    }
+    function positionMine() {                    // В6 + С1: measured off the field, never off a hidden box
+      if (!box.classList.contains('visible')) { bareTheirs(); return; }
+      if (!keyed) {                              // no key -> today's order: the addresses first
+        bareTheirs();
+        setStyle(box, 'top', theirsEl.classList.contains('visible') ? (theirsEl.offsetTop + theirsEl.offsetHeight) + 'px' : '');
+        setStyle(box, 'maxHeight', (window.innerHeight - box.getBoundingClientRect().top - 12) + 'px');
+        return;
+      }
+      // Б6/С1: with a KEY the searched class stands on top - we take the CSS place
+      // right under the field and cap ourselves at 32vh, so the lower list stays
+      // reachable on 375x812; THEY move under us, with their own reachable height.
+      setStyle(box, 'top', '');
+      setStyle(box, 'maxHeight', Math.max(0, Math.min(Math.round(window.innerHeight * 0.32),
+        Math.round(window.innerHeight - box.getBoundingClientRect().top - 12))) + 'px');
+      if (!theirsEl.classList.contains('visible')) { bareTheirs(); return; }
+      setStyle(theirsEl, 'top', (box.offsetTop + box.offsetHeight) + 'px');
+      setStyle(theirsEl, 'maxHeight', Math.max(0,
+        Math.round(window.innerHeight - theirsEl.getBoundingClientRect().top - 12)) + 'px');
     }
     function tidyTheirs() {                      // Д6/В5: "Няма съвпадения" over a true answer
       if (!box.classList.contains('visible') || !box.querySelector('.pl-item')) return;
+      if (shownFor !== inputEl.value.trim()) return;   // С1: a stale list never tidies
       if (!theirsEl.classList.contains('visible')) return;
       const kids = theirsEl.children;
       if (kids.length !== 1 || !kids[0].classList.contains('asr-status')) return;
@@ -6571,28 +6683,45 @@ window._hydrantDataReady = (async function loadHydrantData() {
       tidiedByUs = true;                         // stands until THEY add children or return .visible
       theirsEl.classList.remove('visible');
     }
-    function render(rows) {
-      shown = rows.slice(0, TOP);
+    function render(rows, hasKey) {
+      // С3: the rows are grouped by CLASS; a group stands at the place of its own
+      // best row, shows at most TOP of its rows (and never more than TOP_TOTAL in
+      // all), and says for ITSELF how many stayed behind. data-idx is the DOM row,
+      // so a click always picks the record the human is looking at.
+      const order = [], byGroup = new Map();
+      for (const rec of rows) {
+        const g = groupOf(rec);
+        let bucket = byGroup.get(g);
+        if (!bucket) { bucket = []; byGroup.set(g, bucket); order.push(g); }
+        bucket.push(rec);
+      }
+      shown = [];
       const frag = document.createDocumentFragment();
-      frag.appendChild(span('pl-group-header', 'Хотели'));
-      shown.forEach(function (rec, idx) {
-        const h = rec.e;
-        const item = document.createElement('div');
-        item.className = 'pl-item';
-        item.setAttribute('role', 'option');
-        item.dataset.idx = String(idx);
-        const body = span('pl-body', '');
-        body.appendChild(span('pl-title', h.name + (h.old_names.length ? ' · старо: ' + h.old_names.join(', ') : '') +
-                                         (h.status === 'бивш' ? ' · бивш' : '')));
-        body.appendChild(span('pl-meta', h.zone));
-        item.appendChild(span('pl-kind', 'хотел'));
-        item.appendChild(body);
-        frag.appendChild(item);
-      });
-      // The list is whole, the screen is not: the tail says how many stayed behind.
-      if (rows.length > shown.length) frag.appendChild(span('pl-more', '…и още ' + (rows.length - shown.length)));
+      for (const g of order) {
+        if (shown.length >= TOP_TOTAL) break;
+        const bucket = byGroup.get(g), take = Math.min(TOP, TOP_TOTAL - shown.length, bucket.length);
+        frag.appendChild(span('pl-group-header', g));
+        for (let i = 0; i < take; i++) {
+          const rec = bucket[i], h = rec.e;
+          const item = document.createElement('div');
+          item.className = 'pl-item';
+          item.setAttribute('role', 'option');
+          item.dataset.idx = String(shown.length);
+          const body = span('pl-body', '');
+          body.appendChild(span('pl-title', h.name + (h.old_names.length ? ' · старо: ' + h.old_names.join(', ') : '') +
+                                           (h.status === 'бивш' ? ' · бивш' : '')));
+          body.appendChild(span('pl-meta', h.zone));
+          item.appendChild(span('pl-kind', KIND_CHIP[h.kind] || h.kind));
+          item.appendChild(body);
+          frag.appendChild(item);
+          shown.push(rec);
+        }
+        // The list is whole, the screen is not: the tail says how many stayed behind.
+        if (bucket.length > take) frag.appendChild(span('pl-more', '…и още ' + (bucket.length - take)));
+      }
       box.replaceChildren(frag);
       box.classList.add('visible');
+      keyed = !!hasKey && shown.length > 0;      // С1: with a key and 0 rows there is no styling
       positionMine();
       tidyTheirs();
     }
@@ -6602,9 +6731,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const wrap = document.createElement('div');
       wrap.className = 'place-popup';
       wrap.appendChild(span('pp-title', h.name + (h.status === 'бивш' ? ' (бивш)' : '')));
-      const bits = [h.kind];
-      if (h.cat.length) bits.push('★' + h.cat.join('/'));
-      if (h.beds.length) bits.push(h.beds.join('+') + ' легла');
+      const bits = [h.kind];                     // С3: cat/beds ride the hotels only
+      if (h.cat && h.cat.length) bits.push('★' + h.cat.join('/'));
+      if (h.beds && h.beds.length) bits.push(h.beds.join('+') + ' легла');
       bits.push(h.zone);
       wrap.appendChild(span('pp-sub', bits.join(' · ')));
       if (h.old_names.length) wrap.appendChild(span('pp-old', 'старо име: ' + h.old_names.join(', ')));
@@ -6614,22 +6743,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return wrap;
     }
     function openPlacePopup(h) {
+      // С4: the self-restore is GONE. Leaflet has no "closed by a human" mark, so
+      // the old rule was fooled by the × (our own node lingers ~200 ms for the fade)
+      // and by a hydrant popup. The replacement is the narrow observer below.
       const p = L.popup({ closeButton: true, autoPan: false });
-      placePopup = null;                         // the popup we are about to evict must not return
-      p.on('remove', function () {
-        if (placePopup !== p || !mineActive) return;
-        // В1: a late address popup (the fail-soft /detail/ path) can take the slot from
-        // us. If a tick later ANOTHER popup holds the slot, ours comes back. Leaflet
-        // keeps our own node in the DOM ~200 ms for the fade-out, so the popup found
-        // there can be the one being removed — that is the × the human just pressed,
-        // and then we stay closed (the pin stands and re-opens us on click).
-        const dying = p.getElement && p.getElement();
-        setTimeout(function () {
-          if (placePopup !== p || !mineActive) return;
-          const other = Array.from(document.querySelectorAll('.leaflet-popup')).find((n) => n !== dying);
-          if (other) openPlacePopup(h);
-        }, 0);
-      });
       p.setLatLng([h.lat, h.lon]).setContent(popupFor(h)).openOn(map);
       placePopup = p;
     }
@@ -6655,9 +6772,31 @@ window._hydrantDataReady = (async function loadHydrantData() {
       dropTheirs();
       mineActive = true;
       lastPick = rec.e;
+      restoreArmed = true;                       // С4: one late .search-popup may be evicted
       anchorHydrantsAt(rec.e.lat, rec.e.lon);    // the operational gain: hydrants around the place
       showPlace(rec.e);
     }
+
+    // С4 - the one narrow case that is left: AFTER our pick (mineActive) and with
+    // no pin of theirs in between (that clears mineActive), their late fail-soft
+    // address popup can still take the slot. Only a .search-popup is evicted, and
+    // only then does ours come back. A hydrant popup, the ×, Escape and a click on
+    // the map are untouched - Leaflet's own behaviour stands.
+    const popupPane = map.getPane('popupPane');
+    if (popupPane) new MutationObserver(guarded(function () {
+      // ONE shot per selection: the eviction itself mutates this very pane, so an
+      // unbounded rule would answer its own mutation for ever (measured 03.09 — the
+      // page froze and the probe hung). And a popup that Leaflet is fading OUT
+      // carries opacity 0: that is the × or the previous popup dying, never a new
+      // one taking the slot (the C10 lesson, kept).
+      if (!mineActive || !lastPick || !restoreArmed) return;
+      const landed = Array.from(popupPane.querySelectorAll('.leaflet-popup'))
+        .some((n) => n.style.opacity !== '0' && n.querySelector('.search-popup'));
+      if (!landed) return;
+      restoreArmed = false;
+      try { map.closePopup(); } catch (e) {}
+      openPlacePopup(lastPick);
+    })).observe(popupPane, { childList: true, subtree: true });
 
     // ---- Д8/В2/В3/В5: our surface stands down when theirs comes up
     const pane = map.getPane('markerPane');
@@ -6667,15 +6806,23 @@ window._hydrantDataReady = (async function loadHydrantData() {
           if (node.nodeType === 1 && (node.classList.contains('search-pin-wrapper') ||
                                       node.classList.contains('approx-pin-wrapper'))) { clearMine(); return; }
     }).observe(pane, { childList: true });
-    new MutationObserver(guarded(function () {
-      const kids = theirsEl.children;
-      const onlyStatus = kids.length === 1 && kids[0].classList.contains('asr-status');
-      if (onlyStatus && kids[0].textContent === 'Няма съвпадения') theirStatusFor = inputEl.value.trim();  // В4
-      if ((kids.length && !onlyStatus) || theirsEl.classList.contains('visible')) tidiedByUs = false;
+    new MutationObserver(guarded(function (records) {
+      // С1: a STYLE-only record is our own write (we push them down under us) and
+      // must not be read as "their list changed" — Д8в would then take our own list
+      // down the moment we position them. Only childList/class is theirs.
+      const theirsMoved = records.some((r) => r.type === 'childList' || r.attributeName === 'class');
+      if (theirsMoved) {
+        const kids = theirsEl.children;
+        const onlyStatus = kids.length === 1 && kids[0].classList.contains('asr-status');
+        if (onlyStatus && kids[0].textContent === 'Няма съвпадения') theirStatusFor = inputEl.value.trim();  // В4
+        if ((kids.length && !onlyStatus) || theirsEl.classList.contains('visible')) tidiedByUs = false;
+      }
       positionMine();
       tidyTheirs();
-      if (!theirsEl.classList.contains('visible') && !tidiedByUs) hideMine();   // Д8в
-    })).observe(theirsEl, { childList: true, attributes: true, attributeFilter: ['class'] });
+      if (theirsMoved && !theirsEl.classList.contains('visible') && !tidiedByUs) hideMine();   // Д8в
+      // С1: 'style' is watched too - only so no inline remainder of ours can survive
+      // a mutation of theirs; positionMine() writes nothing when nothing changes.
+    })).observe(theirsEl, { childList: true, attributes: true, attributeFilter: ['class', 'style'] });
     const bodyObs = new MutationObserver(guarded(function () {
       const sheet = document.getElementById('detailSheet');   // В3: the panel is created lazily
       if (!sheet) return;
@@ -6688,6 +6835,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }));
     bodyObs.observe(document.body, { childList: true, subtree: true });
     window.addEventListener('resize', guarded(positionMine));
+    // С1: OUR height is what pushes them down, so watch it, not just the window.
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(guarded(positionMine)).observe(box);
 
     // ---- Д9′/Д10/Д11: the events (never a stopPropagation — the address branch first)
     inputEl.addEventListener('focus', guarded(function () { ensurePlaces().catch(function () {}); }));
@@ -6695,10 +6844,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
       gen++;                                     // Д10: a late answer never revives a closed list
       dismissed = false;
       mineActive = false;
+      restoreArmed = false;
       const mine = gen, q = inputEl.value.trim();
       if (timer) clearTimeout(timer);
       if (!q) { hideMine(); clearMine(); return; }
       if (q.length < MIN_Q) { hideMine(); return; }
+      // С1: the remainder goes SYNCHRONOUSLY, before their 120 ms debounce mutates
+      // anything - G3 reads their FIRST mutation, and it must find no style of ours.
+      if (!hasKeyFor(q)) { keyed = false; bareTheirs(); }
       timer = setTimeout(function () { runMine(q, mine); }, DEBOUNCE_MS);
     }));
     async function runMine(q, mine) {
@@ -6712,9 +6865,21 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const res = search(q);
         if (!res.rows.length) { hideMine(); return; }
         shownFor = q;
-        render(res.rows);
+        render(res.rows, res.hasKey);
       } catch (e) { warnOnce(e); }
     }
+    // С2: with a KEY the intention is explicit, so Enter is OURS - and the owner is
+    // decided deterministically, not by timing: at the target phase a CAPTURE
+    // listener runs before their bubble-registered one, so stopImmediatePropagation
+    // means their handler never starts. In every other case we do not touch the
+    // event and the address branch stays the owner (Д9' below).
+    inputEl.addEventListener('keydown', guarded(function (ev) {
+      if (!ev.isTrusted || ev.key !== 'Enter') return;
+      if (!keyed || !shown.length || shownFor !== inputEl.value.trim()) return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      pick(shown[0]);
+    }), true);
     inputEl.addEventListener('keydown', guarded(function (ev) {
       if (!ev.isTrusted) return;                 // our own synthetic Escape (Д7) is not a human
       if (ev.key === 'Escape') { dismissed = true; hideMine(); clearMine(); return; }
@@ -6743,10 +6908,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
                                status: rec.e.status, old_names: rec.e.old_names.slice() });
     window.__places = {
       tokens: (q) => placeTokens(q).map((t) => t.s),
-      search: function (q) { const r = search(q); return { category: r.category, rows: r.rows.map(rowOut) }; },
+      search: function (q) { const r = search(q); return { category: r.category, hasKey: r.hasKey, rows: r.rows.map(rowOut) }; },
       rows: () => shown.map(rowOut),
       ensure: ensurePlaces,
-      keys: (q) => (RECS.length ? splitKeys(placeTokens(q)).keys : [])
+      keys: (q) => (RECS.length ? splitKeys(placeTokens(q)).keys : []),
+      keyed: () => keyed
     };
   })();
 

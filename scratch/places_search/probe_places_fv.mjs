@@ -197,6 +197,9 @@ async function openSession() {
 
   const s = {
     errs: [],                 // page-level errors only (gate: empty)
+    warns: [],                // console.warn - the places branch funnels EVERY caught
+                              // exception into warnOnce(), so a silent ReferenceError
+                              // shows up here and nowhere else (measured 03.09).
     reqUrl: new Map(),        // requestId -> url (every request)
     status: new Map(),        // requestId -> status (or "failed:…")
     inflight: new Set(),      // requestIds of page-relevant requests still open
@@ -229,6 +232,8 @@ async function openSession() {
       case "Runtime.consoleAPICalled":
         if (p.type === "error")
           s.errs.push((p.args || []).map((a) => a.value ?? a.description).join(" "));
+        else if (p.type === "warning")
+          s.warns.push((p.args || []).map((a) => a.value ?? a.description).join(" "));
         break;
       case "Network.requestWillBeSent": {
         const url = p.request?.url || "";
@@ -699,11 +704,66 @@ const PL_ROWS_JS = `(function () {
   }
   var more = box.querySelector('.pl-more');
   var head = box.querySelector('.pl-group-header');
+  var heads = [], hn = box.querySelectorAll('.pl-group-header');
+  for (var j = 0; j < hn.length; j++) heads.push(hn[j].textContent);
+  var mores = [], mn = box.querySelectorAll('.pl-more');
+  for (var k = 0; k < mn.length; k++) mores.push(mn[k].textContent);
   var r = box.getBoundingClientRect();
   return { visible: box.classList.contains('visible'), header: head ? head.textContent : null,
+           headers: heads, mores: mores,
            rows: rows, more: more ? more.textContent : null,
            rect: { top: Math.round(r.top), bottom: Math.round(r.bottom), height: Math.round(r.height) },
            innerHeight: window.innerHeight };
+})()`;
+
+// Phase 2 (plan sec.16 J2 / phase-2 plan D4 + Sol C1): WHO stands on top. Read off
+// the two containers themselves, never off a class name; `theirStyle` is the whole
+// inline attribute, so a leftover style="" would be visible here.
+const GEOM_JS = `(function () {
+  var mine = document.getElementById('placesSearchResults');
+  var theirs = document.getElementById('addrSearchResults');
+  var m = mine.getBoundingClientRect(), t = theirs.getBoundingClientRect();
+  return {
+    mineVisible: mine.classList.contains('visible'),
+    theirVisible: theirs.classList.contains('visible'),
+    mineTop: Math.round(m.top), mineBottom: Math.round(m.bottom),
+    theirTop: Math.round(t.top), theirBottom: Math.round(t.bottom),
+    mineFirst: m.top < t.top,
+    theirStyle: theirs.getAttribute('style'),
+    mineStyleTop: mine.style.top || '',
+    innerHeight: window.innerHeight,
+    mineFits: m.bottom <= window.innerHeight + 1,
+    theirFits: t.bottom <= window.innerHeight + 1,
+    theirScrollable: theirs.scrollHeight > theirs.clientHeight + 1,
+    theirRows: theirs.querySelectorAll('.asr-item').length,
+    headers: (function () { var h = mine.querySelectorAll('.pl-group-header'), o = [];
+      for (var i = 0; i < h.length; i++) o.push(h[i].textContent); return o; })(),
+    chips: (function () { var h = mine.querySelectorAll('.pl-kind'), o = [];
+      for (var i = 0; i < h.length; i++) o.push(h[i].textContent); return o; })()
+  };
+})()`;
+
+// Sol C5: the clicks of the phase-2 scenarios are REAL mouse events at real
+// coordinates, not element.click() - a pin under an overlay must fail loudly.
+const HYDRANT_RECT_JS = `(function () {
+  var pop = document.querySelector('.leaflet-popup');
+  var pr = pop ? pop.getBoundingClientRect() : null;
+  var pins = document.querySelectorAll('.h-pin-wrapper');
+  for (var i = 0; i < pins.length; i++) {
+    var r = pins[i].getBoundingClientRect();
+    if (r.width < 1 || r.top < 0 || r.left < 0) continue;
+    if (r.bottom > window.innerHeight || r.right > window.innerWidth) continue;
+    // the pin must not sit under the open popup, or the click lands on the popup
+    if (pr && r.left < pr.right && r.right > pr.left && r.top < pr.bottom && r.bottom > pr.top) continue;
+    return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2), of: pins.length };
+  }
+  return null;
+})()`;
+const CLOSE_BTN_RECT_JS = `(function () {
+  var b = document.querySelector('.leaflet-popup-close-button');
+  if (!b) return null;
+  var r = b.getBoundingClientRect();
+  return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
 })()`;
 const PLACE_SURFACE_JS = `(function () {
   var pins = document.querySelectorAll('.place-pin-wrapper');
@@ -763,10 +823,23 @@ async function armPlacesFetch(s) {
   if (s.placesArmed) return;
   s.placesArmed = true;
   s.hotelsMode = "pass";           // pass | hold | 404 | malformed
+  s.places2Mode = "pass";          // pass | 404  (phase 2: the SECOND payload)
   s.heldHotelsId = null;
   const prev = s.onPaused;
   s.onPaused = async (p) => {
     const url = p.request?.url || "";
+    // Sol C3: one refusal must not take the others down, so each payload can be
+    // refused on its own - hotels without places and places without hotels.
+    if (url.includes("/places.json")) {
+      try {
+        if (s.places2Mode === "404") {
+          await s.send("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: 404, body: "" });
+          return;
+        }
+        await s.send("Fetch.continueRequest", { requestId: p.requestId });
+      } catch (e) { warn("places.json Fetch: " + e); }
+      return;
+    }
     if (!url.includes("hotels.json")) return prev(p);
     try {
       if (s.hotelsMode === "404") {
@@ -786,6 +859,7 @@ async function armPlacesFetch(s) {
   await s.send("Fetch.enable", { patterns: [
     { urlPattern: "*search_index.json*", requestStage: "Request" },
     { urlPattern: "*hotels.json*", requestStage: "Request" },
+    { urlPattern: "*/places.json*", requestStage: "Request" },
     { urlPattern: "*/details/*", requestStage: "Request" },
     { urlPattern: "*/detail/*", requestStage: "Request" },
   ] });
@@ -945,6 +1019,8 @@ async function checkRefusals(s) {
     out[name] = { rows: rows.rows.length, visible: rows.visible,
                   hasExport: await s.ev("!!window.__places"),
                   searchRows: await s.ev("window.__places ? window.__places.search('хотел адмирал').rows.length : null"),
+                  // C3: the OTHER payload must still be in the index
+                  placesRows: await s.ev("window.__places ? window.__places.search('училище').rows.length : null"),
                   cacheEntry: await placesCacheHas(s),
                   consoleErrors: s.errs.length - errsBefore };
     s.hotelsMode = "pass";
@@ -952,6 +1028,19 @@ async function checkRefusals(s) {
   };
   await scenario("notFound", "404");
   await scenario("malformed", "malformed");
+  // C3, the mirror image: places.json refused, the hotels stay whole.
+  await navigateFresh(s, "refusal places404");
+  await dropPlacesCache(s);
+  s.places2Mode = "404";
+  const errsBeforeP = s.errs.length;
+  const hotelsOnly = await (async () => { await focusInput(s); await sleep(1500);
+                                          return await typePlaces(s, "хотел адмирал"); })();
+  out.places404 = { rows: hotelsOnly.rows.length,
+                    searchRows: await s.ev("window.__places ? window.__places.search('хотел адмирал').rows.length : null"),
+                    placesRows: await s.ev("window.__places ? window.__places.search('училище').rows.length : null"),
+                    consoleErrors: s.errs.length - errsBeforeP };
+  s.places2Mode = "pass";
+  await clearField(s);
   // Held body: our AbortController must give up at 8 s and the branch must stay
   // quiet. The request is released afterwards so the session is left clean.
   await navigateFresh(s, "refusal held-body");
@@ -1136,11 +1225,135 @@ async function checkV8(s) {
   return out;
 }
 
-// G12г — the two constants against the bytes of the two tracked files.
+async function clickAt(s, x, y) {
+  await s.send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y, buttons: 0 });
+  await s.send("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", buttons: 1, clickCount: 1 });
+  await s.send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", buttons: 0, clickCount: 1 });
+}
+
+// Phase-2 plan sec.3 + sec.16 J2: WITH a key our group stands ABOVE the address
+// rows ("хотел адмирал" over "адрес: хотел бриз/мак/…"); WITHOUT one the addresses
+// keep the top, exactly as today. Measured as geometry, not as a promise.
+async function checkOrdering(s) {
+  const out = {};
+  for (const q of ["хотел адмирал", "адмирал", "училище", "болница", "детска градина", "хотел 999999"]) {
+    await typePlaces(s, q);
+    await sleep(POLL_MS * 4);
+    out[q] = await s.ev(GEOM_JS);
+    out[q].keys = JSON.parse(await s.ev(`JSON.stringify(window.__places.keys(${JSON.stringify(q)}))`));
+    out[q].hasKey = await s.ev(`window.__places.search(${JSON.stringify(q)}).hasKey === true`);
+  }
+  // Sol C1, the remainder: a keyed query followed by a keyless one must leave no
+  // inline style on their container - and the removal happens on the keystroke,
+  // before their 120 ms debounce, which is the mutation G3 reads.
+  await typePlaces(s, "хотел адмирал");
+  await clearField(s);
+  await typeQuery(s, "адмирал");
+  out.afterKeyedNoBlank = { immediate: await s.ev("document.getElementById('addrSearchResults').getAttribute('style')") };
+  await sleep(POLL_MS * 8);
+  out.afterKeyedNoBlank.settled = await s.ev("document.getElementById('addrSearchResults').getAttribute('style')");
+  await clearField(s);
+  return out;
+}
+
+// Sol C2 — Enter while a key is in the field is OURS, decided by a capture
+// listener; their handler never starts (one popup, one pin, their list quiet).
+async function checkEnterKeyed(s) {
+  await navigateFresh(s, "Enter with a key");
+  if (!(await placesReady(s))) return { ready: false };
+  const list = await typePlaces(s, "хотел адмирал");
+  await focusInput(s);
+  await pressKey(s, "Enter", 13);
+  const ok = await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const surface = await s.ev(PLACE_SURFACE_JS);
+  const out = { ready: true, picked: ok, rows: list.rows.length, firstRow: list.rows[0] || null,
+                pins: surface.pins, popups: surface.popups, title: surface.title,
+                theirPins: surface.theirPins, theirVisible: surface.theirVisible,
+                theirStyle: await s.ev("document.getElementById('addrSearchResults').getAttribute('style')"),
+                field: await s.ev(INPUT_VALUE_JS) };
+  await pressEscape(s);
+  await clearField(s);
+  return out;
+}
+
+// Sol C4 — the popup rule. (1) a REAL click on a hydrant while our place is
+// selected: the hydrant popup opens and ours does NOT come back. (2) the × on our
+// own popup closes it and it stays closed (the pin stands).
+async function checkPopupRule(s) {
+  await navigateFresh(s, "popup rule");
+  if (!(await placesReady(s))) return { ready: false };
+  const out = { ready: true };
+  await typePlaces(s, "хотел адмирал");
+  await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const hyd = await s.ev(HYDRANT_RECT_JS);
+  out.hydrantPin = hyd;
+  if (hyd) {
+    await clickAt(s, hyd.x, hyd.y);
+    await sleep(1200);
+    await waitMapStill(s);
+    out.afterHydrantClick = {
+      placePopups: await s.ev("document.querySelectorAll('.place-popup').length"),
+      anyPopup: await s.ev("document.querySelectorAll('.leaflet-popup').length"),
+      hydrantPopup: await s.ev("!!document.querySelector('.leaflet-popup .hydrant-popup')"),
+      hydrantTitle: await s.ev("(function () { var t = document.querySelector('.hydrant-popup .hp-title'); return t ? t.textContent : null; })()"),
+      placePins: await s.ev("document.querySelectorAll('.place-pin-wrapper').length")
+    };
+  } else warn("няма видим хидрантен пин за пробата на попъпа");
+  // (2) the × on our own popup
+  await pressEscape(s);
+  await clearField(s);
+  await typePlaces(s, "хотел адмирал");
+  await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+  await waitFor(s, "document.querySelector('.place-popup') !== null", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const close = await s.ev(CLOSE_BTN_RECT_JS);
+  out.closeButton = close;
+  if (close) {
+    await clickAt(s, close.x, close.y);
+    await sleep(1500);
+    out.afterClose = {
+      placePopups: await s.ev("document.querySelectorAll('.place-popup').length"),
+      anyPopup: await s.ev("document.querySelectorAll('.leaflet-popup').length"),
+      placePins: await s.ev("document.querySelectorAll('.place-pin-wrapper').length")
+    };
+  } else warn("няма × върху нашия попъп");
+  await pressEscape(s);
+  await clearField(s);
+  return out;
+}
+
+// 375x812 with a KEY: both lists must be on the screen and the lower one must be
+// reachable - the reason Sol put a max-height on their container as well (C1).
+async function checkMobileKeyed(s) {
+  await s.send("Emulation.setDeviceMetricsOverride", { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
+  await navigateFresh(s, "375px keyed");
+  const ready = await placesReady(s);
+  const list = await typePlaces(s, "хотел");
+  await sleep(POLL_MS * 4);
+  const geom = await s.ev(GEOM_JS);
+  const scrolled = await s.ev(
+    "(function () { var t = document.getElementById('addrSearchResults');" +
+    " t.scrollTop = 9999; return t.scrollTop; })()");
+  const out = { ready, rows: list.rows.length, mores: list.mores, geom, theirScrollTop: scrolled,
+                minRowHeight: Math.min.apply(null, list.rows.map((r) => r.height).concat([999])) };
+  await clearField(s);
+  await s.send("Emulation.setDeviceMetricsOverride", { width: W, height: H, deviceScaleFactor: MOB ? 2 : 1, mobile: MOB });
+  return out;
+}
+
+// G12г — the constants against the bytes of the tracked files.
 function checkShaPins() {
   const index = fs.readFileSync(path.join(REPO, "index.html"), "utf8");
   const out = [];
-  for (const [name, rel] of [["HOTELS_SHA256", "data/hotels.json"], ["CATS_SHA256", "data/place_categories.json"]]) {
+  for (const [name, rel] of [["HOTELS_SHA256", "data/hotels.json"],
+                             ["PLACES2_SHA256", "data/places.json"],
+                             ["CATS_SHA256", "data/place_categories.json"]]) {
     const m = index.match(new RegExp("const\\s+" + name + "\\s*=\\s*'([0-9a-f]{64})'"));
     const digest = crypto.createHash("sha256").update(fs.readFileSync(path.join(REPO, rel))).digest("hex");
     out.push({ constant: name, file: rel, pinned: m ? m[1] : null, actual: digest, ok: !!m && m[1] === digest });
@@ -1173,6 +1386,15 @@ async function runG4(s) {
   out.races = await checkRaces(s);
   out.v8 = await checkV8(s);
   out.mobile = await checkMobile(s);
+  // --- phase 2 ---------------------------------------------------------------
+  out.ordering = await checkOrdering(s);
+  console.log(`     подредбата: "хотел адмирал" наши отгоре: ${out.ordering["хотел адмирал"].mineFirst}, ` +
+              `"адмирал" наши отгоре: ${out.ordering["адмирал"].mineFirst}`);
+  out.enterKeyed = await checkEnterKeyed(s);
+  out.popupRule = await checkPopupRule(s);
+  out.mobileKeyed = await checkMobileKeyed(s);
+  out.consoleWarns = [...new Set(s.warns)];    // warnOnce() is where a caught throw lands
+  if (out.consoleWarns.length) warn(`конзолни предупреждения: ${out.consoleWarns.length}`);
   return out;
 }
 
@@ -1365,6 +1587,8 @@ async function main() {
 
   console.log(`  конзолни грешки: ${s.errs.length}`);
   if (s.errs.length) for (const e of s.errs) console.log(`     ${String(e).slice(0, 200)}`);
+  console.log(`  конзолни предупреждения: ${s.warns.length}`);
+  if (s.warns.length) for (const e of [...new Set(s.warns)]) console.log(`     ${String(e).slice(0, 200)}`);
   console.log(`  предупреждения на пробата: ${warnings.length}`);
   await bye(s.errs.length ? 1 : 0);
 }

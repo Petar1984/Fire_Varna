@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 recall_sweep_v22.py — FINAL: copy of recall_sweep_v21.py with the four repairs
-Petar signed on 02.09 switched ON (П2+П3+П4+П5, WITHOUT П1), and the "парк" line
+Petar signed on 02.09 switched ON (П2+П3+П4+П5+П6, WITHOUT П1), and the "парк" line
 of A8 corrected as a FACT of the data and regenerated with sec.11 B1: 19 rows =
 12 exact "ПАРК" first, then 7 fuzzy.
 The diff v21 -> v22 IS the change list; the diff recall_sweep.py -> v21 is the
@@ -13,6 +13,9 @@ sec.10 amendment list.
      filter: a row without an EXACT name/alias match for it drops out
   П5 (over A5) without a key a 2-char word is significant on an EXACT match
      against a record whose whole name is that single token ("йо" -> Йо)
+  П6 (over A5, signed sec.9 v1.4) without a key a 2-char token that matches a
+     NAME token EXACTLY becomes significant when the query carries at least one
+     MORE token that also matches the same record exactly ("7 су", "1 ег")
 
   A1  a form is a KEY only if its class holds >=1 loaded record; with several
       keys the LEFTMOST is the class, the rest become name tokens; if the search
@@ -50,8 +53,14 @@ import io
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-HOTELS = r"C:/git/varna_3d/data/fire_varna_hotels.json"
-CATS = r"C:/git/varna_3d/data/place_categories.json"
+# Phase 2 (places_phase2_plan.md sec.8, lot C12): the reference reads the
+# DELIVERED bytes of Fire_Varna -- the very three files the browser fetches --
+# not the varna_3d originals. Identical content today; a divergence between the
+# two repos must be loud in this gate, not silent.
+HOTELS = r"C:/git/Fire_Varna/data/hotels.json"
+PLACES2 = r"C:/git/Fire_Varna/data/places.json"
+CATS = r"C:/git/Fire_Varna/data/place_categories.json"
+REPO_ROWS_OUT = r"C:/git/Fire_Varna/scratch/places_search/recall_sweep_rows.json"
 OUTDIR = (r"C:/Users/Petar/AppData/Local/Temp/claude/C--git/"
           r"fb0c0608-7fdb-4635-a8fc-44575d26700a/scratchpad/measures/")
 
@@ -207,6 +216,7 @@ def key_of(s):
 # ------------------------------------------------------------------ T2 / K2
 cats = json.load(open(CATS, encoding="utf-8"))
 hotels = json.load(open(HOTELS, encoding="utf-8"))["hotels"]
+places2 = json.load(open(PLACES2, encoding="utf-8"))["places"]
 
 # --- A2: chip -> head  (place_categories.json chips[] carries "head")
 CHIP_HEAD = {}
@@ -260,7 +270,10 @@ class Rec(object):
         self.dist = math.hypot(dx, dy)
 
 
-RECS = [Rec(h) for h in hotels]
+# Phase 2: ONE index, two deliveries. `kind` carries the class of every record
+# (hotels: 4 kinds; places: school/university/hospital/DKC/hospice/kindergarten).
+# Nothing else in the matcher knows which file a row came from.
+RECS = [Rec(h) for h in hotels] + [Rec(p) for p in places2]
 
 
 def in_class(rec, fk):
@@ -288,6 +301,41 @@ CLASS_OF = {}
 for fk in FORM_IDX:
     CLASS_OF[fk] = [r for r in RECS if in_class(r, fk)]
 
+# --- phase 2, Sol C3: the classes AS THE HUMAN ASKS FOR THEM. The four hotel
+# kinds are ONE group ("Хотели"); every other kind is its own group. The group is
+# also the unit of the M3/B2 generosity gate below (index.html render() groups by
+# exactly this table, so the reference and the browser cut the same way).
+KIND_GROUP = {
+    u"Хотел": u"Хотели",
+    u"Семеен хотел": u"Хотели",
+    u"хотел · без категоризация": u"Хотели",
+    u"апарт-хотел": u"Хотели",
+    u"училище": u"Училища",
+    u"университет": u"Университети",
+    u"болница": u"Болници",
+    u"ДКЦ": u"ДКЦ",
+    u"хоспис": u"Хосписи",
+    u"детска градина": u"Детски градини",
+}
+GEN_CAP = 300                                    # M3/B2: the generosity ceiling
+
+
+def group_of(rec):
+    return KIND_GROUP.get(rec.kind, rec.kind)
+
+
+GROUP_SIZE = {}
+for _r in RECS:
+    GROUP_SIZE[group_of(_r)] = GROUP_SIZE.get(group_of(_r), 0) + 1
+
+
+def gen_ok(rec):
+    """M3/B2 as Sol repaired it (phase-2 plan sec.7 C3): without a key the
+       generosity is decided by the size of the record's OWN class, not by the
+       size of the whole index. With 226 hotels the old wording was harmless;
+       with 361 records it would have switched the keyless branch off entirely."""
+    return GROUP_SIZE.get(group_of(rec), 0) <= GEN_CAP
+
 
 # --------------------------------------------------------------- M2 matching
 CAPMODE = (sys.argv[1] if len(sys.argv) > 1 else "plan")   # "plan" | "poi"
@@ -299,7 +347,10 @@ CAPMODE = (sys.argv[1] if len(sys.argv) > 1 else "plan")   # "plan" | "poi"
 # П4  a dictionary word whose class is EMPTY must match a name/alias, else 0 rows
 # П5 SIGNED 02.09 too: without a key a 2-char word is significant only on an EXACT
 # match against a record whose whole name is that single token ("йо" -> хотел Йо).
-BASE = {"P1": False, "P2": True, "P3": True, "P4": True, "P5": True}   # signed 02.09
+# П6 SIGNED 02.09 (sec.9 v1.4): without a key a 2-char token with an EXACT name
+# match is significant when ANOTHER query token also matches that record exactly.
+BASE = {"P1": False, "P2": True, "P3": True, "P4": True, "P5": True,
+        "P6": True}                                          # signed 02.09
 FIX = dict(BASE)
 
 
@@ -352,7 +403,7 @@ def token_match(rec, t):
     return (None, 0)
 
 
-def significant(t, cat, q, has_key, rec=None):
+def significant(t, cat, q, has_key, rec=None, R=None):
     """A5. Base (always): >=3 original chars, not an address marker, not a number.
        With a key the base is EXTENDED (not replaced): any non-numeric exact or
        prefix match counts ("хотел йо"), and a purely numeric token counts only
@@ -370,6 +421,17 @@ def significant(t, cat, q, has_key, rec=None):
     if (FIX.get("P5") and not has_key and cat == "name" and q == 3
             and rec is not None and len(rec.ntk) == 1):
         return True                                  # П5 (signed)
+    # П6 (signed §9 v1.4): a 2-char token that hits a NAME token EXACTLY is
+    # significant when the query carries at least one MORE token that also matches
+    # this very record exactly (the number is conjunctive anyway by П3).
+    if (FIX.get("P6") and not has_key and cat == "name" and q == 3
+            and len(t.orig) == 2 and rec is not None and R):
+        for t2 in R:
+            if t2 is t:
+                continue
+            c2, q2 = token_match(rec, t2)
+            if q2 == 3 and c2 in ("name", "alias"):
+                return True                              # П6 (signed)
     return False
 
 
@@ -395,7 +457,7 @@ def score(rec, R, has_key):
             ssum += 2 * q                  # M4 weight: name x2
             if q > best_nk:
                 best_nk = q
-            if significant(t, cat, q, has_key, rec):
+            if significant(t, cat, q, has_key, rec, R):
                 qual = True
     if numfail:
         qual = False
@@ -490,8 +552,10 @@ def search(q):
         has_key = False
     if not R:
         return order_category(cls), "M1-category"          # M1: key only
-    if not has_key and len(cls) > 300:
-        return [], "M3-too-big"                            # M3 generosity gate
+    if not has_key:                                        # M3/B2 gate, PER CLASS
+        cls = [r for r in cls if gen_ok(r)]
+        if not cls:
+            return [], "M3-too-big"
     # ---- A3: key + remainder that is PURELY zone/kind -> filtered category list
     if has_key:
         zk_all = set()
@@ -659,8 +723,10 @@ chk(u"хотелите", u"А8: 226", lambda r: len(r) == 226)
 chk(u"семеен хотел", u"само семейните (50)",
     lambda r: len(r) == 50 and all(x.kind == u"Семеен хотел" for x in r))
 chk(u"хотел златни", u"А8: 85", lambda r: len(r) == 85 and all(x.zone == Z_ZL for x in r))
-chk(u"берлин голдън бийч", u"А8: първият ред БЕРЛИН ГОЛДЪН БИЙЧ (16 реда общо)",
-    lambda r: len(r) == 16 and first_is(r, u"БЕРЛИН ГОЛДЪН БИЙЧ"))
+# фаза 2: същата заявка, по-голям индекс — размитата опашка по `бийч`/`голдън`
+# хваща и места; първият ред (върху който е гейтът) е непокътнат.
+chk(u"берлин голдън бийч", u"А8 (фаза 2): първият ред БЕРЛИН ГОЛДЪН БИЙЧ (20 реда общо)",
+    lambda r: len(r) == 20 and first_is(r, u"БЕРЛИН ГОЛДЪН БИЙЧ"))
 chk(u"лти берлин", u"А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
     lambda r: first_is(r, u"БЕРЛИН ГОЛДЪН БИЙЧ"))
 chk(u"lti", u"А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
@@ -671,29 +737,110 @@ chk(u"роял", u"А8: РОЯЛ (Одесос), РОЯЛ (Златни), пос
 chk(u"royal", u"А8: същите 3 в същия ред; размита опашка ОК",
     lambda r: len(r) >= 3 and nz(r[0]) == (u"РОЯЛ", Z_OD) and nz(r[1]) == (u"РОЯЛ", Z_ZL)
               and nz(r[2]) == (u"Royal Beach", Z_CH))
-chk(u"синчец", u"ДАНА ПАЛАС", lambda r: first_is(r, u"ДАНА ПАЛАС"))
+# фаза 2: има място, НАИМЕНУВАНО „Синчец“ (ДГ 30). По А4 точното име и
+# псевдонимът са равностойни (k3), така че решава разстоянието до центъра:
+# ДГ 30 (Младост) е по-близо от ДАНА ПАЛАС (Златни). С ключ — хотелът.
+chk(u"синчец", u"фаза 2: ДГ 30 „Синчец“ (името), после ДАНА ПАЛАС (старото име)",
+    lambda r: len(r) == 2 and r[0].name == u'ДГ 30 "Синчец"' and r[1].name == u"ДАНА ПАЛАС")
 chk(u"хотел синчец", u"ДАНА ПАЛАС", lambda r: first_is(r, u"ДАНА ПАЛАС"))
-chk(u"русалка", u"А8: РУСАЛКА (Виница/север), Русалка (Св. К.) „· бивш“ първи; размита опашка ОК",
-    lambda r: len(r) >= 2 and nz(r[0]) == (u"РУСАЛКА", Z_VN)
-              and nz(r[1]) == (u"Русалка", Z_SK) and r[1].status == u"бивш")
+# фаза 2 + §8: зоната на РУСАЛКА е вече кварталът (Виница/север →
+# к.к. Чайка), а МЕЖДУ двата хотела влиза ДЯ №13 „Русалка“ (по-близо).
+chk(u"русалка", u"фаза 2: РУСАЛКА (к.к. Чайка), ДЯ „Русалка“, Русалка (Св. К.) „бивш“",
+    lambda r: len(r) >= 3 and nz(r[0]) == (u"РУСАЛКА", Z_CH)
+              and r[1].kind == u"детска градина"
+              and nz(r[2]) == (u"Русалка", Z_SK) and r[2].status == u"бивш")
 chk(u"бонита", u"БОНИТА/BONITA", lambda r: first_is(r, u"БОНИТА/BONITA"))
 chk(u"bonita", u"БОНИТА/BONITA", lambda r: first_is(r, u"БОНИТА/BONITA"))
 chk(u"хелиос спа", u"ХОТЕЛ  ХЕЛИОС СПА", lambda r: first_is(r, u"ХОТЕЛ  ХЕЛИОС СПА"))
 chk(u"спа хелиос", u"ХОТЕЛ  ХЕЛИОС СПА", lambda r: first_is(r, u"ХОТЕЛ  ХЕЛИОС СПА"))
-chk(u"парк", u"А8 (поправено като факт): 19 реда — първите 12 с точно „ПАРК“, после 7 размити",
-    lambda r: (len(r) == 19
+# фаза 2: точните 12 са същите (всичките са хотели); размитата опашка
+# расте от 7 на 10 с местата (Левенщайн 2 от `park`). Разделянето 12/10 е гейтът.
+chk(u"парк", u"А8 (фаза 2): 22 реда — първите 12 с точно „ПАРК“, после 10 размити",
+    lambda r: (len(r) == 22
                and all(u"park" in x.nset for x in r[:12])
                and not any(u"park" in x.nset for x in r[12:])))
-chk(u"градина", u"А8: хотел ГРАДИНА", lambda r: first_is(r, u"ГРАДИНА"))
+# фаза 2: класът „детска градина“ вече е НАСЕЛЕН, затова по А1 формата
+# „градина“ е КЛЮЧ (точно както „болница“ и „дкц“) → категориен списък.
+# Хотел ГРАДИНА се вади с ключа на своя клас: „хотел градина“ (extra).
+chk(u"градина", u"фаза 2 §3: категорийният списък на детските градини (46)",
+    lambda r: len(r) == 46 and all(x.kind == u"детска градина" for x in r))
 chk(u"блок с", u"0 наши реда", lambda r: len(r) == 0)
 chk(u"402", u"0 наши реда", lambda r: len(r) == 0)
 chk(u"бл. 402", u"0 наши реда", lambda r: len(r) == 0)
 chk(u"вх 3", u"0 наши реда", lambda r: len(r) == 0)
 chk(u"ьььь", u"0 наши реда", lambda r: len(r) == 0)
-for q in [u"7 су", u"седмо су", u"vii су"]:
-    chk(q, u"А8: 0", lambda r: len(r) == 0)
-for q in [u"дкц 2", u"болница света марина", u"градина 12"]:
-    chk(q, u"§3 М5: 0 (А8 мълчи)", lambda r: len(r) == 0)
+# ФАЗА 2 · гейтът на интуитивните заявки (places_phase2_plan.md §3).
+# Дотук тези заявки чакаха 0 реда, ЗАЩОТО класовете ги нямаше в доставката.
+# Сега ги има — очакванията са ДОСЛОВНО тези от §3 на плана за фаза 2:
+# както е записано там, „падне ли — правилото“, така че паднал ред тук
+# е искане за подписано правило, не за тихо преписване на очакването.
+UMBAL = u"„Университетска многопрофилна болница за активно лечение „Света Марина““ ЕАД"
+VII_SU = u"VII СУ „Найден Геров“"
+II_OU = u"II ОУ „Никола Йонков Вапцаров“"
+II_DKC = u"II ДКЦ Св. Иван Рилски"
+VVMU = u"ВВМУ „Н. Й. Вапцаров“"
+
+# §3 ред 1 — категорийните списъци на шестте класа
+def _cat(kind, n):
+    return lambda r: len(r) == n and all(x.kind == kind for x in r)
+
+
+for _q, _k, _n in [(u"училище", u"училище", 60),
+                   (u"училища", u"училище", 60),
+                   (u"университет", u"университет", 7),
+                   (u"болница", u"болница", 13),
+                   (u"детска градина", u"детска градина", 46),
+                   (u"дкц", u"ДКЦ", 6),
+                   (u"хоспис", u"хоспис", 3)]:
+    chk(_q, u"§3: категориен списък на класа (%d)" % _n, _cat(_k, _n))
+
+# §3 ред 2 — VII СУ „Найден Геров“ първи
+for _q in [u"7 су", u"седмо су", u"vii су", u"7-мо су"]:
+    chk(_q, u"§3: VII СУ „Найден Геров“ първи", lambda r: first_is(r, VII_SU))
+
+# §3 ред 3 — Вапцаров. §9 v1.4: очакването е поправено като ФАКТ на
+# данните: две институции носят това име (училището и ВВМУ) и двете съвпадат
+# точно; редът между тях е по П2 (покритие на името). Гейтът: двата реда
+# са първите два. С класовия ключ („2 оу вапцаров“) училището е първо.
+chk(u"2 оу вапцаров", u"§3: II ОУ „Никола Йонков Вапцаров“ първи",
+    lambda r: first_is(r, II_OU))
+chk(u"вапцаров", u"§3 (§9 v1.4): двете „Вапцаров“ в първите два (редът — по П2)",
+    lambda r: len(r) >= 2 and set([r[0].name, r[1].name]) == set([II_OU, VVMU]))
+
+# §3 ред 4 — I ЕГ първи
+for _q in [u"1 ег", u"i ег"]:
+    chk(_q, u"§3: I ЕГ първи", lambda r: first_is(r, u"I ЕГ"))
+
+# §3 ред 5 — II ДКЦ Св. Иван Рилски
+for _q in [u"дкц 2", u"2 дкц", u"дкц св иван рилски"]:
+    chk(_q, u"§3: II ДКЦ Св. Иван Рилски първи", lambda r: first_is(r, II_DKC))
+
+# §3 ред 6 — УМБАЛ „Св. Марина“ по извора (регистровото име на ИАМН)
+for _q in [u"болница света марина", u"св марина", u"умбал"]:
+    chk(_q, u"§3: УМБАЛ „Св. Марина“ първи (регистровото име)", lambda r: first_is(r, UMBAL))
+
+# §3 ред 7 — „ДГ №12 (по извора)“: в доставката НЯМА ДГ №12 (К4),
+# затова честното очакване „по извора“ е 0 реда, а не измислен ред.
+for _q in [u"градина 12", u"дг 12", u"детска градина 12"]:
+    chk(_q, u"§3 „по извора“: 0 — ДГ №12 не е в доставката", lambda r: len(r) == 0)
+
+# §3 ред 8 — университетите
+# §9 v1.4: „ту варна“ ОТПАДА от гейта — псевдонимът „ТУ“ стои в `rejected` на
+# одобрения речник varna_3d/data/place_aliases.json (правилото на Петър от 21.08:
+# само официални съкращения); решението за него е в 3D-то, не тук. „технически
+# университет“ намира ТУ-Варна и остава в гейта.
+for _q, _name in [(u"икономически университет", u"Икономически университет - Варна"),
+                  (u"технически университет", u"Технически университет – Варна"),
+                  (u"медицински университет", u"Медицински университет „Проф. д-р Параскев Стоянов“"),
+                  (u"ввму", u"ВВМУ „Н. Й. Вапцаров“"),
+                  (u"вму", u"ВВМУ „Н. Й. Вапцаров“"),
+                  (u"всу", u"Варненски Свободен Университет „Черноризец Храбър“")]:
+    chk(_q, u"§3: %s първи" % _name,
+        (lambda name: (lambda r: first_is(r, name)))(_name))
+
+# §3 ред 10 — адресните заявки от G3-корпуса: 0 наши реда
+for _q in [u"бл. 402 вх. 3", u"макгахан 15"]:
+    chk(_q, u"§3: 0 наши реда (адресните отгоре, байт-равни)", lambda r: len(r) == 0)
 
 # ------------------------------------------- extra probes asked for tonight
 def chk2(q, expect, ok_fn):
@@ -1111,8 +1258,9 @@ ROWS = {
     "_meta": {
         "source": "measures/recall_sweep_v22.py",
         "rules": "plan sec.3 (T1/T2/K2/M1-M5) + sec.10 A1-A8 + P2+P3+P4 (no P1)",
-        "data": ["varna_3d/data/fire_varna_hotels.json",
-                 "varna_3d/data/place_categories.json"],
+        "data": ["Fire_Varna/data/hotels.json",
+                 "Fire_Varna/data/places.json",
+                 "Fire_Varna/data/place_categories.json"],
         "records": len(RECS),
         "center": [CENTER[0], CENTER[1]],
         "top_cut_is_in_render": TOP,
@@ -1134,8 +1282,11 @@ for _bucket, _spec in [("gate_m5_a8", M5SPEC), ("extra", EXTRASPEC)]:
             "rows": [{"name": x.name, "zone": x.zone} for x in _r],
         })
 ROWS_OUT = OUTDIR + "recall_sweep_v22_rows.json"
-open(ROWS_OUT, "w", encoding="utf-8").write(
-    json.dumps(ROWS, ensure_ascii=False, indent=1, sort_keys=False) + chr(10))
+_rows_text = json.dumps(ROWS, ensure_ascii=False, indent=1, sort_keys=False) + chr(10)
+open(ROWS_OUT, "w", encoding="utf-8").write(_rows_text)
+# The reference the JS is gated against lives next to the probe that replays it
+# (scratch/places_search/recall_sweep_rows.json) - one file, one generator.
+open(REPO_ROWS_OUT, "w", encoding="utf-8").write(_rows_text)
 
 OUT = OUTDIR + ("recall_sweep_v22.md" if CAPMODE == "plan"
                 else "recall_sweep_v22_cap_poi.md")
