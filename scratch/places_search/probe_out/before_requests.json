@@ -1,0 +1,23 @@
+{
+  "window": "Page.navigate -> first focus of #addrSearchInput",
+  "page": [
+    {
+      "url": "http://localhost:8000/data/hydrants.json",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:8000/favicon.ico",
+      "status": 404
+    },
+    {
+      "url": "http://localhost:8000/index.html",
+      "status": 200
+    }
+  ],
+  "thirdPartyHosts": [
+    "a.tile.openstreetmap.org",
+    "b.tile.openstreetmap.org",
+    "c.tile.openstreetmap.org",
+    "varna-hydrants-proxy.petar-dikov2019.workers.dev"
+  ]
+}

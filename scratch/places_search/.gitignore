@@ -1,0 +1,3 @@
+# The probe throwaway Chrome profile. probe_places_fv.mjs wipes it before and
+# after every run; a crashed run must not leave it staged for a commit.
+_cprof/
