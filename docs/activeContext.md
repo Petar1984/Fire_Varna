@@ -1,6 +1,6 @@
 # Active context — Fire_Varna
 
-**Date:** 2026-09-02 · **last verified against commit** 0e563bd (`main`; ahead of `origin/main` by the 2026-09-01 plan's and the places-search cycle's commits until Petar's push — see the table) · verified by: Opus (executor), audited by: Opus (auditor, C6) · signed: __
+**Date:** 2026-09-02 · **last verified against commit** 0bc2424 (`main`; ahead of `origin/main` by the places-search cycle's commits (see the table) until Petar's push) · verified by: Opus (executor), audited by: Opus (auditor, C6) · signed: __
 > Every number here is the output of the command next to it, run on the date above (`verify_numbers.py` checks it). A number without a command does not enter.
 > The previous chronicle (state as of 2026-07-04) is frozen in [archive/activeContext_2026-07-04.md](archive/activeContext_2026-07-04.md).
 
@@ -30,8 +30,8 @@ Public mobile-first web app (README calls it a PWA; there is no web manifest —
 | open reports (issues) | 18 | `gh issue list -R Petar1984/Fire_Varna --state open --limit 200 --json number --jq length` |
 | closed reports | 709 | `gh api "search/issues?q=repo:Petar1984/Fire_Varna+is:issue+is:closed" --jq .total_count` |
 | commits on `main` | 222 | `git rev-list --count main` |
-| last pushed commit | 06cdada 2026-09-01 | `git log -1 --format='%h %cs' origin/main` |
-| commits ahead of `origin/main` (the 2026-09-01 plan + the places-search cycle, unpushed) | 8 | `git rev-list --count origin/main..main` |
+| last pushed commit | ca25595 2026-09-02 | `git log -1 --format='%h %cs' origin/main` |
+| commits ahead of `origin/main` (the places-search cycle, unpushed) | 9 | `git rev-list --count origin/main..main` |
 | last data commit (moderation cycle) | 2026-09-01 data: cycle #30 — 15 reports, and the Golden Sands import left alone | `git log -1 --format='%cs %s' -- data/hydrants.json docs/moderation_log.md` |
 | `index.html` bytes | 508556 | `wc -c < index.html` |
 | `data/hydrants.json` bytes | 1311397 | `wc -c < data/hydrants.json` |
