@@ -268,11 +268,10 @@ C:\git\Fire_Varna\
 │   ├── copy_basemap_release.py / vendor_basemap_deps.mjs
 │   └── lib/hydrant_core.py        <- H1 shared core (spatial dedup)
 ├── tests/                         <- unittest suite (test_hydrant_core.py,
-│                                     test_apply_approved_reports_parity.py, golden fixtures)
+│                                     test_apply_approved_reports_parity.py, golden fixtures);
+│                                     verify_apply.py / verify_h4.py — one-off checkers (Р-21 of the 01.09 plan)
 ├── worker/                        <- Cloudflare Worker source + README (deploy version 5accc88e)
 ├── extract_hydrants.py            <- extracts embedded hydrant JSON from older index builds
-├── verify_apply.py                <- one-off checker for an apply run (hydrants + provenance)
-├── verify_h4.py                   <- one-off checker for the H4 ЕТР KMZ apply (reads the flag queue)
 ├── hydrants_varna.json            <- original KMZ-derived reference dataset
 ├── sw.js                          <- service worker; index.html registers it only in PMTiles mode
 ├── vendor/                        <- vendored basemap runtime deps (pmtiles, protomaps-leaflet)
