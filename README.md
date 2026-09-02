@@ -1,5 +1,7 @@
 # Fire_Varna — карта на пожарните хидранти във Варна
 
+> Сверка 02.09.2026 (комит bc18d54): числата в този документ носят собствената си дата на измерване; каквото е остаряло към 02.09.2026 е отбелязано с ⚠ под реда.
+
 **[Български](#български)** · **[English](#english)**
 
 🔗 **<https://petar1984.github.io/Fire_Varna/>**
@@ -18,10 +20,12 @@
   **до 100 м**, **топ 5 най-близки** (по подразбиране), **всички**.
 - 🧭 един tap води до избрания хидрант — Google Maps при по-голямо
   разстояние, вграден компас в последните 100 м.
+> ⚠ остаряло към 02.09.2026: buildNavActions дава 4 външни линка: Waze, Google Maps walking, Google карта, Street View. NEAR_THRESHOLD_M се ползва само на ред 2169 за режим „Близо" (измерено 01.09.2026, приложение Е) — `sed -n '4205,4210p' index.html; grep -n 'NEAR_THRESHOLD_M' index.html`
 - 🚨 **сигнали от терена направо от картата**: повреден/блокиран хидрант,
   грешна локация, нов хидрант, потвърдено състояние. Сигналите се пазят
   и офлайн и се изпращат при връзка; всеки минава през човешка модерация,
   преди да промени данните.
+> ⚠ остаряло към 02.09.2026: data-type="damaged" · data-type="exists_confirmed" · data-type="missing" · data-type="new_hydrant" · data-type="wrong_location" — `grep -o 'data-type="[a-z_]*"' index.html | sort -u`
 - **Търсачка на адреси** — улици, номера, квартали, блок + вход
   (напр. „бл. 402 вх. 3"), и сурови GPS координати.
 - Сателитен изглед (Esri World Imagery) и сграден слой (векторни тайлове).
@@ -31,6 +35,9 @@
 Над **7 000 записа за хидранти** (точните текущи бройки:
 [docs/activeContext.md](docs/activeContext.md#current-state)), обединени
 и дедуплицирани от:
+> ⚠ остаряло към 02.09.2026: 7403 — `grep -n 'Last updated\|/data/hydrants.json: \*\*' docs/activeContext.md; python -c "import json;print(len(json.load(open('data/hydrants.json',encoding='utf-8'))))"`
+
+> ⚠ остаряло към 02.09.2026: [('vik', 3524), ('national', 2329), ('etr_varna', 763), ('etr_provadia', 244), ('etr_dolni_chiflik', 219), ('field_report', 147), ('pozarna_gz', 99), ('etr_devnya', 78)] — `python -c "import json,collections;print(collections.Counter(x.get('origin') for x in json.load(open('data/hydrants.json',encoding='utf-8'))).most_common())"`
 
 | източник | какво е |
 |---|---|
@@ -63,6 +70,7 @@
 
 Статична страница + един малък worker. Без build система, без runtime
 зависимости, без акаунти, без следене.
+> ⚠ остаряло към 02.09.2026: 4132:  const VECTORGRID_CDN = 'https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.min.js'; · 4397:      s.src = VECTORGRID_CDN; — `grep -n 'VECTORGRID_CDN' index.html; grep -noiE 'gtag|google-analytics|plausible|matomo|sentry' index.html; ls -1 | grep -iE 'package|webpack|vite|rollup'`
 
 - **Frontend** — един `index.html` (Leaflet 1.9.4 + MarkerCluster,
   ванилен JS/CSS) на GitHub Pages; `data/hydrants.json` се тегли при
@@ -105,16 +113,20 @@
 > hydrant in the Varna region, Bulgaria — in the browser, no
 > installation, no account.
 
+> ⚠ остаряло към 02.09.2026: 0 · 4507:  const BASEMAP_PMTILES_ENABLED = false; — `grep -c 'rel="manifest"' index.html; git ls-files | grep -i webmanifest; grep -n 'BASEMAP_PMTILES_ENABLED = ' index.html`
+
 ### What it does
 
 - Shows your position and the nearest fire hydrants, with three view
   modes: **within 100 m**, **top 5 nearest** (default), **all**.
 - 🧭 one tap navigates to the chosen hydrant — Google Maps for longer
   distances, a built-in compass within the last 100 m.
+> ⚠ остаряло към 02.09.2026: четири линка (Waze / Google Maps walking / Google map / Street View); NEAR_THRESHOLD_M се ползва само за филтъра на режим „Близо" (измерено 01.09.2026, приложение Е) — `sed -n '4205,4210p' index.html; grep -n 'NEAR_THRESHOLD_M' index.html`
 - 🚨 **field reports straight from the map**: broken/blocked hydrant,
   wrong location, new hydrant, condition confirmed. Reports queue
   offline and send when the connection returns; every report passes
   human moderation before it changes the dataset.
+> ⚠ остаряло към 02.09.2026: data-type="damaged" · data-type="exists_confirmed" · data-type="missing" · data-type="new_hydrant" · data-type="wrong_location" — `grep -o 'data-type="[a-z_]*"' index.html | sort -u`
 - **Address search** — streets, house numbers, quarters, block +
   entrance (e.g. „бл. 402 вх. 3"), plus raw GPS coordinates.
 - Satellite imagery toggle (Esri World Imagery) and a building layer
@@ -125,6 +137,9 @@
 Over **7,000 hydrant records** (exact live counts:
 [docs/activeContext.md](docs/activeContext.md#current-state)), merged
 and deduplicated from:
+> ⚠ остаряло към 02.09.2026: activeContext.md е от 2026-07-04 и обявява 7,238 записа; живият файл е 7403 (измерено 01.09.2026, приложение Е) — `grep -n 'Last updated\|/data/hydrants.json: \*\*' docs/activeContext.md`
+
+> ⚠ остаряло към 02.09.2026: [('vik', 3524), ('national', 2329), ('etr_varna', 763), ('etr_provadia', 244), ('etr_dolni_chiflik', 219), ('field_report', 147), ('pozarna_gz', 99), ('etr_devnya', 78)] — `python -c "import json,collections;print(collections.Counter(x.get('origin') for x in json.load(open('data/hydrants.json',encoding='utf-8'))).most_common())"`
 
 | source | what it is |
 |---|---|
@@ -156,6 +171,7 @@ before publishing — no cadastral identifiers, no personal data.
 
 Static single-page app + one small serverless worker. No build system,
 no runtime npm dependencies, no accounts, no tracking.
+> ⚠ остаряло към 02.09.2026: 4132:  const VECTORGRID_CDN = 'https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.min.js'; · 4397:      s.src = VECTORGRID_CDN; — `grep -n 'VECTORGRID_CDN' index.html; grep -noiE 'gtag|google-analytics|plausible|matomo|sentry' index.html`
 
 - **Frontend** — one `index.html` (Leaflet 1.9.4 + MarkerCluster,
   vanilla JS/CSS) on GitHub Pages; `data/hydrants.json` fetched at
