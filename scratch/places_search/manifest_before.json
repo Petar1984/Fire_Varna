@@ -1,0 +1,58 @@
+{
+  "README.md": {
+    "bytes": 14137,
+    "sha256": "523ddd7ddcbae4c2abbd67dcd24b0da4ec0a6873005e3b09a66ed32de1ce1c8e"
+  },
+  "data/address_rows.json": {
+    "bytes": 5073137,
+    "sha256": "2a4766bd474f34817081e2d4e49b0ab2abbe54080c809b0402e079e1b9a0904a"
+  },
+  "data/approx_addresses_v1.json": {
+    "bytes": 846649,
+    "sha256": "97ebe841c9ba45e0f89eee20b5a43eb98a1cbb7f9abe251f4c13346c5de29822"
+  },
+  "data/basemaps/basemap_manifest.json": {
+    "bytes": 2657,
+    "sha256": "092ee99c656252cf868b3e1f3287aa07962bf87f7fd23427b54814ffd11f3df2"
+  },
+  "data/generation_manifest.json": {
+    "bytes": 836,
+    "sha256": "1c160ef7415a162d9415822aabda4def2c9c511bc2ca4829611d04ac453684a6"
+  },
+  "data/hydrants.json": {
+    "bytes": 1313848,
+    "sha256": "6191f08ecfb8c02a0aaf17191c223fbddc8b48fbfca4158555b9e90da83fced6"
+  },
+  "data/hydrants.json.pre_address_backfill.json": {
+    "bytes": 870256,
+    "sha256": "8cd1a95bc02977583b9f79da38f70e87d305f3426535c2820bbe8c7a6b973ab4"
+  },
+  "data/hydrants.json.pre_cleanup_snapshot.json": {
+    "bytes": 968365,
+    "sha256": "ee92c904dd6eddcf2625e25f24d1829bece96e0917b60f21309d19361d55ed2f"
+  },
+  "data/hydrants_provenance.json": {
+    "bytes": 4206768,
+    "sha256": "30d3e802876c471226cf1515d9085909c2abf374d820a5e35bdb6caf4aa21b1d"
+  },
+  "data/hydrants_provenance.json.pre_address_backfill.json": {
+    "bytes": 1350083,
+    "sha256": "262155b083072c63071535830c4369c193b4a62e5bebce10005119c8b4175b3b"
+  },
+  "data/removed_hydrants.json": {
+    "bytes": 22271,
+    "sha256": "0a580704a4658a6913970acc7356cb21a45b500014b0302af0356b1c8e8ffd04"
+  },
+  "data/search_index.json": {
+    "bytes": 11242756,
+    "sha256": "c12f94259bd986dd8b874f4866a0e9e311ada713e49ff4d67afcd58d48467b0d"
+  },
+  "index.html": {
+    "bytes": 475446,
+    "sha256": "0bccd106f842a35e2840d2f20734d249d1d160cbb854dac3915188b7afe1e0f0"
+  },
+  "sw.js": {
+    "bytes": 11839,
+    "sha256": "c83000233092d5a37625e8ce0b2806fd8f7d7cd72192072c08af4d5a9c10f430"
+  }
+}
