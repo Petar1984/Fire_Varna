@@ -34,7 +34,7 @@ The app loads a static hydrant dataset, shows the user's GPS position, and guide
 
 **What is forbidden here** is written in § Hard Constraints, § System Invariants and § When To Stop And Ask. Read those three before the first edit; they are not restated in this section.
 
-**Live numbers live in the entry point, not here.** No state number enters this file: record counts, per-origin counts, file counts, byte sizes and commit hashes belong in [`docs/activeContext.md` § Current State](docs/activeContext.md#current-state). What stays here are numbers that are rules — hard caps, intervals, thresholds (§ Hard Constraints) — and pointers into configuration, such as the Worker deploy version in § Report Flow. A figure that carries a `непроверено` marker has no measurable source in this repo; never quote it as state.
+**Live numbers live in the entry point, not here.** No state number enters this file: record counts, per-origin counts, file counts, byte sizes and commit hashes quoted as state belong in [`docs/activeContext.md` § Current State](docs/activeContext.md#current-state); a commit named as provenance (the commit of an import, of a fix) is a pointer, not state. What stays here are numbers that are rules — hard caps, intervals, thresholds (§ Hard Constraints) — and pointers into configuration, such as the Worker deploy version in § Report Flow. A figure that carries a `непроверено` marker has no measurable source in this repo; never quote it as state.
 
 ---
 
@@ -107,7 +107,7 @@ For `wrong_location` reports, **always update the existing record's coordinate f
 
 | Target ID type | Action |
 |---|---|
-| Canonical IDs (every id is `coord_<lon>_<lat>` today; `NAT-`, `VIK-`, `GZ-` survive in `legacy_ids`) | update `coords` in `data/hydrants.json` |
+| Canonical IDs (every id starts with `coord_<lon>_<lat>`; disambiguated duplicates carry a `__NAT-####` suffix (count them with `python -c "import json;print(sum(1 for r in json.load(open('data/hydrants.json',encoding='utf-8')) if '__' in r['id']))"`); `NAT-`, `VIK-`, `GZ-` survive in `legacy_ids`) | update `coords` in `data/hydrants.json` |
 | `field_*` IDs (no record carries one today; `field_*` survives only in `legacy_ids`) | update `coords` in `data/hydrants.json` |
 
 `field_reports.json` is no longer a current file; all records (including `field_*`) live in `data/hydrants.json` only. After the coord update, set `existence_status` to `"verified"`. Old coords go in the commit message for audit trail. A `new_hydrant` report creates a record with a `coord_<lon>_<lat>` id; the `field_*` identifier it came in with is kept in `legacy_ids`. No record in the dataset carries a `field_*` id.
@@ -297,7 +297,7 @@ All working, tested on mobile.
    - "Близо <100м" - hydrants within 100m radius
    - "Топ 5" - default, 5 nearest by Haversine
    - "Всички" - full clustered overlay of every record in the dataset (count in `docs/activeContext.md`)
-4. **Bottom sheet** - compact card always visible; list expands from handle.
+4. **Bottom sheet — removed** in the popup pivot (`grep -n 'bottom sheet' index.html` → the comment "the bottom sheet was removed in the popup pivot"; CLAUDE.md § Verification says the same).
 5. **Compass arrow + heading cone** on user marker.
 6. **Hybrid navigation** - distance >100m opens Google Maps, <=100m uses in-app compass target.
 7. **Follow mode** - centers on user; user pan exits follow mode.
@@ -314,7 +314,7 @@ Tap on a pin selects/activates it. Long-press on a pin opens the report menu. Th
 - **`deviceorientation` fires at 100-200Hz on Android.** Store latest raw heading, run EMA once per `requestAnimationFrame`. `HEADING_SMOOTHING = 0.10`.
 - **Use `L.divIcon` for all markers**, never `L.icon`.
 - **MarkerCluster is only used in "Всички" mode.** "Близо" and "Топ" render plain numbered pins.
-- **Auto-fit only twice:** on first GPS lock and on mode change.
+- **Auto-fit happens at three sites:** first GPS lock (`refresh(!deepLinkFramed)`), mode change (`setMode()` → `refresh(true)`) and the manual-position map click (`refresh(true)`); routine GPS ticks call `refresh(false)` (`grep -n -E 'refresh\(true\)|refresh\(!deepLinkFramed\)' index.html`).
 - **A service worker exists (`sw.js`) but is off by default.** `index.html` registers it only when the PMTiles basemap capability is active, and the committed flag `BASEMAP_PMTILES_ENABLED` is `false` — so by default (no `?basemap_pmtiles=1` opt-in stored on the device) tiles on the live site are still fetched live from OSM.
 - `index.html` now depends on `data/hydrants.json`; serve over HTTP locally so fetch works.
 
@@ -326,7 +326,7 @@ Tap on a pin selects/activates it. Long-press on a pin opens the report menu. Th
 2. **No build system.** Diffs are hard to read. Refactoring is post-launch.
 3. **Data is static JSON.** Updating hydrants requires regenerating/reviewing `data/hydrants.json`.
 4. **Worker source lives in `worker/`** (extracted in `914dc2a`); Cloudflare deploy is manual, deploy version repo-declared `5accc88e`.
-5. **The offline tile cache exists but is off by default.** `sw.js` and the PMTiles basemap release under `data/basemaps/` are both in the repo; the committed flag `BASEMAP_PMTILES_ENABLED` is `false`, and only a per-device opt-in (`?basemap_pmtiles=1`, `index.html` line 4504) registers them — without it the app still fails where live OSM tiles cannot load.
+5. **The offline tile cache exists but is off by default.** `sw.js` and the PMTiles basemap release under `data/basemaps/` are both in the repo; the committed flag `BASEMAP_PMTILES_ENABLED` is `false`, and only a per-device opt-in (`?basemap_pmtiles=1`; see `BASEMAP_PMTILES_ENABLED` and `isBasemapPmtilesActive()` in `index.html`) registers them — without it the app still fails where live OSM tiles cannot load.
 6. **No PWA manifest.**
 7. **Tests exist (`tests/`, Python unittest); there is no CI — confirmed absent (no `.github/`, no other CI configuration in the repo).**
 8. **Bulgarian-only UI.** No localization layer.
@@ -340,7 +340,7 @@ Defender exclusions applied (2026-05-06):
 - ExclusionPath: `C:\git\Fire_Varna`
 - ExclusionProcess: `git.exe`, `git-remote-https.exe`, `node.exe`
 
-Primary workflow: agents edit + commit locally in the canonical working directory `C:\git\Fire_Varna`; **Petar alone pushes** after reviewing the diff (Gate 2). The deploy clone `Fire_Varna_deploy2` no longer exists on disk; `C:\git\Fire_Varna` is the only working copy.
+Primary workflow: agents edit + commit locally in the canonical working directory `C:\git\Fire_Varna`; **Petar alone pushes** after reviewing the diff (Gate 2). The deploy clone `Fire_Varna_deploy2` no longer exists on disk (`ls C:\git\Fire_Varna_deploy2` → no such file).
 
 Fallback, only if exclusions fail: Python pre-place blob recovery technique. See git history for full procedure, search "blob corruption".
 
