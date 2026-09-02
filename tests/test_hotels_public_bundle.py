@@ -18,6 +18,9 @@ plan §2 Д1 / §5 G2 (no cadastral identifier leaks, verbatim licence line, no 
 data in the free text, unique (name, zone), no alias that shadows another record or a
 dictionary form) and the dictionary contract the key model of plan §3 Т2 depends on.
 
+Plan §5 G9 adds one more: both README mirrors (Български / English) must quote that same
+licence line byte for byte, and must carry the honest note that the bundle is online-only.
+
 G2 ("the test RUNS and FAILS") needs the gate pointed at a deliberately corrupted copy.
 Set the environment variable **FIRE_VARNA_HOTELS_PATH** to an alternative hotels file
 and every assertion below runs against it; unset, the gate reads `data/hotels.json`.
@@ -142,6 +145,19 @@ class HotelsBundleTest(unittest.TestCase):
 
     def test_licence_line_is_verbatim(self):
         self.assertEqual(self.doc["_meta"]["licence"], LICENCE)
+
+    def test_readme_carries_licence_line(self):
+        # Plan §5 G9. The licence travels with the data: whoever reads the repo's front
+        # page must see the same sentence the payload carries, in both mirrors, unedited
+        # — a paraphrase would be a different licence. Each README quote therefore sits
+        # on ONE line; wrapping it would break the byte equality this asserts.
+        readme = (REPO / "README.md").read_text(encoding="utf-8")
+        licence = self.doc["_meta"]["licence"]
+        self.assertGreaterEqual(readme.count(licence), 2, "licence quoted in BG and EN")
+        # The bundle is not in the sw.js offline pack; the README says so out loud.
+        # assertTrue, not assertIn: a failing assertIn would dump the whole README.
+        self.assertTrue("не са част от офлайн пакета" in readme,
+                        "README.md lost the offline note about the hotels bundle")
 
     def test_encoding_is_utf8_without_bom_and_free_of_mojibake(self):
         self.assertFalse(self.raw.startswith(b"\xef\xbb\xbf"))

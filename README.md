@@ -28,6 +28,10 @@
 > ⚠ остаряло към 02.09.2026: data-type="damaged" · data-type="exists_confirmed" · data-type="missing" · data-type="new_hydrant" · data-type="wrong_location" — `grep -o 'data-type="[a-z_]*"' index.html | sort -u`
 - **Търсачка на адреси** — улици, номера, квартали, блок + вход
   (напр. „бл. 402 вх. 3"), и сурови GPS координати.
+- **Хотели в търсачката** — 226 места за настаняване от Националния
+  туристически регистър (име, вид, категория, легла, зона);
+  „хотел адмирал“ намира и трите.
+> ✓ вярно към 02.09.2026: 226 · 3 — `PYTHONIOENCODING=utf-8 python -c "import json;d=json.load(open('data/hotels.json',encoding='utf-8'));print(d['_meta']['count'], sum(1 for h in d['hotels'] if 'мирал' in h['name'].lower()))"`
 - Сателитен изглед (Esri World Imagery) и сграден слой (векторни тайлове).
 
 ### Данните
@@ -45,6 +49,7 @@
 | **Национален регистър** | държавният набор за цялата страна |
 | **ЕТР** | KMZ файлове на районните служби: Варна, Провадия, Долни чифлик, Девня (внесени 06.2026+) |
 | **Полеви сигнали** | хидранти, докладвани, потвърдени или поправени на място през 🚨 |
+| **Национален туристически регистър** | местата за настаняване (хотели) — отделни факти, атрибуция в попъпа |
 
 Координатите са WGS84. Рядката метаданна (тип, адрес, състояние) остава
 точно толкова рядка, колкото е в източниците — нищо не се измисля. Всяка
@@ -57,6 +62,23 @@
 отворените данни на кадастъра и минават гейтове за поверителност и
 цялост преди публикуване — без кадастрални идентификатори, без лични
 данни.
+
+#### Хотели
+
+Местата за настаняване в търсачката идват от **Националния туристически
+регистър** — отделни факти, без масово копиране на регистъра.
+Координатите: собствена геолокация върху отворените данни на КАИС.
+Имената от публична идентификация (OSM, официални сайтове, общински
+регистри) също са отделни факти; източникът на всеки ред стои в `src` и
+се показва в попъпа му.
+
+Лицензният ред на доставката (`data/hotels.json`, `_meta.licence`),
+дословно:
+
+> Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).
+
+Хотелите не са част от офлайн пакета (sw.js): без връзка търсачката на
+места не работи.
 
 ### Как се ползва
 
@@ -129,6 +151,10 @@
 > ⚠ остаряло към 02.09.2026: data-type="damaged" · data-type="exists_confirmed" · data-type="missing" · data-type="new_hydrant" · data-type="wrong_location" — `grep -o 'data-type="[a-z_]*"' index.html | sort -u`
 - **Address search** — streets, house numbers, quarters, block +
   entrance (e.g. „бл. 402 вх. 3"), plus raw GPS coordinates.
+- **Hotels in the search** — 226 accommodation places from the National
+  Tourist Register (name, kind, category, beds, zone); „хотел адмирал“
+  finds all three.
+> ✓ вярно към 02.09.2026: 226 · 3 — `PYTHONIOENCODING=utf-8 python -c "import json;d=json.load(open('data/hotels.json',encoding='utf-8'));print(d['_meta']['count'], sum(1 for h in d['hotels'] if 'мирал' in h['name'].lower()))"`
 - Satellite imagery toggle (Esri World Imagery) and a building layer
   served as vector tiles.
 
@@ -147,6 +173,7 @@ and deduplicated from:
 | **National registry** | the country-wide hydrant dataset |
 | **ЕТР imports** | district fire-service KMZ files: Varna, Provadia, Dolni Chiflik, Devnya (imported 2026-06+) |
 | **Field reports** | hydrants reported, confirmed, or corrected on site via 🚨 |
+| **National Tourist Register** | accommodation places (hotels) — separate facts, attribution in the popup |
 
 Coordinates are WGS84. Sparse metadata (type, address, operational
 status) stays exactly as sparse as the sources are — nothing is
@@ -159,6 +186,23 @@ The address-search payloads (`data/search_index.json`,
 ([Varna_buildings](https://github.com/Petar1984/Varna_buildings)) from
 the national cadastre's open data, and pass privacy and integrity gates
 before publishing — no cadastral identifiers, no personal data.
+
+#### Hotels
+
+The accommodation places in the search come from the **National Tourist
+Register** — separate facts, no bulk copying of the register. The
+coordinates are our own geolocation over the КАИС open data. The names
+taken from public identification (OSM, official websites, municipal
+registers) are separate facts too; the source of every row sits in `src`
+and is shown in its popup.
+
+The delivery's licence line (`data/hotels.json`, `_meta.licence`),
+verbatim (in Bulgarian, as published):
+
+> Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).
+
+The hotels bundle is not part of the offline pack (sw.js): without a
+connection the places search does not work.
 
 ### Usage
 
