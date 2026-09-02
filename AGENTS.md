@@ -353,3 +353,26 @@ Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
 - You do not have an approved plan and the task is non-trivial.
 
 When in doubt, ask. Petar would rather review a question than revert a commit.
+
+## Output budget (token discipline)
+
+Context cost here is dominated by tool output, not by files or prompts.
+Hard rules:
+
+1. **Search capped.** `rg` always with `--max-count 20 --max-columns 200`.
+   Start with `rg -l` (file list only), then read matches selectively.
+2. **Read ranges, never whole files.** Use `sed -n 'A,Bp'`, `head -n 100`,
+   or `Get-Content -TotalCount 100`. Max 150 lines per read; for a large
+   file, read only the range you need.
+3. **Data and logs are size-gated.** `head`/`tail` samples of data files
+   are fine; never output a whole file over 1 MB (`*.log`, `*.jsonl`,
+   `*.db`, `*.csv`, binaries), and never read `node_modules/`, `.git/`,
+   or build output. A log check is `tail -n 50`, once.
+4. **One question per command.** If a capped result is insufficient,
+   refine ONCE with a narrower query — never re-run with broader flags
+   or raised caps. Still insufficient → state what is missing in your
+   answer instead of searching further.
+5. **Prefer what is already in context** over re-reading the same file.
+6. **Escape hatch:** if the task explicitly names a file or module for
+   exhaustive review, sequential ranged reads of the whole target are
+   allowed.
