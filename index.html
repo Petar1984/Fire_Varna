@@ -6619,10 +6619,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
       p.on('remove', function () {
         if (placePopup !== p || !mineActive) return;
         // В1: a late address popup (the fail-soft /detail/ path) can take the slot from
-        // us. If a tick later the slot is TAKEN, ours comes back; if it is empty, the
-        // human closed ours with the × and it stays closed.
+        // us. If a tick later ANOTHER popup holds the slot, ours comes back. Leaflet
+        // keeps our own node in the DOM ~200 ms for the fade-out, so the popup found
+        // there can be the one being removed — that is the × the human just pressed,
+        // and then we stay closed (the pin stands and re-opens us on click).
+        const dying = p.getElement && p.getElement();
         setTimeout(function () {
-          if (placePopup === p && mineActive && document.querySelector('.leaflet-popup')) openPlacePopup(h);
+          if (placePopup !== p || !mineActive) return;
+          const other = Array.from(document.querySelectorAll('.leaflet-popup')).find((n) => n !== dying);
+          if (other) openPlacePopup(h);
         }, 0);
       });
       p.setLatLng([h.lat, h.lon]).setContent(popupFor(h)).openOn(map);
