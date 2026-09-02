@@ -35,7 +35,7 @@
 Над **7 000 записа за хидранти** (точните текущи бройки:
 [docs/activeContext.md](docs/activeContext.md#current-state)), обединени
 и дедуплицирани от:
-> ⚠ остаряло към 02.09.2026: 7403 — `grep -n 'Last updated\|/data/hydrants.json: \*\*' docs/activeContext.md; python -c "import json;print(len(json.load(open('data/hydrants.json',encoding='utf-8'))))"`
+> ✓ вярно към 02.09.2026 (след ЛОТ 5 на плана от 01.09): [docs/activeContext.md § Current State](docs/activeContext.md#current-state) носи броя записи с командата до него — 7403 — `PYTHONIOENCODING=utf-8 python -c "import json;print(len(json.load(open('data/hydrants.json',encoding='utf-8'))))"`; до 02.09.2026 същият път сочеше хрониката от 2026-07-04 (7,238 записа), сега замразена в [docs/archive/activeContext_2026-07-04.md](docs/archive/activeContext_2026-07-04.md).
 
 > ⚠ остаряло към 02.09.2026: [('vik', 3524), ('national', 2329), ('etr_varna', 763), ('etr_provadia', 244), ('etr_dolni_chiflik', 219), ('field_report', 147), ('pozarna_gz', 99), ('etr_devnya', 78)] — `python -c "import json,collections;print(collections.Counter(x.get('origin') for x in json.load(open('data/hydrants.json',encoding='utf-8'))).most_common())"`
 
@@ -137,7 +137,7 @@
 Over **7,000 hydrant records** (exact live counts:
 [docs/activeContext.md](docs/activeContext.md#current-state)), merged
 and deduplicated from:
-> ⚠ остаряло към 02.09.2026: activeContext.md е от 2026-07-04 и обявява 7,238 записа; живият файл е 7403 (измерено 01.09.2026, приложение Е) — `grep -n 'Last updated\|/data/hydrants.json: \*\*' docs/activeContext.md`
+> ✓ вярно към 02.09.2026 (след ЛОТ 5 на плана от 01.09): същото като по-горе — новата входна точка носи 7403 с командата `PYTHONIOENCODING=utf-8 python -c "import json;print(len(json.load(open('data/hydrants.json',encoding='utf-8'))))"`; хрониката от 2026-07-04 (7,238 записа) е в [docs/archive/activeContext_2026-07-04.md](docs/archive/activeContext_2026-07-04.md).
 
 > ⚠ остаряло към 02.09.2026: [('vik', 3524), ('national', 2329), ('etr_varna', 763), ('etr_provadia', 244), ('etr_dolni_chiflik', 219), ('field_report', 147), ('pozarna_gz', 99), ('etr_devnya', 78)] — `python -c "import json,collections;print(collections.Counter(x.get('origin') for x in json.load(open('data/hydrants.json',encoding='utf-8'))).most_common())"`
 

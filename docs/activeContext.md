@@ -11,7 +11,7 @@ Public mobile-first web app (README calls it a PWA; there is no web manifest —
 `main`; `origin/main` is behind it by the plan's commits (table row “commits ahead of `origin/main`”) until Petar pushes. Local branch `backup/pre-c17-split` (commits only there: see the table) stays by decision Р-13 of the 2026-09-01 plan; the merged `hydrants-c17` was deleted under the same decision (`git branch` lists two local branches).
 
 ## Open theme
-- Moderation cycle #31: the open reports (count in the table; `gh issue list -R Petar1984/Fire_Varna --state open`) — run through `/firehydrants`, not part of the ordering plan.
+- The next moderation cycle (after cycle #30 in `docs/moderation_log.md`): the open reports (count in the table; `gh issue list -R Petar1984/Fire_Varna --state open`) — run through `/firehydrants`, not part of the ordering plan.
 - ADR 005 service-worker cache lifecycle — `Proposed — awaiting Petar (Gate 1)` (`decisions/005_sw_cache_lifecycle.md`, 2026-08-11).
 
 ## Waiting for signature
@@ -36,6 +36,8 @@ Public mobile-first web app (README calls it a PWA; there is no web manifest —
 | web manifest (`rel="manifest"`) in `index.html` | 0 | `grep -c 'rel="manifest"' index.html` |
 | commits only on `backup/pre-c17-split` | 5 | `git rev-list --count main..backup/pre-c17-split` |
 | cycle #30 date in `docs/moderation_log.md` | 2026-08-31 | `grep -m1 -oE '^## [0-9-]+ — цикъл #30' docs/moderation_log.md \| cut -c4-13` |
+| records per origin (AGENTS.md § Data model points here for the per-origin counts) | [('vik', 3524), ('national', 2329), ('etr_varna', 763), ('etr_provadia', 244), ('etr_dolni_chiflik', 219), ('field_report', 147), ('pozarna_gz', 99), ('etr_devnya', 78)] | `PYTHONIOENCODING=utf-8 python -c "import json,collections;print(collections.Counter(x.get('origin') for x in json.load(open('data/hydrants.json',encoding='utf-8'))).most_common())"` |
+| Worker deploy version (repo-declared in `worker/README.md`; `worker/DEPLOY_E2.md` says to record it here) | 5accc88e | `sed -n '20p' worker/README.md \| grep -oE '[0-9a-f]{8}'` |
 
 ## Forbidden here
 - `git push`, Worker deploy, any publish — Petar only. Personal data in `data/`, issues or docs (`reporters_private.md` is gitignored on purpose). New runtime/build dependencies, Bulgarian UI wording changes, first load > 5 MB — without Petar's approval. Cross-repo edits from here.
