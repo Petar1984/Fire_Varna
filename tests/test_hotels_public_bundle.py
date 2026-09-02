@@ -1,7 +1,8 @@
 """Plan §5 G1/G2 — SHA-pinned gate for the two published place payloads.
 
 Guards `data/hotels.json` (the 226-record hotel delivery exported from varna_3d on
-23.08.2026) and `data/place_categories.json` (the 264-form / 55-chip category
+23.08.2026, re-exported on 02.09.2026 with quarter/district zones — phase-2 plan §8)
+and `data/place_categories.json` (the 264-form / 55-chip category
 dictionary) that the places branch of the search lazy-loads on first focus. Sibling of
 tests/test_approx_addresses_public_bundle.py, which guards the approximate-address
 bundle the same way.
@@ -41,12 +42,17 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 HOTELS = pathlib.Path(os.environ.get("FIRE_VARNA_HOTELS_PATH") or (REPO / "data" / "hotels.json"))
 CATEGORIES = REPO / "data" / "place_categories.json"
 
-# The tracked LF blobs, measured at C2 (varna_3d HEAD 9f55c08, branch rezhimi):
+# The tracked LF blobs. The dictionary was measured at C2 (varna_3d HEAD 9f55c08, branch
+# rezhimi); the hotels were RE-measured at C11 (HEAD ba78a25, same branch), because
+# phase-2 plan §8 had the delivery regenerated so every hotel carries the quarter/district
+# of the signed `zone_label` ladder instead of one of the six old boxes. Only `zone` moved:
+# comparing the 226 records without that key against the previous blob gives 0 differences
+# (45 zones re-labelled, 10 distinct values → 24).
 #   git -C ../varna_3d show HEAD:data/fire_varna_hotels.json > data/hotels.json
 #   git -C ../varna_3d show HEAD:data/place_categories.json  > data/place_categories.json
-HOTELS_SHA256 = "7205544432f8f4c28289da20eea83ab964b1936864e4922532b4cf4df10d4806"
-HOTELS_BYTES = 78601
-HOTELS_GZIP9 = 8979
+HOTELS_SHA256 = "fd4b6989d63c1f8b7563d1ab9b78f72a0ea0d9fe93386a8080ee64211476a15c"
+HOTELS_BYTES = 78491
+HOTELS_GZIP9 = 9140
 CATEGORIES_SHA256 = "6bf5dd323370cb6be895979ae6a0144da1f29b9231cf684fee696f7cc8d26ce5"
 CATEGORIES_BYTES = 36203
 CATEGORIES_GZIP9 = 4009
@@ -132,6 +138,20 @@ class HotelsBundleTest(unittest.TestCase):
             self.assertIsInstance(lon, (int, float))
             self.assertTrue(min_lat <= lat <= max_lat, rec)
             self.assertTrue(min_lon <= lon <= max_lon, rec)
+
+    def test_zone_is_a_quarter_or_district_label(self):
+        # Phase-2 plan §8: the zone is no longer one of the six closed boxes the old
+        # `zone_of` returned — it is the quarter or district resolved by the `zone_label`
+        # ladder signed at Gate 1b (resort box → the КАИС quarter of the anchored building
+        # → the drawn envelope → the district). 24 distinct values over these 226 records,
+        # and the list moves with every КАИС generation, so pinning them as an enumeration
+        # would pin the generation instead of the contract. What the delivery owes is the
+        # SHAPE: a non-empty label short enough to sit on the meta row of a result.
+        for rec in self.records:
+            zone = rec["zone"]
+            self.assertIsInstance(zone, str, rec.get("name"))
+            self.assertTrue(zone.strip(), rec.get("name"))
+            self.assertLessEqual(len(zone), 60, rec.get("name"))
 
     def test_no_cadastral_identifier_reaches_the_public_payload(self):
         self.assertEqual(sorted(set(_CADASTRAL_RE.findall(self.text))), [])
