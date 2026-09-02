@@ -1,0 +1,2315 @@
+{
+  "mode": "after",
+  "viewport": {
+    "width": 1400,
+    "height": 900,
+    "mobile": false
+  },
+  "pageUrl": "http://localhost:8000/index.html",
+  "corpus": [
+    "бл. 402 вх. 3",
+    "макгахан 15",
+    "макгахан 153",
+    "кв владиславово бл 402",
+    "бл. 402",
+    "чайка",
+    "виница",
+    "43.2100, 27.9100",
+    "ьььь"
+  ],
+  "scenarios": {
+    "cold": {
+      "profileWarm": false,
+      "g3": [
+        {
+          "query": "бл. 402 вх. 3",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 3 · вх. 1</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 2 · вх. 3</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 147 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 149 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. А</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. Б</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Левски, бл. 3 · вх. А</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 3 · вх. 1</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 2 · вх. 3</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 147 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 149 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. А</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. Б</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Левски, бл. 3 · вх. А</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "входкв. Владиславово, бл. 402 · вх. 3район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "1",
+              "text": "входкв. Изгрев, бл. 3 · вх. 1район Приморски",
+              "chip": "вход",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "2",
+              "text": "входкв. Изгрев, бл. 2 · вх. 3район Приморски",
+              "chip": "вход",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "3",
+              "text": "входмладост бл 147 · вх. 3район Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "4",
+              "text": "входмладост бл 149 · вх. 3район Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "5",
+              "text": "входж.к. Победа, бл. 3 · вх. Арайон Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "6",
+              "text": "входж.к. Победа, бл. 3 · вх. Брайон Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "7",
+              "text": "входкв. Левски, бл. 3 · вх. Арайон Приморски",
+              "chip": "вход",
+              "meta": "район Приморски"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25021,27.84162&travelmode=walking",
+                "https://www.google.com/maps?q=43.25021,27.84162",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Изгрев, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23076,27.91095&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23076,27.91095&travelmode=walking",
+                "https://www.google.com/maps?q=43.23076,27.91095",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23076,27.91095"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b02fd254b3e55eccf.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Изгрев, бл. 2",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23107,27.91068&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23107,27.91068&travelmode=walking",
+                "https://www.google.com/maps?q=43.23107,27.91068",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23107,27.91068"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b079e7b522ba2ac71.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "младост бл 147",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22804,27.88348&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22804,27.88348&travelmode=walking",
+                "https://www.google.com/maps?q=43.22804,27.88348",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22804,27.88348"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/bcf4ac73b9c6a6703.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "младост бл 149",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23,27.88128&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23,27.88128&travelmode=walking",
+                "https://www.google.com/maps?q=43.23,27.88128",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23,27.88128"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b13c307ef5687791a.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "5",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "ж.к. Победа, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22573,27.90205&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22573,27.90205&travelmode=walking",
+                "https://www.google.com/maps?q=43.22573,27.90205",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22573,27.90205"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "6",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "ж.к. Победа, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22562,27.90223&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22562,27.90223&travelmode=walking",
+                "https://www.google.com/maps?q=43.22562,27.90223",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22562,27.90223"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "7",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Левски, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.21791,27.92044&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.21791,27.92044&travelmode=walking",
+                "https://www.google.com/maps?q=43.21791,27.92044",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.21791,27.92044"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/bc259f641b7198204.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "макгахан 15",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">парцел</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 15</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">парцел</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 15</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "парцелmakgahan 15район Одесос",
+              "chip": "парцел",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "1",
+              "text": "адресmakgahan 1район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "2",
+              "text": "адресmakgahan 10район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "3",
+              "text": "адресmakgahan 11район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 15",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20562,27.89463&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20562,27.89463&travelmode=walking",
+                "https://www.google.com/maps?q=43.20562,27.89463",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20562,27.89463"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 1",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20623,27.89346&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20623,27.89346&travelmode=walking",
+                "https://www.google.com/maps?q=43.20623,27.89346",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20623,27.89346"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 10",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20574,27.89386&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20574,27.89386&travelmode=walking",
+                "https://www.google.com/maps?q=43.20574,27.89386",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20574,27.89386"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 11",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20564,27.8944&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20564,27.8944&travelmode=walking",
+                "https://www.google.com/maps?q=43.20564,27.8944",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20564,27.8944"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "макгахан 153",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "адресmakgahan 1район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "1",
+              "text": "адресmakgahan 10район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "2",
+              "text": "адресmakgahan 11район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 1",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20623,27.89346&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20623,27.89346&travelmode=walking",
+                "https://www.google.com/maps?q=43.20623,27.89346",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20623,27.89346"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 10",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20574,27.89386&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20574,27.89386&travelmode=walking",
+                "https://www.google.com/maps?q=43.20574,27.89386",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20574,27.89386"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 11",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20564,27.8944&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20564,27.8944&travelmode=walking",
+                "https://www.google.com/maps?q=43.20564,27.8944",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20564,27.8944"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "кв владиславово бл 402",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402 в район Владислав Варненчик</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 17</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 19</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 20</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 25</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402 в район Владислав Варненчик</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 17</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 19</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 20</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 25</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "сградакв. Владиславово, бл. 402район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "1",
+              "text": "сградакв. Владиславово, бл. 17район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "2",
+              "text": "сградакв. Владиславово, бл. 19район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "3",
+              "text": "сградакв. Владиславово, бл. 20район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "4",
+              "text": "сградакв. Владиславово, бл. 25район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24967,27.84243&travelmode=walking",
+                "https://www.google.com/maps?q=43.24967,27.84243",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 17",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24455,27.85035&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24455,27.85035&travelmode=walking",
+                "https://www.google.com/maps?q=43.24455,27.85035",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24455,27.85035"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/be23f14e575d7d45f.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 19",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.2464,27.85083&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.2464,27.85083&travelmode=walking",
+                "https://www.google.com/maps?q=43.2464,27.85083",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2464,27.85083"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b7954a5cebbfe41e6.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 20",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24769,27.8485&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24769,27.8485&travelmode=walking",
+                "https://www.google.com/maps?q=43.24769,27.8485",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24769,27.8485"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b10f03e889696cdfa.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 25",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24832,27.85362&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24832,27.85362&travelmode=walking",
+                "https://www.google.com/maps?q=43.24832,27.85362",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24832,27.85362"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b10a7cfe6276045ff.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "бл. 402",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 1</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 2</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 4</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 5</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 6</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 7</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"8\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 8</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"9\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 9</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 1</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 2</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 4</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 5</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 6</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 7</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"8\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 8</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"9\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 9</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "сградакв. Владиславово, бл. 402район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "1",
+              "text": "входкв. Владиславово, бл. 402 · вх. 1район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "2",
+              "text": "входкв. Владиславово, бл. 402 · вх. 2район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "3",
+              "text": "входкв. Владиславово, бл. 402 · вх. 3район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "4",
+              "text": "входкв. Владиславово, бл. 402 · вх. 4район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "5",
+              "text": "входкв. Владиславово, бл. 402 · вх. 5район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "6",
+              "text": "входкв. Владиславово, бл. 402 · вх. 6район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "7",
+              "text": "входкв. Владиславово, бл. 402 · вх. 7район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "8",
+              "text": "входкв. Владиславово, бл. 402 · вх. 8район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "9",
+              "text": "входкв. Владиславово, бл. 402 · вх. 9район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24967,27.84243&travelmode=walking",
+                "https://www.google.com/maps?q=43.24967,27.84243",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24988,27.84151&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24988,27.84151&travelmode=walking",
+                "https://www.google.com/maps?q=43.24988,27.84151",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24988,27.84151"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25004,27.84158&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25004,27.84158&travelmode=walking",
+                "https://www.google.com/maps?q=43.25004,27.84158",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25004,27.84158"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25021,27.84162&travelmode=walking",
+                "https://www.google.com/maps?q=43.25021,27.84162",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25035,27.84176&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25035,27.84176&travelmode=walking",
+                "https://www.google.com/maps?q=43.25035,27.84176",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25035,27.84176"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "5",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25048,27.8419&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25048,27.8419&travelmode=walking",
+                "https://www.google.com/maps?q=43.25048,27.8419",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25048,27.8419"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "6",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25062,27.842&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25062,27.842&travelmode=walking",
+                "https://www.google.com/maps?q=43.25062,27.842",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25062,27.842"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "7",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.2507,27.84229&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.2507,27.84229&travelmode=walking",
+                "https://www.google.com/maps?q=43.2507,27.84229",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2507,27.84229"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "8",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25064,27.84249&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25064,27.84249&travelmode=walking",
+                "https://www.google.com/maps?q=43.25064,27.84249",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25064,27.84249"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "9",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25059,27.84271&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25059,27.84271&travelmode=walking",
+                "https://www.google.com/maps?q=43.25059,27.84271",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25059,27.84271"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "чайка",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">чайка</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">чайка</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "адресчайкарайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "чайка",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24788,28.02765&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24788,28.02765&travelmode=walking",
+                "https://www.google.com/maps?q=43.24788,28.02765",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24788,28.02765"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "виница",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">383</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">акчелар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">ваялар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">кв виница</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">неизвестна</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">383</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">акчелар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">ваялар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">кв виница</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">неизвестна</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "адрес383район Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "1",
+              "text": "адресакчеларрайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "2",
+              "text": "адресваяларрайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "3",
+              "text": "адрескв виницарайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "4",
+              "text": "адреснеизвестнарайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "383",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22899,27.95581&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22899,27.95581&travelmode=walking",
+                "https://www.google.com/maps?q=43.22899,27.95581",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22899,27.95581"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "акчелар",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22505,27.93947&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22505,27.93947&travelmode=walking",
+                "https://www.google.com/maps?q=43.22505,27.93947",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22505,27.93947"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "ваялар",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22873,27.96844&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22873,27.96844&travelmode=walking",
+                "https://www.google.com/maps?q=43.22873,27.96844",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22873,27.96844"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "кв виница",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23508,27.98245&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23508,27.98245&travelmode=walking",
+                "https://www.google.com/maps?q=43.23508,27.98245",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23508,27.98245"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "неизвестна",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22507,27.96051&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22507,27.96051&travelmode=walking",
+                "https://www.google.com/maps?q=43.22507,27.96051",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22507,27.96051"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "43.2100, 27.9100",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind gps\">GPS</span><span class=\"asr-body\"><span class=\"asr-title\">43.21000, 27.91000</span><span class=\"asr-meta\">≈ 24 м от Хаджи ст сидеров 35</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind gps\">GPS</span><span class=\"asr-body\"><span class=\"asr-title\">43.21000, 27.91000</span><span class=\"asr-meta\">≈ 24 м от Хаджи ст сидеров 35</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "GPS43.21000, 27.91000≈ 24 м от Хаджи ст сидеров 35",
+              "chip": "GPS",
+              "meta": "≈ 24 м от Хаджи ст сидеров 35"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "GPS 43.21000, 27.91000",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.21,27.91&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.21,27.91&travelmode=walking",
+                "https://www.google.com/maps?q=43.21,27.91",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.21,27.91"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "ьььь",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-status\">Няма съвпадения</div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-status\">Няма съвпадения</div></div>",
+          "rows": [],
+          "clicks": []
+        }
+      ]
+    },
+    "warm": {
+      "profileWarm": true,
+      "g3": [
+        {
+          "query": "бл. 402 вх. 3",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 3 · вх. 1</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 2 · вх. 3</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 147 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 149 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. А</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. Б</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Левски, бл. 3 · вх. А</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 3 · вх. 1</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Изгрев, бл. 2 · вх. 3</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 147 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">младост бл 149 · вх. 3</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. А</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">ж.к. Победа, бл. 3 · вх. Б</span><span class=\"asr-meta\">район Младост</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Левски, бл. 3 · вх. А</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "входкв. Владиславово, бл. 402 · вх. 3район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "1",
+              "text": "входкв. Изгрев, бл. 3 · вх. 1район Приморски",
+              "chip": "вход",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "2",
+              "text": "входкв. Изгрев, бл. 2 · вх. 3район Приморски",
+              "chip": "вход",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "3",
+              "text": "входмладост бл 147 · вх. 3район Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "4",
+              "text": "входмладост бл 149 · вх. 3район Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "5",
+              "text": "входж.к. Победа, бл. 3 · вх. Арайон Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "6",
+              "text": "входж.к. Победа, бл. 3 · вх. Брайон Младост",
+              "chip": "вход",
+              "meta": "район Младост"
+            },
+            {
+              "idx": "7",
+              "text": "входкв. Левски, бл. 3 · вх. Арайон Приморски",
+              "chip": "вход",
+              "meta": "район Приморски"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25021,27.84162&travelmode=walking",
+                "https://www.google.com/maps?q=43.25021,27.84162",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Изгрев, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23076,27.91095&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23076,27.91095&travelmode=walking",
+                "https://www.google.com/maps?q=43.23076,27.91095",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23076,27.91095"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b02fd254b3e55eccf.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Изгрев, бл. 2",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23107,27.91068&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23107,27.91068&travelmode=walking",
+                "https://www.google.com/maps?q=43.23107,27.91068",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23107,27.91068"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b079e7b522ba2ac71.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "младост бл 147",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22804,27.88348&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22804,27.88348&travelmode=walking",
+                "https://www.google.com/maps?q=43.22804,27.88348",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22804,27.88348"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/bcf4ac73b9c6a6703.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "младост бл 149",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23,27.88128&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23,27.88128&travelmode=walking",
+                "https://www.google.com/maps?q=43.23,27.88128",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23,27.88128"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b13c307ef5687791a.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "5",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "ж.к. Победа, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22573,27.90205&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22573,27.90205&travelmode=walking",
+                "https://www.google.com/maps?q=43.22573,27.90205",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22573,27.90205"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "6",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "ж.к. Победа, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22562,27.90223&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22562,27.90223&travelmode=walking",
+                "https://www.google.com/maps?q=43.22562,27.90223",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22562,27.90223"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "7",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Левски, бл. 3",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.21791,27.92044&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.21791,27.92044&travelmode=walking",
+                "https://www.google.com/maps?q=43.21791,27.92044",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.21791,27.92044"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/bc259f641b7198204.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "макгахан 15",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">парцел</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 15</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">парцел</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 15</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "парцелmakgahan 15район Одесос",
+              "chip": "парцел",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "1",
+              "text": "адресmakgahan 1район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "2",
+              "text": "адресmakgahan 10район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "3",
+              "text": "адресmakgahan 11район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 15",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20562,27.89463&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20562,27.89463&travelmode=walking",
+                "https://www.google.com/maps?q=43.20562,27.89463",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20562,27.89463"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 1",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20623,27.89346&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20623,27.89346&travelmode=walking",
+                "https://www.google.com/maps?q=43.20623,27.89346",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20623,27.89346"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 10",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20574,27.89386&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20574,27.89386&travelmode=walking",
+                "https://www.google.com/maps?q=43.20574,27.89386",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20574,27.89386"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 11",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20564,27.8944&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20564,27.8944&travelmode=walking",
+                "https://www.google.com/maps?q=43.20564,27.8944",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20564,27.8944"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "макгахан 153",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 1</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 10</span><span class=\"asr-meta\">район Одесос</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">makgahan 11</span><span class=\"asr-meta\">район Одесос</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "адресmakgahan 1район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "1",
+              "text": "адресmakgahan 10район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            },
+            {
+              "idx": "2",
+              "text": "адресmakgahan 11район Одесос",
+              "chip": "адрес",
+              "meta": "район Одесос"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 1",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20623,27.89346&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20623,27.89346&travelmode=walking",
+                "https://www.google.com/maps?q=43.20623,27.89346",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20623,27.89346"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 10",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20574,27.89386&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20574,27.89386&travelmode=walking",
+                "https://www.google.com/maps?q=43.20574,27.89386",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20574,27.89386"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "makgahan 11",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.20564,27.8944&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.20564,27.8944&travelmode=walking",
+                "https://www.google.com/maps?q=43.20564,27.8944",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.20564,27.8944"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "кв владиславово бл 402",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402 в район Владислав Варненчик</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 17</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 19</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 20</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 25</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402 в район Владислав Варненчик</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 17</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 19</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 20</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 25</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "сградакв. Владиславово, бл. 402район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "1",
+              "text": "сградакв. Владиславово, бл. 17район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "2",
+              "text": "сградакв. Владиславово, бл. 19район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "3",
+              "text": "сградакв. Владиславово, бл. 20район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "4",
+              "text": "сградакв. Владиславово, бл. 25район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24967,27.84243&travelmode=walking",
+                "https://www.google.com/maps?q=43.24967,27.84243",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 17",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24455,27.85035&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24455,27.85035&travelmode=walking",
+                "https://www.google.com/maps?q=43.24455,27.85035",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24455,27.85035"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/be23f14e575d7d45f.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 19",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.2464,27.85083&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.2464,27.85083&travelmode=walking",
+                "https://www.google.com/maps?q=43.2464,27.85083",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2464,27.85083"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b7954a5cebbfe41e6.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 20",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24769,27.8485&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24769,27.8485&travelmode=walking",
+                "https://www.google.com/maps?q=43.24769,27.8485",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24769,27.8485"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b10f03e889696cdfa.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 25",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24832,27.85362&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24832,27.85362&travelmode=walking",
+                "https://www.google.com/maps?q=43.24832,27.85362",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24832,27.85362"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b10a7cfe6276045ff.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "бл. 402",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 1</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 2</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 4</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 5</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 6</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 7</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"8\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 8</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"9\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 9</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 1</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 2</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 4</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 5</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 6</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 7</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"8\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 8</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"9\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 9</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "сградакв. Владиславово, бл. 402район Владислав Варненчик",
+              "chip": "сграда",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "1",
+              "text": "входкв. Владиславово, бл. 402 · вх. 1район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "2",
+              "text": "входкв. Владиславово, бл. 402 · вх. 2район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "3",
+              "text": "входкв. Владиславово, бл. 402 · вх. 3район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "4",
+              "text": "входкв. Владиславово, бл. 402 · вх. 4район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "5",
+              "text": "входкв. Владиславово, бл. 402 · вх. 5район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "6",
+              "text": "входкв. Владиславово, бл. 402 · вх. 6район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "7",
+              "text": "входкв. Владиславово, бл. 402 · вх. 7район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "8",
+              "text": "входкв. Владиславово, бл. 402 · вх. 8район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            },
+            {
+              "idx": "9",
+              "text": "входкв. Владиславово, бл. 402 · вх. 9район Владислав Варненчик",
+              "chip": "вход",
+              "meta": "район Владислав Варненчик"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24967,27.84243&travelmode=walking",
+                "https://www.google.com/maps?q=43.24967,27.84243",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24988,27.84151&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24988,27.84151&travelmode=walking",
+                "https://www.google.com/maps?q=43.24988,27.84151",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24988,27.84151"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25004,27.84158&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25004,27.84158&travelmode=walking",
+                "https://www.google.com/maps?q=43.25004,27.84158",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25004,27.84158"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25021,27.84162&travelmode=walking",
+                "https://www.google.com/maps?q=43.25021,27.84162",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25035,27.84176&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25035,27.84176&travelmode=walking",
+                "https://www.google.com/maps?q=43.25035,27.84176",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25035,27.84176"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "5",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25048,27.8419&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25048,27.8419&travelmode=walking",
+                "https://www.google.com/maps?q=43.25048,27.8419",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25048,27.8419"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "6",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25062,27.842&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25062,27.842&travelmode=walking",
+                "https://www.google.com/maps?q=43.25062,27.842",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25062,27.842"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "7",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.2507,27.84229&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.2507,27.84229&travelmode=walking",
+                "https://www.google.com/maps?q=43.2507,27.84229",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2507,27.84229"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "8",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25064,27.84249&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25064,27.84249&travelmode=walking",
+                "https://www.google.com/maps?q=43.25064,27.84249",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25064,27.84249"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "9",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "sheet",
+              "title": "кв. Владиславово, бл. 402",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.25059,27.84271&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.25059,27.84271&travelmode=walking",
+                "https://www.google.com/maps?q=43.25059,27.84271",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25059,27.84271"
+              ],
+              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "pinRect": {
+                "x": 513,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "чайка",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">чайка</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">чайка</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "адресчайкарайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "чайка",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.24788,28.02765&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.24788,28.02765&travelmode=walking",
+                "https://www.google.com/maps?q=43.24788,28.02765",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24788,28.02765"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "виница",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">383</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">акчелар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">ваялар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">кв виница</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">неизвестна</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">383</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">акчелар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">ваялар</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">кв виница</span><span class=\"asr-meta\">район Приморски</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind complex\">адрес</span><span class=\"asr-body\"><span class=\"asr-title\">неизвестна</span><span class=\"asr-meta\">район Приморски</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "адрес383район Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "1",
+              "text": "адресакчеларрайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "2",
+              "text": "адресваяларрайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "3",
+              "text": "адрескв виницарайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            },
+            {
+              "idx": "4",
+              "text": "адреснеизвестнарайон Приморски",
+              "chip": "адрес",
+              "meta": "район Приморски"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "383",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22899,27.95581&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22899,27.95581&travelmode=walking",
+                "https://www.google.com/maps?q=43.22899,27.95581",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22899,27.95581"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "1",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "акчелар",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22505,27.93947&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22505,27.93947&travelmode=walking",
+                "https://www.google.com/maps?q=43.22505,27.93947",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22505,27.93947"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "2",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "ваялар",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22873,27.96844&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22873,27.96844&travelmode=walking",
+                "https://www.google.com/maps?q=43.22873,27.96844",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22873,27.96844"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "3",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "кв виница",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.23508,27.98245&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.23508,27.98245&travelmode=walking",
+                "https://www.google.com/maps?q=43.23508,27.98245",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23508,27.98245"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            },
+            {
+              "idx": "4",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "неизвестна",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.22507,27.96051&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.22507,27.96051&travelmode=walking",
+                "https://www.google.com/maps?q=43.22507,27.96051",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22507,27.96051"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "43.2100, 27.9100",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind gps\">GPS</span><span class=\"asr-body\"><span class=\"asr-title\">43.21000, 27.91000</span><span class=\"asr-meta\">≈ 24 м от Хаджи ст сидеров 35</span></span></div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind gps\">GPS</span><span class=\"asr-body\"><span class=\"asr-title\">43.21000, 27.91000</span><span class=\"asr-meta\">≈ 24 м от Хаджи ст сидеров 35</span></span></div></div>",
+          "rows": [
+            {
+              "idx": "0",
+              "text": "GPS43.21000, 27.91000≈ 24 м от Хаджи ст сидеров 35",
+              "chip": "GPS",
+              "meta": "≈ 24 м от Хаджи ст сидеров 35"
+            }
+          ],
+          "clicks": [
+            {
+              "idx": "0",
+              "clicked": true,
+              "surfaceAppeared": true,
+              "surface": "popup",
+              "title": "GPS 43.21000, 27.91000",
+              "navHrefs": [
+                "https://waze.com/ul?ll=43.21,27.91&navigate=yes",
+                "https://www.google.com/maps/dir/?api=1&destination=43.21,27.91&travelmode=walking",
+                "https://www.google.com/maps?q=43.21,27.91",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.21,27.91"
+              ],
+              "detailUrl": null,
+              "pinRect": {
+                "x": 691,
+                "y": 516,
+                "w": 18,
+                "h": 18
+              }
+            }
+          ]
+        },
+        {
+          "query": "ьььь",
+          "intermediate": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-status\">Няма съвпадения</div></div>",
+          "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-status\">Няма съвпадения</div></div>",
+          "rows": [],
+          "clicks": []
+        }
+      ]
+    },
+    "heldIndex": {
+      "query": "бл. 402",
+      "indexHeld": true,
+      "duringHold": [
+        "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>"
+      ],
+      "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 1</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 2</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 4</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 5</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 6</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 7</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"8\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 8</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"9\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 9</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+      "rows": [
+        {
+          "idx": "0",
+          "text": "сградакв. Владиславово, бл. 402район Владислав Варненчик",
+          "chip": "сграда",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "1",
+          "text": "входкв. Владиславово, бл. 402 · вх. 1район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "2",
+          "text": "входкв. Владиславово, бл. 402 · вх. 2район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "3",
+          "text": "входкв. Владиславово, бл. 402 · вх. 3район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "4",
+          "text": "входкв. Владиславово, бл. 402 · вх. 4район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "5",
+          "text": "входкв. Владиславово, бл. 402 · вх. 5район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "6",
+          "text": "входкв. Владиславово, бл. 402 · вх. 6район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "7",
+          "text": "входкв. Владиславово, бл. 402 · вх. 7район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "8",
+          "text": "входкв. Владиславово, бл. 402 · вх. 8район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "9",
+          "text": "входкв. Владиславово, бл. 402 · вх. 9район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        }
+      ]
+    },
+    "offlineIndex": {
+      "query": "бл. 402",
+      "indexRequestFailed": true,
+      "settled": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 1</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 2</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 4</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 5</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 6</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 7</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"8\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 8</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"9\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 9</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+      "rows": [
+        {
+          "idx": "0",
+          "text": "сградакв. Владиславово, бл. 402район Владислав Варненчик",
+          "chip": "сграда",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "1",
+          "text": "входкв. Владиславово, бл. 402 · вх. 1район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "2",
+          "text": "входкв. Владиславово, бл. 402 · вх. 2район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "3",
+          "text": "входкв. Владиславово, бл. 402 · вх. 3район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "4",
+          "text": "входкв. Владиславово, бл. 402 · вх. 4район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "5",
+          "text": "входкв. Владиславово, бл. 402 · вх. 5район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "6",
+          "text": "входкв. Владиславово, бл. 402 · вх. 6район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "7",
+          "text": "входкв. Владиславово, бл. 402 · вх. 7район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "8",
+          "text": "входкв. Владиславово, бл. 402 · вх. 8район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        },
+        {
+          "idx": "9",
+          "text": "входкв. Владиславово, бл. 402 · вх. 9район Владислав Варненчик",
+          "chip": "вход",
+          "meta": "район Владислав Варненчик"
+        }
+      ]
+    },
+    "enterBeforeFetch": {
+      "query": "бл. 402",
+      "settled": "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>",
+      "rows": [],
+      "surface": "sheet",
+      "title": "кв. Владиславово, бл. 402",
+      "navHrefs": [
+        "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
+        "https://www.google.com/maps/dir/?api=1&destination=43.24967,27.84243&travelmode=walking",
+        "https://www.google.com/maps?q=43.24967,27.84243",
+        "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
+      ],
+      "pinRect": {
+        "x": 513,
+        "y": 516,
+        "w": 18,
+        "h": 18
+      }
+    },
+    "outsideClick": {
+      "query": "бл. 402",
+      "clickPoint": {
+        "x": 700,
+        "y": 450
+      },
+      "visibleBefore": true,
+      "htmlBefore": "<div id=\"addrSearchResults\" class=\"search-results visible\" role=\"listbox\" aria-label=\"Резултати от търсенето\"><div class=\"asr-group-header\">1 блок № 402</div><div class=\"asr-item\" role=\"option\" data-idx=\"0\"><span class=\"asr-kind complex\">сграда</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"1\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 1</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"2\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 2</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"3\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 3</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"4\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 4</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"5\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 5</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"6\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 6</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"7\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 7</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"8\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 8</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div><div class=\"asr-item\" role=\"option\" data-idx=\"9\"><span class=\"asr-kind entrance\">вход</span><span class=\"asr-body\"><span class=\"asr-title\">кв. Владиславово, бл. 402 · вх. 9</span><span class=\"asr-meta\">район Владислав Варненчик</span></span></div></div>",
+      "visibleAfter": false,
+      "htmlAfter": "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>",
+      "leafletPopupAfter": true
+    },
+    "emptyField": {
+      "query": "бл. 402",
+      "selected": {
+        "idx": "0",
+        "clicked": true,
+        "surfaceAppeared": true,
+        "surface": "sheet",
+        "title": "кв. Владиславово, бл. 402",
+        "navHrefs": [
+          "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
+          "https://www.google.com/maps/dir/?api=1&destination=43.24967,27.84243&travelmode=walking",
+          "https://www.google.com/maps?q=43.24967,27.84243",
+          "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
+        ],
+        "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+        "pinRect": {
+          "x": 513,
+          "y": 516,
+          "w": 18,
+          "h": 18
+        }
+      },
+      "pinBeforeClear": {
+        "x": 513,
+        "y": 516,
+        "w": 18,
+        "h": 18
+      },
+      "visibleAfterClear": false,
+      "htmlAfterClear": "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>",
+      "pinAfterClear": null
+    }
+  },
+  "errs": []
+}

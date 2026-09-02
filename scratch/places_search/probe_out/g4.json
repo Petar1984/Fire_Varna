@@ -1,0 +1,2342 @@
+{
+  "ready": true,
+  "shaPins": [
+    {
+      "constant": "HOTELS_SHA256",
+      "file": "data/hotels.json",
+      "pinned": "7205544432f8f4c28289da20eea83ab964b1936864e4922532b4cf4df10d4806",
+      "actual": "7205544432f8f4c28289da20eea83ab964b1936864e4922532b4cf4df10d4806",
+      "ok": true
+    },
+    {
+      "constant": "CATS_SHA256",
+      "file": "data/place_categories.json",
+      "pinned": "6bf5dd323370cb6be895979ae6a0144da1f29b9231cf684fee696f7cc8d26ce5",
+      "actual": "6bf5dd323370cb6be895979ae6a0144da1f29b9231cf684fee696f7cc8d26ce5",
+      "ok": true
+    }
+  ],
+  "tokens": {
+    "rows": [
+      {
+        "q": "VII СУ „Найден Геров“",
+        "expected": [
+          "7",
+          "su",
+          "naiden",
+          "gerov"
+        ],
+        "got": [
+          "7",
+          "su",
+          "naiden",
+          "gerov"
+        ],
+        "ok": true
+      },
+      {
+        "q": "седмо су",
+        "expected": [
+          "7",
+          "su"
+        ],
+        "got": [
+          "7",
+          "su"
+        ],
+        "ok": true
+      },
+      {
+        "q": "7-мо су",
+        "expected": [
+          "7",
+          "su"
+        ],
+        "got": [
+          "7",
+          "su"
+        ],
+        "ok": true
+      },
+      {
+        "q": "І ОУ „Свети княз Борис I“",
+        "expected": [
+          "1",
+          "ou",
+          "sveti",
+          "kniaz",
+          "boris",
+          "1"
+        ],
+        "got": [
+          "1",
+          "ou",
+          "sveti",
+          "kniaz",
+          "boris",
+          "1"
+        ],
+        "ok": true
+      },
+      {
+        "q": "св. марина",
+        "expected": [
+          "sveti",
+          "marina"
+        ],
+        "got": [
+          "sveti",
+          "marina"
+        ],
+        "ok": true
+      },
+      {
+        "q": "д-р иванов",
+        "expected": [
+          "doktor",
+          "ivanov"
+        ],
+        "got": [
+          "doktor",
+          "ivanov"
+        ],
+        "ok": true
+      },
+      {
+        "q": "БОНИТА/BONITA",
+        "expected": [
+          "bonita",
+          "bonita"
+        ],
+        "got": [
+          "bonita",
+          "bonita"
+        ],
+        "ok": true
+      },
+      {
+        "q": "х-л романтика",
+        "expected": [
+          "hotel",
+          "romantika"
+        ],
+        "got": [
+          "hotel",
+          "romantika"
+        ],
+        "ok": true
+      },
+      {
+        "q": "ДКЦ 2",
+        "expected": [
+          "dkts",
+          "2"
+        ],
+        "got": [
+          "dkts",
+          "2"
+        ],
+        "ok": true
+      },
+      {
+        "q": "II ДКЦ",
+        "expected": [
+          "2",
+          "dkts"
+        ],
+        "got": [
+          "2",
+          "dkts"
+        ],
+        "ok": true
+      },
+      {
+        "q": "Зл.котва",
+        "expected": [
+          "zl",
+          "kotva"
+        ],
+        "got": [
+          "zl",
+          "kotva"
+        ],
+        "ok": true
+      },
+      {
+        "q": "Иглика-2",
+        "expected": [
+          "iglika",
+          "2"
+        ],
+        "got": [
+          "iglika",
+          "2"
+        ],
+        "ok": true
+      },
+      {
+        "q": "ХОТЕЛ  ХЕЛИОС СПА",
+        "expected": [
+          "hotel",
+          "helios",
+          "spa"
+        ],
+        "got": [
+          "hotel",
+          "helios",
+          "spa"
+        ],
+        "ok": true
+      },
+      {
+        "q": "Св.Николай",
+        "expected": [
+          "sveti",
+          "nikolai"
+        ],
+        "got": [
+          "sveti",
+          "nikolai"
+        ],
+        "ok": true
+      },
+      {
+        "q": "Св.св.Кирил",
+        "expected": [
+          "sveti",
+          "sveti",
+          "kiril"
+        ],
+        "got": [
+          "sveti",
+          "sveti",
+          "kiril"
+        ],
+        "ok": true
+      },
+      {
+        "q": "Др Хараламбиев",
+        "expected": [
+          "doktor",
+          "haralambiev"
+        ],
+        "got": [
+          "doktor",
+          "haralambiev"
+        ],
+        "ok": true
+      },
+      {
+        "q": "апартхотел",
+        "expected": [
+          "apart",
+          "hotel"
+        ],
+        "got": [
+          "apart",
+          "hotel"
+        ],
+        "ok": true
+      },
+      {
+        "q": "апарткомплекс",
+        "expected": [
+          "apart",
+          "kompleks"
+        ],
+        "got": [
+          "apart",
+          "kompleks"
+        ],
+        "ok": true
+      }
+    ],
+    "passed": 18,
+    "total": 18,
+    "rowsInTest": 18
+  },
+  "reference": {
+    "mode": "ordered",
+    "queries": [
+      {
+        "q": "хотел адмирал",
+        "expect": "3 реда: АДМИРАЛ (Златни), Адмирал (Св. Константин), АМИРАЛ (Приморски)",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "refFirst3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "адмирал",
+        "expect": "същите 3",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "refFirst3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел адмиралл",
+        "expect": "3",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "refFirst3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел амирал",
+        "expect": "3",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "АМИРАЛ · район Приморски",
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "АМИРАЛ · район Приморски",
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "адмирал златни",
+        "expect": "А8: точно 3, АДМИРАЛ (Златни) първи",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "Адмирал · к.к. Св. Константин",
+          "АМИРАЛ · район Приморски"
+        ],
+        "refFirst3": [
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "Адмирал · к.к. Св. Константин",
+          "АМИРАЛ · район Приморски"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел адмирал златни пясъци",
+        "expect": "А8: точно 3, АДМИРАЛ (Златни) първи",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "Адмирал · к.к. Св. Константин",
+          "АМИРАЛ · район Приморски"
+        ],
+        "refFirst3": [
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "Адмирал · к.к. Св. Константин",
+          "АМИРАЛ · район Приморски"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотели",
+        "expect": "А8: 226",
+        "bucket": "gate_m5_a8",
+        "category": true,
+        "n": 226,
+        "refN": 226,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "КАМПУС 90 · район Приморски",
+          "Орбита · район Одесос",
+          "РЕВЕРАНС · район Одесос"
+        ],
+        "refFirst3": [
+          "КАМПУС 90 · район Приморски",
+          "Орбита · район Одесос",
+          "РЕВЕРАНС · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел",
+        "expect": "категорийният списък (226)",
+        "bucket": "gate_m5_a8",
+        "category": true,
+        "n": 226,
+        "refN": 226,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "КАМПУС 90 · район Приморски",
+          "Орбита · район Одесос",
+          "РЕВЕРАНС · район Одесос"
+        ],
+        "refFirst3": [
+          "КАМПУС 90 · район Приморски",
+          "Орбита · район Одесос",
+          "РЕВЕРАНС · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотелите",
+        "expect": "А8: 226",
+        "bucket": "gate_m5_a8",
+        "category": true,
+        "n": 226,
+        "refN": 226,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "КАМПУС 90 · район Приморски",
+          "Орбита · район Одесос",
+          "РЕВЕРАНС · район Одесос"
+        ],
+        "refFirst3": [
+          "КАМПУС 90 · район Приморски",
+          "Орбита · район Одесос",
+          "РЕВЕРАНС · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "семеен хотел",
+        "expect": "само семейните (50)",
+        "bucket": "gate_m5_a8",
+        "category": true,
+        "n": 50,
+        "refN": 50,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Каприз · район Одесос",
+          "Перфект · район Одесос",
+          "Дивеста · район Одесос"
+        ],
+        "refFirst3": [
+          "Каприз · район Одесос",
+          "Перфект · район Одесос",
+          "Дивеста · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел златни",
+        "expect": "А8: 85",
+        "bucket": "gate_m5_a8",
+        "category": true,
+        "n": 85,
+        "refN": 85,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Меркурий · к.к. Златни пясъци",
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АПОЛО РИЗОРТ · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "Меркурий · к.к. Златни пясъци",
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АПОЛО РИЗОРТ · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "берлин голдън бийч",
+        "expect": "А8: първият ред БЕРЛИН ГОЛДЪН БИЙЧ (16 реда общо)",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 16,
+        "refN": 16,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+          "ПАРК ХОТЕЛ ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+          "СИРИУС БИЙЧ · к.к. Св. Константин"
+        ],
+        "refFirst3": [
+          "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+          "ПАРК ХОТЕЛ ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+          "СИРИУС БИЙЧ · к.к. Св. Константин"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "лти берлин",
+        "expect": "А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 2,
+        "refN": 2,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+          "БЕРЛИН ГРИЙН ПАРК · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+          "БЕРЛИН ГРИЙН ПАРК · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "lti",
+        "expect": "А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "роял",
+        "expect": "А8: РОЯЛ (Одесос), РОЯЛ (Златни), после Royal Beach; размита опашка ОК",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 4,
+        "refN": 4,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "РОЯЛ · район Одесос",
+          "РОЯЛ · к.к. Златни пясъци",
+          "Royal Beach · к.к. Чайка"
+        ],
+        "refFirst3": [
+          "РОЯЛ · район Одесос",
+          "РОЯЛ · к.к. Златни пясъци",
+          "Royal Beach · к.к. Чайка"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "royal",
+        "expect": "А8: същите 3 в същия ред; размита опашка ОК",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 4,
+        "refN": 4,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "РОЯЛ · район Одесос",
+          "РОЯЛ · к.к. Златни пясъци",
+          "Royal Beach · к.к. Чайка"
+        ],
+        "refFirst3": [
+          "РОЯЛ · район Одесос",
+          "РОЯЛ · к.к. Златни пясъци",
+          "Royal Beach · к.к. Чайка"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "синчец",
+        "expect": "ДАНА ПАЛАС",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ДАНА ПАЛАС · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "ДАНА ПАЛАС · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел синчец",
+        "expect": "ДАНА ПАЛАС",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ДАНА ПАЛАС · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "ДАНА ПАЛАС · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "русалка",
+        "expect": "А8: РУСАЛКА (Виница/север), Русалка (Св. К.) „· бивш“ първи; размита опашка ОК",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "РУСАЛКА · Виница/север",
+          "Русалка · к.к. Св. Константин",
+          "M Hostel Musala · район Одесос"
+        ],
+        "refFirst3": [
+          "РУСАЛКА · Виница/север",
+          "Русалка · к.к. Св. Константин",
+          "M Hostel Musala · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "бонита",
+        "expect": "БОНИТА/BONITA",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "БОНИТА/BONITA · к.к. Златни пясъци",
+          "Бендита · к.к. Златни пясъци",
+          "Hotel Bona Vita · Виница/север"
+        ],
+        "refFirst3": [
+          "БОНИТА/BONITA · к.к. Златни пясъци",
+          "Бендита · к.к. Златни пясъци",
+          "Hotel Bona Vita · Виница/север"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "bonita",
+        "expect": "БОНИТА/BONITA",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "БОНИТА/BONITA · к.к. Златни пясъци",
+          "Бендита · к.к. Златни пясъци",
+          "Hotel Bona Vita · Виница/север"
+        ],
+        "refFirst3": [
+          "БОНИТА/BONITA · к.к. Златни пясъци",
+          "Бендита · к.к. Златни пясъци",
+          "Hotel Bona Vita · Виница/север"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хелиос спа",
+        "expect": "ХОТЕЛ  ХЕЛИОС СПА",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АЗАЛИЯ МЕДИКЪЛ СПА · к.к. Св. Константин",
+          "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ · к.к. Св. Константин"
+        ],
+        "refFirst3": [
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АЗАЛИЯ МЕДИКЪЛ СПА · к.к. Св. Константин",
+          "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ · к.к. Св. Константин"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "спа хелиос",
+        "expect": "ХОТЕЛ  ХЕЛИОС СПА",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АЗАЛИЯ МЕДИКЪЛ СПА · к.к. Св. Константин",
+          "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ · к.к. Св. Константин"
+        ],
+        "refFirst3": [
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АЗАЛИЯ МЕДИКЪЛ СПА · к.к. Св. Константин",
+          "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ · к.к. Св. Константин"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "парк",
+        "expect": "А8 (поправено като факт): 19 реда — първите 12 с точно „ПАРК“, после 7 размити",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 19,
+        "refN": 19,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "КИНИ ПАРК · к.к. Чайка",
+          "ХОЛИДЕЙ ПАРК · к.к. Чайка",
+          "ДЖОЯ ПАРК · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "КИНИ ПАРК · к.к. Чайка",
+          "ХОЛИДЕЙ ПАРК · к.к. Чайка",
+          "ДЖОЯ ПАРК · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "градина",
+        "expect": "А8: хотел ГРАДИНА",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ГРАДИНА · к.к. Чайка"
+        ],
+        "refFirst3": [
+          "ГРАДИНА · к.к. Чайка"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "блок с",
+        "expect": "0 наши реда",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "402",
+        "expect": "0 наши реда",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "бл. 402",
+        "expect": "0 наши реда",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "вх 3",
+        "expect": "0 наши реда",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "ьььь",
+        "expect": "0 наши реда",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "7 су",
+        "expect": "А8: 0",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "седмо су",
+        "expect": "А8: 0",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "vii су",
+        "expect": "А8: 0",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "дкц 2",
+        "expect": "§3 М5: 0 (А8 мълчи)",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "болница света марина",
+        "expect": "§3 М5: 0 (А8 мълчи)",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "градина 12",
+        "expect": "§3 М5: 0 (А8 мълчи)",
+        "bucket": "gate_m5_a8",
+        "category": false,
+        "n": 0,
+        "refN": 0,
+        "ordered": true,
+        "sets": true,
+        "first3": [],
+        "refFirst3": [],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел йо",
+        "expect": "Йо",
+        "bucket": "extra",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Йо · к.к. Св. Константин"
+        ],
+        "refFirst3": [
+          "Йо · к.к. Св. Константин"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел градина",
+        "expect": "ГРАДИНА",
+        "bucket": "extra",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ГРАДИНА · к.к. Чайка"
+        ],
+        "refFirst3": [
+          "ГРАДИНА · к.к. Чайка"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел семеен",
+        "expect": "50",
+        "bucket": "extra",
+        "category": true,
+        "n": 50,
+        "refN": 50,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Каприз · район Одесос",
+          "Перфект · район Одесос",
+          "Дивеста · район Одесос"
+        ],
+        "refFirst3": [
+          "Каприз · район Одесос",
+          "Перфект · район Одесос",
+          "Дивеста · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел адмирал",
+        "expect": "3, най-близкият (от точните) първи",
+        "bucket": "extra",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "refFirst3": [
+          "Адмирал · к.к. Св. Константин",
+          "АДМИРАЛ · к.к. Златни пясъци",
+          "АМИРАЛ · район Приморски"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "аквапарк клуб",
+        "expect": "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ",
+        "bucket": "extra",
+        "category": false,
+        "n": 3,
+        "refN": 3,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · к.к. Златни пясъци",
+          "ПРЕСТИЖ ХОТЕЛ И АКВАПАРК · к.к. Златни пясъци",
+          "ПРЕСТИЖ ГРАНД ХОТЕЛ И АКВАПАРК · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · к.к. Златни пясъци",
+          "ПРЕСТИЖ ХОТЕЛ И АКВАПАРК · к.к. Златни пясъци",
+          "ПРЕСТИЖ ГРАНД ХОТЕЛ И АКВАПАРК · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "ritsa",
+        "expect": "Апарт комплекс Ritsa / „Рица“",
+        "bucket": "extra",
+        "category": false,
+        "n": 5,
+        "refN": 5,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Апарт комплекс Ritsa / „Рица“ · к.к. Св. Константин",
+          "Елица · район Одесос",
+          "РИВА · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "Апарт комплекс Ritsa / „Рица“ · к.к. Св. Константин",
+          "Елица · район Одесос",
+          "РИВА · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "арабела блок с",
+        "expect": "АРАБЕЛА",
+        "bucket": "extra",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "АРАБЕЛА · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "АРАБЕЛА · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "арабела",
+        "expect": "АРАБЕЛА",
+        "bucket": "extra",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "АРАБЕЛА · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "АРАБЕЛА · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "мак",
+        "expect": "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ (псевдоним „Мак“)",
+        "bucket": "extra",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "йо",
+        "expect": "Йо (голата 2-знакова заявка — по П5)",
+        "bucket": "extra",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Йо · к.к. Св. Константин"
+        ],
+        "refFirst3": [
+          "Йо · к.к. Св. Константин"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      }
+    ],
+    "passedOrdered": 46,
+    "passedSets": 46,
+    "total": 46,
+    "rows": 962
+  },
+  "m5": [
+    {
+      "q": "хотел адмирал",
+      "expect": "3 реда: АДМИРАЛ (Златни), Адмирал (Св. Константин), АМИРАЛ (Приморски)",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "Адмирал · к.к. Св. Константин",
+        "АДМИРАЛ · к.к. Златни пясъци",
+        "АМИРАЛ · район Приморски"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "Адмирал | к.к. Св. Константин",
+        "АДМИРАЛ | к.к. Златни пясъци",
+        "АМИРАЛ | район Приморски"
+      ],
+      "ok": true
+    },
+    {
+      "q": "адмирал",
+      "expect": "същите 3",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "Адмирал · к.к. Св. Константин",
+        "АДМИРАЛ · к.к. Златни пясъци",
+        "АМИРАЛ · район Приморски"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "Адмирал | к.к. Св. Константин",
+        "АДМИРАЛ | к.к. Златни пясъци",
+        "АМИРАЛ | район Приморски"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел адмиралл",
+      "expect": "3",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "Адмирал · к.к. Св. Константин",
+        "АДМИРАЛ · к.к. Златни пясъци",
+        "АМИРАЛ · район Приморски"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "Адмирал | к.к. Св. Константин",
+        "АДМИРАЛ | к.к. Златни пясъци",
+        "АМИРАЛ | район Приморски"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел амирал",
+      "expect": "3",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "АМИРАЛ · район Приморски",
+        "Адмирал · к.к. Св. Константин",
+        "АДМИРАЛ · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "АМИРАЛ | район Приморски",
+        "Адмирал | к.к. Св. Константин",
+        "АДМИРАЛ | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "адмирал златни",
+      "expect": "А8: точно 3, АДМИРАЛ (Златни) първи",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "АДМИРАЛ · к.к. Златни пясъци",
+        "Адмирал · к.к. Св. Константин",
+        "АМИРАЛ · район Приморски"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "АДМИРАЛ | к.к. Златни пясъци",
+        "Адмирал | к.к. Св. Константин",
+        "АМИРАЛ | район Приморски"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел адмирал златни пясъци",
+      "expect": "А8: точно 3, АДМИРАЛ (Златни) първи",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "АДМИРАЛ · к.к. Златни пясъци",
+        "Адмирал · к.к. Св. Константин",
+        "АМИРАЛ · район Приморски"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "АДМИРАЛ | к.к. Златни пясъци",
+        "Адмирал | к.к. Св. Константин",
+        "АМИРАЛ | район Приморски"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотели",
+      "expect": "А8: 226",
+      "jsN": 226,
+      "refN": 226,
+      "category": true,
+      "jsFirst3": [
+        "КАМПУС 90 · район Приморски",
+        "Орбита · район Одесос",
+        "РЕВЕРАНС · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 218",
+      "domFirst3": [
+        "КАМПУС 90 | район Приморски",
+        "Орбита | район Одесос",
+        "РЕВЕРАНС | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел",
+      "expect": "категорийният списък (226)",
+      "jsN": 226,
+      "refN": 226,
+      "category": true,
+      "jsFirst3": [
+        "КАМПУС 90 · район Приморски",
+        "Орбита · район Одесос",
+        "РЕВЕРАНС · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 218",
+      "domFirst3": [
+        "КАМПУС 90 | район Приморски",
+        "Орбита | район Одесос",
+        "РЕВЕРАНС | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотелите",
+      "expect": "А8: 226",
+      "jsN": 226,
+      "refN": 226,
+      "category": true,
+      "jsFirst3": [
+        "КАМПУС 90 · район Приморски",
+        "Орбита · район Одесос",
+        "РЕВЕРАНС · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 218",
+      "domFirst3": [
+        "КАМПУС 90 | район Приморски",
+        "Орбита | район Одесос",
+        "РЕВЕРАНС | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "семеен хотел",
+      "expect": "само семейните (50)",
+      "jsN": 50,
+      "refN": 50,
+      "category": true,
+      "jsFirst3": [
+        "Каприз · район Одесос",
+        "Перфект · район Одесос",
+        "Дивеста · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 42",
+      "domFirst3": [
+        "Каприз | район Одесос",
+        "Перфект | район Одесос",
+        "Дивеста | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел златни",
+      "expect": "А8: 85",
+      "jsN": 85,
+      "refN": 85,
+      "category": true,
+      "jsFirst3": [
+        "Меркурий · к.к. Златни пясъци",
+        "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+        "АПОЛО РИЗОРТ · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 77",
+      "domFirst3": [
+        "Меркурий | к.к. Златни пясъци",
+        "ХОТЕЛ  ХЕЛИОС СПА | к.к. Златни пясъци",
+        "АПОЛО РИЗОРТ | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "берлин голдън бийч",
+      "expect": "А8: първият ред БЕРЛИН ГОЛДЪН БИЙЧ (16 реда общо)",
+      "jsN": 16,
+      "refN": 16,
+      "category": false,
+      "jsFirst3": [
+        "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+        "ПАРК ХОТЕЛ ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+        "СИРИУС БИЙЧ · к.к. Св. Константин"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 8",
+      "domFirst3": [
+        "БЕРЛИН ГОЛДЪН БИЙЧ · старо: LTI Берлин ГБ | к.к. Златни пясъци",
+        "ПАРК ХОТЕЛ ГОЛДЪН БИЙЧ | к.к. Златни пясъци",
+        "СИРИУС БИЙЧ | к.к. Св. Константин"
+      ],
+      "ok": true
+    },
+    {
+      "q": "лти берлин",
+      "expect": "А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
+      "jsN": 2,
+      "refN": 2,
+      "category": false,
+      "jsFirst3": [
+        "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци",
+        "БЕРЛИН ГРИЙН ПАРК · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 2,
+      "domMore": null,
+      "domFirst3": [
+        "БЕРЛИН ГОЛДЪН БИЙЧ · старо: LTI Берлин ГБ | к.к. Златни пясъци",
+        "БЕРЛИН ГРИЙН ПАРК | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "lti",
+      "expect": "А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "БЕРЛИН ГОЛДЪН БИЙЧ · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "БЕРЛИН ГОЛДЪН БИЙЧ · старо: LTI Берлин ГБ | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "роял",
+      "expect": "А8: РОЯЛ (Одесос), РОЯЛ (Златни), после Royal Beach; размита опашка ОК",
+      "jsN": 4,
+      "refN": 4,
+      "category": false,
+      "jsFirst3": [
+        "РОЯЛ · район Одесос",
+        "РОЯЛ · к.к. Златни пясъци",
+        "Royal Beach · к.к. Чайка"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 4,
+      "domMore": null,
+      "domFirst3": [
+        "РОЯЛ | район Одесос",
+        "РОЯЛ | к.к. Златни пясъци",
+        "Royal Beach | к.к. Чайка"
+      ],
+      "ok": true
+    },
+    {
+      "q": "royal",
+      "expect": "А8: същите 3 в същия ред; размита опашка ОК",
+      "jsN": 4,
+      "refN": 4,
+      "category": false,
+      "jsFirst3": [
+        "РОЯЛ · район Одесос",
+        "РОЯЛ · к.к. Златни пясъци",
+        "Royal Beach · к.к. Чайка"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 4,
+      "domMore": null,
+      "domFirst3": [
+        "РОЯЛ | район Одесос",
+        "РОЯЛ | к.к. Златни пясъци",
+        "Royal Beach | к.к. Чайка"
+      ],
+      "ok": true
+    },
+    {
+      "q": "синчец",
+      "expect": "ДАНА ПАЛАС",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "ДАНА ПАЛАС · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "ДАНА ПАЛАС · старо: Синчец | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел синчец",
+      "expect": "ДАНА ПАЛАС",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "ДАНА ПАЛАС · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "ДАНА ПАЛАС · старо: Синчец | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "русалка",
+      "expect": "А8: РУСАЛКА (Виница/север), Русалка (Св. К.) „· бивш“ първи; размита опашка ОК",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "РУСАЛКА · Виница/север",
+        "Русалка · к.к. Св. Константин",
+        "M Hostel Musala · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "РУСАЛКА | Виница/север",
+        "Русалка · бивш | к.к. Св. Константин",
+        "M Hostel Musala | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "бонита",
+      "expect": "БОНИТА/BONITA",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "БОНИТА/BONITA · к.к. Златни пясъци",
+        "Бендита · к.к. Златни пясъци",
+        "Hotel Bona Vita · Виница/север"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "БОНИТА/BONITA | к.к. Златни пясъци",
+        "Бендита | к.к. Златни пясъци",
+        "Hotel Bona Vita | Виница/север"
+      ],
+      "ok": true
+    },
+    {
+      "q": "bonita",
+      "expect": "БОНИТА/BONITA",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "БОНИТА/BONITA · к.к. Златни пясъци",
+        "Бендита · к.к. Златни пясъци",
+        "Hotel Bona Vita · Виница/север"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "БОНИТА/BONITA | к.к. Златни пясъци",
+        "Бендита | к.к. Златни пясъци",
+        "Hotel Bona Vita | Виница/север"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хелиос спа",
+      "expect": "ХОТЕЛ  ХЕЛИОС СПА",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+        "АЗАЛИЯ МЕДИКЪЛ СПА · к.к. Св. Константин",
+        "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ · к.к. Св. Константин"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "ХОТЕЛ  ХЕЛИОС СПА | к.к. Златни пясъци",
+        "АЗАЛИЯ МЕДИКЪЛ СПА | к.к. Св. Константин",
+        "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ | к.к. Св. Константин"
+      ],
+      "ok": true
+    },
+    {
+      "q": "спа хелиос",
+      "expect": "ХОТЕЛ  ХЕЛИОС СПА",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+        "АЗАЛИЯ МЕДИКЪЛ СПА · к.к. Св. Константин",
+        "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ · к.к. Св. Константин"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "ХОТЕЛ  ХЕЛИОС СПА | к.к. Златни пясъци",
+        "АЗАЛИЯ МЕДИКЪЛ СПА | к.к. Св. Константин",
+        "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ | к.к. Св. Константин"
+      ],
+      "ok": true
+    },
+    {
+      "q": "парк",
+      "expect": "А8 (поправено като факт): 19 реда — първите 12 с точно „ПАРК“, после 7 размити",
+      "jsN": 19,
+      "refN": 19,
+      "category": false,
+      "jsFirst3": [
+        "КИНИ ПАРК · к.к. Чайка",
+        "ХОЛИДЕЙ ПАРК · к.к. Чайка",
+        "ДЖОЯ ПАРК · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 11",
+      "domFirst3": [
+        "КИНИ ПАРК | к.к. Чайка",
+        "ХОЛИДЕЙ ПАРК | к.к. Чайка",
+        "ДЖОЯ ПАРК | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "градина",
+      "expect": "А8: хотел ГРАДИНА",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "ГРАДИНА · к.к. Чайка"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "ГРАДИНА | к.к. Чайка"
+      ],
+      "ok": true
+    },
+    {
+      "q": "блок с",
+      "expect": "0 наши реда",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "402",
+      "expect": "0 наши реда",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "бл. 402",
+      "expect": "0 наши реда",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "вх 3",
+      "expect": "0 наши реда",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "ьььь",
+      "expect": "0 наши реда",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "7 су",
+      "expect": "А8: 0",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "седмо су",
+      "expect": "А8: 0",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "vii су",
+      "expect": "А8: 0",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "дкц 2",
+      "expect": "§3 М5: 0 (А8 мълчи)",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "болница света марина",
+      "expect": "§3 М5: 0 (А8 мълчи)",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "градина 12",
+      "expect": "§3 М5: 0 (А8 мълчи)",
+      "jsN": 0,
+      "refN": 0,
+      "category": false,
+      "jsFirst3": [],
+      "domVisible": false,
+      "domHeader": null,
+      "domRows": 0,
+      "domMore": null,
+      "domFirst3": [],
+      "ok": true
+    },
+    {
+      "q": "хотел йо",
+      "expect": "Йо",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "Йо · к.к. Св. Константин"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "Йо | к.к. Св. Константин"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел градина",
+      "expect": "ГРАДИНА",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "ГРАДИНА · к.к. Чайка"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "ГРАДИНА | к.к. Чайка"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел семеен",
+      "expect": "50",
+      "jsN": 50,
+      "refN": 50,
+      "category": true,
+      "jsFirst3": [
+        "Каприз · район Одесос",
+        "Перфект · район Одесос",
+        "Дивеста · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 8,
+      "domMore": "…и още 42",
+      "domFirst3": [
+        "Каприз | район Одесос",
+        "Перфект | район Одесос",
+        "Дивеста | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел адмирал",
+      "expect": "3, най-близкият (от точните) първи",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "Адмирал · к.к. Св. Константин",
+        "АДМИРАЛ · к.к. Златни пясъци",
+        "АМИРАЛ · район Приморски"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "Адмирал | к.к. Св. Константин",
+        "АДМИРАЛ | к.к. Златни пясъци",
+        "АМИРАЛ | район Приморски"
+      ],
+      "ok": true
+    },
+    {
+      "q": "аквапарк клуб",
+      "expect": "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ",
+      "jsN": 3,
+      "refN": 3,
+      "category": false,
+      "jsFirst3": [
+        "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · к.к. Златни пясъци",
+        "ПРЕСТИЖ ХОТЕЛ И АКВАПАРК · к.к. Златни пясъци",
+        "ПРЕСТИЖ ГРАНД ХОТЕЛ И АКВАПАРК · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 3,
+      "domMore": null,
+      "domFirst3": [
+        "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · старо: Мак | к.к. Златни пясъци",
+        "ПРЕСТИЖ ХОТЕЛ И АКВАПАРК | к.к. Златни пясъци",
+        "ПРЕСТИЖ ГРАНД ХОТЕЛ И АКВАПАРК · старо: Ерма | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "ritsa",
+      "expect": "Апарт комплекс Ritsa / „Рица“",
+      "jsN": 5,
+      "refN": 5,
+      "category": false,
+      "jsFirst3": [
+        "Апарт комплекс Ritsa / „Рица“ · к.к. Св. Константин",
+        "Елица · район Одесос",
+        "РИВА · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 5,
+      "domMore": null,
+      "domFirst3": [
+        "Апарт комплекс Ritsa / „Рица“ | к.к. Св. Константин",
+        "Елица | район Одесос",
+        "РИВА | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "арабела блок с",
+      "expect": "АРАБЕЛА",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "АРАБЕЛА · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "АРАБЕЛА · старо: Арабела блок С | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "арабела",
+      "expect": "АРАБЕЛА",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "АРАБЕЛА · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "АРАБЕЛА · старо: Арабела блок С | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "мак",
+      "expect": "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ (псевдоним „Мак“)",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ · старо: Мак | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "йо",
+      "expect": "Йо (голата 2-знакова заявка — по П5)",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "Йо · к.к. Св. Константин"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "Йо | к.к. Св. Константин"
+      ],
+      "ok": true
+    }
+  ],
+  "pick": {
+    "query": "хотел адмирал",
+    "rowsShown": 3,
+    "firstRow": {
+      "idx": "0",
+      "kind": "хотел",
+      "title": "Адмирал",
+      "meta": "к.к. Св. Константин",
+      "height": 52
+    },
+    "clicked": true,
+    "fieldAfterPick": "",
+    "surface": {
+      "pins": 1,
+      "popups": 1,
+      "title": "Адмирал",
+      "sub": "Хотел · ★2 · 196 легла · к.к. Св. Константин",
+      "old": null,
+      "src": "име: Национален туристически регистър · координати: КАИС Отворени данни (АГКК)",
+      "navHrefs": [
+        "https://waze.com/ul?ll=43.236512,28.013759&navigate=yes",
+        "https://www.google.com/maps/dir/?api=1&destination=43.236512,28.013759&travelmode=walking",
+        "https://www.google.com/maps?q=43.236512,28.013759",
+        "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.236512,28.013759"
+      ],
+      "theirPins": 0,
+      "sheetHidden": null,
+      "theirVisible": false,
+      "theirHtml": "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>",
+      "legendOpen": false
+    },
+    "hydrantsBefore": 0,
+    "hydrantsAfter": 5,
+    "hydrantsChanged": true,
+    "afterEscape": {
+      "pins": 0,
+      "popups": 0,
+      "listVisible": false
+    }
+  },
+  "lateSheet": {
+    "ready": true,
+    "theirRows": 8,
+    "mineRows": 3,
+    "sheetHidden": true,
+    "pins": 1,
+    "popups": 1,
+    "title": "Адмирал",
+    "theirPins": 0
+  },
+  "refusals": {
+    "notFound": {
+      "rows": 0,
+      "visible": false,
+      "hasExport": true,
+      "searchRows": 0,
+      "cacheEntry": false,
+      "consoleErrors": 0
+    },
+    "malformed": {
+      "rows": 0,
+      "visible": false,
+      "hasExport": true,
+      "searchRows": 0,
+      "cacheEntry": false,
+      "consoleErrors": 0
+    },
+    "heldBody": {
+      "paused": true,
+      "rows": 0,
+      "searchRows": 0,
+      "consoleErrors": 0
+    },
+    "staleCache": {
+      "rows": 0,
+      "visible": false,
+      "hasExport": true,
+      "searchRows": 0,
+      "cacheEntry": true,
+      "consoleErrors": 0
+    }
+  },
+  "races": {
+    "hotelFirst": {
+      "indexHeld": true,
+      "mineRows": 3,
+      "mineTitles": [
+        "Адмирал",
+        "АДМИРАЛ",
+        "АМИРАЛ"
+      ],
+      "theirVisibleDuringHold": false,
+      "settledTheirRows": [
+        {
+          "idx": "0",
+          "text": "адресadmiral greig 10район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "1",
+          "text": "адресadmiral greig 11район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "2",
+          "text": "адресadmiral greig 12район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "3",
+          "text": "адресadmiral greig 13район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        }
+      ],
+      "settledMine": [
+        "Адмирал",
+        "АДМИРАЛ",
+        "АМИРАЛ"
+      ]
+    },
+    "addressFirst": {
+      "hotelsHeld": true,
+      "theirRows": [
+        {
+          "idx": "0",
+          "text": "адресadmiral greig 10район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "1",
+          "text": "адресadmiral greig 11район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "2",
+          "text": "адресadmiral greig 12район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "3",
+          "text": "адресadmiral greig 13район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        }
+      ],
+      "mineDuringHold": 0,
+      "theirRowsAfter": [
+        {
+          "idx": "0",
+          "text": "адресadmiral greig 10район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "1",
+          "text": "адресadmiral greig 11район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "2",
+          "text": "адресadmiral greig 12район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        },
+        {
+          "idx": "3",
+          "text": "адресadmiral greig 13район Аспарухово",
+          "chip": "адрес",
+          "meta": "район Аспарухово"
+        }
+      ],
+      "mineAfter": [
+        "Адмирал",
+        "АДМИРАЛ",
+        "АМИРАЛ"
+      ]
+    }
+  },
+  "v8": {
+    "enterLti": {
+      "mineRows": 1,
+      "theirStatus": "Няма съвпадения",
+      "surface": {
+        "pins": 1,
+        "popups": 1,
+        "title": "БЕРЛИН ГОЛДЪН БИЙЧ",
+        "sub": "Хотел · ★4 · 876 легла · к.к. Златни пясъци",
+        "old": "старо име: LTI Берлин ГБ",
+        "src": "име: Национален туристически регистър · координати: КАИС Отворени данни (АГКК)",
+        "navHrefs": [
+          "https://waze.com/ul?ll=43.300517,28.049085&navigate=yes",
+          "https://www.google.com/maps/dir/?api=1&destination=43.300517,28.049085&travelmode=walking",
+          "https://www.google.com/maps?q=43.300517,28.049085",
+          "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.300517,28.049085"
+        ],
+        "theirPins": 0,
+        "sheetHidden": null,
+        "theirVisible": false,
+        "theirHtml": "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>",
+        "legendOpen": false
+      }
+    },
+    "pickBeforeIndex": {
+      "mineRows": 3,
+      "theirVisible": false,
+      "theirHtmlHasStatus": false,
+      "pins": 1,
+      "popups": 1,
+      "title": "БОНИТА/BONITA",
+      "field": ""
+    },
+    "gpsThenHotel": {
+      "theirPinDuringHold": 0,
+      "theirPinAfterRelease": 1,
+      "surface": {
+        "pins": 1,
+        "popups": 1,
+        "title": "Адмирал",
+        "sub": "Хотел · ★2 · 196 легла · к.к. Св. Константин",
+        "old": null,
+        "src": "име: Национален туристически регистър · координати: КАИС Отворени данни (АГКК)",
+        "navHrefs": [
+          "https://waze.com/ul?ll=43.236512,28.013759&navigate=yes",
+          "https://www.google.com/maps/dir/?api=1&destination=43.236512,28.013759&travelmode=walking",
+          "https://www.google.com/maps?q=43.236512,28.013759",
+          "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.236512,28.013759"
+        ],
+        "theirPins": 0,
+        "sheetHidden": null,
+        "theirVisible": false,
+        "theirHtml": "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>",
+        "legendOpen": false
+      }
+    },
+    "legend": {
+      "openBefore": true,
+      "rows": 1,
+      "openAfterEnterPick": true,
+      "pins": 1,
+      "title": "БЕРЛИН ГОЛДЪН БИЙЧ"
+    }
+  },
+  "mobile": {
+    "ready": true,
+    "rows": 8,
+    "more": "…и още 11",
+    "rect": {
+      "top": 307,
+      "bottom": 766,
+      "height": 459
+    },
+    "innerHeight": 812,
+    "fits": true,
+    "minRowHeight": 52
+  }
+}

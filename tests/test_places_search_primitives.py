@@ -4,15 +4,20 @@
     normalisation: plan §3 Т1(4)/(5) says it copies `norm()` and `skel()` (and `lev()`
     for the fuzzy step) out of the address search word for word, because the address
     IIFE keeps them private. This test pulls every one-line definition of the three out
-    of index.html and asserts all copies are byte-identical. Today there is exactly one
-    of each (index.html:4786-4788, the address search); when C4 lands the places IIFE
-    there will be two. The day someone "improves" one copy, the two branches start
+    of index.html and asserts all copies are byte-identical. There are exactly two of
+    each: the address search (index.html:4786-4788) and the places IIFE that C4 landed
+    under it. The day someone "improves" one copy, the two branches start
     disagreeing about which hotel a query finds — silently. This makes it loud.
 
 (b) placeTokens REPLICA. The tokenizer of plan §3 Т1, as refined by §11 Б1, written
     once in Python here and once in JS in C4 — one table, two implementations. The
     EXPECTATIONS table below is the contract C4 copies 1:1; if a row of it ever has to
     change, the rule changed, and that needs a signed plan.
+
+(c) SHA-PINNED PAYLOADS (plan §12 В7 + §14, gate G12г). The places branch trusts only
+    the bytes the plan pinned, so the two constants in index.html must equal the sha256
+    of the two tracked files. A regenerated bundle that forgets to re-pin would switch
+    the whole branch off in the browser without a word; this makes it a red build.
 
     Order matters and is the plan's, not a convenience:
       1. lower-case, then strip only what `norm()` itself would destroy — typographic
@@ -27,12 +32,17 @@
 
 Run: python -m unittest discover -s tests
 """
+import hashlib
 import pathlib
 import re
 import unittest
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 INDEX = REPO / "index.html"
+
+# G12г — the payloads the places branch is allowed to trust: the constant in
+# index.html, and the tracked file whose bytes it pins (plan §12 В7, §14).
+SHA_PINS = (("HOTELS_SHA256", "data/hotels.json"), ("CATS_SHA256", "data/place_categories.json"))
 
 # The three private helpers of the address search that the places branch must copy.
 PRIMITIVES = ("norm", "skel", "lev")
@@ -210,8 +220,9 @@ class VerbatimPrimitivesTest(unittest.TestCase):
     def test_every_primitive_is_defined_in_index_html(self):
         for name in PRIMITIVES:
             copies = definitions_of(self.index, name)
-            # One today (the address search); two once C4 lands the places IIFE.
-            self.assertGreaterEqual(len(copies), 1, "no definition of " + name + "()")
+            # EXACTLY two since C4: the address search and the places branch. A third
+            # copy means a third matcher nobody is comparing against the other two.
+            self.assertEqual(len(copies), 2, "expected 2 definitions of " + name + "()")
 
     def test_all_copies_of_each_primitive_are_byte_identical(self):
         for name in PRIMITIVES:
@@ -221,6 +232,18 @@ class VerbatimPrimitivesTest(unittest.TestCase):
                 len(distinct), 1,
                 "%s() has %d definitions in %d variants:\n%s"
                 % (name, len(copies), len(distinct), "\n".join(distinct)))
+
+
+class ShaPinTest(unittest.TestCase):
+    """G12г — the constants in index.html against the bytes on disk."""
+
+    def test_pinned_hashes_match_the_tracked_payloads(self):
+        index = INDEX.read_text(encoding="utf-8")
+        for constant, relative in SHA_PINS:
+            match = re.search(r"const\s+" + constant + r"\s*=\s*'([0-9a-f]{64})'", index)
+            self.assertIsNotNone(match, constant + " is not pinned in index.html")
+            digest = hashlib.sha256((REPO / relative).read_bytes()).hexdigest()
+            self.assertEqual(match.group(1), digest, relative + " no longer matches " + constant)
 
 
 class PlaceTokensTest(unittest.TestCase):

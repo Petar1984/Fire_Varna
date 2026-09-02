@@ -1,0 +1,1159 @@
+# -*- coding: utf-8 -*-
+"""
+recall_sweep_v22.py — FINAL: copy of recall_sweep_v21.py with the four repairs
+Petar signed on 02.09 switched ON (П2+П3+П4+П5, WITHOUT П1), and the "парк" line
+of A8 corrected as a FACT of the data and regenerated with sec.11 B1: 19 rows =
+12 exact "ПАРК" first, then 7 fuzzy.
+The diff v21 -> v22 IS the change list; the diff recall_sweep.py -> v21 is the
+sec.10 amendment list.
+
+  П2 (over A7) name coverage ^ between "active before бивш" and "distance ^"
+  П3 (over A5) a numeric token with no EXACT match rejects the record
+  П4 (over A1) a dictionary word with an EMPTY class is a name token AND a
+     filter: a row without an EXACT name/alias match for it drops out
+  П5 (over A5) without a key a 2-char word is significant on an EXACT match
+     against a record whose whole name is that single token ("йо" -> Йо)
+
+  A1  a form is a KEY only if its class holds >=1 loaded record; with several
+      keys the LEFTMOST is the class, the rest become name tokens; if the search
+      inside the class returns 0 rows -> retry with all keys as names (fail-open)
+  A2  a ONE-TOKEN form also selects records whose kind tokens contain the chip's
+      HEAD word (place_categories.json chips[].head)  -> "хотели" = 226
+  A3  key + remainder that matches zone/kind tokens EXACTLY -> filtered category
+      list, nearest first  ("хотел златни" = 85, "хотел семеен" = 50)
+  A4  one token = one match, best by priority
+      name-exact > alias > zone/kind-exact > name-prefix > name-fuzzy;
+      an exact zone/kind match EATS the token (no fuzzy name credit for it)
+  A5  significance: without a key >=3 original chars, not an address marker,
+      not a number; with a key any exact/prefix non-numeric match also counts,
+      and a purely numeric token counts only with a key and only exact
+  A6  old_names are NAME TOKENS (not a phrase), minus tokens <=2 chars and
+      address markers
+  A7  order: bestNameKind v (3/2/1) -> nameMatched v -> totalMatched v -> sum v
+      -> active before "бивш" -> distance to centre ^ -> name length ^ -> bg abc
+  A8  the M5 expectations as corrected by sec.10
+
+READ-ONLY. Writes nothing but its own report next to itself.
+NEVER prints cadastral identifiers (record["uins"] is not read at all).
+
+Sources replicated 1:1:
+  norm/skel/lev  -> C:/git/Fire_Varna/index.html lines 4786-4789
+  TYPO/MARKERS/kindOf -> C:/git/varna_3d/web/poi-search.js lines 49, 97-151
+  T1..M5 + sec.10 -> C:/git/Fire_Varna/docs/plans/places_search_plan_2026-09-02.md
+"""
+import json
+import math
+import re
+import sys
+import io
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
+HOTELS = r"C:/git/varna_3d/data/fire_varna_hotels.json"
+CATS = r"C:/git/varna_3d/data/place_categories.json"
+OUTDIR = (r"C:/Users/Petar/AppData/Local/Temp/claude/C--git/"
+          r"fb0c0608-7fdb-4635-a8fc-44575d26700a/scratchpad/measures/")
+
+# Fire_Varna/index.html:1838  .setView([43.2141, 27.9147], 13)
+# stand-in for map.getCenter() -- there is no map in a headless sweep.
+CENTER = (43.2141, 27.9147)
+TOP = 8
+
+# ----------------------------------------------------------------- primitives
+# index.html:4786 norm()   [unchanged from recall_sweep.py]
+def norm(s):
+    s = ("" if s is None else str(s)).lower()
+    s = s.replace("\u0431\u043b\u043e\u043a", "\u0431\u043b")   # блок -> бл
+    s = s.replace("\u0432\u0445\u043e\u0434", "\u0432\u0445")   # вход -> вх
+    s = re.sub(r"[.\u2116,'\"\-]", " ", s)                      # [.№,'"-] -> space
+    s = re.sub(r"\s+", " ", s)
+    return s.strip()
+
+# index.html:4787 skel()
+_SKEL = {
+    "\u0430": "a", "\u0431": "b", "\u0432": "v", "\u0433": "g", "\u0434": "d",
+    "\u0435": "e", "\u0436": "zh", "\u0437": "z", "\u0438": "i", "\u0439": "i",
+    "\u043a": "k", "\u043b": "l", "\u043c": "m", "\u043d": "n", "\u043e": "o",
+    "\u043f": "p", "\u0440": "r", "\u0441": "s", "\u0442": "t", "\u0443": "u",
+    "\u0444": "f", "\u0445": "h", "\u0446": "ts", "\u0447": "ch", "\u0448": "sh",
+    "\u0449": "sht", "\u044a": "a", "\u044c": "", "\u044e": "yu", "\u044f": "ya",
+}
+
+def skel(w):
+    w = w.lower()
+    o = "".join(_SKEL.get(ch, ch) for ch in w)
+    o = re.sub(r"[yj]", "i", o)
+    o = re.sub(r"([^0-9])\1+", r"\1", o)   # JS /(\D)\1+/g ; \D == [^0-9]
+    return o
+
+# index.html:4788 lev()
+def lev(a, b, cap):
+    la, lb = len(a), len(b)
+    if abs(la - lb) > cap:
+        return cap + 1
+    prev = list(range(lb + 1))
+    for i in range(1, la + 1):
+        cur = [i] * (lb + 1)
+        best = i
+        for j in range(1, lb + 1):
+            v = min(prev[j] + 1, cur[j - 1] + 1,
+                    prev[j - 1] + (0 if a[i - 1] == b[j - 1] else 1))
+            cur[j] = v
+            if v < best:
+                best = v
+        if best > cap:
+            return cap + 1
+        prev = cur
+    return prev[lb]
+
+# ------------------------------------------------------------------- T1 tokens
+TYPO = re.compile(u"[\u201e\u201c\u201d\u201a\u2018\u2019\u00ab\u00bb\u2013\u2014/()]")
+
+LET = u"\u0410-\u042f\u0430-\u044fA-Za-z"
+NOL = u"(?<![" + LET + u"])"
+NOR = u"(?![" + LET + u"])"
+MARKERS = [
+    (re.compile(NOL + u"\u0445\\s*-\\s*\u043b" + NOR, re.I), u" \u0445\u043e\u0442\u0435\u043b "),
+    (re.compile(NOL + u"\u043a\\s*-\\s*\u0441" + NOR, re.I), u" \u043a\u043e\u043c\u043f\u043b\u0435\u043a\u0441 "),
+    (re.compile(NOL + u"\u0434\\s*-\\s*\u0440" + NOR, re.I), u" \u0434\u043e\u043a\u0442\u043e\u0440 "),
+    (re.compile(NOL + u"\u0441\u0432\\." , re.I), u" \u0441\u0432\u0435\u0442\u0438 "),
+    (re.compile(NOL + u"\u0441\u0432" + NOR, re.I), u" \u0441\u0432\u0435\u0442\u0438 "),
+]
+ORD_SUF = re.compile(
+    u"(\\d+)\\s*-?\\s*(\u043c\u0438|\u043c\u0430|\u043c\u043e|\u0442\u0438|\u0442\u0430|\u0442\u043e|"
+    u"\u0432\u0438|\u0432\u0430|\u0432\u043e|\u0440\u0438|\u0440\u0430|\u0440\u043e)(?![" + LET + u"])", re.I)
+
+_ORD_STEM = {
+    u"\u043f\u044a\u0440\u0432": 1, u"\u0432\u0442\u043e\u0440": 2, u"\u0442\u0440\u0435\u0442": 3,
+    u"\u0447\u0435\u0442\u0432\u044a\u0440\u0442": 4, u"\u043f\u0435\u0442": 5, u"\u0448\u0435\u0441\u0442": 6,
+    u"\u0441\u0435\u0434\u043c": 7, u"\u043e\u0441\u043c": 8, u"\u0434\u0435\u0432\u0435\u0442": 9,
+    u"\u0434\u0435\u0441\u0435\u0442": 10, u"\u0435\u0434\u0438\u043d\u0430\u0434\u0435\u0441\u0435\u0442": 11,
+    u"\u0435\u0434\u0438\u043d\u0430\u0439\u0441\u0435\u0442": 11,
+    u"\u0434\u0432\u0430\u043d\u0430\u0434\u0435\u0441\u0435\u0442": 12,
+    u"\u0434\u0432\u0430\u043d\u0430\u0439\u0441\u0435\u0442": 12,
+}
+_ORD_END = [u"\u0438", u"\u0430", u"\u043e", u"\u0438\u044f\u0442", u"\u0438\u044f",
+            u"\u0430\u0442\u0430", u"\u043e\u0442\u043e", u"\u0438\u0442\u0435"]
+ORD_WORDS = {}
+for _st, _n in _ORD_STEM.items():
+    for _e in _ORD_END:
+        ORD_WORDS[_st + _e] = str(_n)
+
+# sec.11 B1: compounds norm() cannot split, because they carry no separator at all.
+COMPOUNDS = {u"апартхотел": [u"апарт", u"хотел"],
+             u"апарткомплекс": [u"апарт", u"комплекс"]}
+
+ROMAN_OK = re.compile(r"^(x{0,3})(ix|iv|v?i{0,3})$")
+ROMAN_SHAPE = re.compile(r"^[ivx]{1,5}$")
+_RV = {"i": 1, "v": 5, "x": 10}
+
+def roman_to_arabic(t):
+    tot, prev = 0, 0
+    for ch in reversed(t):
+        v = _RV[ch]
+        tot += -v if v < prev else v
+        if v > prev:
+            prev = v
+    return str(tot)
+
+
+class Tok(object):
+    __slots__ = ("s", "orig", "num")
+
+    def __init__(self, s, orig, num):
+        self.s = s
+        self.orig = orig
+        self.num = num
+
+
+def place_tokens(s):
+    """plan sec.3 T1 -> list[Tok]"""
+    raw = "" if s is None else str(s)
+    raw = TYPO.sub(" ", raw)
+    raw = raw.replace(u"\u0406", "I").replace(u"\u0456", "i")
+    for rx, to in MARKERS:
+        raw = rx.sub(to, raw)
+    raw = ORD_SUF.sub(r"\1", raw)
+    n = norm(raw)
+    if not n:
+        return []
+    out = []
+    for w in n.split(" "):
+        if not w:
+            continue
+        # B1: a split compound yields two tokens, and both keep the WHOLE word
+        # as their original -- significance (A5) reads the original, not the part.
+        for part in COMPOUNDS.get(w, [w]):
+            if ROMAN_SHAPE.match(part) and ROMAN_OK.match(part):
+                out.append(Tok(roman_to_arabic(part), w, True))
+                continue
+            if part in ORD_WORDS:
+                out.append(Tok(ORD_WORDS[part], w, True))
+                continue
+            if part.isdigit():
+                out.append(Tok(part, w, True))
+                continue
+            sk = skel(part)
+            if sk:
+                out.append(Tok(sk, w, False))
+    return out
+
+
+def key_of(s):
+    return " ".join(t.s for t in place_tokens(s))
+
+
+# ------------------------------------------------------------------ T2 / K2
+cats = json.load(open(CATS, encoding="utf-8"))
+hotels = json.load(open(HOTELS, encoding="utf-8"))["hotels"]
+
+# --- A2: chip -> head  (place_categories.json chips[] carries "head")
+CHIP_HEAD = {}
+for _c in cats["chips"]:
+    CHIP_HEAD[_c["chip"]] = _c.get("head") or _c["chip"]
+
+# form-key -> {chips: chip-keys, heads: head-keys, forms: raw forms}
+FORM_IDX = {}
+for form, chips in cats["forms"].items():
+    fk = key_of(form)
+    if not fk:
+        continue
+    e = FORM_IDX.setdefault(fk, {"chips": set(), "heads": set(), "forms": set()})
+    e["forms"].add(form)
+    for c in chips:
+        e["chips"].add(key_of(c))
+        e["heads"].add(key_of(CHIP_HEAD.get(c, c)))
+MAXFORM = 3   # plan sec.3 T2: forms up to 3 tokens
+
+# A5: address markers are never significant (post-norm forms: блок->бл, вход->вх)
+ADDR = set([u"\u0431\u043b", u"\u0431\u043b\u043e\u043a", u"\u0432\u0445",
+            u"\u0432\u0445\u043e\u0434", u"\u0443\u043b", u"\u0431\u0443\u043b",
+            u"\u043a\u0432", u"\u0436\u043a", u"\u2116"])
+
+
+class Rec(object):
+    def __init__(self, h):
+        self.name = h["name"]
+        self.kind = h["kind"]
+        self.zone = h["zone"]
+        self.status = h.get("status") or ""
+        self.lat = h["lat"]
+        self.lon = h["lon"]
+        self.ntk = [t.s for t in place_tokens(self.name)]
+        self.nset = set(self.ntk)
+        self.ztk = [t.s for t in place_tokens(self.zone)]
+        self.ktk = [t.s for t in place_tokens(self.kind)]
+        self.zkset = set(self.ztk) | set(self.ktk)
+        self.kkey = " ".join(self.ktk)
+        # A6: old_names are NAME TOKENS, minus <=2 chars and address markers
+        self.aset = set()
+        for o in (h.get("old_names") or []):
+            for t in place_tokens(o):
+                if t.num:
+                    continue
+                if len(t.orig) <= 2 or t.orig in ADDR:
+                    continue
+                self.aset.add(t.s)
+        dy = (self.lat - CENTER[0]) * 110574.0
+        dx = (self.lon - CENTER[1]) * 81152.0
+        self.dist = math.hypot(dx, dy)
+
+
+RECS = [Rec(h) for h in hotels]
+
+
+def in_class(rec, fk):
+    """plan sec.3 K2 + A2:
+       (a) kindKey in the form's chips;
+       (b) the form is ONE token and that token is in the kind's tokens (K2b);
+       (c) A2: the form is ONE token and the chip's HEAD (tokenised) sits inside
+           the kind's tokens -> "хотели"/"хотелите" reach апарт-хотел too."""
+    e = FORM_IDX[fk]
+    if rec.kkey in e["chips"]:
+        return True
+    parts = fk.split(" ")
+    if len(parts) == 1:
+        if parts[0] in rec.ktk:
+            return True
+        for hk in e["heads"]:                                   # A2
+            hp = hk.split(" ")
+            if hp and all(p in rec.ktk for p in hp):
+                return True
+    return False
+
+
+# A1: a form is a KEY only if its class holds >=1 loaded record.
+CLASS_OF = {}
+for fk in FORM_IDX:
+    CLASS_OF[fk] = [r for r in RECS if in_class(r, fk)]
+
+
+# --------------------------------------------------------------- M2 matching
+CAPMODE = (sys.argv[1] if len(sys.argv) > 1 else "plan")   # "plan" | "poi"
+
+# ---- candidate rule REPAIRS, measured as counterfactuals in sec. в4 ----------
+# П1  fuzzy only from 6 original chars up (4-5 chars: exact/prefix + lev<=1)
+# П2  A7: "покритие на името" (unmatched name tokens ^) just before distance
+# П3  a purely numeric token must match EXACTLY or the record is rejected
+# П4  a dictionary word whose class is EMPTY must match a name/alias, else 0 rows
+# П5 SIGNED 02.09 too: without a key a 2-char word is significant only on an EXACT
+# match against a record whose whole name is that single token ("йо" -> хотел Йо).
+BASE = {"P1": False, "P2": True, "P3": True, "P4": True, "P5": True}   # signed 02.09
+FIX = dict(BASE)
+
+
+def set_fix(cfg):
+    for _k in FIX:
+        FIX[_k] = bool(cfg.get(_k, False))
+
+
+def kind_gen(t, v):
+    """plan sec.3 M2: 3 exact / 2 prefix / 1 lev<=cap ; 2-3 chars exact+prefix
+       only ; 1 char nothing ; purely numeric -> exact only."""
+    q = t.s
+    if t.num:
+        return 3 if v == q else 0
+    L = len(t.orig)
+    if L <= 1:
+        return 0
+    if v == q:
+        return 3
+    if v.startswith(q):
+        return 2
+    if L <= 3:
+        return 0
+    if FIX["P1"] and L <= 5:                       # П1
+        return 1 if lev(q, v, 1) <= 1 else 0
+    cap = 2 if CAPMODE == "plan" else (2 if len(q) >= 7 else 1)
+    return 1 if lev(q, v, cap) <= cap else 0
+
+
+def token_match(rec, t):
+    """A4: ONE match per token, best by priority
+       name-exact(3) > alias(3) > zone/kind-exact > name-prefix(2) > name-fuzzy(1).
+       An exact zone/kind match EATS the token: no fuzzy name credit afterwards.
+       Returns (category, quality) with category in {"name","alias","zk",None}."""
+    if t.s in rec.nset:
+        return ("name", 3)
+    if (not t.num) and len(t.orig) > 2 and t.s in rec.aset:
+        return ("alias", 3)
+    if t.s in rec.zkset:
+        return ("zk", 3)
+    kn = 0
+    for v in rec.ntk:
+        k = kind_gen(t, v)
+        if k > kn:
+            kn = k
+            if kn == 2:
+                break
+    if kn:
+        return ("name", kn)
+    return (None, 0)
+
+
+def significant(t, cat, q, has_key, rec=None):
+    """A5. Base (always): >=3 original chars, not an address marker, not a number.
+       With a key the base is EXTENDED (not replaced): any non-numeric exact or
+       prefix match counts ("хотел йо"), and a purely numeric token counts only
+       with a key and only exact ("градина 12", "дкц 2")."""
+    if cat not in ("name", "alias"):
+        return False
+    if t.orig in ADDR:
+        return False
+    if t.num:
+        return has_key and q == 3
+    if len(t.orig) >= 3:
+        return True
+    if has_key and q >= 2:
+        return True
+    if (FIX.get("P5") and not has_key and cat == "name" and q == 3
+            and rec is not None and len(rec.ntk) == 1):
+        return True                                  # П5 (signed)
+    return False
+
+
+def score(rec, R, has_key):
+    """A4 + A5 -> (bestNameKind, nameMatched, totalMatched, sum, qualified, uncov)"""
+    best_nk = 0
+    nmatched = 0
+    total = 0
+    ssum = 0
+    qual = False
+    numfail = False
+    for t in R:
+        cat, q = token_match(rec, t)
+        if cat is None:
+            if t.num and FIX["P3"]:                # \u041f3: numbers are conjunctive
+                numfail = True
+            continue
+        total += 1
+        if cat == "zk":
+            ssum += 3                      # M4 weight: zone/kind x1 (quality 3)
+        else:
+            nmatched += 1
+            ssum += 2 * q                  # M4 weight: name x2
+            if q > best_nk:
+                best_nk = q
+            if significant(t, cat, q, has_key, rec):
+                qual = True
+    if numfail:
+        qual = False
+    # \u041f2: how many of the record's OWN name tokens stayed untouched
+    uncov = 0
+    for v in set(rec.ntk):
+        if not any(kind_gen(t, v) for t in R):
+            uncov += 1
+    return best_nk, nmatched, total, ssum, qual, uncov
+
+
+def order_named(rows):
+    """A7 (M4 refined); rows = (rec, bestNameKind, nameMatched, total, sum, uncov)"""
+    rows.sort(key=lambda x: (-x[1], -x[2], -x[3], -x[4],
+                             1 if x[0].status == u"\u0431\u0438\u0432\u0448" else 0,
+                             x[5] if FIX["P2"] else 0,          # \u041f2
+                             x[0].dist, len(x[0].name), x[0].name.lower()))
+    return [x[0] for x in rows]
+
+
+def order_category(recs):
+    """plan sec.3 M1: nearest to the frame centre first (CENTER stand-in)."""
+    return sorted(recs, key=lambda r: (r.dist, len(r.name), r.name.lower()))
+
+
+# --------------------------------------------------------------------- search
+def split_keys(qt):
+    """T2 + A1: longest form at each position, but ONLY forms whose class holds
+       >=1 loaded record become keys. Returns (keys, slots, dead) where slots is
+       the positional list of (token, key_index_or_None) and `dead` are the
+       tokens of dictionary forms whose class is EMPTY (A1 -> plain names)."""
+    keys = []
+    slots = []
+    dead = []
+    i = 0
+    while i < len(qt):
+        hit = None
+        for L in range(min(MAXFORM, len(qt) - i), 0, -1):
+            fk = " ".join(t.s for t in qt[i:i + L])
+            if fk in FORM_IDX and CLASS_OF[fk]:      # A1: populated only
+                hit = (fk, L)
+                break
+        if hit:
+            ki = len(keys)
+            keys.append(hit[0])
+            for j in range(hit[1]):
+                slots.append((qt[i + j], ki))
+            i += hit[1]
+        else:
+            for L in range(min(MAXFORM, len(qt) - i), 0, -1):
+                fk = " ".join(t.s for t in qt[i:i + L])
+                if fk in FORM_IDX:                   # exists but class is empty
+                    dead.extend(qt[i:i + L])
+                    break
+            slots.append((qt[i], None))
+            i += 1
+    return keys, slots, dead
+
+
+def run_scored(cls, R, has_key, dead=()):
+    scored = []
+    for r in cls:
+        if FIX["P4"] and dead:                       # П4 (exact name/alias only:
+            ok = True                                # a fuzzy coincidence such as
+            for t in dead:                           # болница~БОНИТА is not proof
+                cat, q = token_match(r, t)           # that the class word is there)
+                if cat not in ("name", "alias") or q != 3:
+                    ok = False
+                    break
+            if not ok:
+                continue
+        bnk, nm, tot, ssum, qual, unc = score(r, R, has_key)
+        if qual:
+            scored.append((r, bnk, nm, tot, ssum, unc))
+    return order_named(scored)
+
+
+def search(q):
+    """Returns (rows, branch). rows is the FULL list (the TOP-8 cut is in render)."""
+    qt = place_tokens(q)
+    if not qt:
+        return [], "empty"
+    keys, slots, dead = split_keys(qt)
+    if keys:
+        # A1: the LEFTMOST key is the class; the other key words become names.
+        cls = CLASS_OF[keys[0]]
+        R = [t for (t, ki) in slots if ki is None or ki != 0]
+        has_key = True
+    else:
+        cls = RECS
+        R = [t for (t, ki) in slots]
+        has_key = False
+    if not R:
+        return order_category(cls), "M1-category"          # M1: key only
+    if not has_key and len(cls) > 300:
+        return [], "M3-too-big"                            # M3 generosity gate
+    # ---- A3: key + remainder that is PURELY zone/kind -> filtered category list
+    if has_key:
+        zk_all = set()
+        nm_all = set()
+        for r in cls:
+            zk_all |= r.zkset
+            nm_all |= r.nset
+        # A3' (see report sec. г): A4's priority also governs the branch --
+        # a token that matches a NAME exactly is a name token, not a filter.
+        if R and all(t.s in zk_all for t in R) and not any(t.s in nm_all for t in R):
+            flt = [r for r in cls if all(t.s in r.zkset for t in R)]
+            if flt:
+                return order_category(flt), "A3-category+zone/kind"
+    rows = run_scored(cls, R, has_key, dead)
+    if rows:
+        return rows, ("M2" if has_key else "M3")
+    if has_key:
+        # A1 fail-open: retry with ALL keys as plain name tokens, whole delivery
+        R2 = [t for (t, ki) in slots]
+        rows = run_scored(RECS, R2, False, dead)
+        if rows:
+            return rows, "M2-failopen"
+    return [], ("M2" if has_key else "M3")
+
+
+def rows_label(rows, n=3):
+    return u" · ".join(u"%s (%s)" % (r.name, r.zone) for r in rows[:n]) or u"—"
+
+
+# ============================================================== SWEEP (a)
+def name_words(rec_name):
+    """post-norm words of the name, tagged as key / non-key (A1 definition)"""
+    qt = place_tokens(rec_name)
+    keys, slots, dead = split_keys(qt)
+    return [(t.orig, ki is not None) for (t, ki) in slots]
+
+
+LAT = re.compile(r"[A-Za-z]")
+
+
+def latin_half(name):
+    if "/" not in name:
+        return None
+    parts = [p.strip() for p in name.split("/")]
+    parts = [p for p in parts if p]
+    best, bn = None, 0
+    for p in parts:
+        c = len(LAT.findall(p))
+        if c > bn:
+            bn, best = c, p
+    return best if bn else None
+
+
+def rank_of(rows, rec):
+    for i, r in enumerate(rows):
+        if r is rec:
+            return i
+    return -1
+
+
+CLS_ORDER = [u"A1 цялото име (малки букви)", u"A2 името без ключовите думи",
+             u"A3 всяка значеща дума ≥4 знака", u"A4 латинската половина при „/“"]
+
+
+def sweep_recall():
+    classes = dict((k, []) for k in CLS_ORDER)
+    fails = dict((k, []) for k in CLS_ORDER)
+    notin8 = dict((k, []) for k in CLS_ORDER)
+    for rec in RECS:
+        ws = name_words(rec.name)
+        q = rec.name.lower()
+        rows, br = search(q)
+        classes[CLS_ORDER[0]].append((rec, q, rank_of(rows, rec), len(rows), br))
+        rest = [w for w, isk in ws if not isk]
+        q2 = " ".join(rest)
+        if q2:
+            rows, br = search(q2)
+            classes[CLS_ORDER[1]].append((rec, q2, rank_of(rows, rec), len(rows), br))
+        for w, isk in ws:
+            if isk or len(w) < 4:
+                continue
+            rows, br = search(w)
+            classes[CLS_ORDER[2]].append((rec, w, rank_of(rows, rec), len(rows), br))
+        lh = latin_half(rec.name)
+        if lh:
+            rows, br = search(lh)
+            classes[CLS_ORDER[3]].append((rec, lh, rank_of(rows, rec), len(rows), br))
+    for k, v in classes.items():
+        for rec, q, rk, n, br in v:
+            if rk < 0:
+                fails[k].append((rec, q, n, br))
+            elif rk >= TOP:
+                notin8[k].append((rec, q, rk, n, br))
+    return classes, fails, notin8
+
+
+set_fix(BASE)
+classes, fails, notin8 = sweep_recall()
+
+# ============================================================== SWEEP (b)
+COLL = [u"парк", u"бриз", u"роял", u"402", u"блок с", u"бл 402", u"вх 3",
+        u"чайка", u"виница", u"златни", u"хотел", u"хотели", u"семеен хотел",
+        u"хотел златни", u"хотел адмирал", u"адмирал", u"хотел адмиралл",
+        u"хотел амирал", u"адмирал златни", u"хотел адмирал златни пясъци",
+        u"берлин голдън бийч", u"лти берлин", u"lti", u"royal", u"синчец",
+        u"хотел синчец", u"русалка", u"бонита", u"bonita", u"хелиос спа",
+        u"спа хелиос", u"парк хотел бриз", u"морска градина", u"аквапарк",
+        u"комплекс", u"ьььь"]
+
+def sweep_coll():
+    out = []
+    for q in COLL:
+        rows, br = search(q)
+        out.append((q, len(rows), br, rows[:3]))
+    return out
+
+
+coll_rows = sweep_coll()
+
+# ============================================================== SWEEP (c) M5/A8
+M5SPEC = []
+EXTRASPEC = []
+
+
+def chk(q, expect, ok_fn):
+    M5SPEC.append((q, expect, ok_fn))
+
+
+def evaluate(spec):
+    out = []
+    for q, expect, ok_fn in spec:
+        rows, br = search(q)
+        out.append((q, expect, len(rows), br, rows_label(rows, 3), ok_fn(rows)))
+    return out
+
+
+Z_ZL = u"к.к. Златни пясъци"
+Z_SK = u"к.к. Св. Константин"
+Z_OD = u"район Одесос"
+Z_VN = u"Виница/север"
+Z_CH = u"к.к. Чайка"
+
+
+def first_is(rows, name, zone=None):
+    return bool(rows) and rows[0].name.strip() == name and (zone is None or rows[0].zone == zone)
+
+
+def nz(r):
+    return (r.name.strip(), r.zone)
+
+
+chk(u"хотел адмирал", u"3 реда: АДМИРАЛ (Златни), Адмирал (Св. Константин), АМИРАЛ (Приморски)",
+    lambda r: len(r) == 3 and sorted(x.name for x in r) == sorted([u"АДМИРАЛ", u"Адмирал", u"АМИРАЛ"]))
+chk(u"адмирал", u"същите 3",
+    lambda r: len(r) == 3 and sorted(x.name for x in r) == sorted([u"АДМИРАЛ", u"Адмирал", u"АМИРАЛ"]))
+chk(u"хотел адмиралл", u"3", lambda r: len(r) == 3)
+chk(u"хотел амирал", u"3", lambda r: len(r) == 3)
+chk(u"адмирал златни", u"А8: точно 3, АДМИРАЛ (Златни) първи",
+    lambda r: len(r) == 3 and nz(r[0]) == (u"АДМИРАЛ", Z_ZL))
+chk(u"хотел адмирал златни пясъци", u"А8: точно 3, АДМИРАЛ (Златни) първи",
+    lambda r: len(r) == 3 and nz(r[0]) == (u"АДМИРАЛ", Z_ZL))
+chk(u"хотели", u"А8: 226", lambda r: len(r) == 226)
+chk(u"хотел", u"категорийният списък (226)", lambda r: len(r) == 226)
+chk(u"хотелите", u"А8: 226", lambda r: len(r) == 226)
+chk(u"семеен хотел", u"само семейните (50)",
+    lambda r: len(r) == 50 and all(x.kind == u"Семеен хотел" for x in r))
+chk(u"хотел златни", u"А8: 85", lambda r: len(r) == 85 and all(x.zone == Z_ZL for x in r))
+chk(u"берлин голдън бийч", u"А8: първият ред БЕРЛИН ГОЛДЪН БИЙЧ (16 реда общо)",
+    lambda r: len(r) == 16 and first_is(r, u"БЕРЛИН ГОЛДЪН БИЙЧ"))
+chk(u"лти берлин", u"А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
+    lambda r: first_is(r, u"БЕРЛИН ГОЛДЪН БИЙЧ"))
+chk(u"lti", u"А8: БЕРЛИН ГОЛДЪН БИЙЧ първи",
+    lambda r: first_is(r, u"БЕРЛИН ГОЛДЪН БИЙЧ"))
+chk(u"роял", u"А8: РОЯЛ (Одесос), РОЯЛ (Златни), после Royal Beach; размита опашка ОК",
+    lambda r: len(r) >= 3 and nz(r[0]) == (u"РОЯЛ", Z_OD) and nz(r[1]) == (u"РОЯЛ", Z_ZL)
+              and nz(r[2]) == (u"Royal Beach", Z_CH))
+chk(u"royal", u"А8: същите 3 в същия ред; размита опашка ОК",
+    lambda r: len(r) >= 3 and nz(r[0]) == (u"РОЯЛ", Z_OD) and nz(r[1]) == (u"РОЯЛ", Z_ZL)
+              and nz(r[2]) == (u"Royal Beach", Z_CH))
+chk(u"синчец", u"ДАНА ПАЛАС", lambda r: first_is(r, u"ДАНА ПАЛАС"))
+chk(u"хотел синчец", u"ДАНА ПАЛАС", lambda r: first_is(r, u"ДАНА ПАЛАС"))
+chk(u"русалка", u"А8: РУСАЛКА (Виница/север), Русалка (Св. К.) „· бивш“ първи; размита опашка ОК",
+    lambda r: len(r) >= 2 and nz(r[0]) == (u"РУСАЛКА", Z_VN)
+              and nz(r[1]) == (u"Русалка", Z_SK) and r[1].status == u"бивш")
+chk(u"бонита", u"БОНИТА/BONITA", lambda r: first_is(r, u"БОНИТА/BONITA"))
+chk(u"bonita", u"БОНИТА/BONITA", lambda r: first_is(r, u"БОНИТА/BONITA"))
+chk(u"хелиос спа", u"ХОТЕЛ  ХЕЛИОС СПА", lambda r: first_is(r, u"ХОТЕЛ  ХЕЛИОС СПА"))
+chk(u"спа хелиос", u"ХОТЕЛ  ХЕЛИОС СПА", lambda r: first_is(r, u"ХОТЕЛ  ХЕЛИОС СПА"))
+chk(u"парк", u"А8 (поправено като факт): 19 реда — първите 12 с точно „ПАРК“, после 7 размити",
+    lambda r: (len(r) == 19
+               and all(u"park" in x.nset for x in r[:12])
+               and not any(u"park" in x.nset for x in r[12:])))
+chk(u"градина", u"А8: хотел ГРАДИНА", lambda r: first_is(r, u"ГРАДИНА"))
+chk(u"блок с", u"0 наши реда", lambda r: len(r) == 0)
+chk(u"402", u"0 наши реда", lambda r: len(r) == 0)
+chk(u"бл. 402", u"0 наши реда", lambda r: len(r) == 0)
+chk(u"вх 3", u"0 наши реда", lambda r: len(r) == 0)
+chk(u"ьььь", u"0 наши реда", lambda r: len(r) == 0)
+for q in [u"7 су", u"седмо су", u"vii су"]:
+    chk(q, u"А8: 0", lambda r: len(r) == 0)
+for q in [u"дкц 2", u"болница света марина", u"градина 12"]:
+    chk(q, u"§3 М5: 0 (А8 мълчи)", lambda r: len(r) == 0)
+
+# ------------------------------------------- extra probes asked for tonight
+def chk2(q, expect, ok_fn):
+    EXTRASPEC.append((q, expect, ok_fn))
+
+
+chk2(u"хотел йо", u"Йо", lambda r: first_is(r, u"Йо"))
+chk2(u"хотел градина", u"ГРАДИНА", lambda r: first_is(r, u"ГРАДИНА"))
+chk2(u"хотел семеен", u"50", lambda r: len(r) == 50 and all(x.kind == u"Семеен хотел" for x in r))
+chk2(u"хотел адмирал", u"3, най-близкият (от точните) първи",
+     lambda r: len(r) == 3 and nz(r[0]) == (u"Адмирал", Z_SK))
+chk2(u"аквапарк клуб", u"ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ",
+     lambda r: first_is(r, u"ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ"))
+chk2(u"ritsa", u"Апарт комплекс Ritsa / „Рица“",
+     lambda r: first_is(r, u"Апарт комплекс Ritsa / „Рица“"))
+chk2(u"арабела блок с", u"АРАБЕЛА", lambda r: first_is(r, u"АРАБЕЛА"))
+chk2(u"арабела", u"АРАБЕЛА", lambda r: first_is(r, u"АРАБЕЛА"))
+chk2(u"мак", u"ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ (псевдоним „Мак“)",
+     lambda r: first_is(r, u"ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ"))
+chk2(u"йо", u"Йо (голата 2-знакова заявка — по П5)", lambda r: first_is(r, u"Йо"))
+
+# G12b unit tests of placeTokens
+G12B = [(u"VII", "7"), (u"седмо", "7"), (u"7-мо", "7"), (u"І", "1"),
+        (u"св.", u"sveti"), (u"д-р", u"doktor"), (u"х-л", u"hotel"),
+        (u"к-с", u"kompleks"), (u"апартхотел", u"hotel")]
+
+M5 = evaluate(M5SPEC)
+EXTRA = evaluate(EXTRASPEC)
+
+# ------------------------------------------------- counterfactual rule repairs
+VARIANTS = [
+    (u"§10 буквално (без П2–П5) — прогонът v2.1", {}),
+    (u"**подписаният набор П2+П3+П4+П5 — v2.2**", dict(BASE)),
+    (u"−П5 (за сравнение: `йо` остава ненамерен)", dict(BASE, P5=False)),
+    (u"+П1 (отхвърлен: мени и `берлин голдън бийч` 16→14)", dict(BASE, P1=True)),
+]
+# what П1 does to the two A8 counts that were measured under the v2 cap
+P1_COUNTS = []
+for _lbl, _cfg in [(u"v2.2 (без П1)", dict(BASE)),
+                   (u"с П1", dict(BASE, P1=True))]:
+    set_fix(_cfg)
+    _row = [_lbl]
+    for _q in [u"парк", u"берлин голдън бийч", u"хотел амирал", u"хотел адмиралл",
+               u"русалка", u"роял"]:
+        _r, _b = search(_q)
+        _ex = sum(1 for x in _r if any(t.s in x.nset for t in place_tokens(_q)))
+        _row.append((_q, len(_r), _ex))
+    P1_COUNTS.append(_row)
+set_fix(BASE)
+VAR_ROWS = []
+for vname, cfg in VARIANTS:
+    set_fix(cfg)
+    m5 = evaluate(M5SPEC)
+    ex = evaluate(EXTRASPEC)
+    cl, fl, n8 = sweep_recall()
+    VAR_ROWS.append((vname, m5, ex, cl, fl,
+                     [x[0] for x in m5 if not x[5]] + [x[0] for x in ex if not x[5]]))
+set_fix(BASE)
+
+# ---------------------------------------- narrative: cause + smallest repair
+MISS_WHY = {
+    u"роял": (u"**А7** (подредбата). И трите са точни (k3), с 1 именно съвпадение "
+              u"и еднаква сума → решава „разстояние до центъра ↑“, а Royal Beach "
+              u"(Чайка, 11 258 м) стои МЕЖДУ двата РОЯЛ (1 583 м и 12 428 м). "
+              u"Очакването на А8 „РОЯЛ, РОЯЛ, после Royal Beach“ иска критерий, "
+              u"който А7 няма.",
+              u"**П2** — между „действащ преди бивш“ и „разстояние“ се вмъква "
+              u"**покритие на името ↑**: РОЯЛ покрива цялото си име (0 непокрити "
+              u"токена), Royal Beach — половината (1 непокрит). Един ключ повече "
+              u"в сортировката; не пипа „най-близкият първи“ при равни имена "
+              u"(тримата Адмирали остават както са)."),
+    u"royal": (u"Същото като `роял`.", u"Същото — **П2**."),
+    u"парк": (u"**А8 сам по себе си**: „18 реда, всички с точно ПАРК“ не може да е "
+              u"вярно едновременно — точните са **12**, а 19 се получава само с "
+              u"размитата опашка (Арт, Art Green…, Апарт комплекс…, АРЕНА МАР, "
+              u"ДОЛЧЕ МАРЕ, ПАЛМ БИЙЧ — всички на Левенщайн 2 от `park`). "
+              u"Правилото-причина за опашката е **А5+М2**: `парк` е 4 знака ≥3 → "
+              u"значеща, а М2 дава размито от 4 знака нагоре.",
+              u"**П1** — размитото да важи от **6** оригинални знака нагоре "
+              u"(4–5 знака: точно/префикс/Левенщайн ≤1). Тогава `парк` = 12 реда, "
+              u"всички с точно ПАРК; `хотел амирал` (6) и `хотел адмиралл` (8) "
+              u"остават 3. **Цената:** същият cap стои зад другото число на А8 — "
+              u"`берлин голдън бийч` пада от 16 на 14 реда (`бийч` е 4 знака). "
+              u"Тоест двете половини на реда „парк“ в А8 не могат да са верни "
+              u"едновременно: или 19 реда с размита опашка (както А8 изрично "
+              u"позволява за `роял` и `русалка`), или 12 реда, всички точни, и "
+              u"тогава числото 16 при `берлин голдън бийч` става 14. **Това е "
+              u"решение за Петър, не за скрипта** — затова П1 стои ИЗВЪН "
+              u"препоръчания набор."),
+    u"болница света марина": (
+        u"**А1**. „болница“ е форма с ПРАЗЕН клас → пада до именен токен; "
+        u"„света“ съвпада точно (СВЕТА ЕЛЕНА…), „марина“ — точно/размито "
+        u"(Санта Марина, Marina Varna…), а М2 иска само ЕДНА значеща дума → 16 реда.",
+        u"**П4** — празният клас остава именен токен, но е и **филтър**: ред без "
+        u"съвпадение по име/псевдоним за самата дума („болница“) отпада → 0 реда. "
+        u"Не пипа „градина“→ГРАДИНА, „аквапарк клуб“, „галерия графит“, "
+        u"„комплекс ritsa“ (там думата съвпада с името)."),
+    u"градина 12": (
+        u"**А5**. След А1 „градина“ е име (и намира хотел ГРАДИНА); „12“ е числов "
+        u"токен без ключ → по А5 не е значещ, но и не пречи — а М2 иска само една "
+        u"значеща дума. §3 М5 чака 0 („класът не е в доставката“), А8 мълчи.",
+        u"**П3** — числов токен, който не съвпада ТОЧНО с токен на записа, "
+        u"отхвърля записа (числата са конюнктивни). „КАМПУС 90“ остава намираем "
+        u"(90 съвпада), „402“/„бл 402“/„вх 3“ си остават 0."),
+}
+
+DIFF_G = [
+    u"Освен буквалните А1–А8, за да тръгне изобщо, се наложиха следните "
+    u"уточнения — всяко е решение, което §10 оставя отворено:",
+    u"",
+    u"1. **А1, сканирането.** „Най-дългата форма на позиция“ вече прескача "
+    u"НЕнаселените форми и опитва по-къса: инак `детска градина` би глътнала "
+    u"`градина`, а класът ѝ е празен. Ключ е само форма с ≥1 зареден запис.",
+    u"2. **А1, вторите ключове.** Ключ-думите след най-левия се връщат като "
+    u"именни токени НА СВОЯТА ПОЗИЦИЯ (важно, докато псевдонимите бяха фраза; "
+    u"след А6 вече е без значение).",
+    u"3. **А1, fail-open.** Повторението с ключовете като имена се прави върху "
+    u"ЦЯЛАТА доставка (не в класа) и с изключен ключов режим; клон "
+    u"`M2-failopen`. В този прогон не се задейства нито веднъж.",
+    u"4. **А2, откъде е главната дума.** `forms[форма] → [чип]`, после "
+    u"`chips[].head` за този чип; правилото важи само за ЕДНО-токенните форми "
+    u"(както е записано). К2(б) от §3 се пази — А2 е добавка, не замяна.",
+    u"5. **А3′ — единственото същинско доуточняване.** А3 буквално („всеки "
+    u"останал токен съвпада точно със зонов или видов токен“) чупи "
+    u"„хотел градина“: `градина` е зонов токен на **Морска градина** и заявката "
+    u"връща 2-та хотела в тази зона вместо хотел ГРАДИНА. Затова приоритетът на "
+    u"А4 (**име точно > зона/вид точно**) важи и при ИЗБОРА на клона: А3 се "
+    u"пуска само ако никой остатъчен токен не съвпада ТОЧНО с име в класа. "
+    u"С това „хотел златни“ = 85 и „хотел семеен“ = 50 остават, а "
+    u"„хотел градина“ = ГРАДИНА.",
+    u"6. **А3, филтърът е конюнктивен** (записът трябва да покрие ВСИЧКИ "
+    u"остатъчни токени по зона/вид); празен резултат пропада към именното "
+    u"търсене, не към 0.",
+    u"7. **А4, псевдонимът е ТОЧНО съвпадение.** В приоритетния списък "
+    u"„псевдоним“ е едно ниво между „име точно“ и „зона/вид точно“ → без "
+    u"префикс и без размито по псевдоним. Тежести за сумата: име `2×качество`, "
+    u"зона/вид `3` (М4: име ×2, зона ×1 при качество 3).",
+    u"8. **А5, клаузата „с ключ“ е РАЗШИРЕНИЕ, не замяна.** Ако „значеща с ключ“ "
+    u"означаваше САМО точно/префиксно съвпадение, „хотел амирал“ пада от 3 на 1 "
+    u"ред (АДМИРАЛ съвпада само размито), а М5 иска 3. Затова: базата "
+    u"(≥3 знака, не маркер, не число) важи винаги, а ключът ДОБАВЯ късите точни "
+    u"съвпадения („хотел йо“) и точните числа.",
+    u"9. **А5, адресните маркери не са значещи никога** — и с ключ. Инак "
+    u"„хотел бл“ би бил заявка.",
+    u"10. **А6, псевдонимните токени не дават кредит на числа** и падат при "
+    u"≤2 знака (затова „Арабела блок С“ = само `arabela`, а „Мак“ (3) остава).",
+    u"11. **А7, „българска азбучна“** = `name.lower()` по кодови точки "
+    u"(непроменено от v2); центърът за близостта е началният `setView` "
+    u"(43.2141, 27.9147), защото в безглав прогон няма карта.",
+    u"",
+    u"12. **П2/П3/П4/П5 (подписани 02.09).** П2 добавя „покритие на името ↑“ в А7 "
+    u"между статуса и разстоянието; П3 прави числовия токен конюнктивен; П4 прави "
+    u"празния клас филтър с ТОЧНО съвпадение по име/псевдоним; П5 пуска "
+    u"2-знаковата дума без ключ, но само срещу едно-токенно име, съвпаднало точно. "
+    u"П1 е отхвърлена.",
+    u"",
+    u"**Какво се смени в поведението спрямо v2** (същите данни, същият cap):",
+    u"",
+    u"| заявка/мярка | v2 | v2.1 | правилото |",
+    u"|---|---|---|---|",
+    u"| 4-те неоткриваеми (ГРАДИНА, ГАЛЕРИЯ ГРАФИТ, Апарт комплекс Ritsa, "
+    u"ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ) | 0 реда | намерени, 1-ви ред | А1 |",
+    u"| `хотели` / `хотелите` | 217 | **226** | А2 |",
+    u"| `хотел златни` | 1 (Златен рог) | **85** | А3 |",
+    u"| `хотел семеен` | (не е в М5) | **50** | А3 |",
+    u"| `адмирал златни` · `хотел адмирал златни пясъци` | 4 | **3** | А4 |",
+    u"| `lti` | 0 | **1, БЕРЛИН ГОЛДЪН БИЙЧ** | А6 |",
+    u"| `лти берлин` | ГРИЙН ПАРК първи | **ГОЛДЪН БИЙЧ първи** | А6 |",
+    u"| `блок с` · `бл. 402` | 1 (Адия Блу) | **0** | А5 |",
+    u"| `7 су` · `седмо су` · `vii су` | 2 | **0** | А5 |",
+    u"| `мак` | (не е в М5) | **ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ** | А6 |",
+    u"| `русалка` | РУСАЛКА, Русалка, Musala | същите, но редът е гейтнат | А7 |",
+    u"| `роял` · `royal` | РОЯЛ, **Royal Beach**, РОЯЛ | РОЯЛ, РОЯЛ, Royal Beach | П2 |",
+    u"| `болница света марина` | 16 | **0** | П4 |",
+    u"| `градина 12` | 1 (ГРАДИНА) | **0** | П3 |",
+    u"| `парк` | 18, редът не е гейтван | **19 = 12 точни + 7 размити**, гейтван | А8 (факт) |",
+    u"| М5 по А8 | 19/35 (v2) → 31/36 (v2.1) | **36/36** | П2+П3+П4 |",
+    u"| `йо` (гола заявка) | 0 реда | **хотел Йо** | П5 |",
+    u"| A1 / A2 recall | 222/226 · 225/225 | **226/226 · 226/226** | А1 + П5 |",
+    u"",
+    u"**Остатъчните проблеми след v2.1 (с причина):**",
+    u"",
+    u"1. **`йо` — ЗАТВОРЕН с П5** (подписана 02.09). Без ключ 2-знакова дума е "
+    u"значеща само при ТОЧНО съвпадение със запис, чието цяло име е този единствен "
+    u"токен; префиксните 2-знакови съвпадения продължават да не квалифицират. "
+    u"А1/А2 = **226/226**, 36/36 и 10/10 остават, нула други промени "
+    u"(редът `−П5` в в4 е мярката).",
+    u"2. **`парк` — ЗАТВОРЕН** с поправката на очакването като факт (12 точни "
+    u"първи, после 7 размити = 19 реда); гейтът вече проверява и разделянето "
+    u"12/7, не само броя.",
+    u"3. **`чайка` → Villa Chinka** (1 ред, размито). Зоната „к.к. Чайка“ не "
+    u"квалифицира сама (правилно по §3), но `chaika`~`chinka` е на Левенщайн 2. "
+    u"П1 (размито от 6 знака) го маха; иначе е безобиден единичен ред.",
+    u"4. **`берлин голдън бийч` = 16 реда**, от които 11 съдържат точен токен от "
+    u"заявката — първият ред е верният, останалите са опашка по `голдън`/`бийч`. "
+    u"А8 го приема така.",
+]
+
+# =============================================================== the report
+L = []
+w = L.append
+w(u"# Recall-прогон v2.2 · 226-те хотела · А1–А8 + подписаните П2+П3+П4+П5")
+w(u"")
+w(u"Скрипт: `measures/recall_sweep_v22.py` — копие на `recall_sweep_v21.py` с "
+  u"включени **П2** (покритие на името преди близостта), **П3** (числов токен без "
+  u"точно съвпадение отхвърля записа), **П4** (дума от речника с празен клас = "
+  u"именен токен И филтър) и **П5 включена** (без ключ 2-знакова дума е значеща "
+  u"при точно съвпадение с едно-токенно име → `йо` → хотел Йо), **без П1**; "
+  u"редът „парк“ на А8 е поправен като ФАКТ: 19 реда — първите 12 с точно „ПАРК“, "
+  u"после 7-те размити. Само четене. "
+  u"Кадастрални идентификатори не се четат и не се изписват.")
+w(u"**П5 включена (подписана 02.09).** Единствената ѝ следа в резултатите е редът "
+  u"`йо` в допълнителните проверки (10-та заявка, добавена тази нощ): 0 реда → "
+  u"**Йо**. Всичко останало е байт-същото — А1/А2 се вдигат от 225/226 на "
+  u"**226/226**, гейтът на §10 е затворен и по двете си половини.")
+w(u"Еталонът за JS-а ред по ред: `measures/recall_sweep_v22_rows.json` "
+  u"(пълните списъци име · зона за 36-те гейт-заявки и 9-те допълнителни).")
+w(u"Данни: `varna_3d/data/fire_varna_hotels.json` (%d записа) · "
+  u"`varna_3d/data/place_categories.json` (%d форми, %d чипа с `head`)."
+  % (len(RECS), len(cats["forms"]), len(cats["chips"])))
+w(u"Център за М1/А3 (`map.getCenter()` няма в безглав прогон): "
+  u"**43.2141, 27.9147** — началният `setView` на `Fire_Varna/index.html:1838`.")
+w(u"")
+w(u"## 0 · Санитарна проверка на токенизатора (G12б)")
+w(u"")
+w(u"| вход | placeTokens | очаквано | |")
+w(u"|---|---|---|---|")
+for src, exp in G12B:
+    got = " ".join(t.s for t in place_tokens(src))
+    w(u"| `%s` | `%s` | `%s` | %s |" % (src, got, exp, u"ДА" if got == exp else u"**НЕ**"))
+w(u"")
+w(u"### 0б · Населените класове (А1) и обхватът им (А2)")
+w(u"")
+w(u"| форма | ключ | клас (записи) | по (а) чип | по (б) К2б | по (в) А2 head |")
+w(u"|---|---|---|---|---|---|")
+for form in [u"хотел", u"хотели", u"хотелите", u"хотелът", u"хотела",
+             u"семеен хотел", u"апарт-хотел", u"комплекс", u"аквапарк",
+             u"градина", u"галерия", u"клуб", u"парк"]:
+    fk = key_of(form)
+    if fk not in FORM_IDX:
+        w(u"| `%s` | — | (не е форма в речника) | | | |" % form)
+        continue
+    e = FORM_IDX[fk]
+    a = [r for r in RECS if r.kkey in e["chips"]]
+    parts = fk.split(" ")
+    b = [r for r in RECS if r not in a and len(parts) == 1 and parts[0] in r.ktk]
+    c3 = [r for r in CLASS_OF[fk] if r not in a and r not in b]
+    n = len(CLASS_OF[fk])
+    w(u"| `%s` | `%s` | %s | %d | %d | %d |"
+      % (form, fk, (u"**%d**" % n) if n else u"0 → **не е ключ (А1)**",
+         len(a), len(b), len(c3)))
+w(u"")
+kinds = {}
+for r in RECS:
+    kinds[r.kind] = kinds.get(r.kind, 0) + 1
+w(u"Видове в доставката: " + u" · ".join(u"%s %d" % (k, v) for k, v in
+                                          sorted(kinds.items(), key=lambda x: -x[1])))
+w(u"")
+w(u"## а · Recall по клас заявки (226 записа)")
+w(u"")
+w(u"| клас заявки | заявки | намерен | %% | в първите 8 | %% |")
+w(u"|---|---|---|---|---|---|")
+recall_line = {}
+for k in CLS_ORDER:
+    v = classes[k]
+    n = len(v)
+    found = sum(1 for _, _, rk, _, _ in v if rk >= 0)
+    top8 = sum(1 for _, _, rk, _, _ in v if 0 <= rk < TOP)
+    recall_line[k] = (n, found, top8)
+    w(u"| %s | %d | %d | %.1f | %d | %.1f |"
+      % (k, n, found, 100.0 * found / n if n else 0.0, top8,
+         100.0 * top8 / n if n else 0.0))
+w(u"")
+for k in CLS_ORDER:
+    w(u"### %s" % k)
+    w(u"")
+    if not fails[k]:
+        w(u"Ненамерени: **0**.")
+    else:
+        w(u"Ненамерени (**%d**):" % len(fails[k]))
+        w(u"")
+        w(u"| запис | зона | заявка | редове | клон |")
+        w(u"|---|---|---|---|---|")
+        for rec, q, n, br in fails[k]:
+            w(u"| %s | %s | `%s` | %d | %s |" % (rec.name, rec.zone, q, n, br))
+    w(u"")
+    if notin8[k]:
+        w(u"Намерени, но извън първите 8 (**%d**):" % len(notin8[k]))
+        w(u"")
+        w(u"| запис | зона | заявка | позиция | редове | клон |")
+        w(u"|---|---|---|---|---|---|")
+        for rec, q, rk, n, br in notin8[k]:
+            w(u"| %s | %s | `%s` | %d | %d | %s |" % (rec.name, rec.zone, q, rk + 1, n, br))
+    else:
+        w(u"Извън първите 8: **0**.")
+    w(u"")
+w(u"## б · Таблица на колизиите")
+w(u"")
+w(u"| заявка | редове | клон | първите 3 (име · зона) |")
+w(u"|---|---|---|---|")
+for q, n, br, top3 in coll_rows:
+    w(u"| `%s` | %d | %s | %s |" % (q, n, br, rows_label(top3, 3)))
+w(u"")
+w(u"## в · Срещу М5 по А8")
+w(u"")
+w(u"| заявка | очаквано (М5 по А8) | измерено | клон | първите 3 | съвпада |")
+w(u"|---|---|---|---|---|---|")
+for q, exp, n, br, lab, ok in M5:
+    w(u"| `%s` | %s | %d реда | %s | %s | %s |"
+      % (q, exp, n, br, lab, u"ДА" if ok else u"**НЕ**"))
+w(u"")
+bad = [x for x in M5 if not x[5]]
+w(u"**Разминавания с М5 по А8: %d от %d.**" % (len(bad), len(M5)))
+w(u"")
+for q, exp, n, br, lab, ok in bad:
+    why, fix = MISS_WHY.get(q, (u"(без анализ)", u"(без предложение)"))
+    w(u"- **`%s`** — очаквано: %s · измерено: %d реда (%s) · %s" % (q, exp, n, br, lab))
+    w(u"  - *правило-причина:* %s" % why)
+    w(u"  - *най-малката поправка на правилото:* %s" % fix)
+w(u"")
+w(u"### в2 · Допълнителните проверки от промпта")
+w(u"")
+w(u"| заявка | очаквано | измерено | клон | първите 3 | съвпада |")
+w(u"|---|---|---|---|---|---|")
+for q, exp, n, br, lab, ok in EXTRA:
+    w(u"| `%s` | %s | %d реда | %s | %s | %s |"
+      % (q, exp, n, br, lab, u"ДА" if ok else u"**НЕ**"))
+w(u"")
+badx = [x for x in EXTRA if not x[5]]
+w(u"**Разминавания в допълнителните проверки: %d от %d.**" % (len(badx), len(EXTRA)))
+w(u"")
+w(u"### в3 · Кой ред е най-близък до центъра (43.2141, 27.9147)")
+w(u"")
+_adm, _ = search(u"хотел адмирал")
+w(u"| # | име | зона | статус | разстояние |")
+w(u"|---|---|---|---|---|")
+for i, r in enumerate(_adm):
+    w(u"| %d | %s | %s | %s | %.0f м |" % (i + 1, r.name, r.zone, r.status or u"—", r.dist))
+w(u"")
+_royal, _ = search(u"роял")
+w(u"`роял` (пълен ред):")
+w(u"")
+w(u"| # | име | зона | качество | разстояние |")
+w(u"|---|---|---|---|---|")
+for i, r in enumerate(_royal):
+    bnk, nm, tot, ssum, qual, unc = score(r, place_tokens(u"роял"), False)
+    w(u"| %d | %s | %s | k%d | %.0f м |" % (i + 1, r.name, r.zone, bnk, r.dist))
+w(u"")
+_park, _ = search(u"парк")
+w(u"`парк` — кои редове НЕ са точни:")
+w(u"")
+w(u"| # | име | зона | качество |")
+w(u"|---|---|---|---|")
+for i, r in enumerate(_park):
+    if u"park" not in r.nset:
+        bnk, nm, tot, ssum, qual, unc = score(r, place_tokens(u"парк"), False)
+        w(u"| %d | %s | %s | k%d (размито) |" % (i + 1, r.name, r.zone, bnk))
+w(u"")
+w(u"### в4 · Контрафакт: кандидат-поправките НА ПРАВИЛОТО (мерени, не приети наслуки)")
+w(u"")
+w(u"| вариант | М5/А8 | доп. | A1 recall | A3 recall | остатъчни разминавания |")
+w(u"|---|---|---|---|---|---|")
+for vname, m5, ex, cl, fl, miss in VAR_ROWS:
+    a1 = cl[CLS_ORDER[0]]
+    a3 = cl[CLS_ORDER[2]]
+    f1 = sum(1 for _, _, rk, _, _ in a1 if rk >= 0)
+    f3 = sum(1 for _, _, rk, _, _ in a3 if rk >= 0)
+    w(u"| %s | %d/%d | %d/%d | %d/%d | %d/%d | %s |"
+      % (vname, sum(1 for x in m5 if x[5]), len(m5),
+         sum(1 for x in ex if x[5]), len(ex),
+         f1, len(a1), f3, len(a3),
+         u", ".join(u"`%s`" % q for q in miss) or u"—"))
+w(u"")
+w(u"Легенда на поправките (всяка е ЕДНО изречение върху едно правило):")
+w(u"")
+w(u"- **П1 (над А5/М2):** размитото съвпадение (Левенщайн ≤2) важи от **6 оригинални "
+  u"знака** нагоре; при 4–5 знака — точно, префиксно и Левенщайн ≤1.")
+w(u"- **П2 (над А7):** между „действащ преди бивш“ и „разстояние до центъра“ се "
+  u"вмъква **покритие на името ↑** (брой НЕсъвпаднали собствени именни токени).")
+w(u"- **П3 (над А5):** чисто числов токен, който **не съвпада точно** с токен на "
+  u"записа, отхвърля записа (числата са конюнктивни, не по избор).")
+w(u"- **П4 (над А1):** дума от речника, чийто клас е **празен**, остава именен токен, "
+  u"но е и **филтър**: ред без ТОЧНО съвпадение по име/псевдоним за нея отпада "
+  u"(размитото съвпадение `болница`~БОНИТА не е доказателство, че думата я има).")
+w(u"- **П5 (над А5, ПОДПИСАНА 02.09):** без ключ дума от 2 знака е значеща само при "
+  u"ТОЧНО съвпадение със запис, чието цяло име е този единствен токен → затваря "
+  u"`йо` и вдига А1/А2 на **226/226** (гейтът на §10). Нула други промени: "
+  u"префиксните 2-знакови съвпадения НЕ квалифицират.")
+w(u"")
+w(u"Цената на П1 (двете числа на А8 са мерени при стария cap):")
+w(u"")
+w(u"| заявка | без П1: редове (от тях точни) | с П1: редове (от тях точни) |")
+w(u"|---|---|---|")
+for _i in range(len(P1_COUNTS[0]) - 1):
+    _q, _n0, _e0 = P1_COUNTS[0][_i + 1]
+    _q2, _n1, _e1 = P1_COUNTS[1][_i + 1]
+    w(u"| `%s` | %d (%d) | %d (%d) |" % (_q, _n0, _e0, _n1, _e1))
+w(u"")
+w(u"**Присъда на прогона.** Подписаният набор **П2+П3+П4+П5** затваря и петте "
+  u"разминавания на v2.1 И дупката `йо`; редът „парк“ на А8 е поправен като факт "
+  u"(12 точни, после 7 размити = 19), а П1 остава ОТХВЪРЛЕН, защото щеше да смени "
+  u"и второто измерено число на А8 (`берлин голдън бийч` 16→14). "
+  u"**Гейтът на §10 е затворен: 0 разминавания с М5 по А8 (36/36) и 226/226 за "
+  u"А1/А2**, плюс 10/10 на допълнителните проверки.")
+w(u"")
+w(u"## г · Разликите v2 → v2.2 в правилата, които се наложиха")
+w(u"")
+for ln in DIFF_G:
+    w(ln)
+w(u"")
+
+# ------------------------------------------------- the row-by-row JS baseline
+set_fix(BASE)
+ROWS = {
+    "_meta": {
+        "source": "measures/recall_sweep_v22.py",
+        "rules": "plan sec.3 (T1/T2/K2/M1-M5) + sec.10 A1-A8 + P2+P3+P4 (no P1)",
+        "data": ["varna_3d/data/fire_varna_hotels.json",
+                 "varna_3d/data/place_categories.json"],
+        "records": len(RECS),
+        "center": [CENTER[0], CENTER[1]],
+        "top_cut_is_in_render": TOP,
+        "note": ("full ordered lists; the TOP-8 cut belongs to render(), not to "
+                 "the search. No cadastral identifiers are read or written."),
+    },
+    "gate_m5_a8": [],
+    "extra": [],
+}
+for _bucket, _spec in [("gate_m5_a8", M5SPEC), ("extra", EXTRASPEC)]:
+    for _q, _exp, _fn in _spec:
+        _r, _b = search(_q)
+        ROWS[_bucket].append({
+            "q": _q,
+            "expect": _exp,
+            "branch": _b,
+            "n": len(_r),
+            "ok": bool(_fn(_r)),
+            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+        })
+ROWS_OUT = OUTDIR + "recall_sweep_v22_rows.json"
+open(ROWS_OUT, "w", encoding="utf-8").write(
+    json.dumps(ROWS, ensure_ascii=False, indent=1, sort_keys=False) + chr(10))
+
+OUT = OUTDIR + ("recall_sweep_v22.md" if CAPMODE == "plan"
+                else "recall_sweep_v22_cap_poi.md")
+open(OUT, "w", encoding="utf-8").write(u"\n".join(L) + u"\n")
+print(u"CAPMODE=%s -> %s" % (CAPMODE, OUT))
+print(u"rows -> %s (%d + %d заявки, %d реда общо)"
+      % (ROWS_OUT, len(ROWS["gate_m5_a8"]), len(ROWS["extra"]),
+         sum(len(x["rows"]) for x in ROWS["gate_m5_a8"] + ROWS["extra"])))
+print(u"M5/A8: %d/%d съвпадат ; extra %d/%d"
+      % (len(M5) - len(bad), len(M5), len(EXTRA) - len(badx), len(EXTRA)))
+for k in CLS_ORDER:
+    n, found, top8 = recall_line[k]
+    print(u"%-36s n=%3d found=%3d top8=%3d" % (k, n, found, top8))
+print(u"--- misses (M5/A8) ---")
+for q, exp, n, br, lab, ok in M5:
+    if not ok:
+        print(u"  %-32s %-22s %3d  %s" % (q, br, n, lab))
+print(u"--- misses (extra) ---")
+for q, exp, n, br, lab, ok in EXTRA:
+    if not ok:
+        print(u"  %-32s %-22s %3d  %s" % (q, br, n, lab))

@@ -54,6 +54,7 @@
 // (Runtime.exceptionThrown + console.error), not from browser-level network
 // noise: the gate is "the app threw nothing", not "the satellite link was up".
 import { spawn, spawnSync } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -652,14 +653,527 @@ function runG6(s) {
   };
 }
 
-// --- G4: the intuitive-query gate — lands with the branch itself, in C4 ------
+// --- G4: the places (hotels) branch — plan §3 М5 + §10 А8 + §12 В8 + G12б/в/г
+// Lands with the branch it measures (C4). Everything here reads OUR container
+// (#placesSearchResults), OUR marker (.place-pin-wrapper) and OUR export
+// (window.__places); the G3 corpus above is untouched by construction.
+const REF_ROWS = JSON.parse(fs.readFileSync(path.join(HERE, "recall_sweep_rows.json"), "utf8"));
+// The placeTokens contract, repeated verbatim from tests/test_places_search_primitives.py
+// (EXPECTATIONS). checkTokenTable() also counts the rows over there, so a row added
+// to the test without being added here is loud rather than silent.
+const CYR_I_UPPER = "І";
+const TOKEN_TABLE = [
+  ["VII СУ „Найден Геров“", ["7", "su", "naiden", "gerov"]],
+  ["седмо су", ["7", "su"]],
+  ["7-мо су", ["7", "su"]],
+  [CYR_I_UPPER + " ОУ „Свети княз Борис I“", ["1", "ou", "sveti", "kniaz", "boris", "1"]],
+  ["св. марина", ["sveti", "marina"]],
+  ["д-р иванов", ["doktor", "ivanov"]],
+  ["БОНИТА/BONITA", ["bonita", "bonita"]],
+  ["х-л романтика", ["hotel", "romantika"]],
+  ["ДКЦ 2", ["dkts", "2"]],
+  ["II ДКЦ", ["2", "dkts"]],
+  ["Зл.котва", ["zl", "kotva"]],
+  ["Иглика-2", ["iglika", "2"]],
+  ["ХОТЕЛ  ХЕЛИОС СПА", ["hotel", "helios", "spa"]],
+  ["Св.Николай", ["sveti", "nikolai"]],
+  ["Св.св.Кирил", ["sveti", "sveti", "kiril"]],
+  ["Др Хараламбиев", ["doktor", "haralambiev"]],
+  ["апартхотел", ["apart", "hotel"]],
+  ["апарткомплекс", ["apart", "kompleks"]],
+];
+
+const PLACES_CACHE = "fire-varna-hotels-v2-226";
+const HOTELS_URL = BASE + "data/hotels.json";
+
+const PL_VISIBLE_JS = "document.getElementById('placesSearchResults').classList.contains('visible')";
+const PL_ROWS_JS = `(function () {
+  var box = document.getElementById('placesSearchResults');
+  var rows = [], items = box.querySelectorAll('.pl-item');
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    rows.push({ idx: it.dataset.idx, kind: (it.querySelector('.pl-kind') || {}).textContent || null,
+                title: (it.querySelector('.pl-title') || {}).textContent || null,
+                meta: (it.querySelector('.pl-meta') || {}).textContent || null,
+                height: Math.round(it.getBoundingClientRect().height) });
+  }
+  var more = box.querySelector('.pl-more');
+  var head = box.querySelector('.pl-group-header');
+  var r = box.getBoundingClientRect();
+  return { visible: box.classList.contains('visible'), header: head ? head.textContent : null,
+           rows: rows, more: more ? more.textContent : null,
+           rect: { top: Math.round(r.top), bottom: Math.round(r.bottom), height: Math.round(r.height) },
+           innerHeight: window.innerHeight };
+})()`;
+const PLACE_SURFACE_JS = `(function () {
+  var pins = document.querySelectorAll('.place-pin-wrapper');
+  var pop = document.querySelector('.place-popup');
+  var hrefs = [];
+  if (pop) { var a = pop.querySelectorAll('.nav-actions a'); for (var i = 0; i < a.length; i++) hrefs.push(a[i].getAttribute('href')); }
+  var sheet = document.getElementById('detailSheet');
+  return {
+    pins: pins.length,
+    popups: document.querySelectorAll('.place-popup').length,
+    title: pop ? (pop.querySelector('.pp-title') || {}).textContent || null : null,
+    sub: pop ? (pop.querySelector('.pp-sub') || {}).textContent || null : null,
+    old: pop ? ((pop.querySelector('.pp-old') || {}).textContent || null) : null,
+    src: pop ? (pop.querySelector('.pp-src') || {}).textContent || null : null,
+    navHrefs: hrefs,
+    theirPins: document.querySelectorAll('.search-pin-wrapper').length,
+    sheetHidden: sheet ? !!sheet.hidden : null,
+    theirVisible: document.getElementById('addrSearchResults').classList.contains('visible'),
+    theirHtml: document.getElementById('addrSearchResults').outerHTML,
+    legendOpen: (function () { var l = document.getElementById('legend'); return l ? !l.hidden : null; })()
+  };
+})()`;
+// The ranked hydrant pins ARE the "Топ 5" list — the mode renders numbered pins, not
+// an HTML list. Their positions + rank badges are what re-anchoring visibly changes.
+const HYDRANT_PINS_JS = `(function () {
+  var out = [], pins = document.querySelectorAll('.h-pin-wrapper');
+  for (var i = 0; i < pins.length; i++) {
+    var b = pins[i].querySelector('.h-rank');
+    out.push((pins[i].style.transform || '') + '|' + (b ? b.textContent : ''));
+  }
+  out.sort();
+  return out;
+})()`;
+
+async function placesReady(s, timeoutMs = 30000) {
+  await focusInput(s);
+  const ok = await waitFor(s, "!!window.__places", timeoutMs);
+  if (!ok) return false;
+  try { await s.ev("window.__places.ensure().then(function () { return true; }).catch(function () { return false; })"); }
+  catch (e) { return false; }
+  return await s.ev("window.__places.tokens('хотел').length > 0 && window.__places.search('хотел').rows.length > 0");
+}
+
+// Our own dropdown answers on the same 120 ms debounce as theirs; waitSettled only
+// watches THEIR container, so give ours its own (bounded) wait as well.
+async function typePlaces(s, q) {
+  await clearField(s);
+  await typeQuery(s, q);
+  await waitFor(s, `${PL_VISIBLE_JS} || document.getElementById('addrSearchResults').classList.contains('visible')`, 8000);
+  await sleep(POLL_MS * 4);
+  return await s.ev(PL_ROWS_JS);
+}
+
+// One interception for hotels.json on top of the session's own (search_index /
+// detail) handling: the original hook is kept and delegated to.
+async function armPlacesFetch(s) {
+  if (s.placesArmed) return;
+  s.placesArmed = true;
+  s.hotelsMode = "pass";           // pass | hold | 404 | malformed
+  s.heldHotelsId = null;
+  const prev = s.onPaused;
+  s.onPaused = async (p) => {
+    const url = p.request?.url || "";
+    if (!url.includes("hotels.json")) return prev(p);
+    try {
+      if (s.hotelsMode === "404") {
+        await s.send("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: 404, body: "" });
+        return;
+      }
+      if (s.hotelsMode === "malformed") {
+        await s.send("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: 200,
+          responseHeaders: [{ name: "Content-Type", value: "application/json" }],
+          body: Buffer.from('{"_meta":{"count":226},"hotels":[', "utf8").toString("base64") });
+        return;
+      }
+      if (s.hotelsMode === "hold" && s.heldHotelsId === null) { s.heldHotelsId = p.requestId; return; }
+      await s.send("Fetch.continueRequest", { requestId: p.requestId });
+    } catch (e) { warn("hotels.json Fetch: " + e); }
+  };
+  await s.send("Fetch.enable", { patterns: [
+    { urlPattern: "*search_index.json*", requestStage: "Request" },
+    { urlPattern: "*hotels.json*", requestStage: "Request" },
+    { urlPattern: "*/details/*", requestStage: "Request" },
+    { urlPattern: "*/detail/*", requestStage: "Request" },
+  ] });
+}
+
+const dropPlacesCache = (s) =>
+  s.ev(`caches.delete('${PLACES_CACHE}').then(function (v) { return v; }).catch(function () { return null; })`);
+const placesCacheHas = (s) =>
+  s.ev(`caches.open('${PLACES_CACHE}').then(function (c) { return c.match('${HOTELS_URL}'); })` +
+       `.then(function (h) { return !!h; }).catch(function () { return null; })`);
+
+async function checkTokenTable(s) {
+  const rows = [];
+  for (const [q, expected] of TOKEN_TABLE) {
+    const got = await s.ev(`JSON.stringify(window.__places.tokens(${JSON.stringify(q)}))`);
+    rows.push({ q, expected, got: JSON.parse(got), ok: got === JSON.stringify(expected) });
+  }
+  // the same table must still be the one the unit test carries
+  const py = fs.readFileSync(path.join(REPO, "tests", "test_places_search_primitives.py"), "utf8");
+  const block = py.slice(py.indexOf("EXPECTATIONS = ("), py.indexOf("class VerbatimPrimitivesTest"));
+  const inTest = (block.match(/^ {4}\(/gm) || []).length;
+  return { rows, passed: rows.filter((r) => r.ok).length, total: rows.length, rowsInTest: inTest };
+}
+
+// G12в — the 46 reference queries, row by row, against recall_sweep_rows.json.
+// Order-sensitive first: the distance tie-break reads map.getCenter(), and the
+// sweep stood in for it with the map's own opening centre [43.2141, 27.9147]. If
+// the ordered comparison holds, the browser sat on that centre; only if it does
+// not do we fall back to comparing the SETS and say so.
+async function checkReferenceRows(s) {
+  const out = { mode: "ordered", queries: [], passedOrdered: 0, passedSets: 0, total: 0, rows: 0 };
+  for (const bucket of ["gate_m5_a8", "extra"]) {
+    for (const rec of REF_ROWS[bucket]) {
+      const got = JSON.parse(await s.ev(
+        `JSON.stringify((function (r) { return { category: r.category, rows: r.rows.map(function (x) { return x.name + ' · ' + x.zone; }) }; })(window.__places.search(${JSON.stringify(rec.q)})))`));
+      const want = rec.rows.map((r) => r.name + " · " + r.zone);
+      const ordered = JSON.stringify(got.rows) === JSON.stringify(want);
+      const sets = JSON.stringify([...got.rows].sort()) === JSON.stringify([...want].sort());
+      out.total++;
+      out.rows += want.length;
+      if (ordered) out.passedOrdered++;
+      if (sets) out.passedSets++;
+      const first = got.rows.findIndex((v, i) => v !== want[i]);
+      out.queries.push({ q: rec.q, expect: rec.expect, bucket, category: got.category,
+                         n: got.rows.length, refN: want.length, ordered, sets,
+                         first3: got.rows.slice(0, 3), refFirst3: want.slice(0, 3),
+                         firstDiffAt: ordered ? null : first,
+                         diffOurs: ordered ? null : got.rows.slice(Math.max(0, first), first + 2),
+                         diffRef: ordered ? null : want.slice(Math.max(0, first), first + 2) });
+    }
+  }
+  if (out.passedOrdered < out.total && out.passedSets === out.total) out.mode = "sets";
+  return out;
+}
+
+// §3 М5 / §10 А8 — the same 46 queries as a human sees them: how many rows and
+// which first three, read from OUR DOM (top 8) as well as from the export.
+async function checkM5Table(s) {
+  const out = [];
+  for (const bucket of ["gate_m5_a8", "extra"]) {
+    for (const rec of REF_ROWS[bucket]) {
+      const js = JSON.parse(await s.ev(
+        `JSON.stringify((function (r) { return { n: r.rows.length, category: r.category, first3: r.rows.slice(0, 3).map(function (x) { return x.name + ' · ' + x.zone; }) }; })(window.__places.search(${JSON.stringify(rec.q)})))`));
+      const dom = await typePlaces(s, rec.q);
+      out.push({ q: rec.q, expect: rec.expect, jsN: js.n, refN: rec.rows.length, category: js.category,
+                 jsFirst3: js.first3, domVisible: dom.visible, domHeader: dom.header,
+                 domRows: dom.rows.length, domMore: dom.more,
+                 domFirst3: dom.rows.slice(0, 3).map((r) => r.title + " | " + r.meta),
+                 ok: js.n === rec.rows.length });
+    }
+  }
+  await clearField(s);
+  return out;
+}
+
+// A click on our first row: orange pin, popup with all its lines, the hydrant
+// ranking re-anchored around the place, and Escape taking all of it away again.
+async function checkPickAndEscape(s, q) {
+  const before = await s.ev(HYDRANT_PINS_JS);
+  const list = await typePlaces(s, q);
+  const clicked = await s.ev(
+    "(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]');" +
+    " if (!e) return false; e.click(); return true; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const after = await s.ev(HYDRANT_PINS_JS);
+  const surface = await s.ev(PLACE_SURFACE_JS);
+  const field = await s.ev(INPUT_VALUE_JS);
+  await focusInput(s);
+  await pressKey(s, "Escape", 27);
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length === 0", 15000);
+  await waitSettled(s, 20000);
+  const afterEscape = await s.ev(PLACE_SURFACE_JS);
+  const plAfter = await s.ev(PL_ROWS_JS);
+  await clearField(s);
+  return {
+    query: q, rowsShown: list.rows.length, firstRow: list.rows[0] || null, clicked: !!clicked,
+    fieldAfterPick: field, surface,
+    hydrantsBefore: before.length, hydrantsAfter: after.length,
+    hydrantsChanged: JSON.stringify(before) !== JSON.stringify(after),
+    afterEscape: { pins: afterEscape.pins, popups: afterEscape.popups, listVisible: plAfter.visible },
+  };
+}
+
+// П7 (§12 В3) — their building panel arrives 3 s late, after we have already put
+// our place on the map. The panel must not land on top of our selection.
+async function checkLateDetailSheet(s) {
+  await navigateFresh(s, "П7 late /detail/");
+  if (!(await placesReady(s))) return { ready: false };
+  s.holdDetail = true;
+  const prev = s.onPaused;
+  s.onPaused = async (p) => {
+    const url = p.request?.url || "";
+    if (s.holdDetail && isDetailUrl(url)) {
+      setTimeout(() => { s.send("Fetch.continueRequest", { requestId: p.requestId }).catch(() => {}); }, HOLD_MS);
+      return;
+    }
+    return prev(p);
+  };
+  await clearField(s);
+  await typeQuery(s, "бл. 402 вх. 3");
+  const theirRows = await s.ev(ROWS_JS);
+  if (theirRows.length)
+    await s.ev(`(function () { var e = document.querySelector('#addrSearchResults .asr-item[data-idx="${theirRows[0].idx}"]');` +
+               " if (e) e.click(); return !!e; })()");
+  const mine = await typePlaces(s, "хотел адмирал");
+  await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await sleep(HOLD_MS + 1500);                 // outlive the held response by a second
+  await waitSettled(s, 30000);
+  const surface = await s.ev(PLACE_SURFACE_JS);
+  s.holdDetail = false;
+  s.onPaused = prev;
+  await pressEscape(s);
+  await clearField(s);
+  return { ready: true, theirRows: theirRows.length, mineRows: mine.rows.length,
+           sheetHidden: surface.sheetHidden, pins: surface.pins, popups: surface.popups,
+           title: surface.title, theirPins: surface.theirPins };
+}
+
+// The four refusals of the payload (Д2/Д3/В7). Our cache namespace is emptied
+// first, so "no answer" means the network answer, not a warm copy.
+async function checkRefusals(s) {
+  const out = {};
+  const scenario = async (name, mode, prep) => {
+    await navigateFresh(s, "refusal " + name);
+    await dropPlacesCache(s);
+    if (prep) await prep();
+    s.hotelsMode = mode;
+    const errsBefore = s.errs.length;
+    const rows = await (async () => {
+      await focusInput(s);
+      await sleep(1500);
+      return await typePlaces(s, "хотел адмирал");
+    })();
+    out[name] = { rows: rows.rows.length, visible: rows.visible,
+                  hasExport: await s.ev("!!window.__places"),
+                  searchRows: await s.ev("window.__places ? window.__places.search('хотел адмирал').rows.length : null"),
+                  cacheEntry: await placesCacheHas(s),
+                  consoleErrors: s.errs.length - errsBefore };
+    s.hotelsMode = "pass";
+    await clearField(s);
+  };
+  await scenario("notFound", "404");
+  await scenario("malformed", "malformed");
+  // Held body: our AbortController must give up at 8 s and the branch must stay
+  // quiet. The request is released afterwards so the session is left clean.
+  await navigateFresh(s, "refusal held-body");
+  await dropPlacesCache(s);
+  s.heldHotelsId = null;
+  s.hotelsMode = "hold";
+  const errsBefore = s.errs.length;
+  await focusInput(s);
+  const paused = await waitNode(() => s.heldHotelsId !== null, 25000, "hotels.json paused");
+  await sleep(10000);                          // past the 8 s abort, well short of 20 s
+  const held = await typePlaces(s, "хотел адмирал");
+  out.heldBody = { paused, rows: held.rows.length,
+                   searchRows: await s.ev("window.__places ? window.__places.search('хотел адмирал').rows.length : null"),
+                   consoleErrors: s.errs.length - errsBefore };
+  s.hotelsMode = "pass";
+  if (paused) { try { await s.send("Fetch.continueRequest", { requestId: s.heldHotelsId }); } catch (e) {} }
+  s.heldHotelsId = null;
+  await clearField(s);
+  // A STALE cache (the old 144-record contract) plus a 404 from the network: the
+  // stale copy must not pass validation. Plan §12 В7: it is IGNORED, not deleted.
+  await scenario("staleCache", "404", async () => {
+    const body = JSON.stringify({ _meta: { count: 144, licence: "x" },
+                                  hotels: Array.from({ length: 144 }, (_, i) => ({ name: "X" + i })) });
+    await s.ev(`caches.open('${PLACES_CACHE}').then(function (c) {` +
+               ` return c.put('${HOTELS_URL}', new Response(${JSON.stringify(body)},` +
+               ` { headers: { 'Content-Type': 'application/json' } })); }).then(function () { return true; })`);
+  });
+  return out;
+}
+
+// Who wins the race: their index held 3 s (hotel-first) and ours held 3 s
+// (address-first). The address rows for "адмирал" must be the same four either way.
+async function checkRaces(s) {
+  const out = {};
+  // hotel-first: THEIR index is held for 3 s (the plan's number, and inside our own
+  // 8 s budget), so our rows are what the human sees first.
+  await navigateFresh(s, "hotel-first");
+  s.heldIndexId = null;
+  s.indexMode = "hold";
+  await focusInput(s);
+  const pausedIdx = await waitNode(() => s.heldIndexId !== null, 25000, "search_index.json paused");
+  await s.ev(RESET_LOG_JS);
+  await s.send("Input.insertText", { text: "адмирал" });
+  await sleep(HOLD_MS);
+  const mineHold = await s.ev(PL_ROWS_JS);
+  out.hotelFirst = { indexHeld: pausedIdx, mineRows: mineHold.rows.length,
+                     mineTitles: mineHold.rows.map((r) => r.title),
+                     theirVisibleDuringHold: await s.ev(RESULTS_VISIBLE_JS) };
+  s.indexMode = "pass";
+  if (pausedIdx) await s.send("Fetch.continueRequest", { requestId: s.heldIndexId });
+  s.heldIndexId = null;
+  await waitSettled(s, 60000);
+  out.hotelFirst.settledTheirRows = await s.ev(ROWS_JS);
+  out.hotelFirst.settledMine = (await s.ev(PL_ROWS_JS)).rows.map((r) => r.title);
+  await clearField(s);
+
+  // address-first: OUR payload is held for 3 s. Their four "Адмирал Грейг" rows must
+  // be exactly the four they always are, and ours must arrive under them afterwards.
+  await navigateFresh(s, "address-first");
+  await dropPlacesCache(s);
+  s.heldHotelsId = null;
+  s.hotelsMode = "hold";
+  await focusInput(s);
+  const pausedHotels = await waitNode(() => s.heldHotelsId !== null, 25000, "hotels.json paused");
+  await s.ev(RESET_LOG_JS);
+  await s.send("Input.insertText", { text: "адмирал" });
+  await sleep(HOLD_MS);
+  out.addressFirst = { hotelsHeld: pausedHotels, theirRows: await s.ev(ROWS_JS),
+                       mineDuringHold: (await s.ev(PL_ROWS_JS)).rows.length };
+  s.hotelsMode = "pass";
+  if (pausedHotels) await s.send("Fetch.continueRequest", { requestId: s.heldHotelsId });
+  s.heldHotelsId = null;
+  await waitSettled(s, 30000);
+  await waitFor(s, PL_VISIBLE_JS, 8000);
+  out.addressFirst.theirRowsAfter = await s.ev(ROWS_JS);
+  out.addressFirst.mineAfter = (await s.ev(PL_ROWS_JS)).rows.map((r) => r.title);
+  await clearField(s);
+  return out;
+}
+
+// 375×812 (Д5/В6/G11): the whole list must stay on the screen and every row must
+// keep the 44 px touch target.
+async function checkMobile(s) {
+  await s.send("Emulation.setDeviceMetricsOverride", { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
+  await navigateFresh(s, "375px");
+  const ready = await placesReady(s);
+  const list = await typePlaces(s, "парк");
+  const out = { ready, rows: list.rows.length, more: list.more, rect: list.rect,
+                innerHeight: list.innerHeight, fits: list.rect.bottom <= list.innerHeight,
+                minRowHeight: Math.min.apply(null, list.rows.map((r) => r.height).concat([999])) };
+  await clearField(s);
+  await s.send("Emulation.setDeviceMetricsOverride", { width: W, height: H, deviceScaleFactor: MOB ? 2 : 1, mobile: MOB });
+  return out;
+}
+
+// §12 В8 — the five wiring scenarios Sol's verdict demanded.
+async function checkV8(s) {
+  const out = {};
+  // 1. a REAL Enter on "lti" selects БЕРЛИН ГОЛДЪН БИЙЧ (their status said "Няма съвпадения")
+  await navigateFresh(s, "В8 enter lti");
+  await placesReady(s);
+  const lti = await typePlaces(s, "lti");
+  const theirStatus = await s.ev(
+    "(function () { var k = document.getElementById('addrSearchResults').children;" +
+    " return k.length === 1 && k[0].className.indexOf('asr-status') >= 0 ? k[0].textContent : null; })()");
+  await focusInput(s);
+  await pressKey(s, "Enter", 13);
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitSettled(s, 30000);
+  out.enterLti = { mineRows: lti.rows.length, theirStatus, surface: await s.ev(PLACE_SURFACE_JS) };
+  await pressEscape(s);
+  await clearField(s);
+
+  // 2. their index held, our pick lands first: no "Няма съвпадения" afterwards
+  await navigateFresh(s, "В8 held index + бонита");
+  s.heldIndexId = null;
+  s.indexMode = "hold";
+  await placesReady(s);
+  const bonita = await typePlaces(s, "бонита");
+  await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  s.indexMode = "pass";
+  if (s.heldIndexId !== null) await s.send("Fetch.continueRequest", { requestId: s.heldIndexId });
+  s.heldIndexId = null;
+  await waitSettled(s, 60000);
+  await sleep(1500);
+  const afterIndex = await s.ev(PLACE_SURFACE_JS);
+  out.pickBeforeIndex = { mineRows: bonita.rows.length, theirVisible: afterIndex.theirVisible,
+                          theirHtmlHasStatus: afterIndex.theirHtml.indexOf("Няма съвпадения") >= 0,
+                          pins: afterIndex.pins, popups: afterIndex.popups, title: afterIndex.title,
+                          field: await s.ev(INPUT_VALUE_JS) };
+  await pressEscape(s);
+  await clearField(s);
+
+  // 3. a GPS Enter with the index held, then a hotel pick: ours survives
+  await navigateFresh(s, "В8 GPS + hotel");
+  s.heldIndexId = null;
+  s.indexMode = "hold";
+  await placesReady(s);
+  await clearField(s);
+  await s.send("Input.insertText", { text: "43.2100, 27.9100" });
+  await sleep(800);
+  await pressKey(s, "Enter", 13);
+  // Their coordinate path awaits ensureSearchData (index.html:5045), so nothing of
+  // theirs can land while the index is held; the hold is the plan's 3 s and the GPS
+  // pin is then given its own wait.
+  await sleep(HOLD_MS);
+  const gpsDuringHold = await s.ev("document.querySelectorAll('.search-pin-wrapper').length");
+  s.indexMode = "pass";
+  if (s.heldIndexId !== null) await s.send("Fetch.continueRequest", { requestId: s.heldIndexId });
+  s.heldIndexId = null;
+  await waitFor(s, "document.querySelectorAll('.search-pin-wrapper').length > 0", 30000);
+  const gpsPins = await s.ev("document.querySelectorAll('.search-pin-wrapper').length");
+  await typePlaces(s, "хотел адмирал");
+  await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitSettled(s, 60000);
+  out.gpsThenHotel = { theirPinDuringHold: gpsDuringHold, theirPinAfterRelease: gpsPins,
+                       surface: await s.ev(PLACE_SURFACE_JS) };
+  await pressEscape(s);
+  await clearField(s);
+
+  // 4. the legend is open and we select with ENTER: bubbles:false keeps it open.
+  //    (A CLICK closes it by THEIR own outside-click rule, index.html:1720 — recorded.)
+  await navigateFresh(s, "В8 legend");
+  await placesReady(s);
+  // The legend is opened FIRST: a click outside .search-bar dismisses our list by
+  // Д8е, so opening it afterwards would leave nothing to select.
+  await s.ev("(function () { var b = document.getElementById('legendBtn'); if (b) b.click(); return !!b; })()");
+  const legendBefore = await s.ev("(function () { var l = document.getElementById('legend'); return l ? !l.hidden : null; })()");
+  const legendRows = await typePlaces(s, "lti");
+  await focusInput(s);
+  await pressKey(s, "Enter", 13);
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitSettled(s, 30000);
+  const legendSurface = await s.ev(PLACE_SURFACE_JS);
+  out.legend = { openBefore: legendBefore, rows: legendRows.rows.length,
+                 openAfterEnterPick: legendSurface.legendOpen,
+                 pins: legendSurface.pins, title: legendSurface.title };
+  await pressEscape(s);
+  await clearField(s);
+  return out;
+}
+
+// G12г — the two constants against the bytes of the two tracked files.
+function checkShaPins() {
+  const index = fs.readFileSync(path.join(REPO, "index.html"), "utf8");
+  const out = [];
+  for (const [name, rel] of [["HOTELS_SHA256", "data/hotels.json"], ["CATS_SHA256", "data/place_categories.json"]]) {
+    const m = index.match(new RegExp("const\\s+" + name + "\\s*=\\s*'([0-9a-f]{64})'"));
+    const digest = crypto.createHash("sha256").update(fs.readFileSync(path.join(REPO, rel))).digest("hex");
+    out.push({ constant: name, file: rel, pinned: m ? m[1] : null, actual: digest, ok: !!m && m[1] === digest });
+  }
+  return out;
+}
+
+// The lot's own gate, in the order the plan reads: the tokenizer, the reference
+// rows, the М5 table as a human sees it, the selection, П7, the four refusals,
+// the two races, В8 and 375 px.
 async function runG4(s) {
-  // TODO(C4): the places corpus of §3 М5 + §10 А8 + §13 (hotel-first /
-  // address-first, the orange .place-pin, the popup rows, the re-anchored
-  // hydrants, П7) is written here, together with the branch it measures. It is
-  // deliberately empty in C4-pre: this lot records the address search BEFORE a
-  // single line of index.html changes, so there is nothing of ours to assert.
-  return null;
+  console.log("  == G4 (местата) ==");
+  await armPlacesFetch(s);
+  await navigateFresh(s, "places");
+  const ready = await placesReady(s);
+  if (!ready) { warn("клонът на местата не се вдигна"); return { ready: false, shaPins: checkShaPins() }; }
+  const out = { ready: true, shaPins: checkShaPins() };
+  out.tokens = await checkTokenTable(s);
+  console.log(`     G12б: ${out.tokens.passed}/${out.tokens.total} (в теста: ${out.tokens.rowsInTest} реда)`);
+  out.reference = await checkReferenceRows(s);
+  console.log(`     G12в: ${out.reference.passedOrdered}/${out.reference.total} подредени, ` +
+              `${out.reference.passedSets}/${out.reference.total} като множества, режим ${out.reference.mode}`);
+  out.m5 = await checkM5Table(s);
+  console.log(`     М5: ${out.m5.filter((r) => r.ok).length}/${out.m5.length} по брой редове`);
+  out.pick = await checkPickAndEscape(s, "хотел адмирал");
+  console.log(`     избор: пин ${out.pick.surface.pins}, попъп "${out.pick.surface.title}", ` +
+              `хидрантите различни: ${out.pick.hydrantsChanged}`);
+  out.lateSheet = await checkLateDetailSheet(s);
+  out.refusals = await checkRefusals(s);
+  out.races = await checkRaces(s);
+  out.v8 = await checkV8(s);
+  out.mobile = await checkMobile(s);
+  return out;
 }
 
 // --- the single-behaviour scenarios ----------------------------------------
@@ -844,7 +1358,7 @@ async function main() {
 
   if (MODE === "after") {
     const g4 = await runG4(s);
-    const g4Path = path.join(OUT_DIR, `${OUT_NAME}_g4.json`);
+    const g4Path = path.join(OUT_DIR, "g4.json");
     fs.writeFileSync(g4Path, JSON.stringify(g4, null, 2) + "\n");
     console.log(`  записах ${g4Path} (кука за C4)`);
   }
