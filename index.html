@@ -1132,6 +1132,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .place-popup { font-size: 13px; line-height: 1.45; min-width: 180px; max-width: 260px; }
   .place-popup .pp-title { font-weight: 700; margin-bottom: 4px; color: #1f2d3d; }
   .place-popup .pp-sub, .place-popup .pp-old, .place-popup .pp-src { font-size: 11.5px; color: #6b7785; }
+  /* The four rows are <span>s (the JS contract): inline by default they ran into one line. */
+  .place-popup .pp-title, .place-popup .pp-sub, .place-popup .pp-old, .place-popup .pp-src { display: block; }
   .place-popup .nav-actions { margin-top: 6px; }
   /* Approximate-address result (ADR 001) — a distinct amber ≈ marker + chip, so it
      never reads as a verified building, exact address, or hydrant. Fires only on
