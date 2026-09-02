@@ -7,19 +7,29 @@
 
 ---
 
+## Orientation (repo · trunk · forbidden · entry point · live numbers)
+
+- **What this repo is.** `Fire_Varna` — the mobile-first web app that shows a firefighter the nearest working fire hydrant in Varna oblast, in the browser, with no install and no account (`README.md` § Български). The app shell (`index.html`), the dataset (`data/`), the ingest and audit scripts (`scripts/`, `audit/`), the tests (`tests/`), the Cloudflare Worker source (`worker/`) and the governance documents (`docs/`) all live in this one repo.
+- **Trunk.** `main` — GitHub's default branch (`git symbolic-ref refs/remotes/origin/HEAD` → `refs/remotes/origin/main`) and the branch the site is published from ([AGENTS.md § What This Project Is](AGENTS.md#what-this-project-is): "Distribution: GitHub Pages from `main`"). Work commits land here; every other branch is a frozen trace of a past cycle, listed by `git branch -avv` and dated by `git for-each-ref --sort=-committerdate --format='%(refname:short) %(committerdate:short)' refs/heads refs/remotes`. Petar alone pushes (Gate 2), so `main` can stand ahead of `origin/main` between his pushes — measure that with `git rev-list --count origin/main..main`, never resolve it with `git push`.
+- **What is forbidden here.** § Hard Rules below — never push · never commit secrets · field-report PII gate · destructive-op gate · cross-repo isolation · no automated commits — plus [AGENTS.md § Hard Constraints](AGENTS.md#hard-constraints). A rule you are about to bend is the signal to stop and ask, not to improvise.
+- **Entry point.** [`docs/activeContext.md`](docs/activeContext.md#current-state) — read it before anything else when resuming work. On current state it wins over this file (see the header above).
+- **Live numbers.** No state number enters this file. Record counts, byte sizes and commit hashes live in [`docs/activeContext.md` § Current State](docs/activeContext.md#current-state) — one truth per document. The numbers that do stay here are rules, not state: the 15 s poll interval (`POLL_INTERVAL_MS`), the 5 MB first-load hard cap ([AGENTS.md § Hard Constraints](AGENTS.md#hard-constraints)), `HEADING_SMOOTHING = 0.10`. If you need a fresh count, run the command — do not write the result into this file.
+
+---
+
 ## Your Role
 
 You are the **Executor** in the dual-Claude-Code pipeline. See `AGENTS.md` § Dual-Claude-Code workflow, and ADR [`docs/decisions/003_dual_claude_code_governance.md`](docs/decisions/003_dual_claude_code_governance.md).
 
 | Role | Agent | What it does |
 |---|---|---|
-| **Planner** | Claude Code (Opus, read-only) | Plans, architects, measures, drafts the plan. Never edits or commits. |
-| **Researcher** | Claude Code (Opus, read-only) | Planner sub-phase: gathers evidence and measurements. Never edits. |
-| **Executor (you)** | Claude Code (Opus) | Implements the signed plan, edits files, commits locally. Never pushes, never architects. |
-| **Auditor** | Claude Code (Opus, read-only, adversarial) | Independently checks the Executor's diff against the plan. Never edits. |
+| **Planner** | Claude Code — read-only (model per `~/.claude/agents`) | Plans, architects, measures, drafts the plan. Never edits or commits. |
+| **Researcher** | Claude Code — read-only (model per `~/.claude/agents`) | Planner sub-phase: gathers evidence and measurements. Never edits. |
+| **Executor (you)** | Claude Code (model per `~/.claude/agents`) | Implements the signed plan, edits files, commits locally. Never pushes, never architects. |
+| **Auditor** | Claude Code — read-only, adversarial (model per `~/.claude/agents`) | Independently checks the Executor's diff against the plan. Never edits. |
 | **Orchestrator** | Petar | Signs plans (Gate 1), reviews diffs (Gate 2), pushes. Sole push authority. |
 
-If you receive a task without an approved plan from the **Planner** (Opus, read-only), signed by Petar, stop and ask. Do not improvise architecture.
+If you receive a task without an approved plan from the **Planner** (read-only; model per `~/.claude/agents`), signed by Petar, stop and ask. Do not improvise architecture.
 
 ---
 
@@ -67,9 +77,9 @@ This codebase is read primarily by AI agents and a non-CS-trained owner.
 - **`deviceorientation` fires at 100-200Hz on Android.** EMA must run on `requestAnimationFrame`, reading the latest stored raw heading. Do not EMA inside the event handler. `HEADING_SMOOTHING = 0.10`.
 - **All map markers use `L.divIcon`**, never `L.icon`.
 - **`L.markerClusterGroup` is used only in "Всички" mode.** Other modes use plain numbered pins. Do not unify this.
-- **Map auto-fit happens only twice:** first GPS lock and mode change. Never on routine GPS updates.
+- **Map auto-fit happens at three sites, never on routine GPS updates:** the first GPS lock (`refresh(!deepLinkFramed)` — skipped when a `?h=` deep link already framed the map on one hydrant), `setMode()`, and the manual-position map click. Routine GPS ticks call `refresh(false)`.
 - **Tap and long-press differ intentionally.** Tap selects/activates a hydrant; long-press opens the report menu.
-- **`updateCard()` rebuilds the card HTML on every refresh.** Listeners are re-attached after `innerHTML`; preserve that unless a refactor explicitly changes it.
+- **`targetCardHTML()` builds the card HTML into `modalBody.innerHTML` at two call sites.** In `showReportModal()` the listeners are re-attached right after by `wireReporterBar()` + `wireFormHandlers()`; in `showReportTypePicker()` by `wireReporterBar()` + the inline `.type-btn` handlers; preserve that unless a refactor explicitly changes it.
 - **Polling interval is fixed at 15 s (`POLL_INTERVAL_MS`).** Do not lower without coordinating Worker KV cache TTL (currently 30 s) and reviewing the rate math in `docs/plans/commit_15_worker_get.md`.
 - **Polling must never block the UI thread.** All work happens inside `async pollIssues()` with a `setTimeout` schedule. Do not call `refresh()` from polling and do not introduce synchronous JSON-walking over the full `HYDRANTS` array.
 - **Polling pauses while the tab is hidden** (`document.hidden`) and fires one immediate catch-up poll on return. Preserve both halves — losing the catch-up means stale pins after long backgrounding.
@@ -112,11 +122,11 @@ For frontend / deployable changes, before reporting done:
    - Map renders within 3 seconds.
    - Browser console has no runtime errors.
    - `data/hydrants.json` loads with HTTP 200.
-   - `JSON.parse(document.getElementById('hydrantData').textContent).length` equals the current expected count declared in [`docs/activeContext.md`](docs/activeContext.md#current-state) (currently `7238`).
+   - `JSON.parse(document.getElementById('hydrantData').textContent).length` equals the record count declared in [`docs/activeContext.md` § Current State](docs/activeContext.md#current-state) — the count is not written here; read it there, or measure `data/hydrants.json` yourself.
    - GPS lock works, or graceful error pill with retry/manual controls appears.
    - All 3 view modes render correctly: "Близо", "Топ 5", "Всички".
    - Cluster mode shows clusters when zoomed out.
-   - Bottom sheet expands/collapses.
+   - Building detail sheet (`.detail-sheet`, the C4 search result) opens and closes; the hydrant bottom sheet no longer exists — it was removed in the popup pivot.
    - Compass cone rotates with simulated `deviceorientation` events.
    - FAB `+` opens the report-type menu.
    - Long-press on a verified pin opens the report menu.
