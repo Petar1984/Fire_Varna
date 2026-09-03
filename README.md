@@ -28,10 +28,10 @@
 > ⚠ остаряло към 02.09.2026: data-type="damaged" · data-type="exists_confirmed" · data-type="missing" · data-type="new_hydrant" · data-type="wrong_location" — `grep -o 'data-type="[a-z_]*"' index.html | sort -u`
 - **Търсачка на адреси** — улици, номера, квартали, блок + вход
   (напр. „бл. 402 вх. 3"), и сурови GPS координати.
-- **Хотели в търсачката** — 226 места за настаняване от Националния
+- **Хотели в търсачката** — 225 места за настаняване от Националния
   туристически регистър (име, вид, категория, легла, зона);
   „хотел адмирал“ намира и трите.
-> ✓ вярно към 02.09.2026: 226 · 3 — `PYTHONIOENCODING=utf-8 python -c "import json;d=json.load(open('data/hotels.json',encoding='utf-8'));print(d['_meta']['count'], sum(1 for h in d['hotels'] if 'мирал' in h['name'].lower()))"`
+> ✓ вярно към 04.09.2026: 225 · 3 — `PYTHONIOENCODING=utf-8 python -c "import json;d=json.load(open('data/hotels.json',encoding='utf-8'));print(d['_meta']['count'], sum(1 for h in d['hotels'] if 'мирал' in h['name'].lower()))"`
 - Сателитен изглед (Esri World Imagery) и сграден слой (векторни тайлове).
 
 ### Данните
@@ -170,10 +170,10 @@
 > ⚠ остаряло към 02.09.2026: data-type="damaged" · data-type="exists_confirmed" · data-type="missing" · data-type="new_hydrant" · data-type="wrong_location" — `grep -o 'data-type="[a-z_]*"' index.html | sort -u`
 - **Address search** — streets, house numbers, quarters, block +
   entrance (e.g. „бл. 402 вх. 3"), plus raw GPS coordinates.
-- **Hotels in the search** — 226 accommodation places from the National
+- **Hotels in the search** — 225 accommodation places from the National
   Tourist Register (name, kind, category, beds, zone); „хотел адмирал“
   finds all three.
-> ✓ вярно към 02.09.2026: 226 · 3 — `PYTHONIOENCODING=utf-8 python -c "import json;d=json.load(open('data/hotels.json',encoding='utf-8'));print(d['_meta']['count'], sum(1 for h in d['hotels'] if 'мирал' in h['name'].lower()))"`
+> ✓ вярно към 04.09.2026: 225 · 3 — `PYTHONIOENCODING=utf-8 python -c "import json;d=json.load(open('data/hotels.json',encoding='utf-8'));print(d['_meta']['count'], sum(1 for h in d['hotels'] if 'мирал' in h['name'].lower()))"`
 - Satellite imagery toggle (Esri World Imagery) and a building layer
   served as vector tiles.
 
