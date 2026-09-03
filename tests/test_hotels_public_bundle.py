@@ -53,9 +53,14 @@ CATEGORIES = REPO / "data" / "place_categories.json"
 HOTELS_SHA256 = "fd4b6989d63c1f8b7563d1ab9b78f72a0ea0d9fe93386a8080ee64211476a15c"
 HOTELS_BYTES = 78491
 HOTELS_GZIP9 = 9140
-CATEGORIES_SHA256 = "6bf5dd323370cb6be895979ae6a0144da1f29b9231cf684fee696f7cc8d26ce5"
-CATEGORIES_BYTES = 36203
-CATEGORIES_GZIP9 = 4009
+# C16 (§11 П7): the dictionary was re-delivered with a `zones` key — the quarter
+# aliases of the 28 zones that carry a registry entry, schema still 1. `chips` and
+# `forms` are byte-identical to the previous blob (35 600 bytes, sha256
+# 715b96ed6d63f0b7…), so only the three numbers below moved.
+#   git -C ../varna_3d show HEAD:data/place_categories.json > data/place_categories.json
+CATEGORIES_SHA256 = "be215b452723a3f5123630c4d33e941aae2d1099a111a4f50bdfee6183fd61b6"
+CATEGORIES_BYTES = 45765
+CATEGORIES_GZIP9 = 5844
 
 EXPECTED_COUNT = 226
 TOP_LEVEL_KEYS = {"_meta", "hotels"}

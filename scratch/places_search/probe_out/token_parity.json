@@ -1,0 +1,7687 @@
+{
+ "_meta": {
+  "source": "scratch/places_search/recall_sweep.py (place_tokens)",
+  "what": "С6′ tokeniser parity corpus: kept zone aliases + record names",
+  "aliases": 62,
+  "zones_with_aliases": 28,
+  "records": 361,
+  "strings": 421
+ },
+ "strings": [
+  {
+   "s": "ЗПЗ",
+   "tokens": [
+    {
+     "s": "zpz",
+     "orig": "зпз",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Приморски парк",
+   "tokens": [
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Приморският парк",
+   "tokens": [
+    {
+     "s": "primorskiat",
+     "orig": "приморският",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Приморски Парк",
+   "tokens": [
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. БРИЗ",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. БРИЗ-ЮГ",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    },
+    {
+     "s": "iug",
+     "orig": "юг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Бриз-юг",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    },
+    {
+     "s": "iug",
+     "orig": "юг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. Бриз",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. Владиславово",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "vladislavovo",
+     "orig": "владиславово",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Влладислав Варненчик",
+   "tokens": [
+    {
+     "s": "vladislav",
+     "orig": "влладислав",
+     "num": false
+    },
+    {
+     "s": "varnenchik",
+     "orig": "варненчик",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Вл.Варненчик",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "vl",
+     "orig": "вл",
+     "num": false
+    },
+    {
+     "s": "varnenchik",
+     "orig": "варненчик",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Вл. Варненчик",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "vl",
+     "orig": "вл",
+     "num": false
+    },
+    {
+     "s": "varnenchik",
+     "orig": "варненчик",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Дружба-Аспарухово",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "druzhba",
+     "orig": "дружба",
+     "num": false
+    },
+    {
+     "s": "asparuhovo",
+     "orig": "аспарухово",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Дружба",
+   "tokens": [
+    {
+     "s": "druzhba",
+     "orig": "дружба",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. ПОБЕДА",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "pobeda",
+     "orig": "победа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "к.к. Златни Пясъци",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "zlatni",
+     "orig": "златни",
+     "num": false
+    },
+    {
+     "s": "piasatsi",
+     "orig": "пясъци",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "к.к. ЗЛАТНИ ПЯСЪЦИ",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "zlatni",
+     "orig": "златни",
+     "num": false
+    },
+    {
+     "s": "piasatsi",
+     "orig": "пясъци",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. ВИНИЦА",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "vinitsa",
+     "orig": "виница",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. .ВИНИЦА",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "vinitsa",
+     "orig": "виница",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Виница",
+   "tokens": [
+    {
+     "s": "vinitsa",
+     "orig": "виница",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Владислав Варненчик",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "vladislav",
+     "orig": "владислав",
+     "num": false
+    },
+    {
+     "s": "varnenchik",
+     "orig": "варненчик",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. ГАЛАТА",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "galata",
+     "orig": "галата",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Галата",
+   "tokens": [
+    {
+     "s": "galata",
+     "orig": "галата",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Изгрев",
+   "tokens": [
+    {
+     "s": "izgrev",
+     "orig": "изгрев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. ИЗГРЕВ",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "izgrev",
+     "orig": "изгрев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Изгрев",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "izgrev",
+     "orig": "изгрев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "жкИЗГРЕВ",
+   "tokens": [
+    {
+     "s": "zhkizgrev",
+     "orig": "жкизгрев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. ИЗГРЕВ",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "izgrev",
+     "orig": "изгрев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м-т Свети Никола",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "t",
+     "orig": "т",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Свети Никола",
+   "tokens": [
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. СВ.НИКОЛА",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. Св. Никола",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. Св. Никола",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. Св.Никола",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. Свети Никола",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "с.о. СВЕТИ НИКОЛА",
+   "tokens": [
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "o",
+     "orig": "о",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Трошево",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "troshevo",
+     "orig": "трошево",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Чайка",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "chaika",
+     "orig": "чайка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "местност Горчивата чешма",
+   "tokens": [
+    {
+     "s": "mestnost",
+     "orig": "местност",
+     "num": false
+    },
+    {
+     "s": "gorchivata",
+     "orig": "горчивата",
+     "num": false
+    },
+    {
+     "s": "cheshma",
+     "orig": "чешма",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. Горчивата чешма",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "gorchivata",
+     "orig": "горчивата",
+     "num": false
+    },
+    {
+     "s": "cheshma",
+     "orig": "чешма",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Горчивата чешма",
+   "tokens": [
+    {
+     "s": "gorchivata",
+     "orig": "горчивата",
+     "num": false
+    },
+    {
+     "s": "cheshma",
+     "orig": "чешма",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Горчива чешма",
+   "tokens": [
+    {
+     "s": "gorchiva",
+     "orig": "горчива",
+     "num": false
+    },
+    {
+     "s": "cheshma",
+     "orig": "чешма",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Парк Приморски Парк Горчивата Чешма",
+   "tokens": [
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "gorchivata",
+     "orig": "горчивата",
+     "num": false
+    },
+    {
+     "s": "cheshma",
+     "orig": "чешма",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "местност Салтанат",
+   "tokens": [
+    {
+     "s": "mestnost",
+     "orig": "местност",
+     "num": false
+    },
+    {
+     "s": "saltanat",
+     "orig": "салтанат",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. Салтанат",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "saltanat",
+     "orig": "салтанат",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Салтанат",
+   "tokens": [
+    {
+     "s": "saltanat",
+     "orig": "салтанат",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Приморски Парк Салтанат",
+   "tokens": [
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "saltanat",
+     "orig": "салтанат",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. Свети Никола",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "местност Сотира",
+   "tokens": [
+    {
+     "s": "mestnost",
+     "orig": "местност",
+     "num": false
+    },
+    {
+     "s": "sotira",
+     "orig": "сотира",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "местност Шашкъна",
+   "tokens": [
+    {
+     "s": "mestnost",
+     "orig": "местност",
+     "num": false
+    },
+    {
+     "s": "shashkana",
+     "orig": "шашкъна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. ВИЛИТЕ",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "vilite",
+     "orig": "вилите",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м-т Зеленика",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "t",
+     "orig": "т",
+     "num": false
+    },
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Зеленика",
+   "tokens": [
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Зеленика-част",
+   "tokens": [
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    },
+    {
+     "s": "chast",
+     "orig": "част",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. ЗЕЛЕНИКА",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "с.о. Зеленика",
+   "tokens": [
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "o",
+     "orig": "о",
+     "num": false
+    },
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "с.о. Зеленика-част",
+   "tokens": [
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "o",
+     "orig": "о",
+     "num": false
+    },
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    },
+    {
+     "s": "chast",
+     "orig": "част",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. Зеленика",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "с.о. ПРИБОЙ",
+   "tokens": [
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "o",
+     "orig": "о",
+     "num": false
+    },
+    {
+     "s": "priboi",
+     "orig": "прибой",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "к.з. ПРИБОЙ",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "z",
+     "orig": "з",
+     "num": false
+    },
+    {
+     "s": "priboi",
+     "orig": "прибой",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "м. ПРИБОЙ",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "priboi",
+     "orig": "прибой",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Прибой",
+   "tokens": [
+    {
+     "s": "priboi",
+     "orig": "прибой",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПРЕСЛАВ",
+   "tokens": [
+    {
+     "s": "preslav",
+     "orig": "преслав",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕЛЕНА",
+   "tokens": [
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АМБАСАДОР",
+   "tokens": [
+    {
+     "s": "ambasador",
+     "orig": "амбасадор",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "БОНИТА/BONITA",
+   "tokens": [
+    {
+     "s": "bonita",
+     "orig": "бонита",
+     "num": false
+    },
+    {
+     "s": "bonita",
+     "orig": "bonita",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ХОЛИДЕЙ ПАРК",
+   "tokens": [
+    {
+     "s": "holidei",
+     "orig": "холидей",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АРЕНА МАР",
+   "tokens": [
+    {
+     "s": "arena",
+     "orig": "арена",
+     "num": false
+    },
+    {
+     "s": "mar",
+     "orig": "мар",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ХОТЕЛ  ХЕЛИОС СПА",
+   "tokens": [
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "helios",
+     "orig": "хелиос",
+     "num": false
+    },
+    {
+     "s": "spa",
+     "orig": "спа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Варшава",
+   "tokens": [
+    {
+     "s": "varshava",
+     "orig": "варшава",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КАМЧИЯ",
+   "tokens": [
+    {
+     "s": "kamchia",
+     "orig": "камчия",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГЛАДИОЛА СТАР",
+   "tokens": [
+    {
+     "s": "gladiola",
+     "orig": "гладиола",
+     "num": false
+    },
+    {
+     "s": "star",
+     "orig": "стар",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГЛАДИОЛА",
+   "tokens": [
+    {
+     "s": "gladiola",
+     "orig": "гладиола",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "БЕРЛИН ГРИЙН ПАРК",
+   "tokens": [
+    {
+     "s": "berlin",
+     "orig": "берлин",
+     "num": false
+    },
+    {
+     "s": "grin",
+     "orig": "грийн",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПЕРУНИКА",
+   "tokens": [
+    {
+     "s": "perunika",
+     "orig": "перуника",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "НОА",
+   "tokens": [
+    {
+     "s": "noa",
+     "orig": "ноа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЛУНА",
+   "tokens": [
+    {
+     "s": "luna",
+     "orig": "луна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Хоризонт",
+   "tokens": [
+    {
+     "s": "horizont",
+     "orig": "хоризонт",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАЛМ БИЙЧ",
+   "tokens": [
+    {
+     "s": "palm",
+     "orig": "палм",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ВИСТАМАР",
+   "tokens": [
+    {
+     "s": "vistamar",
+     "orig": "вистамар",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АСТОРИЯ",
+   "tokens": [
+    {
+     "s": "astoria",
+     "orig": "астория",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Златен рог",
+   "tokens": [
+    {
+     "s": "zlaten",
+     "orig": "златен",
+     "num": false
+    },
+    {
+     "s": "rog",
+     "orig": "рог",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Диана",
+   "tokens": [
+    {
+     "s": "diana",
+     "orig": "диана",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДАНА ПАЛАС",
+   "tokens": [
+    {
+     "s": "dana",
+     "orig": "дана",
+     "num": false
+    },
+    {
+     "s": "palas",
+     "orig": "палас",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МЕЛИА ГРАНД ЕРМИТАЖ",
+   "tokens": [
+    {
+     "s": "melia",
+     "orig": "мелиа",
+     "num": false
+    },
+    {
+     "s": "grand",
+     "orig": "гранд",
+     "num": false
+    },
+    {
+     "s": "ermitazh",
+     "orig": "ермитаж",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЗДРАВЕЦ",
+   "tokens": [
+    {
+     "s": "zdravets",
+     "orig": "здравец",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ХАВАНА",
+   "tokens": [
+    {
+     "s": "havana",
+     "orig": "хавана",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ИНТЕРНАЦИОНАЛ",
+   "tokens": [
+    {
+     "s": "internatsional",
+     "orig": "интернационал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АТЛАС",
+   "tokens": [
+    {
+     "s": "atlas",
+     "orig": "атлас",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АЛЕГРА",
+   "tokens": [
+    {
+     "s": "alegra",
+     "orig": "алегра",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КРИСТАЛ",
+   "tokens": [
+    {
+     "s": "kristal",
+     "orig": "кристал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАРК ХОТЕЛ БРИЗ",
+   "tokens": [
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПЕРЛА",
+   "tokens": [
+    {
+     "s": "perla",
+     "orig": "перла",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МАРЕА",
+   "tokens": [
+    {
+     "s": "marea",
+     "orig": "мареа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ШИПКА",
+   "tokens": [
+    {
+     "s": "shipka",
+     "orig": "шипка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГРАДИНА",
+   "tokens": [
+    {
+     "s": "gradina",
+     "orig": "градина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ВИВА КЛУБ",
+   "tokens": [
+    {
+     "s": "viva",
+     "orig": "вива",
+     "num": false
+    },
+    {
+     "s": "klub",
+     "orig": "клуб",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАРК ХОТЕЛ ГОЛДЪН БИЙЧ",
+   "tokens": [
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "goldan",
+     "orig": "голдън",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПРЕСТИЖ ГРАНД ХОТЕЛ И АКВАПАРК",
+   "tokens": [
+    {
+     "s": "prestizh",
+     "orig": "престиж",
+     "num": false
+    },
+    {
+     "s": "grand",
+     "orig": "гранд",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "akvapark",
+     "orig": "аквапарк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПЛИСКА",
+   "tokens": [
+    {
+     "s": "pliska",
+     "orig": "плиска",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МАРИНА ГРАНД БИЙЧ",
+   "tokens": [
+    {
+     "s": "marina",
+     "orig": "марина",
+     "num": false
+    },
+    {
+     "s": "grand",
+     "orig": "гранд",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "БЕРЛИН ГОЛДЪН БИЙЧ",
+   "tokens": [
+    {
+     "s": "berlin",
+     "orig": "берлин",
+     "num": false
+    },
+    {
+     "s": "goldan",
+     "orig": "голдън",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЛЮЛЯК",
+   "tokens": [
+    {
+     "s": "liuliak",
+     "orig": "люляк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАРК-ХОТЕЛ ТИНТЯВА",
+   "tokens": [
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "tintiava",
+     "orig": "тинтява",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СЛАВЕЙ",
+   "tokens": [
+    {
+     "s": "slavei",
+     "orig": "славей",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЛИЛИЯ",
+   "tokens": [
+    {
+     "s": "lilia",
+     "orig": "лилия",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МЕТРОПОЛ",
+   "tokens": [
+    {
+     "s": "metropol",
+     "orig": "метропол",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГОЛДЪН ЛАЙН",
+   "tokens": [
+    {
+     "s": "goldan",
+     "orig": "голдън",
+     "num": false
+    },
+    {
+     "s": "lain",
+     "orig": "лайн",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Дукеса",
+   "tokens": [
+    {
+     "s": "dukesa",
+     "orig": "дукеса",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АДАМО",
+   "tokens": [
+    {
+     "s": "adamo",
+     "orig": "адамо",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Романтика",
+   "tokens": [
+    {
+     "s": "romantika",
+     "orig": "романтика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Албиция",
+   "tokens": [
+    {
+     "s": "albitsia",
+     "orig": "албиция",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Людо",
+   "tokens": [
+    {
+     "s": "liudo",
+     "orig": "людо",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Ванила",
+   "tokens": [
+    {
+     "s": "vanila",
+     "orig": "ванила",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Бел Епок",
+   "tokens": [
+    {
+     "s": "bel",
+     "orig": "бел",
+     "num": false
+    },
+    {
+     "s": "epok",
+     "orig": "епок",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАНОРАМА",
+   "tokens": [
+    {
+     "s": "panorama",
+     "orig": "панорама",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РЕВЕРАНС",
+   "tokens": [
+    {
+     "s": "reverans",
+     "orig": "реверанс",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Орбита",
+   "tokens": [
+    {
+     "s": "orbita",
+     "orig": "орбита",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГАЛЕРИЯ ГРАФИТ",
+   "tokens": [
+    {
+     "s": "galeria",
+     "orig": "галерия",
+     "num": false
+    },
+    {
+     "s": "grafit",
+     "orig": "графит",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КАПИТОЛ",
+   "tokens": [
+    {
+     "s": "kapitol",
+     "orig": "капитол",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Виктория“",
+   "tokens": [
+    {
+     "s": "viktoria",
+     "orig": "виктория",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Дивеста",
+   "tokens": [
+    {
+     "s": "divesta",
+     "orig": "дивеста",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АСЛАН ГОЛД",
+   "tokens": [
+    {
+     "s": "aslan",
+     "orig": "аслан",
+     "num": false
+    },
+    {
+     "s": "gold",
+     "orig": "голд",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Дионис",
+   "tokens": [
+    {
+     "s": "dionis",
+     "orig": "дионис",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РОЯЛ",
+   "tokens": [
+    {
+     "s": "roial",
+     "orig": "роял",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГОЛДЪН ТЮЛИП ВАРНА",
+   "tokens": [
+    {
+     "s": "goldan",
+     "orig": "голдън",
+     "num": false
+    },
+    {
+     "s": "tiulip",
+     "orig": "тюлип",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Трите делфина",
+   "tokens": [
+    {
+     "s": "trite",
+     "orig": "трите",
+     "num": false
+    },
+    {
+     "s": "delfina",
+     "orig": "делфина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕФБЕТ",
+   "tokens": [
+    {
+     "s": "efbet",
+     "orig": "ефбет",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Модус",
+   "tokens": [
+    {
+     "s": "modus",
+     "orig": "модус",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГРАНД ХОТЕЛ ЛОНДОН",
+   "tokens": [
+    {
+     "s": "grand",
+     "orig": "гранд",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "london",
+     "orig": "лондон",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Зора",
+   "tokens": [
+    {
+     "s": "zora",
+     "orig": "зора",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Траката",
+   "tokens": [
+    {
+     "s": "trakata",
+     "orig": "траката",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РОСЛИН ДИМЯТ ХОТЕЛ ВАРНА",
+   "tokens": [
+    {
+     "s": "roslin",
+     "orig": "рослин",
+     "num": false
+    },
+    {
+     "s": "dimiat",
+     "orig": "димят",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АМИРАЛ",
+   "tokens": [
+    {
+     "s": "amiral",
+     "orig": "амирал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Амфора",
+   "tokens": [
+    {
+     "s": "amfora",
+     "orig": "амфора",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РОМАНС И ФЕМИЛИ СУИТС",
+   "tokens": [
+    {
+     "s": "romans",
+     "orig": "романс",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "femili",
+     "orig": "фемили",
+     "num": false
+    },
+    {
+     "s": "suits",
+     "orig": "суитс",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КРИСТЕЛ",
+   "tokens": [
+    {
+     "s": "kristel",
+     "orig": "кристел",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СИРИУС БИЙЧ",
+   "tokens": [
+    {
+     "s": "sirius",
+     "orig": "сириус",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АСТОР ГАРДЪН",
+   "tokens": [
+    {
+     "s": "astor",
+     "orig": "астор",
+     "num": false
+    },
+    {
+     "s": "gardan",
+     "orig": "гардън",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕСТРЕЯ ПАЛАС",
+   "tokens": [
+    {
+     "s": "estreia",
+     "orig": "естрея",
+     "num": false
+    },
+    {
+     "s": "palas",
+     "orig": "палас",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КОРАЛ",
+   "tokens": [
+    {
+     "s": "koral",
+     "orig": "корал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПРИМОРСКИ",
+   "tokens": [
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГЛОРИЯ",
+   "tokens": [
+    {
+     "s": "gloria",
+     "orig": "глория",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Русалка",
+   "tokens": [
+    {
+     "s": "rusalka",
+     "orig": "русалка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МДУ ФРЕДЕРИК ЖОЛИО-КЮРИ",
+   "tokens": [
+    {
+     "s": "mdu",
+     "orig": "мду",
+     "num": false
+    },
+    {
+     "s": "frederik",
+     "orig": "фредерик",
+     "num": false
+    },
+    {
+     "s": "zholio",
+     "orig": "жолио",
+     "num": false
+    },
+    {
+     "s": "kiuri",
+     "orig": "кюри",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АЗАЛИЯ МЕДИКЪЛ СПА",
+   "tokens": [
+    {
+     "s": "azalia",
+     "orig": "азалия",
+     "num": false
+    },
+    {
+     "s": "medikal",
+     "orig": "медикъл",
+     "num": false
+    },
+    {
+     "s": "spa",
+     "orig": "спа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАЛАС",
+   "tokens": [
+    {
+     "s": "palas",
+     "orig": "палас",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МАРИНА",
+   "tokens": [
+    {
+     "s": "marina",
+     "orig": "марина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Флагман",
+   "tokens": [
+    {
+     "s": "flagman",
+     "orig": "флагман",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Адмирал",
+   "tokens": [
+    {
+     "s": "admiral",
+     "orig": "адмирал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РУСАЛКА",
+   "tokens": [
+    {
+     "s": "rusalka",
+     "orig": "русалка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Танго",
+   "tokens": [
+    {
+     "s": "tango",
+     "orig": "танго",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Пиер",
+   "tokens": [
+    {
+     "s": "pier",
+     "orig": "пиер",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СТРАНДЖА",
+   "tokens": [
+    {
+     "s": "strandzha",
+     "orig": "странджа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ВЕЖЕН",
+   "tokens": [
+    {
+     "s": "vezhen",
+     "orig": "вежен",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕКЗОТИКА",
+   "tokens": [
+    {
+     "s": "ekzotika",
+     "orig": "екзотика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЕТЕЛИНА",
+   "tokens": [
+    {
+     "s": "detelina",
+     "orig": "детелина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДАЛИЯ ГАРДЪН",
+   "tokens": [
+    {
+     "s": "dalia",
+     "orig": "далия",
+     "num": false
+    },
+    {
+     "s": "gardan",
+     "orig": "гардън",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КИНИ ПАРК",
+   "tokens": [
+    {
+     "s": "kini",
+     "orig": "кини",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ФИЕСТА",
+   "tokens": [
+    {
+     "s": "fiesta",
+     "orig": "фиеста",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СИЛВЕР",
+   "tokens": [
+    {
+     "s": "silver",
+     "orig": "силвер",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОАЗИС/OAZIS",
+   "tokens": [
+    {
+     "s": "oazis",
+     "orig": "оазис",
+     "num": false
+    },
+    {
+     "s": "oazis",
+     "orig": "oazis",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "НИМФА",
+   "tokens": [
+    {
+     "s": "nimfa",
+     "orig": "нимфа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Империя",
+   "tokens": [
+    {
+     "s": "imperia",
+     "orig": "империя",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЛОТОС/LOTOS",
+   "tokens": [
+    {
+     "s": "lotos",
+     "orig": "лотос",
+     "num": false
+    },
+    {
+     "s": "lotos",
+     "orig": "lotos",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РИВИЕРА БИЙЧ",
+   "tokens": [
+    {
+     "s": "riviera",
+     "orig": "ривиера",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Ниагара",
+   "tokens": [
+    {
+     "s": "niagara",
+     "orig": "ниагара",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "НЕПТУН",
+   "tokens": [
+    {
+     "s": "neptun",
+     "orig": "нептун",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Фрегата",
+   "tokens": [
+    {
+     "s": "fregata",
+     "orig": "фрегата",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Маяк",
+   "tokens": [
+    {
+     "s": "maiak",
+     "orig": "маяк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Перла",
+   "tokens": [
+    {
+     "s": "perla",
+     "orig": "перла",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Гран Иван",
+   "tokens": [
+    {
+     "s": "gran",
+     "orig": "гран",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Палитра",
+   "tokens": [
+    {
+     "s": "palitra",
+     "orig": "палитра",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДОЛЧЕ МАРЕ",
+   "tokens": [
+    {
+     "s": "dolche",
+     "orig": "долче",
+     "num": false
+    },
+    {
+     "s": "mare",
+     "orig": "маре",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДОЛЧЕ ВИТА",
+   "tokens": [
+    {
+     "s": "dolche",
+     "orig": "долче",
+     "num": false
+    },
+    {
+     "s": "vita",
+     "orig": "вита",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СЪНРАЙЗ",
+   "tokens": [
+    {
+     "s": "sanraiz",
+     "orig": "сънрайз",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КЛУБ ХОТЕЛ БОЛЕРО",
+   "tokens": [
+    {
+     "s": "klub",
+     "orig": "клуб",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "bolero",
+     "orig": "болеро",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕНКАНТО БИЙЧ",
+   "tokens": [
+    {
+     "s": "enkanto",
+     "orig": "енканто",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РИВА",
+   "tokens": [
+    {
+     "s": "riva",
+     "orig": "рива",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ВАКАНЦИОНЕН КЛУБ АФРОДИТА",
+   "tokens": [
+    {
+     "s": "vakantsionen",
+     "orig": "ваканционен",
+     "num": false
+    },
+    {
+     "s": "klub",
+     "orig": "клуб",
+     "num": false
+    },
+    {
+     "s": "afrodita",
+     "orig": "афродита",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПОСЕЙДОН/ POSEIDON",
+   "tokens": [
+    {
+     "s": "poseidon",
+     "orig": "посейдон",
+     "num": false
+    },
+    {
+     "s": "poseidon",
+     "orig": "poseidon",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СЕРДИКА",
+   "tokens": [
+    {
+     "s": "serdika",
+     "orig": "сердика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАРК ХОТЕЛ БЕЛВЮ",
+   "tokens": [
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "belviu",
+     "orig": "белвю",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЖОЯ ПАРК",
+   "tokens": [
+    {
+     "s": "dzhoia",
+     "orig": "джоя",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Извора",
+   "tokens": [
+    {
+     "s": "izvora",
+     "orig": "извора",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АТЛАНТ",
+   "tokens": [
+    {
+     "s": "atlant",
+     "orig": "атлант",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Йо",
+   "tokens": [
+    {
+     "s": "io",
+     "orig": "йо",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Адия Блу",
+   "tokens": [
+    {
+     "s": "adia",
+     "orig": "адия",
+     "num": false
+    },
+    {
+     "s": "blu",
+     "orig": "блу",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Вега",
+   "tokens": [
+    {
+     "s": "vega",
+     "orig": "вега",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Парадайс",
+   "tokens": [
+    {
+     "s": "paradais",
+     "orig": "парадайс",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Мотиви",
+   "tokens": [
+    {
+     "s": "motivi",
+     "orig": "мотиви",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МАГНОЛИЯ 1 И 2",
+   "tokens": [
+    {
+     "s": "magnolia",
+     "orig": "магнолия",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "1",
+     "num": true
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "2",
+     "orig": "2",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "АКВА АЗУР",
+   "tokens": [
+    {
+     "s": "akva",
+     "orig": "аква",
+     "num": false
+    },
+    {
+     "s": "azur",
+     "orig": "азур",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АКВАВЮ",
+   "tokens": [
+    {
+     "s": "akvaviu",
+     "orig": "аквавю",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "УМАНИ",
+   "tokens": [
+    {
+     "s": "umani",
+     "orig": "умани",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Кабакум",
+   "tokens": [
+    {
+     "s": "kabakum",
+     "orig": "кабакум",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Дива",
+   "tokens": [
+    {
+     "s": "diva",
+     "orig": "дива",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Ной",
+   "tokens": [
+    {
+     "s": "noi",
+     "orig": "ной",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КАМПУС 90",
+   "tokens": [
+    {
+     "s": "kampus",
+     "orig": "кампус",
+     "num": false
+    },
+    {
+     "s": "90",
+     "orig": "90",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "Сорбона",
+   "tokens": [
+    {
+     "s": "sorbona",
+     "orig": "сорбона",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "БУТИК СПЛЕНДИД/BOUTIQUE SPLENDID",
+   "tokens": [
+    {
+     "s": "butik",
+     "orig": "бутик",
+     "num": false
+    },
+    {
+     "s": "splendid",
+     "orig": "сплендид",
+     "num": false
+    },
+    {
+     "s": "boutique",
+     "orig": "boutique",
+     "num": false
+    },
+    {
+     "s": "splendid",
+     "orig": "splendid",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Военноморски клуб",
+   "tokens": [
+    {
+     "s": "voenomorski",
+     "orig": "военноморски",
+     "num": false
+    },
+    {
+     "s": "klub",
+     "orig": "клуб",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Казабланка Грийн",
+   "tokens": [
+    {
+     "s": "kazablanka",
+     "orig": "казабланка",
+     "num": false
+    },
+    {
+     "s": "grin",
+     "orig": "грийн",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Еллинис",
+   "tokens": [
+    {
+     "s": "elinis",
+     "orig": "еллинис",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Алекта",
+   "tokens": [
+    {
+     "s": "alekta",
+     "orig": "алекта",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Елица",
+   "tokens": [
+    {
+     "s": "elitsa",
+     "orig": "елица",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Камелия",
+   "tokens": [
+    {
+     "s": "kamelia",
+     "orig": "камелия",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Перфект",
+   "tokens": [
+    {
+     "s": "perfekt",
+     "orig": "перфект",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Хай",
+   "tokens": [
+    {
+     "s": "hai",
+     "orig": "хай",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Вентура",
+   "tokens": [
+    {
+     "s": "ventura",
+     "orig": "вентура",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Опера",
+   "tokens": [
+    {
+     "s": "opera",
+     "orig": "опера",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Маргарита",
+   "tokens": [
+    {
+     "s": "margarita",
+     "orig": "маргарита",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Класик",
+   "tokens": [
+    {
+     "s": "klasik",
+     "orig": "класик",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Еника",
+   "tokens": [
+    {
+     "s": "enika",
+     "orig": "еника",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Варна",
+   "tokens": [
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ",
+   "tokens": [
+    {
+     "s": "ensana",
+     "orig": "енсана",
+     "num": false
+    },
+    {
+     "s": "akvahus",
+     "orig": "аквахус",
+     "num": false
+    },
+    {
+     "s": "helt",
+     "orig": "хелт",
+     "num": false
+    },
+    {
+     "s": "spa",
+     "orig": "спа",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АСТЕРА",
+   "tokens": [
+    {
+     "s": "astera",
+     "orig": "астера",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МАДАРА",
+   "tokens": [
+    {
+     "s": "madara",
+     "orig": "мадара",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЧЕРНО МОРЕ",
+   "tokens": [
+    {
+     "s": "cherno",
+     "orig": "черно",
+     "num": false
+    },
+    {
+     "s": "more",
+     "orig": "море",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПРЕСТИЖ ХОТЕЛ И АКВАПАРК",
+   "tokens": [
+    {
+     "s": "prestizh",
+     "orig": "престиж",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "akvapark",
+     "orig": "аквапарк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АВРОРА",
+   "tokens": [
+    {
+     "s": "avrora",
+     "orig": "аврора",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕСТРЕЯ  РЕЗИДЕНС",
+   "tokens": [
+    {
+     "s": "estreia",
+     "orig": "естрея",
+     "num": false
+    },
+    {
+     "s": "rezidens",
+     "orig": "резиденс",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАРАДАЙЗ ГРИЙН ПАРК",
+   "tokens": [
+    {
+     "s": "paradaiz",
+     "orig": "парадайз",
+     "num": false
+    },
+    {
+     "s": "grin",
+     "orig": "грийн",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Морски бряг",
+   "tokens": [
+    {
+     "s": "morski",
+     "orig": "морски",
+     "num": false
+    },
+    {
+     "s": "briag",
+     "orig": "бряг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Плаза",
+   "tokens": [
+    {
+     "s": "plaza",
+     "orig": "плаза",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Санта Марина",
+   "tokens": [
+    {
+     "s": "santa",
+     "orig": "санта",
+     "num": false
+    },
+    {
+     "s": "marina",
+     "orig": "марина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Вила Аврора",
+   "tokens": [
+    {
+     "s": "vila",
+     "orig": "вила",
+     "num": false
+    },
+    {
+     "s": "avrora",
+     "orig": "аврора",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Джоя",
+   "tokens": [
+    {
+     "s": "dzhoia",
+     "orig": "джоя",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Арт",
+   "tokens": [
+    {
+     "s": "art",
+     "orig": "арт",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Акрополис",
+   "tokens": [
+    {
+     "s": "akropolis",
+     "orig": "акрополис",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АПОЛО РИЗОРТ",
+   "tokens": [
+    {
+     "s": "apolo",
+     "orig": "аполо",
+     "num": false
+    },
+    {
+     "s": "rizort",
+     "orig": "ризорт",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Marina Varna Apartments",
+   "tokens": [
+    {
+     "s": "marina",
+     "orig": "marina",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "varna",
+     "num": false
+    },
+    {
+     "s": "apartments",
+     "orig": "apartments",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Рубин“ (в реконструкция)",
+   "tokens": [
+    {
+     "s": "rubin",
+     "orig": "рубин",
+     "num": false
+    },
+    {
+     "s": "v",
+     "orig": "в",
+     "num": false
+    },
+    {
+     "s": "rekonstruktsia",
+     "orig": "реконструкция",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Апарткомплекс „Ялта“",
+   "tokens": [
+    {
+     "s": "apart",
+     "orig": "апарткомплекс",
+     "num": false
+    },
+    {
+     "s": "kompleks",
+     "orig": "апарткомплекс",
+     "num": false
+    },
+    {
+     "s": "ialta",
+     "orig": "ялта",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Oasis Villas / Вили Оазис",
+   "tokens": [
+    {
+     "s": "oasis",
+     "orig": "oasis",
+     "num": false
+    },
+    {
+     "s": "vilas",
+     "orig": "villas",
+     "num": false
+    },
+    {
+     "s": "vili",
+     "orig": "вили",
+     "num": false
+    },
+    {
+     "s": "oazis",
+     "orig": "оазис",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Trigor City / Guest Apartments",
+   "tokens": [
+    {
+     "s": "trigor",
+     "orig": "trigor",
+     "num": false
+    },
+    {
+     "s": "citi",
+     "orig": "city",
+     "num": false
+    },
+    {
+     "s": "guest",
+     "orig": "guest",
+     "num": false
+    },
+    {
+     "s": "apartments",
+     "orig": "apartments",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Royal Beach",
+   "tokens": [
+    {
+     "s": "roial",
+     "orig": "royal",
+     "num": false
+    },
+    {
+     "s": "beach",
+     "orig": "beach",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Аква",
+   "tokens": [
+    {
+     "s": "akva",
+     "orig": "аква",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "M Hostel Musala",
+   "tokens": [
+    {
+     "s": "m",
+     "orig": "m",
+     "num": false
+    },
+    {
+     "s": "hostel",
+     "orig": "hostel",
+     "num": false
+    },
+    {
+     "s": "musala",
+     "orig": "musala",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Family Hotel Astra",
+   "tokens": [
+    {
+     "s": "famili",
+     "orig": "family",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "hotel",
+     "num": false
+    },
+    {
+     "s": "astra",
+     "orig": "astra",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Villa Chinka",
+   "tokens": [
+    {
+     "s": "vila",
+     "orig": "villa",
+     "num": false
+    },
+    {
+     "s": "chinka",
+     "orig": "chinka",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Апарт комплекс Ritsa / „Рица“",
+   "tokens": [
+    {
+     "s": "apart",
+     "orig": "апарт",
+     "num": false
+    },
+    {
+     "s": "kompleks",
+     "orig": "комплекс",
+     "num": false
+    },
+    {
+     "s": "ritsa",
+     "orig": "ritsa",
+     "num": false
+    },
+    {
+     "s": "ritsa",
+     "orig": "рица",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Albatros Suites / „Албатрос“",
+   "tokens": [
+    {
+     "s": "albatros",
+     "orig": "albatros",
+     "num": false
+    },
+    {
+     "s": "suites",
+     "orig": "suites",
+     "num": false
+    },
+    {
+     "s": "albatros",
+     "orig": "албатрос",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Nikea / Nikeya Park",
+   "tokens": [
+    {
+     "s": "nikea",
+     "orig": "nikea",
+     "num": false
+    },
+    {
+     "s": "nikeia",
+     "orig": "nikeya",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "park",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Sirena Sea View Apartments",
+   "tokens": [
+    {
+     "s": "sirena",
+     "orig": "sirena",
+     "num": false
+    },
+    {
+     "s": "sea",
+     "orig": "sea",
+     "num": false
+    },
+    {
+     "s": "view",
+     "orig": "view",
+     "num": false
+    },
+    {
+     "s": "apartments",
+     "orig": "apartments",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Kabakum Sea View",
+   "tokens": [
+    {
+     "s": "kabakum",
+     "orig": "kabakum",
+     "num": false
+    },
+    {
+     "s": "sea",
+     "orig": "sea",
+     "num": false
+    },
+    {
+     "s": "view",
+     "orig": "view",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Cabacum Beach Residence",
+   "tokens": [
+    {
+     "s": "cabacum",
+     "orig": "cabacum",
+     "num": false
+    },
+    {
+     "s": "beach",
+     "orig": "beach",
+     "num": false
+    },
+    {
+     "s": "residence",
+     "orig": "residence",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Hugo Hotel",
+   "tokens": [
+    {
+     "s": "hugo",
+     "orig": "hugo",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "hotel",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Хотел „Журналист“ / МДЖ",
+   "tokens": [
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "zhurnalist",
+     "orig": "журналист",
+     "num": false
+    },
+    {
+     "s": "mdzh",
+     "orig": "мдж",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Мотел „Иванчов хан“",
+   "tokens": [
+    {
+     "s": "motel",
+     "orig": "мотел",
+     "num": false
+    },
+    {
+     "s": "ivanchov",
+     "orig": "иванчов",
+     "num": false
+    },
+    {
+     "s": "han",
+     "orig": "хан",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Хотел-ресторант „Комитово ханче“",
+   "tokens": [
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "restorant",
+     "orig": "ресторант",
+     "num": false
+    },
+    {
+     "s": "komitovo",
+     "orig": "комитово",
+     "num": false
+    },
+    {
+     "s": "hanche",
+     "orig": "ханче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Art Green Boutique Hotel",
+   "tokens": [
+    {
+     "s": "art",
+     "orig": "art",
+     "num": false
+    },
+    {
+     "s": "gren",
+     "orig": "green",
+     "num": false
+    },
+    {
+     "s": "boutique",
+     "orig": "boutique",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "hotel",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Hotel Color",
+   "tokens": [
+    {
+     "s": "hotel",
+     "orig": "hotel",
+     "num": false
+    },
+    {
+     "s": "color",
+     "orig": "color",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Hotel Bona Vita",
+   "tokens": [
+    {
+     "s": "hotel",
+     "orig": "hotel",
+     "num": false
+    },
+    {
+     "s": "bona",
+     "orig": "bona",
+     "num": false
+    },
+    {
+     "s": "vita",
+     "orig": "vita",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СВЕТА ЕЛЕНА",
+   "tokens": [
+    {
+     "s": "sveta",
+     "orig": "света",
+     "num": false
+    },
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "БИЗАР ХОТЕЛ",
+   "tokens": [
+    {
+     "s": "bizar",
+     "orig": "бизар",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Вемара сити",
+   "tokens": [
+    {
+     "s": "vemara",
+     "orig": "вемара",
+     "num": false
+    },
+    {
+     "s": "siti",
+     "orig": "сити",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Каприз",
+   "tokens": [
+    {
+     "s": "kapriz",
+     "orig": "каприз",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Станкино ханче",
+   "tokens": [
+    {
+     "s": "stankino",
+     "orig": "станкино",
+     "num": false
+    },
+    {
+     "s": "hanche",
+     "orig": "ханче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Калифорния",
+   "tokens": [
+    {
+     "s": "kalifornia",
+     "orig": "калифорния",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АРАБЕЛА",
+   "tokens": [
+    {
+     "s": "arabela",
+     "orig": "арабела",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АРГИЩ ПАРТЕЗ",
+   "tokens": [
+    {
+     "s": "argisht",
+     "orig": "аргищ",
+     "num": false
+    },
+    {
+     "s": "partez",
+     "orig": "партез",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СОФИЯ",
+   "tokens": [
+    {
+     "s": "sofia",
+     "orig": "софия",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "АДМИРАЛ",
+   "tokens": [
+    {
+     "s": "admiral",
+     "orig": "адмирал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Иглика-2",
+   "tokens": [
+    {
+     "s": "iglika",
+     "orig": "иглика",
+     "num": false
+    },
+    {
+     "s": "2",
+     "orig": "2",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "Царевец",
+   "tokens": [
+    {
+     "s": "tsarevets",
+     "orig": "царевец",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Амфора Палас",
+   "tokens": [
+    {
+     "s": "amfora",
+     "orig": "амфора",
+     "num": false
+    },
+    {
+     "s": "palas",
+     "orig": "палас",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ГРИЙН ПАРК",
+   "tokens": [
+    {
+     "s": "grin",
+     "orig": "грийн",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ",
+   "tokens": [
+    {
+     "s": "prestizh",
+     "orig": "престиж",
+     "num": false
+    },
+    {
+     "s": "deluks",
+     "orig": "делукс",
+     "num": false
+    },
+    {
+     "s": "akvapark",
+     "orig": "аквапарк",
+     "num": false
+    },
+    {
+     "s": "klub",
+     "orig": "клуб",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КАРНИВАЛ",
+   "tokens": [
+    {
+     "s": "karnival",
+     "orig": "карнивал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "МИРАБЕЛ",
+   "tokens": [
+    {
+     "s": "mirabel",
+     "orig": "мирабел",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Вихрен",
+   "tokens": [
+    {
+     "s": "vihren",
+     "orig": "вихрен",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕЛПИДА БИЙЧ",
+   "tokens": [
+    {
+     "s": "elpida",
+     "orig": "елпида",
+     "num": false
+    },
+    {
+     "s": "bich",
+     "orig": "бийч",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЕКСЕЛСИОР",
+   "tokens": [
+    {
+     "s": "ekselsior",
+     "orig": "екселсиор",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Меркурий",
+   "tokens": [
+    {
+     "s": "merkuri",
+     "orig": "меркурий",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Зл.котва",
+   "tokens": [
+    {
+     "s": "zl",
+     "orig": "зл",
+     "num": false
+    },
+    {
+     "s": "kotva",
+     "orig": "котва",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Иглика",
+   "tokens": [
+    {
+     "s": "iglika",
+     "orig": "иглика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Синигер",
+   "tokens": [
+    {
+     "s": "siniger",
+     "orig": "синигер",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "РУМЪР",
+   "tokens": [
+    {
+     "s": "rumar",
+     "orig": "румър",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Гданск",
+   "tokens": [
+    {
+     "s": "gdansk",
+     "orig": "гданск",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАРК ХОТЕЛ ОДЕСОС",
+   "tokens": [
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    },
+    {
+     "s": "hotel",
+     "orig": "хотел",
+     "num": false
+    },
+    {
+     "s": "odesos",
+     "orig": "одесос",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Бендита",
+   "tokens": [
+    {
+     "s": "bendita",
+     "orig": "бендита",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПАЛМА",
+   "tokens": [
+    {
+     "s": "palma",
+     "orig": "палма",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Сентрал",
+   "tokens": [
+    {
+     "s": "sentral",
+     "orig": "сентрал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "КОНТИНЕНТАЛ",
+   "tokens": [
+    {
+     "s": "kontinental",
+     "orig": "континентал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Явор",
+   "tokens": [
+    {
+     "s": "iavor",
+     "orig": "явор",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "3 ОУ Ангел Кънчев",
+   "tokens": [
+    {
+     "s": "3",
+     "orig": "3",
+     "num": true
+    },
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "angel",
+     "orig": "ангел",
+     "num": false
+    },
+    {
+     "s": "kanchev",
+     "orig": "кънчев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "8 СОУПЧЕ",
+   "tokens": [
+    {
+     "s": "8",
+     "orig": "8",
+     "num": true
+    },
+    {
+     "s": "soupche",
+     "orig": "соупче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "бивше ОУ „Д-р Никола Димитров“",
+   "tokens": [
+    {
+     "s": "bivshe",
+     "orig": "бивше",
+     "num": false
+    },
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    },
+    {
+     "s": "dimitrov",
+     "orig": "димитров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Частна профилирана гимназия \"Антонан дьо Сент-Екзюпери\"",
+   "tokens": [
+    {
+     "s": "chastna",
+     "orig": "частна",
+     "num": false
+    },
+    {
+     "s": "profilirana",
+     "orig": "профилирана",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    },
+    {
+     "s": "antonan",
+     "orig": "антонан",
+     "num": false
+    },
+    {
+     "s": "do",
+     "orig": "дьо",
+     "num": false
+    },
+    {
+     "s": "sent",
+     "orig": "сент",
+     "num": false
+    },
+    {
+     "s": "ekziuperi",
+     "orig": "екзюпери",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЧОУ \"Феникс 2020\"",
+   "tokens": [
+    {
+     "s": "chou",
+     "orig": "чоу",
+     "num": false
+    },
+    {
+     "s": "feniks",
+     "orig": "феникс",
+     "num": false
+    },
+    {
+     "s": "2020",
+     "orig": "2020",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "ЧСУ „Монтесори Варна“",
+   "tokens": [
+    {
+     "s": "chsu",
+     "orig": "чсу",
+     "num": false
+    },
+    {
+     "s": "montesori",
+     "orig": "монтесори",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "I ЕГ",
+   "tokens": [
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    },
+    {
+     "s": "eg",
+     "orig": "ег",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "II ОУ „Никола Йонков Вапцаров“",
+   "tokens": [
+    {
+     "s": "2",
+     "orig": "ii",
+     "num": true
+    },
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    },
+    {
+     "s": "ionkov",
+     "orig": "йонков",
+     "num": false
+    },
+    {
+     "s": "vaptsarov",
+     "orig": "вапцаров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "III ПМГ „Акад. Методий Попов“",
+   "tokens": [
+    {
+     "s": "3",
+     "orig": "iii",
+     "num": true
+    },
+    {
+     "s": "pmg",
+     "orig": "пмг",
+     "num": false
+    },
+    {
+     "s": "akad",
+     "orig": "акад",
+     "num": false
+    },
+    {
+     "s": "metodi",
+     "orig": "методий",
+     "num": false
+    },
+    {
+     "s": "popov",
+     "orig": "попов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "IV ЕГ Жолио Кюри",
+   "tokens": [
+    {
+     "s": "4",
+     "orig": "iv",
+     "num": true
+    },
+    {
+     "s": "eg",
+     "orig": "ег",
+     "num": false
+    },
+    {
+     "s": "zholio",
+     "orig": "жолио",
+     "num": false
+    },
+    {
+     "s": "kiuri",
+     "orig": "кюри",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Математическа гимназия „Доктор Петър Берон“",
+   "tokens": [
+    {
+     "s": "matematicheska",
+     "orig": "математическа",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    },
+    {
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "petar",
+     "orig": "петър",
+     "num": false
+    },
+    {
+     "s": "beron",
+     "orig": "берон",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Международното Френско училище във Варна",
+   "tokens": [
+    {
+     "s": "mezhdunarodnoto",
+     "orig": "международното",
+     "num": false
+    },
+    {
+     "s": "frensko",
+     "orig": "френско",
+     "num": false
+    },
+    {
+     "s": "uchilishte",
+     "orig": "училище",
+     "num": false
+    },
+    {
+     "s": "vav",
+     "orig": "във",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Морска гимназия \"Св. Николай Чудотворец\"",
+   "tokens": [
+    {
+     "s": "morska",
+     "orig": "морска",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "nikolai",
+     "orig": "николай",
+     "num": false
+    },
+    {
+     "s": "chudotvorets",
+     "orig": "чудотворец",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Национално училище по изкуствата \"Добри Христов\"",
+   "tokens": [
+    {
+     "s": "natsionalno",
+     "orig": "национално",
+     "num": false
+    },
+    {
+     "s": "uchilishte",
+     "orig": "училище",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "izkustvata",
+     "orig": "изкуствата",
+     "num": false
+    },
+    {
+     "s": "dobri",
+     "orig": "добри",
+     "num": false
+    },
+    {
+     "s": "hristov",
+     "orig": "христов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "НУ Васил Левски",
+   "tokens": [
+    {
+     "s": "nu",
+     "orig": "ну",
+     "num": false
+    },
+    {
+     "s": "vasil",
+     "orig": "васил",
+     "num": false
+    },
+    {
+     "s": "levski",
+     "orig": "левски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Черноризец Храбър",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "chernorizets",
+     "orig": "черноризец",
+     "num": false
+    },
+    {
+     "s": "hrabar",
+     "orig": "храбър",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Добри Чинтулов",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "dobri",
+     "orig": "добри",
+     "num": false
+    },
+    {
+     "s": "chintulov",
+     "orig": "чинтулов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"Г.С.Раковски\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "g",
+     "orig": "г",
+     "num": false
+    },
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "rakovski",
+     "orig": "раковски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Христо Ботев",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "hristo",
+     "orig": "христо",
+     "num": false
+    },
+    {
+     "s": "botev",
+     "orig": "ботев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Йордан Йовков",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "iordan",
+     "orig": "йордан",
+     "num": false
+    },
+    {
+     "s": "iovkov",
+     "orig": "йовков",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Капитан Петко Войвода",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "kapitan",
+     "orig": "капитан",
+     "num": false
+    },
+    {
+     "s": "petko",
+     "orig": "петко",
+     "num": false
+    },
+    {
+     "s": "voivoda",
+     "orig": "войвода",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"Константин Арабаджиев\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "arabadzhiev",
+     "orig": "арабаджиев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ „Константин Арабаджиев“",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "arabadzhiev",
+     "orig": "арабаджиев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Отец Паисий",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "otets",
+     "orig": "отец",
+     "num": false
+    },
+    {
+     "s": "paisi",
+     "orig": "паисий",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"П. Р. Славейков\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "p",
+     "orig": "п",
+     "num": false
+    },
+    {
+     "s": "r",
+     "orig": "р",
+     "num": false
+    },
+    {
+     "s": "slaveikov",
+     "orig": "славейков",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ ,,Панайот Волов\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "panaiot",
+     "orig": "панайот",
+     "num": false
+    },
+    {
+     "s": "volov",
+     "orig": "волов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Патриарх Евтимий",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "patriarh",
+     "orig": "патриарх",
+     "num": false
+    },
+    {
+     "s": "evtimi",
+     "orig": "евтимий",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"Стефан Караджа\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "stefan",
+     "orig": "стефан",
+     "num": false
+    },
+    {
+     "s": "karadzha",
+     "orig": "караджа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Стоян Михайловски",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "stoian",
+     "orig": "стоян",
+     "num": false
+    },
+    {
+     "s": "mihailovski",
+     "orig": "михайловски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ „Св. Климент Охридски“",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "kliment",
+     "orig": "климент",
+     "num": false
+    },
+    {
+     "s": "ohridski",
+     "orig": "охридски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"Св.св.Кирил и Методий\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "kiril",
+     "orig": "кирил",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "metodi",
+     "orig": "методий",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ „Свети Иван Рилски“",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "rilski",
+     "orig": "рилски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"Цар Симеон I\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "tsar",
+     "orig": "цар",
+     "num": false
+    },
+    {
+     "s": "simeon",
+     "orig": "симеон",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"Васил Априлов\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "vasil",
+     "orig": "васил",
+     "num": false
+    },
+    {
+     "s": "aprilov",
+     "orig": "априлов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ Васил Друмев",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "vasil",
+     "orig": "васил",
+     "num": false
+    },
+    {
+     "s": "drumev",
+     "orig": "друмев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОУ \"Захари Стоянов\"",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "zahari",
+     "orig": "захари",
+     "num": false
+    },
+    {
+     "s": "stoianov",
+     "orig": "стоянов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Първа частна търговска гимназия",
+   "tokens": [
+    {
+     "s": "1",
+     "orig": "първа",
+     "num": true
+    },
+    {
+     "s": "chastna",
+     "orig": "частна",
+     "num": false
+    },
+    {
+     "s": "targovska",
+     "orig": "търговска",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГ ИТOK \"Екзюпери\"",
+   "tokens": [
+    {
+     "s": "pg",
+     "orig": "пг",
+     "num": false
+    },
+    {
+     "s": "itok",
+     "orig": "итok",
+     "num": false
+    },
+    {
+     "s": "ekziuperi",
+     "orig": "екзюпери",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГ по Компютърно Моделиране и Компютърни Системи \"Акад. Благовест Сендов\"",
+   "tokens": [
+    {
+     "s": "pg",
+     "orig": "пг",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "kompiutarno",
+     "orig": "компютърно",
+     "num": false
+    },
+    {
+     "s": "modelirane",
+     "orig": "моделиране",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "kompiutarni",
+     "orig": "компютърни",
+     "num": false
+    },
+    {
+     "s": "sistemi",
+     "orig": "системи",
+     "num": false
+    },
+    {
+     "s": "akad",
+     "orig": "акад",
+     "num": false
+    },
+    {
+     "s": "blagovest",
+     "orig": "благовест",
+     "num": false
+    },
+    {
+     "s": "sendov",
+     "orig": "сендов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГ по сградостроителство \"Кольо Фичето\"",
+   "tokens": [
+    {
+     "s": "pg",
+     "orig": "пг",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "sgradostroitelstvo",
+     "orig": "сградостроителство",
+     "num": false
+    },
+    {
+     "s": "kolo",
+     "orig": "кольо",
+     "num": false
+    },
+    {
+     "s": "ficheto",
+     "orig": "фичето",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГ по строителство, архитектура и геодезия \"Васил Левски\"",
+   "tokens": [
+    {
+     "s": "pg",
+     "orig": "пг",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "stroitelstvo",
+     "orig": "строителство",
+     "num": false
+    },
+    {
+     "s": "arhitektura",
+     "orig": "архитектура",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "geodezia",
+     "orig": "геодезия",
+     "num": false
+    },
+    {
+     "s": "vasil",
+     "orig": "васил",
+     "num": false
+    },
+    {
+     "s": "levski",
+     "orig": "левски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГ по текстил и моден дизайн",
+   "tokens": [
+    {
+     "s": "pg",
+     "orig": "пг",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "tekstil",
+     "orig": "текстил",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "moden",
+     "orig": "моден",
+     "num": false
+    },
+    {
+     "s": "dizain",
+     "orig": "дизайн",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГИ „Д-р Иван Богоров“",
+   "tokens": [
+    {
+     "s": "pgi",
+     "orig": "пги",
+     "num": false
+    },
+    {
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "bogorov",
+     "orig": "богоров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГГСД „Николай Хайтов“",
+   "tokens": [
+    {
+     "s": "pgsd",
+     "orig": "пггсд",
+     "num": false
+    },
+    {
+     "s": "nikolai",
+     "orig": "николай",
+     "num": false
+    },
+    {
+     "s": "haitov",
+     "orig": "хайтов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ПГТ „Проф. д-р Асен Златаров\"",
+   "tokens": [
+    {
+     "s": "pgt",
+     "orig": "пгт",
+     "num": false
+    },
+    {
+     "s": "prof",
+     "orig": "проф",
+     "num": false
+    },
+    {
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "asen",
+     "orig": "асен",
+     "num": false
+    },
+    {
+     "s": "zlatarov",
+     "orig": "златаров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Професионална гимназия по електротехника",
+   "tokens": [
+    {
+     "s": "profesionalna",
+     "orig": "професионална",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "elektrotehnika",
+     "orig": "електротехника",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Професионална гимназия по химични и хранително-вкусови технологии \"Д. И. Менделеев\"",
+   "tokens": [
+    {
+     "s": "profesionalna",
+     "orig": "професионална",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "himichni",
+     "orig": "химични",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "hranitelno",
+     "orig": "хранително",
+     "num": false
+    },
+    {
+     "s": "vkusovi",
+     "orig": "вкусови",
+     "num": false
+    },
+    {
+     "s": "tehnologi",
+     "orig": "технологии",
+     "num": false
+    },
+    {
+     "s": "d",
+     "orig": "д",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "mendelev",
+     "orig": "менделеев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Професионална Гимназия по Текстил и Моден Дизайн",
+   "tokens": [
+    {
+     "s": "profesionalna",
+     "orig": "професионална",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "tekstil",
+     "orig": "текстил",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "moden",
+     "orig": "моден",
+     "num": false
+    },
+    {
+     "s": "dizain",
+     "orig": "дизайн",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Професионална Техническа Гимназия",
+   "tokens": [
+    {
+     "s": "profesionalna",
+     "orig": "професионална",
+     "num": false
+    },
+    {
+     "s": "tehnicheska",
+     "orig": "техническа",
+     "num": false
+    },
+    {
+     "s": "gimnazia",
+     "orig": "гимназия",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Спортно училище Георги Бенковски",
+   "tokens": [
+    {
+     "s": "sportno",
+     "orig": "спортно",
+     "num": false
+    },
+    {
+     "s": "uchilishte",
+     "orig": "училище",
+     "num": false
+    },
+    {
+     "s": "georgi",
+     "orig": "георги",
+     "num": false
+    },
+    {
+     "s": "benkovski",
+     "orig": "бенковски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СУ \"Елин Пелин\"",
+   "tokens": [
+    {
+     "s": "su",
+     "orig": "су",
+     "num": false
+    },
+    {
+     "s": "elin",
+     "orig": "елин",
+     "num": false
+    },
+    {
+     "s": "pelin",
+     "orig": "пелин",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СУ „Гео Милев“",
+   "tokens": [
+    {
+     "s": "su",
+     "orig": "су",
+     "num": false
+    },
+    {
+     "s": "geo",
+     "orig": "гео",
+     "num": false
+    },
+    {
+     "s": "milev",
+     "orig": "милев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СУ „Любен Каравелов“",
+   "tokens": [
+    {
+     "s": "su",
+     "orig": "су",
+     "num": false
+    },
+    {
+     "s": "liuben",
+     "orig": "любен",
+     "num": false
+    },
+    {
+     "s": "karavelov",
+     "orig": "каравелов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СУ „Неофит Бозвели“",
+   "tokens": [
+    {
+     "s": "su",
+     "orig": "су",
+     "num": false
+    },
+    {
+     "s": "neofit",
+     "orig": "неофит",
+     "num": false
+    },
+    {
+     "s": "bozveli",
+     "orig": "бозвели",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СУ „Пейо Крачолов Яворов“",
+   "tokens": [
+    {
+     "s": "su",
+     "orig": "су",
+     "num": false
+    },
+    {
+     "s": "peio",
+     "orig": "пейо",
+     "num": false
+    },
+    {
+     "s": "kracholov",
+     "orig": "крачолов",
+     "num": false
+    },
+    {
+     "s": "iavorov",
+     "orig": "яворов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СУХНИ „Константин Преславски“",
+   "tokens": [
+    {
+     "s": "suhni",
+     "orig": "сухни",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "preslavski",
+     "orig": "преславски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "СУУНЗ Проф. д-р Иван Шишманов",
+   "tokens": [
+    {
+     "s": "sunz",
+     "orig": "суунз",
+     "num": false
+    },
+    {
+     "s": "prof",
+     "orig": "проф",
+     "num": false
+    },
+    {
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "shishmanov",
+     "orig": "шишманов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "VII СУ „Найден Геров“",
+   "tokens": [
+    {
+     "s": "7",
+     "orig": "vii",
+     "num": true
+    },
+    {
+     "s": "su",
+     "orig": "су",
+     "num": false
+    },
+    {
+     "s": "naiden",
+     "orig": "найден",
+     "num": false
+    },
+    {
+     "s": "gerov",
+     "orig": "геров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ВТГ „Георги Стойков Раковски\"",
+   "tokens": [
+    {
+     "s": "vtg",
+     "orig": "втг",
+     "num": false
+    },
+    {
+     "s": "georgi",
+     "orig": "георги",
+     "num": false
+    },
+    {
+     "s": "stoikov",
+     "orig": "стойков",
+     "num": false
+    },
+    {
+     "s": "rakovski",
+     "orig": "раковски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "І ОУ „Свети княз Борис I“",
+   "tokens": [
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    },
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "kniaz",
+     "orig": "княз",
+     "num": false
+    },
+    {
+     "s": "boris",
+     "orig": "борис",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "Икономически университет - Варна",
+   "tokens": [
+    {
+     "s": "ikonomicheski",
+     "orig": "икономически",
+     "num": false
+    },
+    {
+     "s": "universitet",
+     "orig": "университет",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Икономически университет - Варна, 2-ри корпус",
+   "tokens": [
+    {
+     "s": "ikonomicheski",
+     "orig": "икономически",
+     "num": false
+    },
+    {
+     "s": "universitet",
+     "orig": "университет",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "2",
+     "orig": "2",
+     "num": true
+    },
+    {
+     "s": "korpus",
+     "orig": "корпус",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Медицински университет „Проф. д-р Параскев Стоянов“",
+   "tokens": [
+    {
+     "s": "meditsinski",
+     "orig": "медицински",
+     "num": false
+    },
+    {
+     "s": "universitet",
+     "orig": "университет",
+     "num": false
+    },
+    {
+     "s": "prof",
+     "orig": "проф",
+     "num": false
+    },
+    {
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "paraskev",
+     "orig": "параскев",
+     "num": false
+    },
+    {
+     "s": "stoianov",
+     "orig": "стоянов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Технически университет – Варна",
+   "tokens": [
+    {
+     "s": "tehnicheski",
+     "orig": "технически",
+     "num": false
+    },
+    {
+     "s": "universitet",
+     "orig": "университет",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Варненски Свободен Университет „Черноризец Храбър“",
+   "tokens": [
+    {
+     "s": "varnenski",
+     "orig": "варненски",
+     "num": false
+    },
+    {
+     "s": "svoboden",
+     "orig": "свободен",
+     "num": false
+    },
+    {
+     "s": "universitet",
+     "orig": "университет",
+     "num": false
+    },
+    {
+     "s": "chernorizets",
+     "orig": "черноризец",
+     "num": false
+    },
+    {
+     "s": "hrabar",
+     "orig": "храбър",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Варненски Университет по Мениджмънт",
+   "tokens": [
+    {
+     "s": "varnenski",
+     "orig": "варненски",
+     "num": false
+    },
+    {
+     "s": "universitet",
+     "orig": "университет",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "menidzhmant",
+     "orig": "мениджмънт",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ВВМУ „Н. Й. Вапцаров“",
+   "tokens": [
+    {
+     "s": "vmu",
+     "orig": "ввму",
+     "num": false
+    },
+    {
+     "s": "n",
+     "orig": "н",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "й",
+     "num": false
+    },
+    {
+     "s": "vaptsarov",
+     "orig": "вапцаров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Аджибадем Сити Клиник",
+   "tokens": [
+    {
+     "s": "adzhibadem",
+     "orig": "аджибадем",
+     "num": false
+    },
+    {
+     "s": "siti",
+     "orig": "сити",
+     "num": false
+    },
+    {
+     "s": "klinik",
+     "orig": "клиник",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Eurohospital",
+   "tokens": [
+    {
+     "s": "eurohospital",
+     "orig": "eurohospital",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Медицински комплекс \"Майчин дом\" - Варна",
+   "tokens": [
+    {
+     "s": "meditsinski",
+     "orig": "медицински",
+     "num": false
+    },
+    {
+     "s": "kompleks",
+     "orig": "комплекс",
+     "num": false
+    },
+    {
+     "s": "maichin",
+     "orig": "майчин",
+     "num": false
+    },
+    {
+     "s": "dom",
+     "orig": "дом",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Многопрофилна болница за активно лечение Света Анна – Варна“ АД",
+   "tokens": [
+    {
+     "s": "mnogoprofilna",
+     "orig": "многопрофилна",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "sveta",
+     "orig": "света",
+     "num": false
+    },
+    {
+     "s": "ana",
+     "orig": "анна",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "ad",
+     "orig": "ад",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Многопрофилна болница за активно лечение Варна“ ЕООД",
+   "tokens": [
+    {
+     "s": "mnogoprofilna",
+     "orig": "многопрофилна",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Онкологична болница-Марко Антонов",
+   "tokens": [
+    {
+     "s": "onkologichna",
+     "orig": "онкологична",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "marko",
+     "orig": "марко",
+     "num": false
+    },
+    {
+     "s": "antonov",
+     "orig": "антонов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Специализирана болница по акушерство и гинекология за активно лечение „Проф. д-р Димитър Стаматов“ – Варна“ ЕООД",
+   "tokens": [
+    {
+     "s": "spetsializirana",
+     "orig": "специализирана",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "akusherstvo",
+     "orig": "акушерство",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "ginekologia",
+     "orig": "гинекология",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "prof",
+     "orig": "проф",
+     "num": false
+    },
+    {
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "dimitar",
+     "orig": "димитър",
+     "num": false
+    },
+    {
+     "s": "stamatov",
+     "orig": "стаматов",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Специализирана болница за активно лечение по кардиология – Кардиолайф“ ООД",
+   "tokens": [
+    {
+     "s": "spetsializirana",
+     "orig": "специализирана",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "kardiologia",
+     "orig": "кардиология",
+     "num": false
+    },
+    {
+     "s": "kardiolaif",
+     "orig": "кардиолайф",
+     "num": false
+    },
+    {
+     "s": "od",
+     "orig": "оод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Специализирана болница за активно лечение по кардиология Варна“ ЕАД",
+   "tokens": [
+    {
+     "s": "spetsializirana",
+     "orig": "специализирана",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "kardiologia",
+     "orig": "кардиология",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "ead",
+     "orig": "еад",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Специализирана хирургична болница за активно лечение – проф. Темелков“ ООД",
+   "tokens": [
+    {
+     "s": "spetsializirana",
+     "orig": "специализирана",
+     "num": false
+    },
+    {
+     "s": "hirurgichna",
+     "orig": "хирургична",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "prof",
+     "orig": "проф",
+     "num": false
+    },
+    {
+     "s": "temelkov",
+     "orig": "темелков",
+     "num": false
+    },
+    {
+     "s": "od",
+     "orig": "оод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Университетска многопрофилна болница за активно лечение „Света Марина““ ЕАД",
+   "tokens": [
+    {
+     "s": "universitetska",
+     "orig": "университетска",
+     "num": false
+    },
+    {
+     "s": "mnogoprofilna",
+     "orig": "многопрофилна",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "sveta",
+     "orig": "света",
+     "num": false
+    },
+    {
+     "s": "marina",
+     "orig": "марина",
+     "num": false
+    },
+    {
+     "s": "ead",
+     "orig": "еад",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Университетска специализирана болница по очни болести за активно лечение – Варна“ ЕООД",
+   "tokens": [
+    {
+     "s": "universitetska",
+     "orig": "университетска",
+     "num": false
+    },
+    {
+     "s": "spetsializirana",
+     "orig": "специализирана",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    },
+    {
+     "s": "po",
+     "orig": "по",
+     "num": false
+    },
+    {
+     "s": "ochni",
+     "orig": "очни",
+     "num": false
+    },
+    {
+     "s": "bolesti",
+     "orig": "болести",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "aktivno",
+     "orig": "активно",
+     "num": false
+    },
+    {
+     "s": "lechenie",
+     "orig": "лечение",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Военно-морска болница",
+   "tokens": [
+    {
+     "s": "voeno",
+     "orig": "военно",
+     "num": false
+    },
+    {
+     "s": "morska",
+     "orig": "морска",
+     "num": false
+    },
+    {
+     "s": "bolnitsa",
+     "orig": "болница",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Диспансер за белодробни заболявания",
+   "tokens": [
+    {
+     "s": "dispanser",
+     "orig": "диспансер",
+     "num": false
+    },
+    {
+     "s": "za",
+     "orig": "за",
+     "num": false
+    },
+    {
+     "s": "belodrobni",
+     "orig": "белодробни",
+     "num": false
+    },
+    {
+     "s": "zaboliavania",
+     "orig": "заболявания",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„ДКЦ 3 – Варна“ ЕООД",
+   "tokens": [
+    {
+     "s": "dkts",
+     "orig": "дкц",
+     "num": false
+    },
+    {
+     "s": "3",
+     "orig": "3",
+     "num": true
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„ДКЦ 4 – Варна“ ЕООД",
+   "tokens": [
+    {
+     "s": "dkts",
+     "orig": "дкц",
+     "num": false
+    },
+    {
+     "s": "4",
+     "orig": "4",
+     "num": true
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„ДКЦ 5 Варна Света Екатерина“ ЕООД",
+   "tokens": [
+    {
+     "s": "dkts",
+     "orig": "дкц",
+     "num": false
+    },
+    {
+     "s": "5",
+     "orig": "5",
+     "num": true
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "sveta",
+     "orig": "света",
+     "num": false
+    },
+    {
+     "s": "ekaterina",
+     "orig": "екатерина",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„ДКЦ Чайка“ ЕООД",
+   "tokens": [
+    {
+     "s": "dkts",
+     "orig": "дкц",
+     "num": false
+    },
+    {
+     "s": "chaika",
+     "orig": "чайка",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "II ДКЦ Св. Иван Рилски",
+   "tokens": [
+    {
+     "s": "2",
+     "orig": "ii",
+     "num": true
+    },
+    {
+     "s": "dkts",
+     "orig": "дкц",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "rilski",
+     "orig": "рилски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Хоспис Филаретова“ ЕООД",
+   "tokens": [
+    {
+     "s": "hospis",
+     "orig": "хоспис",
+     "num": false
+    },
+    {
+     "s": "filaretova",
+     "orig": "филаретова",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Хоспис Мишел Паре“ ООД",
+   "tokens": [
+    {
+     "s": "hospis",
+     "orig": "хоспис",
+     "num": false
+    },
+    {
+     "s": "mishel",
+     "orig": "мишел",
+     "num": false
+    },
+    {
+     "s": "pare",
+     "orig": "паре",
+     "num": false
+    },
+    {
+     "s": "od",
+     "orig": "оод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Хоспис Царица Елеонора – Варна“ ЕООД",
+   "tokens": [
+    {
+     "s": "hospis",
+     "orig": "хоспис",
+     "num": false
+    },
+    {
+     "s": "tsaritsa",
+     "orig": "царица",
+     "num": false
+    },
+    {
+     "s": "eleonora",
+     "orig": "елеонора",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "1 ЦДГ",
+   "tokens": [
+    {
+     "s": "1",
+     "orig": "1",
+     "num": true
+    },
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "13 ЦДГ Звездичка",
+   "tokens": [
+    {
+     "s": "13",
+     "orig": "13",
+     "num": true
+    },
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    },
+    {
+     "s": "zvezdichka",
+     "orig": "звездичка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "20 Логопедична ЦДГ",
+   "tokens": [
+    {
+     "s": "20",
+     "orig": "20",
+     "num": true
+    },
+    {
+     "s": "logopedichna",
+     "orig": "логопедична",
+     "num": false
+    },
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "27 ДГ Успех",
+   "tokens": [
+    {
+     "s": "27",
+     "orig": "27",
+     "num": true
+    },
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "uspeh",
+     "orig": "успех",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "28 ЦДГ Карамфилче",
+   "tokens": [
+    {
+     "s": "28",
+     "orig": "28",
+     "num": true
+    },
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    },
+    {
+     "s": "karamfilche",
+     "orig": "карамфилче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "3 ЦДГ Ян Бибиян",
+   "tokens": [
+    {
+     "s": "3",
+     "orig": "3",
+     "num": true
+    },
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    },
+    {
+     "s": "ian",
+     "orig": "ян",
+     "num": false
+    },
+    {
+     "s": "bibian",
+     "orig": "бибиян",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "35 ОДЗ Детска радост",
+   "tokens": [
+    {
+     "s": "35",
+     "orig": "35",
+     "num": true
+    },
+    {
+     "s": "odz",
+     "orig": "одз",
+     "num": false
+    },
+    {
+     "s": "detska",
+     "orig": "детска",
+     "num": false
+    },
+    {
+     "s": "radost",
+     "orig": "радост",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "4 ОДЗ Чайка",
+   "tokens": [
+    {
+     "s": "4",
+     "orig": "4",
+     "num": true
+    },
+    {
+     "s": "odz",
+     "orig": "одз",
+     "num": false
+    },
+    {
+     "s": "chaika",
+     "orig": "чайка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "46 ДГ Горска приказка",
+   "tokens": [
+    {
+     "s": "46",
+     "orig": "46",
+     "num": true
+    },
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "gorska",
+     "orig": "горска",
+     "num": false
+    },
+    {
+     "s": "prikazka",
+     "orig": "приказка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "9. Детска ясла Детелина",
+   "tokens": [
+    {
+     "s": "9",
+     "orig": "9",
+     "num": true
+    },
+    {
+     "s": "detska",
+     "orig": "детска",
+     "num": false
+    },
+    {
+     "s": "iasla",
+     "orig": "ясла",
+     "num": false
+    },
+    {
+     "s": "detelina",
+     "orig": "детелина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЧДГ „Приятели\"",
+   "tokens": [
+    {
+     "s": "chdg",
+     "orig": "чдг",
+     "num": false
+    },
+    {
+     "s": "priateli",
+     "orig": "приятели",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Детска градина \"Жирафче\"",
+   "tokens": [
+    {
+     "s": "detska",
+     "orig": "детска",
+     "num": false
+    },
+    {
+     "s": "gradina",
+     "orig": "градина",
+     "num": false
+    },
+    {
+     "s": "zhirafche",
+     "orig": "жирафче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Детска Ясла №2 \"Моряче\"",
+   "tokens": [
+    {
+     "s": "detska",
+     "orig": "детска",
+     "num": false
+    },
+    {
+     "s": "iasla",
+     "orig": "ясла",
+     "num": false
+    },
+    {
+     "s": "2",
+     "orig": "2",
+     "num": true
+    },
+    {
+     "s": "moriache",
+     "orig": "моряче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Детска ясла № 7 \"Роза\"",
+   "tokens": [
+    {
+     "s": "detska",
+     "orig": "детска",
+     "num": false
+    },
+    {
+     "s": "iasla",
+     "orig": "ясла",
+     "num": false
+    },
+    {
+     "s": "7",
+     "orig": "7",
+     "num": true
+    },
+    {
+     "s": "roza",
+     "orig": "роза",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Детска ясла (ДЯ) №3 „Зайо Байо“",
+   "tokens": [
+    {
+     "s": "detska",
+     "orig": "детска",
+     "num": false
+    },
+    {
+     "s": "iasla",
+     "orig": "ясла",
+     "num": false
+    },
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "3",
+     "orig": "3",
+     "num": true
+    },
+    {
+     "s": "zaio",
+     "orig": "зайо",
+     "num": false
+    },
+    {
+     "s": "baio",
+     "orig": "байо",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№17 „Петър Берон\" /с ЯГ/",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "17",
+     "orig": "17",
+     "num": true
+    },
+    {
+     "s": "petar",
+     "orig": "петър",
+     "num": false
+    },
+    {
+     "s": "beron",
+     "orig": "берон",
+     "num": false
+    },
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "iag",
+     "orig": "яг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№23 „Иглика\" /с ЯГ/",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "23",
+     "orig": "23",
+     "num": true
+    },
+    {
+     "s": "iglika",
+     "orig": "иглика",
+     "num": false
+    },
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "iag",
+     "orig": "яг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 24 \"Детско градче\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "24",
+     "orig": "24",
+     "num": true
+    },
+    {
+     "s": "detsko",
+     "orig": "детско",
+     "num": false
+    },
+    {
+     "s": "gradche",
+     "orig": "градче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№26 „Изворче\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "26",
+     "orig": "26",
+     "num": true
+    },
+    {
+     "s": "izvorche",
+     "orig": "изворче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 28 \"Пролет\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "28",
+     "orig": "28",
+     "num": true
+    },
+    {
+     "s": "prolet",
+     "orig": "пролет",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 29 \"Звънче\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "29",
+     "orig": "29",
+     "num": true
+    },
+    {
+     "s": "zvanche",
+     "orig": "звънче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 30 \"Синчец\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "30",
+     "orig": "30",
+     "num": true
+    },
+    {
+     "s": "sinchets",
+     "orig": "синчец",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 31 \"Крилатко\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "31",
+     "orig": "31",
+     "num": true
+    },
+    {
+     "s": "krilatko",
+     "orig": "крилатко",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 32 \"Моряче\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "32",
+     "orig": "32",
+     "num": true
+    },
+    {
+     "s": "moriache",
+     "orig": "моряче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 33 „Делфинче“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "33",
+     "orig": "33",
+     "num": true
+    },
+    {
+     "s": "delfinche",
+     "orig": "делфинче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 36 \"Морска звездица\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "36",
+     "orig": "36",
+     "num": true
+    },
+    {
+     "s": "morska",
+     "orig": "морска",
+     "num": false
+    },
+    {
+     "s": "zvezditsa",
+     "orig": "звездица",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 39 \"Приказка\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "39",
+     "orig": "39",
+     "num": true
+    },
+    {
+     "s": "prikazka",
+     "orig": "приказка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ-4 \"Теменужка\" Филиал 1",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "4",
+     "orig": "4",
+     "num": true
+    },
+    {
+     "s": "temenuzhka",
+     "orig": "теменужка",
+     "num": false
+    },
+    {
+     "s": "filial",
+     "orig": "филиал",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "1",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "ДГ№44 „Валентина Терешкова\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "44",
+     "orig": "44",
+     "num": true
+    },
+    {
+     "s": "valentina",
+     "orig": "валентина",
+     "num": false
+    },
+    {
+     "s": "tereshkova",
+     "orig": "терешкова",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ №45 Морски свят",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "45",
+     "orig": "45",
+     "num": true
+    },
+    {
+     "s": "morski",
+     "orig": "морски",
+     "num": false
+    },
+    {
+     "s": "sviat",
+     "orig": "свят",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 5 \"Слънчо\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "5",
+     "orig": "5",
+     "num": true
+    },
+    {
+     "s": "slancho",
+     "orig": "слънчо",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№52 „Бялата лястовица\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "52",
+     "orig": "52",
+     "num": true
+    },
+    {
+     "s": "bialata",
+     "orig": "бялата",
+     "num": false
+    },
+    {
+     "s": "liastovitsa",
+     "orig": "лястовица",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ 7 \"Ал.С. Пушкин\"",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "7",
+     "orig": "7",
+     "num": true
+    },
+    {
+     "s": "al",
+     "orig": "ал",
+     "num": false
+    },
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "pushkin",
+     "orig": "пушкин",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ Мир №13",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "mir",
+     "orig": "мир",
+     "num": false
+    },
+    {
+     "s": "13",
+     "orig": "13",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №11 „Иглика“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "11",
+     "orig": "11",
+     "num": true
+    },
+    {
+     "s": "iglika",
+     "orig": "иглика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №13 „Русалка“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "13",
+     "orig": "13",
+     "num": true
+    },
+    {
+     "s": "rusalka",
+     "orig": "русалка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №14 „Звънче“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "14",
+     "orig": "14",
+     "num": true
+    },
+    {
+     "s": "zvanche",
+     "orig": "звънче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №4 „Приказен свят“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "4",
+     "orig": "4",
+     "num": true
+    },
+    {
+     "s": "prikazen",
+     "orig": "приказен",
+     "num": false
+    },
+    {
+     "s": "sviat",
+     "orig": "свят",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОДГ №14 \"Дружба\"",
+   "tokens": [
+    {
+     "s": "odg",
+     "orig": "одг",
+     "num": false
+    },
+    {
+     "s": "14",
+     "orig": "14",
+     "num": true
+    },
+    {
+     "s": "druzhba",
+     "orig": "дружба",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОДЗ Люляче",
+   "tokens": [
+    {
+     "s": "odz",
+     "orig": "одз",
+     "num": false
+    },
+    {
+     "s": "liuliache",
+     "orig": "люляче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ОДЗ Маргаритка",
+   "tokens": [
+    {
+     "s": "odz",
+     "orig": "одз",
+     "num": false
+    },
+    {
+     "s": "margaritka",
+     "orig": "маргаритка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Оздравителна Детска Градина №9 \"Ален Мак\"",
+   "tokens": [
+    {
+     "s": "ozdravitelna",
+     "orig": "оздравителна",
+     "num": false
+    },
+    {
+     "s": "detska",
+     "orig": "детска",
+     "num": false
+    },
+    {
+     "s": "gradina",
+     "orig": "градина",
+     "num": false
+    },
+    {
+     "s": "9",
+     "orig": "9",
+     "num": true
+    },
+    {
+     "s": "alen",
+     "orig": "ален",
+     "num": false
+    },
+    {
+     "s": "mak",
+     "orig": "мак",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЦДГ 15 \"Гълъбче\"",
+   "tokens": [
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    },
+    {
+     "s": "15",
+     "orig": "15",
+     "num": true
+    },
+    {
+     "s": "galabche",
+     "orig": "гълъбче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЦДГ 43 \"Пинокио\"",
+   "tokens": [
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    },
+    {
+     "s": "43",
+     "orig": "43",
+     "num": true
+    },
+    {
+     "s": "pinokio",
+     "orig": "пинокио",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЦДГ 8 - Христо Ботев",
+   "tokens": [
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    },
+    {
+     "s": "8",
+     "orig": "8",
+     "num": true
+    },
+    {
+     "s": "hristo",
+     "orig": "христо",
+     "num": false
+    },
+    {
+     "s": "botev",
+     "orig": "ботев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЦДГ Пушкин (филиал)",
+   "tokens": [
+    {
+     "s": "tsdg",
+     "orig": "цдг",
+     "num": false
+    },
+    {
+     "s": "pushkin",
+     "orig": "пушкин",
+     "num": false
+    },
+    {
+     "s": "filial",
+     "orig": "филиал",
+     "num": false
+    }
+   ]
+  }
+ ]
+}

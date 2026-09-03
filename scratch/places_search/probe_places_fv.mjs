@@ -663,6 +663,11 @@ function runG6(s) {
 // (#placesSearchResults), OUR marker (.place-pin-wrapper) and OUR export
 // (window.__places); the G3 corpus above is untouched by construction.
 const REF_ROWS = JSON.parse(fs.readFileSync(path.join(HERE, "recall_sweep_rows.json"), "utf8"));
+// С2′: the П7 gate is a bucket of its own, and it is replayed like the other
+// two — so the JS↔Python parity covers the quarter aliases as well.
+const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7"].filter((b) => Array.isArray(REF_ROWS[b]));
+// С6′: the tokeniser-parity corpus, written by the reference next to us.
+const PARITY = JSON.parse(fs.readFileSync(path.join(OUT_DIR, "token_parity.json"), "utf8"));
 // The placeTokens contract, repeated verbatim from tests/test_places_search_primitives.py
 // (EXPECTATIONS). checkTokenTable() also counts the rows over there, so a row added
 // to the test without being added here is loud rather than silent.
@@ -686,6 +691,31 @@ const TOKEN_TABLE = [
   ["Др Хараламбиев", ["doktor", "haralambiev"]],
   ["апартхотел", ["apart", "hotel"]],
   ["апарткомплекс", ["apart", "kompleks"]],
+];
+
+// С8′/С7′ — the SAME dictionary with `zones` replaced by a string. validateCats
+// (schema 1, forms, chips) still accepts it, so the page takes the В7 structure
+// path and buildIndex must simply switch П7 off. Built from the tracked file, so
+// it can never drift from what the browser really fetches.
+const CATS_BAD_ZONES = (function () {
+  const doc = JSON.parse(fs.readFileSync(path.join(REPO, "data", "place_categories.json"), "utf8"));
+  doc.zones = "not an object";
+  return JSON.stringify(doc);
+})();
+// The eight П7 gains AS THEY ANSWERED BEFORE THE RULE (measured 03.09 through the
+// same reference with П7 off): rows, the `category` flag the export carries (true
+// = the А3 category list answered) and the first row. A dictionary whose `zones`
+// is unusable must land back on exactly these — that is what "fail-soft" has to
+// mean to be a gate rather than a hope.
+const P7_BEFORE = [
+  ["владиславово детска градина", 1, true, "ОДЗ Маргаритка"],
+  ["детска градина владислав варненчик", 1, true, 'ДГ 39 "Приказка"'],
+  ["владиславово училище", 4, false, "Спортно училище Георги Бенковски"],
+  ["хотел владиславово", 22, false, "Hotel Color"],
+  ["дкц владиславово", 5, false, "„ДКЦ Чайка“ ЕООД"],
+  ["хотел зпз", 22, false, "Hotel Color"],
+  ["горчива чешма хотел", 22, false, "Hotel Color"],
+  ["училище жкизгрев", 4, false, "Спортно училище Георги Бенковски"],
 ];
 
 const PLACES_CACHE = "fire-varna-hotels-v2-226";
@@ -824,10 +854,28 @@ async function armPlacesFetch(s) {
   s.placesArmed = true;
   s.hotelsMode = "pass";           // pass | hold | 404 | malformed
   s.places2Mode = "pass";          // pass | 404  (phase 2: the SECOND payload)
+  // С8′ (§11): the dictionary carries the quarter aliases now, so it gets the
+  // same treatment as the other two — pass | hold | badZones (a `zones` that is
+  // not an object, to drive the fail-soft of С7′ through the В7 structure path).
+  s.catsMode = "pass";
   s.heldHotelsId = null;
+  s.heldCatsId = null;
   const prev = s.onPaused;
   s.onPaused = async (p) => {
     const url = p.request?.url || "";
+    if (url.includes("place_categories.json")) {
+      try {
+        if (s.catsMode === "badZones") {
+          await s.send("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: 200,
+            responseHeaders: [{ name: "Content-Type", value: "application/json" }],
+            body: Buffer.from(CATS_BAD_ZONES, "utf8").toString("base64") });
+          return;
+        }
+        if (s.catsMode === "hold" && s.heldCatsId === null) { s.heldCatsId = p.requestId; return; }
+        await s.send("Fetch.continueRequest", { requestId: p.requestId });
+      } catch (e) { warn("place_categories.json Fetch: " + e); }
+      return;
+    }
     // Sol C3: one refusal must not take the others down, so each payload can be
     // refused on its own - hotels without places and places without hotels.
     if (url.includes("/places.json")) {
@@ -860,6 +908,7 @@ async function armPlacesFetch(s) {
     { urlPattern: "*search_index.json*", requestStage: "Request" },
     { urlPattern: "*hotels.json*", requestStage: "Request" },
     { urlPattern: "*/places.json*", requestStage: "Request" },
+    { urlPattern: "*place_categories.json*", requestStage: "Request" },
     { urlPattern: "*/details/*", requestStage: "Request" },
     { urlPattern: "*/detail/*", requestStage: "Request" },
   ] });
@@ -884,6 +933,101 @@ async function checkTokenTable(s) {
   return { rows, passed: rows.filter((r) => r.ok).length, total: rows.length, rowsInTest: inTest };
 }
 
+// С6′ — the tokeniser contract, MEASURED instead of claimed: placeTokens (JS, in
+// the page) against place_tokens (Python) over EVERY kept zone alias and EVERY
+// record name, in order. What the shipped export hands out is the `s` sequence —
+// the very thing that becomes ntk/ztk/zkset — plus `num`, which follows from `s`
+// by the same rule on both sides (a token is numeric exactly when it is digits).
+// `orig` is not reachable through window.__places and C16 opens no new export;
+// it stays covered by the 18-row table of G12б and the unit test.
+async function checkTokenParity(s) {
+  const strings = PARITY.strings;
+  const mismatches = [];
+  for (let i = 0; i < strings.length; i += 60) {
+    const chunk = strings.slice(i, i + 60);
+    const got = JSON.parse(await s.ev(
+      `JSON.stringify(${JSON.stringify(chunk.map((x) => x.s))}.map(function (q) { return window.__places.tokens(q); }))`));
+    for (let j = 0; j < chunk.length; j++) {
+      const want = chunk[j].tokens.map((t) => t.s);
+      const wantNum = chunk[j].tokens.map((t) => !!t.num);
+      const gotNum = got[j].map((t) => /^[0-9]+$/.test(t));
+      if (JSON.stringify(got[j]) !== JSON.stringify(want)
+          || JSON.stringify(gotNum) !== JSON.stringify(wantNum))
+        mismatches.push({ s: chunk[j].s, want, got: got[j], wantNum, gotNum });
+    }
+  }
+  return { total: strings.length, aliases: PARITY._meta.aliases,
+           records: PARITY._meta.records, passed: strings.length - mismatches.length,
+           compares: "s + num (orig is not exported)", mismatches: mismatches.slice(0, 20) };
+}
+
+// С8′ — the dictionary's own load: cold, warm (our cache namespace), held past
+// the 8 s timeout, and a `zones` that is not an object. The rule of the scenario
+// is the same in all four: the branch answers, nothing is thrown, the console
+// stays empty, and with an unusable `zones` the answers are the pre-П7 ones.
+async function catsAnswers(s) {
+  const out = [];
+  for (const [q] of P7_BEFORE) {
+    const r = JSON.parse(await s.ev(
+      `JSON.stringify((function (r) { return { category: r.category, n: r.rows.length, first: r.rows.length ? r.rows[0].name : null }; })(window.__places.search(${JSON.stringify(q)})))`));
+    out.push({ q, n: r.n, category: r.category, first: r.first });
+  }
+  return out;
+}
+
+async function scenarioCats(s) {
+  const out = { ok: true, notes: [] };
+  const errsBefore = s.errs.length;
+
+  s.catsMode = "pass";
+  await navigateFresh(s, "cats-cold");
+  out.cold = { ready: await placesReady(s), answers: await catsAnswers(s) };
+
+  await navigateFresh(s, "cats-warm");
+  out.warm = { ready: await placesReady(s), answers: await catsAnswers(s) };
+
+  // held: paused past FETCH_TIMEOUT_MS (8 s). On a profile that has already seen
+  // the file our own cache namespace answers, so П7 stays on; either way nothing
+  // may throw and the branch must still come up.
+  s.catsMode = "hold";
+  s.heldCatsId = null;
+  await navigateFresh(s, "cats-held");
+  const ready = await placesReady(s, 45000);
+  if (s.heldCatsId !== null) {
+    try { await s.send("Fetch.continueRequest", { requestId: s.heldCatsId }); } catch (e) { warn("cats release: " + e); }
+    s.heldCatsId = null;
+  }
+  s.catsMode = "pass";
+  out.held = { ready, answers: await catsAnswers(s) };
+
+  // badZones: the В7 structure path (no SubtleCrypto) lets a dictionary whose
+  // `zones` is a string through validateCats — П7 must switch itself off.
+  const killSubtle = await s.send("Page.addScriptToEvaluateOnNewDocument", {
+    source: "try { Object.defineProperty(window.crypto, 'subtle', { value: undefined, configurable: true }); } catch (e) {}" });
+  s.catsMode = "badZones";
+  await navigateFresh(s, "cats-badZones");
+  out.badZones = { ready: await placesReady(s), answers: await catsAnswers(s) };
+  s.catsMode = "pass";
+  const killId = killSubtle && killSubtle.result && killSubtle.result.identifier;
+  if (killId) await s.send("Page.removeScriptToEvaluateOnNewDocument", { identifier: killId });
+
+  for (let i = 0; i < P7_BEFORE.length; i++) {
+    const [q, n, cat, first] = P7_BEFORE[i];
+    const got = out.badZones.answers[i];
+    if (got.n !== n || got.category !== cat || got.first !== first) {
+      out.ok = false;
+      out.notes.push(`badZones \`${q}\`: ${got.n}/${got.category}/${got.first}, `
+                     + `чакаше ${n}/${cat}/${first}`);
+    }
+  }
+  for (const key of ["cold", "warm", "held", "badZones"])
+    if (!out[key].ready) { out.ok = false; out.notes.push(`${key}: клонът не се вдигна`); }
+  out.consoleErrsDuringScenario = s.errs.length - errsBefore;
+  if (out.consoleErrsDuringScenario) { out.ok = false; out.notes.push("конзолни грешки в сценария"); }
+  for (const note of out.notes) warn("С8′ " + note);
+  return out;
+}
+
 // G12в — the 46 reference queries, row by row, against recall_sweep_rows.json.
 // Order-sensitive first: the distance tie-break reads map.getCenter(), and the
 // sweep stood in for it with the map's own opening centre [43.2141, 27.9147]. If
@@ -891,7 +1035,7 @@ async function checkTokenTable(s) {
 // not do we fall back to comparing the SETS and say so.
 async function checkReferenceRows(s) {
   const out = { mode: "ordered", queries: [], passedOrdered: 0, passedSets: 0, total: 0, rows: 0 };
-  for (const bucket of ["gate_m5_a8", "extra"]) {
+  for (const bucket of REF_BUCKETS) {
     for (const rec of REF_ROWS[bucket]) {
       const got = JSON.parse(await s.ev(
         `JSON.stringify((function (r) { return { category: r.category, rows: r.rows.map(function (x) { return x.name + ' · ' + x.zone; }) }; })(window.__places.search(${JSON.stringify(rec.q)})))`));
@@ -919,7 +1063,7 @@ async function checkReferenceRows(s) {
 // which first three, read from OUR DOM (top 8) as well as from the export.
 async function checkM5Table(s) {
   const out = [];
-  for (const bucket of ["gate_m5_a8", "extra"]) {
+  for (const bucket of REF_BUCKETS) {
     for (const rec of REF_ROWS[bucket]) {
       const js = JSON.parse(await s.ev(
         `JSON.stringify((function (r) { return { n: r.rows.length, category: r.category, first3: r.rows.slice(0, 3).map(function (x) { return x.name + ' · ' + x.zone; }) }; })(window.__places.search(${JSON.stringify(rec.q)})))`));
@@ -1373,6 +1517,9 @@ async function runG4(s) {
   const out = { ready: true, shaPins: checkShaPins() };
   out.tokens = await checkTokenTable(s);
   console.log(`     G12б: ${out.tokens.passed}/${out.tokens.total} (в теста: ${out.tokens.rowsInTest} реда)`);
+  out.parity = await checkTokenParity(s);
+  console.log(`     С6′ токенизатори: ${out.parity.passed}/${out.parity.total} ` +
+              `(${out.parity.aliases} псевдонима + ${out.parity.records} имена, ${out.parity.compares})`);
   out.reference = await checkReferenceRows(s);
   console.log(`     G12в: ${out.reference.passedOrdered}/${out.reference.total} подредени, ` +
               `${out.reference.passedSets}/${out.reference.total} като множества, режим ${out.reference.mode}`);
@@ -1393,6 +1540,10 @@ async function runG4(s) {
   out.enterKeyed = await checkEnterKeyed(s);
   out.popupRule = await checkPopupRule(s);
   out.mobileKeyed = await checkMobileKeyed(s);
+  out.cats = await scenarioCats(s);            // С8′ + С7′ fail-soft
+  console.log(`     С8′ речник: cold/warm/held/badZones ` +
+              `${["cold", "warm", "held", "badZones"].map((k) => (out.cats[k].ready ? "ok" : "ПАДА")).join("/")} ` +
+              `· конзолни грешки ${out.cats.consoleErrsDuringScenario}`);
   out.consoleWarns = [...new Set(s.warns)];    // warnOnce() is where a caught throw lands
   if (out.consoleWarns.length) warn(`конзолни предупреждения: ${out.consoleWarns.length}`);
   return out;
@@ -1578,11 +1729,25 @@ async function main() {
   console.log(`  записах ${reqPath} (${fs.statSync(reqPath).size} B, ` +
               `${requests.page.length} заявки на страницата, ${requests.thirdPartyHosts.length} чужди хоста)`);
 
+  // §11 Р7: until C16 the probe only failed on a console error. A sha pin
+  // that no longer matches, a reference row that moved, a tokeniser that diverged
+  // or a dictionary scenario that fell are gates now - they end the run with 1.
+  const hard = [];
   if (MODE === "after") {
     const g4 = await runG4(s);
     const g4Path = path.join(OUT_DIR, "g4.json");
     fs.writeFileSync(g4Path, JSON.stringify(g4, null, 2) + "\n");
     console.log(`  записах ${g4Path} (кука за C4)`);
+    if (!g4.ready) hard.push("клонът на местата не се вдигна");
+    for (const pin of (g4.shaPins || [])) if (!pin.ok) hard.push(`sha-пин ${pin.constant}`);
+    if (g4.tokens && g4.tokens.passed !== g4.tokens.total)
+      hard.push(`G12б ${g4.tokens.passed}/${g4.tokens.total}`);
+    if (g4.parity && g4.parity.passed !== g4.parity.total)
+      hard.push(`С6′ паритет ${g4.parity.passed}/${g4.parity.total}`);
+    if (g4.reference && g4.reference.passedOrdered !== g4.reference.total)
+      hard.push(`G12в ${g4.reference.passedOrdered}/${g4.reference.total} подредени`);
+    if (g4.m5 && g4.m5.some((r) => !r.ok)) hard.push(`М5 ${g4.m5.filter((r) => r.ok).length}/${g4.m5.length}`);
+    if (g4.cats && !g4.cats.ok) hard.push("С8′ речник");
   }
 
   console.log(`  конзолни грешки: ${s.errs.length}`);
@@ -1590,7 +1755,8 @@ async function main() {
   console.log(`  конзолни предупреждения: ${s.warns.length}`);
   if (s.warns.length) for (const e of [...new Set(s.warns)]) console.log(`     ${String(e).slice(0, 200)}`);
   console.log(`  предупреждения на пробата: ${warnings.length}`);
-  await bye(s.errs.length ? 1 : 0);
+  if (hard.length) for (const h of hard) console.log(`  ПАДНАЛ ГЕЙТ: ${h}`);
+  await bye(s.errs.length || hard.length ? 1 : 0);
 }
 
 process.on("unhandledRejection", async (e) => {
