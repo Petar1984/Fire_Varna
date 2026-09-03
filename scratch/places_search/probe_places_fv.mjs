@@ -1649,7 +1649,9 @@ function scenariosDigest(scenarios) {
     // port or in another viewport moves every recorded URL, the surface and the
     // marker, so without this a base record made elsewhere cannot be told apart
     // from a change in the code -- and that is exactly what happened once.
-    env: { repo: REPO.split(path.sep).join("/"), port: HTTP_PORT, pageUrl: PAGE_URL, viewport: view },
+    // The FOLDER NAME only, never the machine path: g4.json is a tracked file
+    // and a checkout path is nobody's business outside this machine (F3-к).
+    env: { repo: path.basename(REPO), port: HTTP_PORT, pageUrl: PAGE_URL, viewport: view },
     beforeEnv: beforeDoc ? { pageUrl: beforeDoc.pageUrl || null, viewport: beforeDoc.viewport || null } : null,
     before: before === undefined || before === null ? null : sha(before),
     after: sha(scenarios),
@@ -1976,6 +1978,14 @@ async function main() {
       hard.push("К2 преход „хотел адмирал“ → „адмирал“ без изпразване");
     if (!digest.equal)
       hard.push(`G3 дайджест на scenarios: ${digest.before} ≠ ${digest.after}${digest.error ? " (" + digest.error + ")" : ""}`);
+    // F3-к: the environment is a GATE, not a report. Equal digests prove nothing
+    // when the base record was taken on another port or in another viewport —
+    // there every URL, the surface and the marker move, so a comparison against
+    // it is a comparison of two different worlds. Fail-closed: no before.json,
+    // no environment in it, or a different one, ends the run with 1.
+    if (!digest.sameEnv)
+      hard.push(`G3 среда: before.json ${JSON.stringify(digest.beforeEnv)} ≠ `
+                + `${JSON.stringify({ pageUrl: PAGE_URL, viewport: { width: W, height: H, mobile: MOB } })}`);
   }
 
   console.log(`  конзолни грешки: ${s.errs.length}`);

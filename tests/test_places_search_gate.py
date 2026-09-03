@@ -18,7 +18,12 @@ Until C16 nothing here could go red without a human reading a report:
      the ONE signed exception of ЛОТ 1 решение 2 („градина“), named below;
   5. ЛОТ 1 (решения 2 и 1, signed 03.09): the new gate, the four rows of the 103
      the two rules move, and the proof that each rule is load-bearing — inverted
-     in place, the old answer comes back.
+     in place, the old answer comes back;
+  6. F3-к: the П7 bucket — the other 31 of the 103 — is anchored the same way,
+     against `git show 378a844:…rows.json`, with the three signed exceptions of
+     решение 1. Without it the bucket was gated only against an artefact
+     re-frozen in the same commit, so a fourth П7 row could have moved with it
+     and stayed green (audit of 03.09, СРЕДНА).
 
 Read-only: it runs `git show` through subprocess and touches nothing on disk.
 """
@@ -35,6 +40,7 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 REFERENCE = REPO / "scratch" / "places_search" / "recall_sweep.py"
 ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
 FROZEN_COMMIT = "7a6ea1d"          # C15 — the last HEAD before П7 was written
+P7_ANCHOR_COMMIT = "378a844"       # C23 — the last HEAD before the ЛОТ 1 client rules
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
 OLD_BUCKETS = ("gate_m5_a8", "extra")
 # ЛОТ 1, the signed change list (docs/plans/recommendations_2026-09-03.md §1,
@@ -61,14 +67,14 @@ def load_reference():
     return module
 
 
-def frozen_rows():
+def frozen_rows(commit=FROZEN_COMMIT):
     """The baseline as git holds it — never as the working tree holds it."""
     out = subprocess.run(["git", "-C", str(REPO), "show",
-                          FROZEN_COMMIT + ":" + FROZEN_PATH],
+                          commit + ":" + FROZEN_PATH],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if out.returncode != 0:
         raise AssertionError("git show %s:%s failed: %s"
-                             % (FROZEN_COMMIT, FROZEN_PATH,
+                             % (commit, FROZEN_PATH,
                                 out.stderr.decode("utf-8", "replace")))
     return json.loads(out.stdout.decode("utf-8"))
 
@@ -193,11 +199,14 @@ class P7GateTest(unittest.TestCase):
 
 
 class FrozenDiffTest(unittest.TestCase):
-    """С5′: the 72 queries that existed before П7 must not have moved."""
+    """С5′: the 72 queries that existed before П7 must not have moved — and,
+    since F3-к, the 31 П7 queries that came with it must not have moved either.
+    Two anchors, two commits, one signed exception list each."""
 
     @classmethod
     def setUpClass(cls):
         cls.frozen = frozen_rows()
+        cls.anchor_p7 = frozen_rows(P7_ANCHOR_COMMIT)
 
     def test_seventy_two_queries_unchanged_live(self):
         """Re-run through the LIVE reference, not through the artefact.
@@ -238,6 +247,43 @@ class FrozenDiffTest(unittest.TestCase):
                 [(e["q"], e["branch"], [(r["name"], r["zone"]) for r in e["rows"]])
                  for e in current[bucket]], want)
         self.assertEqual(prepended, 1)
+
+    def test_committed_p7_rows_match_the_p7_anchor(self):
+        """F3-к: the П7 bucket of the artefact against a commit OUTSIDE this lot.
+
+        `test_the_three_moved_p7_rows_and_no_others` reads the LIVE engine against
+        the artefact that was re-frozen in the same commit; had a fourth row moved,
+        both sides would carry the new value and the count of moved rows would
+        still be three. The anchor is what makes that impossible: every П7 row is
+        byte-equal (q, branch, name, zone) to 378a844 except the three named in
+        LOT1_MOVED_P7 — and those three must really differ from it, or the
+        exception list is stale."""
+        current = json.loads(ROWS.read_text(encoding="utf-8"))
+        anchor = dict((e["q"], e) for e in self.anchor_p7["gate_p7"])
+        self.assertEqual([e["q"] for e in current["gate_p7"]],
+                         [e["q"] for e in self.anchor_p7["gate_p7"]])
+        self.assertEqual(len(current["gate_p7"]), 31)
+        self.assertEqual(len(LOT1_MOVED_P7), 3)
+        moved = 0
+        for entry in current["gate_p7"]:
+            was = anchor[entry["q"]]
+            now_rows = [(r["name"], r["zone"]) for r in entry["rows"]]
+            was_rows = [(r["name"], r["zone"]) for r in was["rows"]]
+            if entry["q"] in LOT1_MOVED_P7:
+                want_branch, want_n, want_first = LOT1_MOVED_P7[entry["q"]]
+                self.assertEqual((entry["branch"], len(now_rows)),
+                                 (want_branch, want_n), entry["q"])
+                self.assertEqual(now_rows[:len(want_first)], want_first, entry["q"])
+                self.assertNotEqual((entry["branch"], now_rows),
+                                    (was["branch"], was_rows),
+                                    "%s is on the signed list but did not move against %s"
+                                    % (entry["q"], P7_ANCHOR_COMMIT))
+                moved += 1
+            else:
+                self.assertEqual((entry["branch"], now_rows), (was["branch"], was_rows),
+                                 "%s moved against %s and is not on the signed list"
+                                 % (entry["q"], P7_ANCHOR_COMMIT))
+        self.assertEqual(moved, 3)
 
     def test_rows_carry_the_p7_measure(self):
         current = json.loads(ROWS.read_text(encoding="utf-8"))

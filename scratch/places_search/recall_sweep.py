@@ -50,27 +50,32 @@ import re
 import sys
 import io
 import pathlib
+import tempfile
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
+# The checkout this script lives in. INPUTS and artefacts alike are read and
+# written relative to it, never through a fixed path: a worktree must re-freeze
+# its own reference against ITS OWN data (F2-к0 for the outputs, F3-к for the
+# inputs — a fixed path would have a worktree measure another checkout's bytes).
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 # Phase 2 (places_phase2_plan.md sec.8, lot C12): the reference reads the
 # DELIVERED bytes of Fire_Varna -- the very three files the browser fetches --
 # not the varna_3d originals. Identical content today; a divergence between the
 # two repos must be loud in this gate, not silent.
-HOTELS = r"C:/git/Fire_Varna/data/hotels.json"
-PLACES2 = r"C:/git/Fire_Varna/data/places.json"
-CATS = r"C:/git/Fire_Varna/data/place_categories.json"
-# The two artefacts land in the checkout this script lives in, never in a fixed
-# path: a worktree must be able to re-freeze its own reference (F2-к0).
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+HOTELS = str(REPO_ROOT / "data" / "hotels.json")
+PLACES2 = str(REPO_ROOT / "data" / "places.json")
+CATS = str(REPO_ROOT / "data" / "place_categories.json")
 REPO_ROWS_OUT = str(REPO_ROOT / "scratch" / "places_search" / "recall_sweep_rows.json")
 # С6′: the tokeniser-parity corpus the probe replays in the page. One generator,
 # one file — the probe never invents the input list.
 REPO_PARITY_OUT = str(REPO_ROOT / "scratch" / "places_search" / "probe_out"
                       / "token_parity.json")
-OUTDIR = (r"C:/Users/Petar/AppData/Local/Temp/claude/C--git/"
-          r"fb0c0608-7fdb-4635-a8fc-44575d26700a/scratchpad/measures/")
+# The human-readable report and the working copy of the rows are MEASUREMENTS,
+# not deliverables: they land in the system temp — never in the repo, never in a
+# session-specific scratch folder that dies with the session (F3-к).
+OUTDIR = (pathlib.Path(tempfile.gettempdir()) / "fv_measures").as_posix() + "/"
 
 # Fire_Varna/index.html:1838  .setView([43.2141, 27.9147], 13)
 # stand-in for map.getCenter() -- there is no map in a headless sweep.
@@ -1830,6 +1835,7 @@ def main():
                 "ok": bool(_fn(_r)),
                 "rows": [{"name": x.name, "zone": x.zone} for x in _r],
             })
+    pathlib.Path(OUTDIR).mkdir(parents=True, exist_ok=True)
     ROWS_OUT = OUTDIR + "recall_sweep_v22_rows.json"
     _rows_text = json.dumps(ROWS, ensure_ascii=False, indent=1, sort_keys=False) + chr(10)
     open(ROWS_OUT, "w", encoding="utf-8").write(_rows_text)

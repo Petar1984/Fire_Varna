@@ -6298,7 +6298,7 @@
     "what": "sha256(JSON.stringify(scenarios)) — before.json срещу този прогон",
     "file": "scratch/places_search/probe_out/before.json",
     "env": {
-      "repo": "C:/git/_wt/fv_lot1_client",
+      "repo": "fv_lot1_client",
       "port": "8010",
       "pageUrl": "http://localhost:8010/index.html",
       "viewport": {
