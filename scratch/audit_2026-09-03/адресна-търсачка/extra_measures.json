@@ -1,0 +1,765 @@
+{
+ "head": "fd2c315",
+ "probes": {
+  "E1_middle_dot": {
+   "n": 500,
+   "a1": 416,
+   "a8": 452,
+   "b1": 416,
+   "b8": 452,
+   "aL8": 463,
+   "bL8": 463,
+   "improved": 0,
+   "worsened": 0,
+   "a1_pct": 83.2,
+   "a8_pct": 90.4,
+   "b1_pct": 83.2,
+   "b8_pct": 90.4,
+   "aL8_pct": 92.6,
+   "bL8_pct": 92.6
+  },
+  "E2_type_word": {
+   "n": 694,
+   "a1": 328,
+   "a8": 381,
+   "b1": 382,
+   "b8": 426,
+   "aL8": 611,
+   "bL8": 605,
+   "improved": 84,
+   "worsened": 4,
+   "a1_pct": 47.26,
+   "a8_pct": 54.9,
+   "b1_pct": 55.04,
+   "b8_pct": 61.38,
+   "aL8_pct": 88.04,
+   "bL8_pct": 87.18
+  },
+  "E3_adres_prefix": {
+   "n": 14,
+   "a1": 1,
+   "a8": 1,
+   "b1": 1,
+   "b8": 2,
+   "aL8": 2,
+   "bL8": 7,
+   "improved": 1,
+   "worsened": 0,
+   "a1_pct": 7.14,
+   "a8_pct": 7.14,
+   "b1_pct": 7.14,
+   "b8_pct": 14.29,
+   "aL8_pct": 14.29,
+   "bL8_pct": 50
+  },
+  "E4_folding": {
+   "folded_rows": 802,
+   "reasons": {
+    "identical-rendered-row": 777,
+    "address-suppressed-by-sgrada": 25
+   },
+   "dist_m": {
+    "n": 802,
+    "p50": 17,
+    "p90": 159,
+    "max": 10826,
+    "over_100m": 113,
+    "over_500m": 23
+   }
+  },
+  "E5_same_label_other_pin": {
+   "n": 1516,
+   "p50": 461,
+   "p90": 2710,
+   "max": 13169,
+   "over_200m": 893,
+   "over_1000m": 506
+  }
+ },
+ "globals": {
+  "norm_keeps_middle_dot": "а · б",
+  "skel_of_middle_dot": "·",
+  "entries": 86232,
+  "label_latin_only": 32005,
+  "label_mixed_cyr_latin": 2838,
+  "label_with_middle_dot": 4764,
+  "label_with_adres_prefix": 522,
+  "label_bare_typeword": 23,
+  "label_gr_varna_raion_prefix": 23113
+ },
+ "examples": {
+  "E1_middle_dot": [],
+  "E2_type_word": [
+   {
+    "label": "кв. Левски, бл. 22",
+    "raion": "Приморски",
+    "pin": [
+     43.22649,
+     27.92269
+    ],
+    "q_with_type": "кв. Левски, бл. 22",
+    "rank_with_type": 2,
+    "q_without_type": "Левски, бл. 22",
+    "rank_without_type": 0
+   },
+   {
+    "label": "кв. Кайсиева градина, бл. 264",
+    "raion": "Владислав Варненчик",
+    "pin": [
+     43.24026,
+     27.8603
+    ],
+    "q_with_type": "кв. Кайсиева градина, бл. 264",
+    "rank_with_type": -1,
+    "q_without_type": "Кайсиева градина, бл. 264",
+    "rank_without_type": 0
+   },
+   {
+    "label": "кв. Владиславово, бл. 2",
+    "raion": "Владислав Варненчик",
+    "pin": [
+     43.24501,
+     27.83938
+    ],
+    "q_with_type": "кв. Владиславово, бл. 2",
+    "rank_with_type": -1,
+    "q_without_type": "Владиславово, бл. 2",
+    "rank_without_type": 1
+   },
+   {
+    "label": "кв. Чайка, бл. 205",
+    "raion": "Приморски",
+    "pin": [
+     43.21596,
+     27.94625
+    ],
+    "q_with_type": "кв. Чайка, бл. 205",
+    "rank_with_type": -1,
+    "q_without_type": "Чайка, бл. 205",
+    "rank_without_type": 0
+   },
+   {
+    "label": "гр варна район приморски жк изгрев",
+    "raion": "Приморски",
+    "pin": [
+     43.22701,
+     27.90996
+    ],
+    "q_with_type": "гр варна район приморски жк изгрев",
+    "rank_with_type": 0,
+    "q_without_type": "гр варна район приморски изгрев",
+    "rank_without_type": 2
+   },
+   {
+    "label": "кв. Левски, бл. 57",
+    "raion": "Приморски",
+    "pin": [
+     43.21951,
+     27.92528
+    ],
+    "q_with_type": "кв. Левски, бл. 57",
+    "rank_with_type": 2,
+    "q_without_type": "Левски, бл. 57",
+    "rank_without_type": 1
+   },
+   {
+    "label": "кв. Левски, бл. 2",
+    "raion": "Приморски",
+    "pin": [
+     43.21456,
+     27.92283
+    ],
+    "q_with_type": "кв. Левски, бл. 2",
+    "rank_with_type": 6,
+    "q_without_type": "Левски, бл. 2",
+    "rank_without_type": 4
+   },
+   {
+    "label": "кв. Чайка, бл. 206",
+    "raion": "Приморски",
+    "pin": [
+     43.21438,
+     27.93924
+    ],
+    "q_with_type": "кв. Чайка, бл. 206",
+    "rank_with_type": -1,
+    "q_without_type": "Чайка, бл. 206",
+    "rank_without_type": 0
+   }
+  ],
+  "E3_adres_prefix": [
+   {
+    "label": "Евксиноград, Адрес: 21 ва 11",
+    "raion": "Приморски",
+    "pin": [
+     43.22688,
+     27.99642
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": -1
+   },
+   {
+    "label": "в.з. Варна, Адрес: 22 ра 26",
+    "raion": "Приморски",
+    "pin": [
+     43.2286,
+     27.99819
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": -1
+   },
+   {
+    "label": "кв. Св. Иван Рилски, Адрес: западна промишлена зона 1",
+    "raion": "Младост",
+    "pin": [
+     43.21678,
+     27.88091
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": 1
+   },
+   {
+    "label": "кв. Св. Иван Рилски, Адрес: западна промишлена зона 15",
+    "raion": "Младост",
+    "pin": [
+     43.21548,
+     27.88051
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": -1
+   },
+   {
+    "label": "ж.к. Победа, Адрес: м ст пчелина 6",
+    "raion": "Младост",
+    "pin": [
+     43.22986,
+     27.90474
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": -1
+   },
+   {
+    "label": "м-т Свети Никола, Адрес: м ст свети никола 35",
+    "raion": "Приморски",
+    "pin": [
+     43.22309,
+     27.96768
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": -1
+   },
+   {
+    "label": "кв. Виница, Адрес: настирски рид 48",
+    "raion": "Приморски",
+    "pin": [
+     43.24286,
+     28.00995
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": -1
+   },
+   {
+    "label": "Евксиноград, Адрес: ул 13 та 1",
+    "raion": "Приморски",
+    "pin": [
+     43.22678,
+     27.99267
+    ],
+    "rank_as_shown": -1,
+    "rank_cleaned": -1
+   }
+  ],
+  "latin_labels": [
+   {
+    "label": "atanas dalchev 1",
+    "kind": "address",
+    "raion": "Младост",
+    "pin": [
+     43.22715,
+     27.87219
+    ]
+   },
+   {
+    "label": "atanas dalchev 1",
+    "kind": "address",
+    "raion": "Младост",
+    "pin": [
+     43.22722,
+     27.87219
+    ]
+   },
+   {
+    "label": "priboi 31 va 10",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.14586,
+     27.93377
+    ]
+   },
+   {
+    "label": "priboi 31 va 10",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.1459,
+     27.93389
+    ]
+   },
+   {
+    "label": "priboi 31 va 10",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.14591,
+     27.93381
+    ]
+   },
+   {
+    "label": "georgi ganev 10",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22087,
+     27.96901
+    ]
+   },
+   {
+    "label": "georgi ganev 10",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22096,
+     27.96896
+    ]
+   },
+   {
+    "label": "10 ta 1",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22372,
+     27.98591
+    ]
+   }
+  ],
+  "mixed_labels": [
+   {
+    "label": "кв. Виница, aladzha manastir 1a",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.24949,
+     27.98042
+    ]
+   },
+   {
+    "label": "4-ти микрорайон, Антим I 39",
+    "kind": "address",
+    "raion": "Одесос",
+    "pin": [
+     43.20641,
+     27.91441
+    ]
+   },
+   {
+    "label": "кв. Виница, botanicheska gradina 0",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.23553,
+     28.00842
+    ]
+   },
+   {
+    "label": "кв. Виница, botanicheska gradina 0",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.23559,
+     28.00857
+    ]
+   },
+   {
+    "label": "кв. Виница, briz 1 3",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22476,
+     27.94287
+    ]
+   },
+   {
+    "label": "кв. Виница, briz 987",
+    "kind": "mf",
+    "raion": "Приморски",
+    "pin": [
+     43.22532,
+     27.94542
+    ]
+   },
+   {
+    "label": "кв. Галата, Dream Homes Galata",
+    "kind": "mf",
+    "raion": "Аспарухово",
+    "pin": [
+     43.16809,
+     27.93205
+    ]
+   },
+   {
+    "label": "кв. Галата, Dream Homes Galata",
+    "kind": "mf",
+    "raion": "Аспарухово",
+    "pin": [
+     43.16799,
+     27.93226
+    ]
+   }
+  ],
+  "adres_labels": [
+   {
+    "label": "\"Вилна зона\", Адрес: 20 та 3",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22509,
+     27.99369
+    ]
+   },
+   {
+    "label": "\"Вилна зона\", Адрес: 20 та 3",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22514,
+     27.9935
+    ]
+   },
+   {
+    "label": "Евксиноград, Адрес: 21 ва 11",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22685,
+     27.99642
+    ]
+   },
+   {
+    "label": "Евксиноград, Адрес: 21 ва 11",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22688,
+     27.99642
+    ]
+   },
+   {
+    "label": "Евксиноград, Адрес: 21 ва 11",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22689,
+     27.99647
+    ]
+   },
+   {
+    "label": "Евксиноград, Адрес: 21 ва 13",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22668,
+     27.99358
+    ]
+   },
+   {
+    "label": "Евксиноград, Адрес: 21 ва 13",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22669,
+     27.9937
+    ]
+   },
+   {
+    "label": "Евксиноград, Адрес: 21 ва 13",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22672,
+     27.99372
+    ]
+   }
+  ],
+  "bare_typeword_labels": [
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.14715,
+     27.92641
+    ]
+   },
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.14723,
+     27.92614
+    ]
+   },
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.15101,
+     27.91447
+    ]
+   },
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.15104,
+     27.91422
+    ]
+   },
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.15104,
+     27.91431
+    ]
+   },
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Аспарухово",
+    "pin": [
+     43.15894,
+     27.90702
+    ]
+   },
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22726,
+     27.94566
+    ]
+   },
+   {
+    "label": "ул",
+    "kind": "address",
+    "raion": "Приморски",
+    "pin": [
+     43.22726,
+     27.94577
+    ]
+   }
+  ],
+  "folded_far": [
+   {
+    "label": "22 ра",
+    "raion": "Приморски",
+    "pin": [
+     43.22805,
+     27.99773
+    ],
+    "query": "22 ра",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "22 ра",
+    "dist_m": 307
+   },
+   {
+    "label": "37 ма",
+    "raion": "Приморски",
+    "pin": [
+     43.23741,
+     27.92738
+    ],
+    "query": "37 ма",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "37 ма",
+    "dist_m": 5657
+   },
+   {
+    "label": "41 ва",
+    "raion": "Приморски",
+    "pin": [
+     43.23472,
+     27.92303
+    ],
+    "query": "41 ва",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "41 ва",
+    "dist_m": 204
+   },
+   {
+    "label": "83",
+    "raion": "Младост",
+    "pin": [
+     43.22003,
+     27.90284
+    ],
+    "query": "83",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "83",
+    "dist_m": 103
+   },
+   {
+    "label": "ален мак",
+    "raion": "Приморски",
+    "pin": [
+     43.25667,
+     28.01746
+    ],
+    "query": "ален мак",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "ален мак",
+    "dist_m": 498
+   },
+   {
+    "label": "ботаническа градина 0",
+    "raion": "Приморски",
+    "pin": [
+     43.23449,
+     28.00247
+    ],
+    "query": "ботаническа градина 0",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "ботаническа градина 0",
+    "dist_m": 295
+   },
+   {
+    "label": "бул осми приморски полк",
+    "raion": "Приморски",
+    "pin": [
+     43.21317,
+     27.92613
+    ],
+    "query": "бул осми приморски полк",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "бул осми приморски полк",
+    "dist_m": 706
+   },
+   {
+    "label": "бул цар освободител",
+    "raion": "Приморски",
+    "pin": [
+     43.22605,
+     27.90498
+    ],
+    "query": "бул цар освободител",
+    "reason": "identical-rendered-row",
+    "absorbed_by": "бул цар освободител",
+    "dist_m": 1814
+   }
+  ],
+  "same_label_other_pin_far": [
+   {
+    "label": "20 та",
+    "raion": "Приморски",
+    "kind": "address",
+    "true_pin": [
+     43.22695,
+     27.99995
+    ],
+    "shown_at": 0,
+    "dist_m": 612,
+    "query": "20 та"
+   },
+   {
+    "label": "22 ра",
+    "raion": "Приморски",
+    "kind": "address",
+    "true_pin": [
+     43.23037,
+     27.99595
+    ],
+    "shown_at": 0,
+    "dist_m": 602,
+    "query": "22 ра"
+   },
+   {
+    "label": "26 та",
+    "raion": "Приморски",
+    "kind": "address",
+    "true_pin": [
+     43.23101,
+     28.00063
+    ],
+    "shown_at": 0,
+    "dist_m": 5745,
+    "query": "26 та"
+   },
+   {
+    "label": "28 ма",
+    "raion": "Приморски",
+    "kind": "address",
+    "true_pin": [
+     43.2379,
+     27.92573
+    ],
+    "shown_at": 0,
+    "dist_m": 6140,
+    "query": "28 ма"
+   },
+   {
+    "label": "37 ма",
+    "raion": "Приморски",
+    "kind": "address",
+    "true_pin": [
+     43.23741,
+     27.92738
+    ],
+    "shown_at": 0,
+    "dist_m": 5657,
+    "query": "37 ма"
+   },
+   {
+    "label": "боровец юг",
+    "raion": "Аспарухово",
+    "kind": "address",
+    "true_pin": [
+     43.13242,
+     27.91759
+    ],
+    "shown_at": 0,
+    "dist_m": 706,
+    "query": "боровец юг"
+   },
+   {
+    "label": "боровец юг",
+    "raion": "Аспарухово",
+    "kind": "address",
+    "true_pin": [
+     43.13561,
+     27.91388
+    ],
+    "shown_at": 0,
+    "dist_m": 806,
+    "query": "боровец юг"
+   },
+   {
+    "label": "боровец юг",
+    "raion": "Аспарухово",
+    "kind": "address",
+    "true_pin": [
+     43.14064,
+     27.91064
+    ],
+    "shown_at": 0,
+    "dist_m": 1314,
+    "query": "боровец юг"
+   }
+  ]
+ }
+}

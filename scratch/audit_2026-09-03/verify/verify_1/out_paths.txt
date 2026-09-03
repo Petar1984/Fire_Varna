@@ -1,0 +1,21 @@
+--- typing the name letter by letter (MIN_Q=2) ---
+гр                        n=  0  cat=n  key=n  rank=-  ON SCREEN=no  | 
+гра                       n= 10  cat=n  key=n  rank=1  ON SCREEN=YES  | ГРАДИНА / Гран Иван / ГАЛЕРИЯ ГРАФИТ
+град                      n= 20  cat=n  key=n  rank=1  ON SCREEN=YES  | ГРАДИНА / Гран Иван / АСЛАН ГОЛД
+гради                     n=  9  cat=n  key=n  rank=1  ON SCREEN=YES  | ГРАДИНА / Гран Иван / ГАЛЕРИЯ ГРАФИТ
+градин                    n=  9  cat=n  key=n  rank=1  ON SCREEN=YES  | ГРАДИНА / Гран Иван / ГРИЙН ПАРК
+градина                   n= 46  cat=Y  key=Y  rank=-  ON SCREEN=no  | 1 ЦДГ / ДГ Мир №13 / ОДЗ Люляче
+--- other ways to the record ---
+хотел градина             n=  1  cat=n  key=Y  rank=1  ON SCREEN=YES  | ГРАДИНА
+х-л градина               n=  1  cat=n  key=Y  rank=1  ON SCREEN=YES  | ГРАДИНА
+хотел чайка               n= 38  cat=Y  key=Y  rank=14  ON SCREEN=no  | Ной / Пиер / ВЕЖЕН
+чайка                     n=  3  cat=n  key=n  rank=-  ON SCREEN=no  | 4 ОДЗ Чайка / „ДКЦ Чайка“ ЕООД / Villa Chinka
+хотели чайка              n= 38  cat=Y  key=Y  rank=14  ON SCREEN=no  | Ной / Пиер / ВЕЖЕН
+градина к.к. чайка        n=  1  cat=n  key=Y  rank=-  ON SCREEN=no  | 4 ОДЗ Чайка
+гардина                   n= 10  cat=n  key=n  rank=2  ON SCREEN=YES  | МАРИНА / ГРАДИНА / АСТОР ГАРДЪН
+градинa                   n= 46  cat=Y  key=Y  rank=-  ON SCREEN=no  | 1 ЦДГ / ДГ Мир №13 / ОДЗ Люляче
+ГРАДИНА хотел             n=  1  cat=n  key=Y  rank=-  ON SCREEN=no  | ЦДГ 8 - Христо Ботев
+--- does the rule bite the ZONE "Морска градина"? ---
+морска градина            n=  3  cat=n  key=Y  rank=-  ON SCREEN=no  | ДГ 36 "Морска звездица" / ДГ №45 Морски свят / 46 ДГ Горска приказка
+хотел морска градина      n=  3  cat=n  key=Y  rank=1  ON SCREEN=YES  | ГРАДИНА / ВИСТАМАР / Морски бряг
+училище морска градина    n=  1  cat=n  key=Y  rank=-  ON SCREEN=no  | Морска гимназия "Св. Николай Чудотворец"

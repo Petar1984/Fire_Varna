@@ -1,0 +1,6 @@
+total records          : 361
+ABSENT for own name    : 1
+   ABSENT {"name":"ГРАДИНА","kind":"Хотел","zone":"к.к. Чайка","n":46,"category":true,"rank":null}
+present but rank > 8   : 0
+own name lands on the CATEGORY branch: 1
+   CAT {"name":"ГРАДИНА","kind":"Хотел","zone":"к.к. Чайка","n":46,"category":true,"rank":null}

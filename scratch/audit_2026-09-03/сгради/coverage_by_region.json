@@ -1,0 +1,4884 @@
+{
+ "total": {
+  "buildings": 80497,
+  "with_addr": 80372,
+  "with_street": 56991,
+  "with_num": 42578,
+  "street_and_num": 40535,
+  "addr_is_stub": 21338,
+  "no_addr": 125
+ },
+ "by_region": {
+  "район Приморски": {
+   "buildings": 35006,
+   "with_addr": 34954,
+   "with_street": 20988,
+   "with_num": 13516,
+   "street_and_num": 12995,
+   "addr_is_stub": 13445,
+   "no_addr": 52
+  },
+  "район Владислав Варненчик": {
+   "buildings": 4197,
+   "with_addr": 4170,
+   "with_street": 2432,
+   "with_num": 2019,
+   "street_and_num": 1266,
+   "addr_is_stub": 985,
+   "no_addr": 27
+  },
+  "район Одесос": {
+   "buildings": 12944,
+   "with_addr": 12929,
+   "with_street": 12903,
+   "with_num": 12494,
+   "street_and_num": 12494,
+   "addr_is_stub": 26,
+   "no_addr": 15
+  },
+  "район Младост": {
+   "buildings": 11313,
+   "with_addr": 11301,
+   "with_street": 9034,
+   "with_num": 7575,
+   "street_and_num": 7074,
+   "addr_is_stub": 1766,
+   "no_addr": 12
+  },
+  "район Аспарухово": {
+   "buildings": 17036,
+   "with_addr": 17017,
+   "with_street": 11633,
+   "with_num": 6974,
+   "street_and_num": 6706,
+   "addr_is_stub": 5116,
+   "no_addr": 19
+  },
+  "(без район)": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  }
+ },
+ "by_quarter_top30": {
+  "(без квартал)": {
+   "buildings": 49381,
+   "with_addr": 49264,
+   "with_street": 45832,
+   "with_num": 37770,
+   "street_and_num": 37628,
+   "addr_is_stub": 3290,
+   "no_addr": 117
+  },
+  "кв. \"ГАЛАТА\"": {
+   "buildings": 3313,
+   "with_addr": 3313,
+   "with_street": 3243,
+   "with_num": 143,
+   "street_and_num": 143,
+   "addr_is_stub": 70,
+   "no_addr": 0
+  },
+  "кв. ВИНИЦА": {
+   "buildings": 2199,
+   "with_addr": 2199,
+   "with_street": 2140,
+   "with_num": 253,
+   "street_and_num": 253,
+   "addr_is_stub": 59,
+   "no_addr": 0
+  },
+  "с.о. \"АЛЕН МАК\"": {
+   "buildings": 1894,
+   "with_addr": 1894,
+   "with_street": 91,
+   "with_num": 84,
+   "street_and_num": 70,
+   "addr_is_stub": 1789,
+   "no_addr": 0
+  },
+  "ж.к. БРИЗ": {
+   "buildings": 1555,
+   "with_addr": 1555,
+   "with_street": 139,
+   "with_num": 112,
+   "street_and_num": 107,
+   "addr_is_stub": 1411,
+   "no_addr": 0
+  },
+  "с.о.\"Траката\"": {
+   "buildings": 1447,
+   "with_addr": 1447,
+   "with_street": 122,
+   "with_num": 111,
+   "street_and_num": 105,
+   "addr_is_stub": 1319,
+   "no_addr": 0
+  },
+  "с.о. \"МАНАСТИРСКИ РИД\"": {
+   "buildings": 1382,
+   "with_addr": 1382,
+   "with_street": 1287,
+   "with_num": 70,
+   "street_and_num": 70,
+   "addr_is_stub": 95,
+   "no_addr": 0
+  },
+  "с.о. \"ДОБРЕВА ЧЕШМА\"": {
+   "buildings": 1026,
+   "with_addr": 1026,
+   "with_street": 54,
+   "with_num": 44,
+   "street_and_num": 44,
+   "addr_is_stub": 972,
+   "no_addr": 0
+  },
+  "м. ТРАКАТА": {
+   "buildings": 968,
+   "with_addr": 968,
+   "with_street": 99,
+   "with_num": 85,
+   "street_and_num": 76,
+   "addr_is_stub": 860,
+   "no_addr": 0
+  },
+  "ж.к. ИЗГРЕВ-1": {
+   "buildings": 894,
+   "with_addr": 894,
+   "with_street": 35,
+   "with_num": 38,
+   "street_and_num": 27,
+   "addr_is_stub": 848,
+   "no_addr": 0
+  },
+  "местност \"СОТИРА\"": {
+   "buildings": 886,
+   "with_addr": 886,
+   "with_street": 29,
+   "with_num": 16,
+   "street_and_num": 14,
+   "addr_is_stub": 855,
+   "no_addr": 0
+  },
+  "с.о. \"ПРИБОЙ\"": {
+   "buildings": 874,
+   "with_addr": 874,
+   "with_street": 49,
+   "with_num": 21,
+   "street_and_num": 18,
+   "addr_is_stub": 822,
+   "no_addr": 0
+  },
+  "к.к. Чайка": {
+   "buildings": 775,
+   "with_addr": 775,
+   "with_street": 64,
+   "with_num": 81,
+   "street_and_num": 61,
+   "addr_is_stub": 691,
+   "no_addr": 0
+  },
+  "с.о. \"МЕНТЕШЕ\"": {
+   "buildings": 747,
+   "with_addr": 745,
+   "with_street": 13,
+   "with_num": 561,
+   "street_and_num": 12,
+   "addr_is_stub": 183,
+   "no_addr": 2
+  },
+  "м. РАКИТНИКА-І": {
+   "buildings": 724,
+   "with_addr": 724,
+   "with_street": 17,
+   "with_num": 15,
+   "street_and_num": 12,
+   "addr_is_stub": 704,
+   "no_addr": 0
+  },
+  "Западна промишлена зона": {
+   "buildings": 646,
+   "with_addr": 646,
+   "with_street": 240,
+   "with_num": 107,
+   "street_and_num": 78,
+   "addr_is_stub": 377,
+   "no_addr": 0
+  },
+  "ж.к. \"Възраждане\"": {
+   "buildings": 628,
+   "with_addr": 628,
+   "with_street": 210,
+   "with_num": 487,
+   "street_and_num": 190,
+   "addr_is_stub": 121,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЛАДИСЛАВ ВАРНЕНЧИК\"": {
+   "buildings": 611,
+   "with_addr": 611,
+   "with_street": 175,
+   "with_num": 47,
+   "street_and_num": 41,
+   "addr_is_stub": 430,
+   "no_addr": 0
+  },
+  "ЮЖНА ПРОМИШЛЕНА ЗОНА": {
+   "buildings": 608,
+   "with_addr": 608,
+   "with_street": 56,
+   "with_num": 41,
+   "street_and_num": 7,
+   "addr_is_stub": 518,
+   "no_addr": 0
+  },
+  "с.о. \"СЪЛЗИЦА\"": {
+   "buildings": 599,
+   "with_addr": 599,
+   "with_street": 5,
+   "with_num": 18,
+   "street_and_num": 1,
+   "addr_is_stub": 577,
+   "no_addr": 0
+  },
+  "ж.к. \"Изгрев\"": {
+   "buildings": 466,
+   "with_addr": 465,
+   "with_street": 279,
+   "with_num": 84,
+   "street_and_num": 73,
+   "addr_is_stub": 175,
+   "no_addr": 1
+  },
+  "с.о. \"КОЧМАР\"": {
+   "buildings": 449,
+   "with_addr": 449,
+   "with_street": 2,
+   "with_num": 22,
+   "street_and_num": 0,
+   "addr_is_stub": 425,
+   "no_addr": 0
+  },
+  "к.к. \"ЗЛАТНИ ПЯСЪЦИ\"": {
+   "buildings": 442,
+   "with_addr": 442,
+   "with_street": 365,
+   "with_num": 4,
+   "street_and_num": 3,
+   "addr_is_stub": 76,
+   "no_addr": 0
+  },
+  "с.о. \"БОРОВЕЦ СЕВЕР\"": {
+   "buildings": 438,
+   "with_addr": 438,
+   "with_street": 2,
+   "with_num": 64,
+   "street_and_num": 2,
+   "addr_is_stub": 374,
+   "no_addr": 0
+  },
+  "с.о. \"ГОРНА ТРАКА\"": {
+   "buildings": 418,
+   "with_addr": 418,
+   "with_street": 37,
+   "with_num": 24,
+   "street_and_num": 22,
+   "addr_is_stub": 379,
+   "no_addr": 0
+  },
+  "к.к \"Св.св. Константин и Елена\"": {
+   "buildings": 349,
+   "with_addr": 349,
+   "with_street": 189,
+   "with_num": 151,
+   "street_and_num": 148,
+   "addr_is_stub": 157,
+   "no_addr": 0
+  },
+  "с.о. \"МАНАСТИРСКИ РИД, БЯЛАТА ЧЕШМА И ДЪБРАВАТА\"": {
+   "buildings": 338,
+   "with_addr": 338,
+   "with_street": 102,
+   "with_num": 17,
+   "street_and_num": 16,
+   "addr_is_stub": 235,
+   "no_addr": 0
+  },
+  "с.о. \"БОРОВЕЦ ЮГ\"": {
+   "buildings": 305,
+   "with_addr": 304,
+   "with_street": 101,
+   "with_num": 19,
+   "street_and_num": 14,
+   "addr_is_stub": 198,
+   "no_addr": 1
+  },
+  "кв. \"ИЗГРЕВ\"": {
+   "buildings": 214,
+   "with_addr": 214,
+   "with_street": 119,
+   "with_num": 48,
+   "street_and_num": 46,
+   "addr_is_stub": 93,
+   "no_addr": 0
+  },
+  "кв. Свети Никола": {
+   "buildings": 207,
+   "with_addr": 207,
+   "with_street": 20,
+   "with_num": 20,
+   "street_and_num": 19,
+   "addr_is_stub": 186,
+   "no_addr": 0
+  }
+ },
+ "by_quarter_all": {
+  "парк Приморски парк \"Горчивата чешма\"": {
+   "buildings": 31,
+   "with_addr": 31,
+   "with_street": 24,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 7,
+   "no_addr": 0
+  },
+  "(без квартал)": {
+   "buildings": 49381,
+   "with_addr": 49264,
+   "with_street": 45832,
+   "with_num": 37770,
+   "street_and_num": 37628,
+   "addr_is_stub": 3290,
+   "no_addr": 117
+  },
+  "ЮЖНА ПРОМИШЛЕНА ЗОНА": {
+   "buildings": 608,
+   "with_addr": 608,
+   "with_street": 56,
+   "with_num": 41,
+   "street_and_num": 7,
+   "addr_is_stub": 518,
+   "no_addr": 0
+  },
+  "к.к. \"ЗЛАТНИ ПЯСЪЦИ\"": {
+   "buildings": 442,
+   "with_addr": 442,
+   "with_street": 365,
+   "with_num": 4,
+   "street_and_num": 3,
+   "addr_is_stub": 76,
+   "no_addr": 0
+  },
+  "К.К. \"ЗЛАТНИ ПЯСЪЦИ\" - БЕРЛИН ГРИЙН ПАРК": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "Природен парк \"Златни пясъци\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "к.к. \"Златни пясъци\" Изч. център": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. \"ЗЛАТНИ ПЯСЪЦИ\" Х-Л \"ИНТЕРНАЦИОНАЛ\"": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 7,
+   "no_addr": 0
+  },
+  "кк \"Златни пясъци\"-Парк хотел \"Одесос\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. Зл.пясъци - х-л Тинтява": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 6,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "\"ПРИМОРСКИ ПАРК 536-1\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. САЛТАНАТ": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 1,
+   "with_num": 4,
+   "street_and_num": 1,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "\"ПРИМОРСКИ ПАРК 536\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 4,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"Салтанат\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "\"Приморски парк \"Салтанат\"": {
+   "buildings": 12,
+   "with_addr": 12,
+   "with_street": 3,
+   "with_num": 9,
+   "street_and_num": 3,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "м. \"ПРИМОРСКИ ПАРК - 536\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 4,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "Приморска зона, С3-2-Салтанат": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "\"ПРИМОРСКИ ПАРК\"": {
+   "buildings": 22,
+   "with_addr": 22,
+   "with_street": 22,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "парк Прим.парк м-ст Салтанат": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. МЛАДОСТ": {
+   "buildings": 97,
+   "with_addr": 97,
+   "with_street": 23,
+   "with_num": 33,
+   "street_and_num": 14,
+   "addr_is_stub": 55,
+   "no_addr": 0
+  },
+  "местност \"ШАШКЪНА\"": {
+   "buildings": 87,
+   "with_addr": 87,
+   "with_street": 55,
+   "with_num": 40,
+   "street_and_num": 36,
+   "addr_is_stub": 28,
+   "no_addr": 0
+  },
+  "26 м.р.": {
+   "buildings": 9,
+   "with_addr": 9,
+   "with_street": 9,
+   "with_num": 5,
+   "street_and_num": 5,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. ПОБЕДА": {
+   "buildings": 48,
+   "with_addr": 48,
+   "with_street": 48,
+   "with_num": 43,
+   "street_and_num": 43,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Възраждане\"": {
+   "buildings": 628,
+   "with_addr": 628,
+   "with_street": 210,
+   "with_num": 487,
+   "street_and_num": 190,
+   "addr_is_stub": 121,
+   "no_addr": 0
+  },
+  "м. \"Шашкъна\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЪЗРАЖДАНЕ\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ЗПЗ": {
+   "buildings": 61,
+   "with_addr": 61,
+   "with_street": 47,
+   "with_num": 46,
+   "street_and_num": 46,
+   "addr_is_stub": 14,
+   "no_addr": 0
+  },
+  "Западна промишлена зона": {
+   "buildings": 646,
+   "with_addr": 646,
+   "with_street": 240,
+   "with_num": 107,
+   "street_and_num": 78,
+   "addr_is_stub": 377,
+   "no_addr": 0
+  },
+  "ЗПЗ-СЕВЕР": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "\"ЗАПАДАНА ПРОМОШЛЕНА ЗОНА\"": {
+   "buildings": 187,
+   "with_addr": 187,
+   "with_street": 87,
+   "with_num": 31,
+   "street_and_num": 31,
+   "addr_is_stub": 100,
+   "no_addr": 0
+  },
+  "кв. \"Максуда\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ЗПЗ-юг 1": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "район Младост": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "\"ЗАПАДНА ПРОМИШЛЕНА ЗОНА-ЮГ\"": {
+   "buildings": 8,
+   "with_addr": 8,
+   "with_street": 8,
+   "with_num": 7,
+   "street_and_num": 7,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Трошево\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. ТРОШЕВО": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. \"АСПАРУХОВО\"": {
+   "buildings": 81,
+   "with_addr": 81,
+   "with_street": 80,
+   "with_num": 53,
+   "street_and_num": 53,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "16 м.р.": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 4,
+   "with_num": 4,
+   "street_and_num": 4,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"СЪЛЗИЦА\"": {
+   "buildings": 599,
+   "with_addr": 599,
+   "with_street": 5,
+   "with_num": 18,
+   "street_and_num": 1,
+   "addr_is_stub": 577,
+   "no_addr": 0
+  },
+  "с.о. \"СЪЛЗИЦА-1\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. СЪЛЗИЦА": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "со \"Сълзица\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "район\"МЛАДОСТ\", со.\"СЪЛЗИЦА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"ПЧЕЛИНА\"": {
+   "buildings": 49,
+   "with_addr": 49,
+   "with_street": 21,
+   "with_num": 10,
+   "street_and_num": 10,
+   "addr_is_stub": 28,
+   "no_addr": 0
+  },
+  "с.о. Пчелина": {
+   "buildings": 126,
+   "with_addr": 126,
+   "with_street": 46,
+   "with_num": 27,
+   "street_and_num": 21,
+   "addr_is_stub": 74,
+   "no_addr": 0
+  },
+  "м-ст \"Пчелина\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. 'ПЧЕЛИНА'": {
+   "buildings": 19,
+   "with_addr": 19,
+   "with_street": 4,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 13,
+   "no_addr": 0
+  },
+  "м. Пчелина": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. ПЛАНОВА": {
+   "buildings": 8,
+   "with_addr": 8,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 7,
+   "no_addr": 0
+  },
+  "ж.к. \"Възраждане\" до бл. 74": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. ВЪЗРАЖДАНЕ": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. ВЪЗРАЖДАНЕ IV МР": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 2,
+   "with_num": 3,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. \"Възраждане-IV\" М.Р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"\"ВЪЗРАДЖАНЕ\"\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Възраждане\" II м.р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"\"ВЪЗРАЖДАНЕ\"\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ПЗ \"ПЛАНОВА\"": {
+   "buildings": 21,
+   "with_addr": 21,
+   "with_street": 3,
+   "with_num": 13,
+   "street_and_num": 1,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "ж.к. \"Възраждане\" IV": {
+   "buildings": 8,
+   "with_addr": 8,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "ж.к. ВЪЗРАЖДАНЕ - 4М.Р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЪЗРАЖДАНЕ - IV\" М.Р.": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 3,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. ПЛАНОВА": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 1,
+   "with_num": 2,
+   "street_and_num": 1,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "Промишлена зона \"Планова\"": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 7,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. ВЪЗРАЖДАНЕ IV м.р. - 1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. ВЪЗРАЖДАНЕ-IVм.р.": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. ВЪЗРАЖДАНЕ-IVчаст": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. ВЪЗРАЖДАНЕ-IV М.Р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. Възраждане IV м.р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЪЗРАЖДАНЕ II\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"МЛАДОСТ\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"МЛАДОСТ I\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "жкМладост-Орехчето": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. \" МЛАДОСТ \"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. МЛАДОСТ-IIм.р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Младост\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. \"МЛАДОСТ\" II м.р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Младост\" II-ри м.р.": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. ДЕРЕ БОЮ": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. МЛАДОСТ-1 М.Р.": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "район \"МЛАДОСТ\", со \"СЪЛЗИЦА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "кв. \"Свети Иван Рилски\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. Трошево": {
+   "buildings": 66,
+   "with_addr": 66,
+   "with_street": 31,
+   "with_num": 64,
+   "street_and_num": 29,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"КОЧМАР\"": {
+   "buildings": 449,
+   "with_addr": 449,
+   "with_street": 2,
+   "with_num": 22,
+   "street_and_num": 0,
+   "addr_is_stub": 425,
+   "no_addr": 0
+  },
+  "с.о. КОЧМАР": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"Възраждане-IV м.р.\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. Трошево, гараж № 6": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "р-н  МЛАДОСТ": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"МЕНТЕШЕ\"": {
+   "buildings": 747,
+   "with_addr": 745,
+   "with_street": 13,
+   "with_num": 561,
+   "street_and_num": 12,
+   "addr_is_stub": 183,
+   "no_addr": 2
+  },
+  "с.о. МЕНТЕШЕ": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 0,
+   "with_num": 6,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"МЕНТЕШЕ 1\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЛАДИСЛАВ ВАРНЕНЧИК\"": {
+   "buildings": 611,
+   "with_addr": 611,
+   "with_street": 175,
+   "with_num": 47,
+   "street_and_num": 41,
+   "addr_is_stub": 430,
+   "no_addr": 0
+  },
+  "ж.к. \"Владислав Валненчик\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЛ. ВАРНЕНЧИК\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "с.о. \"БАЛЪМ ДЕРЕ\"": {
+   "buildings": 197,
+   "with_addr": 197,
+   "with_street": 0,
+   "with_num": 169,
+   "street_and_num": 0,
+   "addr_is_stub": 28,
+   "no_addr": 0
+  },
+  "местн. \"Балъм дере\"": {
+   "buildings": 2,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 1
+  },
+  "с.о. БАЛЪМ ДЕРЕ": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Владислав Варненчик\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. ВЛ.ВАРНЕНЧИК": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "Ж.К. \"ВЛАСИСЛАВ ВАРНЕНЧИК\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Вл. Варненчик\" I м.р.": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "ж.к. \"Вл.Варненчик\"": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 6,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "ж.к. \"Вл. Варненчик\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 4,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "район \"ВЛАДИСЛАВ ВАРНЕНЧИК\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. ВЛАДИСЛАВ ВАРНЕНЧИК": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЛАДИСЛАВ ВАРНЕНЧИК\", район No 1": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЛАДИСЛАВ ВАЕНЕНЧИК\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. \"Вл. Варненчик\" II м.р.": {
+   "buildings": 8,
+   "with_addr": 8,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 7,
+   "no_addr": 0
+  },
+  "ж.к. \"Влладислав Варненчик\" - II м.р.": {
+   "buildings": 9,
+   "with_addr": 9,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 8,
+   "no_addr": 0
+  },
+  "ж.к. Вл.Варненчик II м.р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. Владислав Варненчик-II м.р.": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. ВЛАДИСЛАВ ВАРНЕНЧИК IIмр, ГРАО 10135 2010": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. Владислав Варненчик - II м.р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. Вл.Варненчик 2 м.р-н": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. ВЛ.ВАРНЕНЧИК- IIм.р.": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ПЗ\"МЕТРО\"": {
+   "buildings": 14,
+   "with_addr": 14,
+   "with_street": 6,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 8,
+   "no_addr": 0
+  },
+  "ВЛАДИСЛАВ ВАРНЕНЧИК": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ОП.З, район Вл.Варненчик": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 4,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"ВЛАДИСЛАВ ВАРНЕНЧИК\", ГРАО 10135    2": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ПАРКОВА ЗОНА ЗА ОБЩЕСТВЕНО ОБСЛУЖВАНЕ": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м.ТРОШЕВИ НИВИ": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"Владислав Варненчик\" м-ст \"Кьор Бунар\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"ТЕРАСИТЕ\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"Джанаварски път\" и \"Караулницата\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "м. \"ДЖАНАВАРСКИ ПЪТ\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. БОКЛУК ТАРЛА": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "м. \"БОКЛУК ТАРЛА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. ВЛАДИСЛСВОВО": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. \"Голям пясък\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"ЗЕЛЕНИКА\"": {
+   "buildings": 89,
+   "with_addr": 89,
+   "with_street": 27,
+   "with_num": 7,
+   "street_and_num": 4,
+   "addr_is_stub": 59,
+   "no_addr": 0
+  },
+  "кв. \"ГАЛАТА\"": {
+   "buildings": 3313,
+   "with_addr": 3313,
+   "with_street": 3243,
+   "with_num": 143,
+   "street_and_num": 143,
+   "addr_is_stub": 70,
+   "no_addr": 0
+  },
+  "кв. Галата": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"ПРИБОЙ\"": {
+   "buildings": 874,
+   "with_addr": 874,
+   "with_street": 49,
+   "with_num": 21,
+   "street_and_num": 18,
+   "addr_is_stub": 822,
+   "no_addr": 0
+  },
+  "м. \"ФИЧОЗА\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "кв. ГАЛАТА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"ЧЕРНОМОРЕЦ\"": {
+   "buildings": 8,
+   "with_addr": 8,
+   "with_street": 8,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.з. ПРИБОЙ": {
+   "buildings": 115,
+   "with_addr": 115,
+   "with_street": 14,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 101,
+   "no_addr": 0
+  },
+  "м. \"ЗЕЛЕНИКА\"": {
+   "buildings": 139,
+   "with_addr": 139,
+   "with_street": 23,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 116,
+   "no_addr": 0
+  },
+  "м. \"ЗЕЛЕНИКА\", ГРАО 10135   12": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \" Зеленика \"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"ЗЕЛЕНИКА\", ГРАО 10135    1": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. .ГАЛАТА М-СТ ЗЕЛЕНИКА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. \"ГАЛАТА\" мест.\"ЗЕЛЕНИКА\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "район \" АСПАРУХОВО\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "в.з. ЗЕЛЕНИКА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. ЗЕЛЕНИКА": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"БОРОВЕЦ ЮГ\"": {
+   "buildings": 305,
+   "with_addr": 304,
+   "with_street": 101,
+   "with_num": 19,
+   "street_and_num": 14,
+   "addr_is_stub": 198,
+   "no_addr": 1
+  },
+  "с.о. \"БОРОВЕЦ-ЮГ\"": {
+   "buildings": 40,
+   "with_addr": 40,
+   "with_street": 15,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 24,
+   "no_addr": 0
+  },
+  "м. БОРОВЕЦ-ЮГ": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 3,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"БОРОВЕЦ - ЮГ\"": {
+   "buildings": 43,
+   "with_addr": 43,
+   "with_street": 20,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 23,
+   "no_addr": 0
+  },
+  "с.о. БОРОВЕЦ ЮГ": {
+   "buildings": 9,
+   "with_addr": 9,
+   "with_street": 2,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 7,
+   "no_addr": 0
+  },
+  "с.о. БОРОВЕЦ-ЮГ": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 11,
+   "with_num": 8,
+   "street_and_num": 8,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. Галата": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"БОРОВЕЦ ЮГ\", ГРАО 0": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"МАЛКА ЧАЙКА\"": {
+   "buildings": 9,
+   "with_addr": 9,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 9,
+   "no_addr": 0
+  },
+  "м. РАКИТНИКА-І": {
+   "buildings": 724,
+   "with_addr": 724,
+   "with_street": 17,
+   "with_num": 15,
+   "street_and_num": 12,
+   "addr_is_stub": 704,
+   "no_addr": 0
+  },
+  "с.о. \"РАКИТНИКА\"": {
+   "buildings": 191,
+   "with_addr": 191,
+   "with_street": 10,
+   "with_num": 12,
+   "street_and_num": 10,
+   "addr_is_stub": 179,
+   "no_addr": 0
+  },
+  "м. РАКИТНИКА-?": {
+   "buildings": 14,
+   "with_addr": 14,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 14,
+   "no_addr": 0
+  },
+  "м. \"РАКИТНИКА\"": {
+   "buildings": 41,
+   "with_addr": 41,
+   "with_street": 11,
+   "with_num": 11,
+   "street_and_num": 11,
+   "addr_is_stub": 30,
+   "no_addr": 0
+  },
+  "СО \"Ракитника\"": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 9,
+   "no_addr": 0
+  },
+  "м. РАКИТНИКА": {
+   "buildings": 15,
+   "with_addr": 15,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 14,
+   "no_addr": 0
+  },
+  "м. РАКИТНИКА-I": {
+   "buildings": 11,
+   "with_addr": 11,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 11,
+   "no_addr": 0
+  },
+  "с.о. РАКИТНИКА, ГРАО 10135    2": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "м. \"Ракитника\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. РАКИТНИКА": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "в.з. РАКИТНИКА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "СО \"РАКИТНИКА - I\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. РАКИТНИКА-I, ГРАО 10135    1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"Ракитника 20-та\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. ДРУЖБА": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 4,
+   "with_num": 10,
+   "street_and_num": 4,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. \"Аспарухово\", ж.к. \"Дружба\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. ПРИБОЙ-ГАЛАТА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"ПРИБОЙ\"": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 4,
+   "with_num": 4,
+   "street_and_num": 4,
+   "addr_is_stub": 9,
+   "no_addr": 0
+  },
+  "с.о. ПРИБОЙ": {
+   "buildings": 20,
+   "with_addr": 20,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 18,
+   "no_addr": 0
+  },
+  "с.о. \"ПРИБОЙ\", ГРАО 10135   11": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"ПРИБОЙ\", ГРАО 10135 3": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. Патрабана": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "м. \"ПАТРАБАНА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"Патрабана\", район \"Аспарухово\", ГРАО 10135    2": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. \"Кaрантината\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "м. \"КАРАНТИНАТА\"": {
+   "buildings": 51,
+   "with_addr": 51,
+   "with_street": 0,
+   "with_num": 50,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"БОРОВЕЦ СЕВЕР\"": {
+   "buildings": 438,
+   "with_addr": 438,
+   "with_street": 2,
+   "with_num": 64,
+   "street_and_num": 2,
+   "addr_is_stub": 374,
+   "no_addr": 0
+  },
+  "м. БОРОВЕЦ СЕВЕР": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "м. МАЛКА ЧАЙКА": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 5,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 8,
+   "no_addr": 0
+  },
+  "м. \"ДЖАНАВАРА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"БОРОВЕЦ\"": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 12,
+   "no_addr": 0
+  },
+  "кв. \"Аспарухово\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "м. \"Разсадника\"": {
+   "buildings": 17,
+   "with_addr": 17,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 17,
+   "no_addr": 0
+  },
+  "с.о. \"БОРОВЕЦ-СЕВЕР\"": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 12,
+   "no_addr": 0
+  },
+  "м. БОРОВЕЦ  СЕВЕР": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 9,
+   "no_addr": 0
+  },
+  "с.о. БОРОВЕЦ СЕВЕР": {
+   "buildings": 17,
+   "with_addr": 17,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 15,
+   "no_addr": 0
+  },
+  "с.о. Боровец - север": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "с.о. БОРОВЕЦ  СЕВЕР": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "с.о. \" Боровец-Север \"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "м. БОРОВЕЦ СЕВЕР1 347": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "парк \"АСПАРУХОВО\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. \"Боровец-юг\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "кв. \"Галата\" м.\"Боровец юг\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "в.з. БОРОВЕЦ - ЮГ": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м-ст \"ПЛАТОТО-4\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "Аспарухово": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Аспарухово\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"ВИЛИТЕ\"": {
+   "buildings": 199,
+   "with_addr": 199,
+   "with_street": 14,
+   "with_num": 30,
+   "street_and_num": 14,
+   "addr_is_stub": 169,
+   "no_addr": 0
+  },
+  "м. ВИЛИТЕ": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 1,
+   "with_num": 2,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "МОРСКА ГРАДИНА": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 5,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "парк \"ПРИМОРСКИ ПАРК /МОРСКА ГРАДИНА\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 5,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "район \"ОДЕСОС\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ОУ \"КОНСТАНТИН АРАБАДЖИЕВ\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 5,
+   "with_num": 5,
+   "street_and_num": 5,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"АКЧЕЛАР\"": {
+   "buildings": 147,
+   "with_addr": 147,
+   "with_street": 42,
+   "with_num": 10,
+   "street_and_num": 10,
+   "addr_is_stub": 105,
+   "no_addr": 0
+  },
+  "местност \"СОТИРА\"": {
+   "buildings": 886,
+   "with_addr": 886,
+   "with_street": 29,
+   "with_num": 16,
+   "street_and_num": 14,
+   "addr_is_stub": 855,
+   "no_addr": 0
+  },
+  "с.о. СОТИРА": {
+   "buildings": 129,
+   "with_addr": 129,
+   "with_street": 21,
+   "with_num": 10,
+   "street_and_num": 9,
+   "addr_is_stub": 107,
+   "no_addr": 0
+  },
+  "м. СОТИРА": {
+   "buildings": 22,
+   "with_addr": 22,
+   "with_street": 2,
+   "with_num": 4,
+   "street_and_num": 2,
+   "addr_is_stub": 18,
+   "no_addr": 0
+  },
+  "с.о. \"Сотира\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "местност \"ТЕЛЕВИЗИОННА КУЛА\"": {
+   "buildings": 130,
+   "with_addr": 130,
+   "with_street": 4,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 126,
+   "no_addr": 0
+  },
+  "с.о. ТЕЛЕВИЗИОННА КУЛА": {
+   "buildings": 47,
+   "with_addr": 47,
+   "with_street": 2,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 45,
+   "no_addr": 0
+  },
+  "с.о. ТЕЛЕВИЗИОННА КУЛА 509": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"Телевизионна кула\", ГРАО 10135  454": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"ДОБРЕВА ЧЕШМА\"": {
+   "buildings": 1026,
+   "with_addr": 1026,
+   "with_street": 54,
+   "with_num": 44,
+   "street_and_num": 44,
+   "addr_is_stub": 972,
+   "no_addr": 0
+  },
+  "с.о. ДОБРЕВА ЧЕШМА": {
+   "buildings": 12,
+   "with_addr": 11,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 11,
+   "no_addr": 1
+  },
+  "с.о. ДОБРЕВА ЧЕШМА 510": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"Добрева чешма\", ГРАО 10135 1549": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "кв. ВИНИЦА": {
+   "buildings": 2199,
+   "with_addr": 2199,
+   "with_street": 2140,
+   "with_num": 253,
+   "street_and_num": 253,
+   "addr_is_stub": 59,
+   "no_addr": 0
+  },
+  "РАЙОН ПРИМОРСКИ": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 7,
+   "with_num": 5,
+   "street_and_num": 5,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о.\"Добрева чешма\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"Добрева чешма\", ГРАО 10135   34": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "с.о. ПЕРЧЕМЛИЯТА": {
+   "buildings": 17,
+   "with_addr": 17,
+   "with_street": 11,
+   "with_num": 3,
+   "street_and_num": 2,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "кв. \"Виница\"": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 13,
+   "with_num": 6,
+   "street_and_num": 6,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"ПЕРЧЕМЛИЯТА\"": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 2,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "с.о. \"АЛЕН МАК\"": {
+   "buildings": 1894,
+   "with_addr": 1894,
+   "with_street": 91,
+   "with_num": 84,
+   "street_and_num": 70,
+   "addr_is_stub": 1789,
+   "no_addr": 0
+  },
+  "к.к. Чайка": {
+   "buildings": 775,
+   "with_addr": 775,
+   "with_street": 64,
+   "with_num": 81,
+   "street_and_num": 61,
+   "addr_is_stub": 691,
+   "no_addr": 0
+  },
+  "м. \"Ален мак\"": {
+   "buildings": 9,
+   "with_addr": 9,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 8,
+   "no_addr": 0
+  },
+  "с.о. АЛЕН МАК": {
+   "buildings": 19,
+   "with_addr": 19,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 18,
+   "no_addr": 0
+  },
+  "с. о. \"Ален мак\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "с.о. Ален Мак, ГРАО 10135  123": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. Бялата чешма и Дъбравата": {
+   "buildings": 34,
+   "with_addr": 34,
+   "with_street": 15,
+   "with_num": 14,
+   "street_and_num": 7,
+   "addr_is_stub": 12,
+   "no_addr": 0
+  },
+  "м. \"Сотира 508\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. МЕШЕЛИКА": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "с.о. \"ГОРНА ТРАКА\"": {
+   "buildings": 418,
+   "with_addr": 418,
+   "with_street": 37,
+   "with_num": 24,
+   "street_and_num": 22,
+   "addr_is_stub": 379,
+   "no_addr": 0
+  },
+  "\"УЗУН КЕЛЕМЕ\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. \"Саръ баир 2019\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"МАНАСТИРСКИ РИД\"": {
+   "buildings": 1382,
+   "with_addr": 1382,
+   "with_street": 1287,
+   "with_num": 70,
+   "street_and_num": 70,
+   "addr_is_stub": 95,
+   "no_addr": 0
+  },
+  "местн. \"Манастирски рид 2020\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. АЯЗМА 2020": {
+   "buildings": 1,
+   "with_addr": 0,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 1
+  },
+  "м. \"АЛАДЖА МАНАСТИР\"": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 10,
+   "no_addr": 0
+  },
+  "с.о. ВИНИЦА-СЕВЕР": {
+   "buildings": 46,
+   "with_addr": 46,
+   "with_street": 13,
+   "with_num": 8,
+   "street_and_num": 7,
+   "addr_is_stub": 32,
+   "no_addr": 0
+  },
+  "с.о. \"ВИНИЦА СЕВЕР\"": {
+   "buildings": 1,
+   "with_addr": 0,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 1
+  },
+  "ВИНИЦА-СЕВЕР": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. БОТАНИКА, ул.30-та": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. БАБА АЛИНО": {
+   "buildings": 54,
+   "with_addr": 54,
+   "with_street": 0,
+   "with_num": 14,
+   "street_and_num": 0,
+   "addr_is_stub": 40,
+   "no_addr": 0
+  },
+  "м-т\"Баба Алино\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. БАБА АЛИНО 464": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"Сотира\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. \"ИЗГРЕВ\"": {
+   "buildings": 49,
+   "with_addr": 49,
+   "with_street": 14,
+   "with_num": 8,
+   "street_and_num": 6,
+   "addr_is_stub": 33,
+   "no_addr": 0
+  },
+  "с.о. ТРАКАТА": {
+   "buildings": 75,
+   "with_addr": 75,
+   "with_street": 12,
+   "with_num": 7,
+   "street_and_num": 7,
+   "addr_is_stub": 63,
+   "no_addr": 0
+  },
+  "м. \"Кемер дере\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "кв. \"ИЗГРЕВ\"": {
+   "buildings": 214,
+   "with_addr": 214,
+   "with_street": 119,
+   "with_num": 48,
+   "street_and_num": 46,
+   "addr_is_stub": 93,
+   "no_addr": 0
+  },
+  "23 м.р.": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 4,
+   "with_num": 4,
+   "street_and_num": 4,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "местност \"СОТИРА-3\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"ЛЕВСКИ\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Изгрев\"": {
+   "buildings": 466,
+   "with_addr": 465,
+   "with_street": 279,
+   "with_num": 84,
+   "street_and_num": 73,
+   "addr_is_stub": 175,
+   "no_addr": 1
+  },
+  "ж.к. \"БРИЗ-ЮГ\"": {
+   "buildings": 131,
+   "with_addr": 131,
+   "with_street": 46,
+   "with_num": 54,
+   "street_and_num": 46,
+   "addr_is_stub": 77,
+   "no_addr": 0
+  },
+  "м. Св. Никола": {
+   "buildings": 198,
+   "with_addr": 198,
+   "with_street": 63,
+   "with_num": 170,
+   "street_and_num": 59,
+   "addr_is_stub": 24,
+   "no_addr": 0
+  },
+  "м. Свети Никола / Бриз/": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 5,
+   "with_num": 5,
+   "street_and_num": 5,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. Бриз, м. \"Свети Никола": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "м. СВ.НИКОЛА-1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. БРИЗ": {
+   "buildings": 1555,
+   "with_addr": 1555,
+   "with_street": 139,
+   "with_num": 112,
+   "street_and_num": 107,
+   "addr_is_stub": 1411,
+   "no_addr": 0
+  },
+  "местност \"Свети Никола-2\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. Свети Никола": {
+   "buildings": 47,
+   "with_addr": 47,
+   "with_street": 7,
+   "with_num": 12,
+   "street_and_num": 7,
+   "addr_is_stub": 35,
+   "no_addr": 0
+  },
+  "м. Св.Никола /ж.к.Бриз/": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. Св. Никола": {
+   "buildings": 19,
+   "with_addr": 19,
+   "with_street": 6,
+   "with_num": 7,
+   "street_and_num": 6,
+   "addr_is_stub": 12,
+   "no_addr": 0
+  },
+  "с.о. \"СВЕТИ НИКОЛА\"": {
+   "buildings": 29,
+   "with_addr": 29,
+   "with_street": 4,
+   "with_num": 6,
+   "street_and_num": 3,
+   "addr_is_stub": 22,
+   "no_addr": 0
+  },
+  "кв. Свети Никола": {
+   "buildings": 207,
+   "with_addr": 207,
+   "with_street": 20,
+   "with_num": 20,
+   "street_and_num": 19,
+   "addr_is_stub": 186,
+   "no_addr": 0
+  },
+  "ж.к. \"БРИЗ\"": {
+   "buildings": 26,
+   "with_addr": 26,
+   "with_street": 10,
+   "with_num": 7,
+   "street_and_num": 6,
+   "addr_is_stub": 15,
+   "no_addr": 0
+  },
+  "Св. Никола /Бриз/": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. БРИЗ - 1": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"Свети Никола\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. \"Св.Никола\"": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "в.з. Варна": {
+   "buildings": 141,
+   "with_addr": 141,
+   "with_street": 137,
+   "with_num": 111,
+   "street_and_num": 111,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "\"Вилна зона\"": {
+   "buildings": 102,
+   "with_addr": 102,
+   "with_street": 102,
+   "with_num": 101,
+   "street_and_num": 101,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к \"Св.св. Константин и Елена\"": {
+   "buildings": 349,
+   "with_addr": 349,
+   "with_street": 189,
+   "with_num": 151,
+   "street_and_num": 148,
+   "addr_is_stub": 157,
+   "no_addr": 0
+  },
+  "вилна зона": {
+   "buildings": 67,
+   "with_addr": 67,
+   "with_street": 63,
+   "with_num": 59,
+   "street_and_num": 59,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. ТРАКАТА": {
+   "buildings": 968,
+   "with_addr": 968,
+   "with_street": 99,
+   "with_num": 85,
+   "street_and_num": 76,
+   "addr_is_stub": 860,
+   "no_addr": 0
+  },
+  "кв. \"Вилна зона\"": {
+   "buildings": 26,
+   "with_addr": 26,
+   "with_street": 26,
+   "with_num": 21,
+   "street_and_num": 21,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "в.з. Траката": {
+   "buildings": 80,
+   "with_addr": 80,
+   "with_street": 72,
+   "with_num": 68,
+   "street_and_num": 68,
+   "addr_is_stub": 8,
+   "no_addr": 0
+  },
+  "с.о.\"Траката\"": {
+   "buildings": 1447,
+   "with_addr": 1447,
+   "with_street": 122,
+   "with_num": 111,
+   "street_and_num": 105,
+   "addr_is_stub": 1319,
+   "no_addr": 0
+  },
+  "м. \"ВИЛНА ЗОНА\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 5,
+   "with_num": 4,
+   "street_and_num": 4,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ВЗ\"ВАЯЛАР\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. ВАЯЛАР": {
+   "buildings": 19,
+   "with_addr": 19,
+   "with_street": 5,
+   "with_num": 4,
+   "street_and_num": 2,
+   "addr_is_stub": 12,
+   "no_addr": 0
+  },
+  "м. ЕВКСИНОГРАД": {
+   "buildings": 32,
+   "with_addr": 32,
+   "with_street": 26,
+   "with_num": 24,
+   "street_and_num": 24,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "м. \"Евсиноград\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "район \"Приморски\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 4,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"Евксиноград\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"Евксиноград-вилна зона\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. \"СВ. КОНСТАНТИН И ЕЛЕНА\"": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 11,
+   "with_num": 12,
+   "street_and_num": 11,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. ВАЯЛАР": {
+   "buildings": 73,
+   "with_addr": 73,
+   "with_street": 14,
+   "with_num": 6,
+   "street_and_num": 6,
+   "addr_is_stub": 59,
+   "no_addr": 0
+  },
+  "м. \"Св.Св.Константин и Елена\"": {
+   "buildings": 9,
+   "with_addr": 9,
+   "with_street": 9,
+   "with_num": 8,
+   "street_and_num": 8,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "Сп. \"Марек\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. \"СВ.КОНСТАНТИН\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. ЧАЙКА": {
+   "buildings": 156,
+   "with_addr": 156,
+   "with_street": 9,
+   "with_num": 139,
+   "street_and_num": 6,
+   "addr_is_stub": 14,
+   "no_addr": 0
+  },
+  "ж.к. \"ЧАЙКА\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \" ЧАЙКА \"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "с.о. \"МАНАСТИРСКИ РИД, БЯЛАТА ЧЕШМА И ДЪБРАВАТА\"": {
+   "buildings": 338,
+   "with_addr": 338,
+   "with_street": 102,
+   "with_num": 17,
+   "street_and_num": 16,
+   "addr_is_stub": 235,
+   "no_addr": 0
+  },
+  "м. \"МАНАСТИРСКИ РИД\"": {
+   "buildings": 9,
+   "with_addr": 9,
+   "with_street": 3,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "с.о. \"Траката\"": {
+   "buildings": 131,
+   "with_addr": 131,
+   "with_street": 22,
+   "with_num": 14,
+   "street_and_num": 12,
+   "addr_is_stub": 107,
+   "no_addr": 0
+  },
+  "БОТАНИЧЕСКА ГРАДИНА": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "с.о. \"ДОЛНА ТРАКА 566\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 3,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. Долна Трака": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 5,
+   "with_num": 6,
+   "street_and_num": 5,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. СТАРИТЕ ЛОЗЯ": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 3,
+   "with_num": 4,
+   "street_and_num": 3,
+   "addr_is_stub": 9,
+   "no_addr": 0
+  },
+  "с.о. \"ДОЛНА ТРАКА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м-ст\"СТАРИТЕ ЛОЗЯ/\"ДОЛНА ТРАКА\"/": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "Приморски парк": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "\"Вила 5\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "\"Занималня към вила 5\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. \"СВЕТИ СВЕТИ КОНСТАНТИН И ЕЛЕНА\"": {
+   "buildings": 73,
+   "with_addr": 73,
+   "with_street": 13,
+   "with_num": 12,
+   "street_and_num": 12,
+   "addr_is_stub": 60,
+   "no_addr": 0
+  },
+  "м. АБАТКО": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 6,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. \"СВ.СВ. КОНСТАНТИН И ЕЛЕНА\", ГРАО 10135   11": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "КК \"Св. Константин и Елена\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. \"СВ.СВ.КОНСТАНТИН И ЕЛЕНА\" ул.46, ГРАО 10135 5784": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "КК \"Св. Констанин и Елена\"": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 7,
+   "with_num": 7,
+   "street_and_num": 7,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "в.з. \"Св. Св. Константин и Елена\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. \"Св.св. Константин и Елена\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. СВ.СВ.КОНСТАНТИН И ЕЛЕНА, ул.49-та": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. Св.Св.Константин и Елена, ул.62-ра": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. \"Св. Константин и Елена\", ул. 56": {
+   "buildings": 8,
+   "with_addr": 8,
+   "with_street": 0,
+   "with_num": 8,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. \"Св. Св. Константин и Елена\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "к.к. СВ.СВ. КОНСТАНТИН И ЕЛЕНА, ГРАО 0": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 10,
+   "no_addr": 0
+  },
+  "к.к. Св.Св.Константин и Елена, ул. 67-ма": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. СВ.КОНСТАНТИН И ЕЛЕНА УЛ.45": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "к.к. Св.св. Константин и Елена": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. СВЕТИ СВЕТИ КОНСТАНТИН И ЕЛЕНА": {
+   "buildings": 11,
+   "with_addr": 11,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 11,
+   "no_addr": 0
+  },
+  "к.к. \"Чайка\"": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "к.к. \"ЧАЙКА\"": {
+   "buildings": 53,
+   "with_addr": 53,
+   "with_street": 15,
+   "with_num": 17,
+   "street_and_num": 14,
+   "addr_is_stub": 35,
+   "no_addr": 0
+  },
+  "к.к. \"ЧАЙКА\", ГРАО 10135   11": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. \"ЧАЙКА\"571": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 1,
+   "with_num": 3,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. к.к.\"ЧАЙКА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. \"Чайка 571-4\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. \"Чайка\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "Морски плаж \"Кабакум - Север\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "к.к. \"Чайка 573\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 1,
+   "with_num": 4,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. \".ВИНИЦА\"": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 6,
+   "with_num": 6,
+   "street_and_num": 6,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ПРИМОРСКИ": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. ВИНИЦА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. Драгу дере": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "КП\"ТРАКАТА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. ГОРНА ТРАКА": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "с.о. Горна Трака, ГРАО 10135    0": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "С.О. Ваялар": {
+   "buildings": 61,
+   "with_addr": 61,
+   "with_street": 10,
+   "with_num": 9,
+   "street_and_num": 8,
+   "addr_is_stub": 50,
+   "no_addr": 0
+  },
+  "район \"Приморски\" м.\"Траката\" Валяр": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. ВАЯЛЯР": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "С.О. \"ВАЯЛАР\" 723": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"Ваялар\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "с.о. \"Траката, Горна трака, Ваялар\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. Манастирски рид,Бялата чешма и Дъбравата": {
+   "buildings": 15,
+   "with_addr": 15,
+   "with_street": 7,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 8,
+   "no_addr": 0
+  },
+  "с.о. Манастирски рид\" -\"Бялата чешма - Дъбравата": {
+   "buildings": 16,
+   "with_addr": 16,
+   "with_street": 9,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "с.о. Ман.рид, Бялата чешма, Дъбравата": {
+   "buildings": 44,
+   "with_addr": 44,
+   "with_street": 7,
+   "with_num": 4,
+   "street_and_num": 4,
+   "addr_is_stub": 37,
+   "no_addr": 0
+  },
+  "с.о. \"Ман. рид, Бялата чешма и Дъбравата\"": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "с.о. МАНАСТИРСКИ РИД, БЯЛАТА ЧЕШМА И ДЪБРАВАТА": {
+   "buildings": 18,
+   "with_addr": 18,
+   "with_street": 8,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 10,
+   "no_addr": 0
+  },
+  "с.о. \"Манастирски рид, БЧД 517-2\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 5,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. МАНАСТИРСКИ РИД, БЯЛАТА ЧЕШМА - ДЪБРАВАТА": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 3,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 7,
+   "no_addr": 0
+  },
+  "с.о. Манастирски рид": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 2,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"МАНАСТИРСКИ РИД, БЯЛАТА ЧЕШМА": {
+   "buildings": 11,
+   "with_addr": 11,
+   "with_street": 6,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "кв. Виница\" ,  \"Maнастирски рид, ГРАО 13055": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "в.з. \"Манастирски рид\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "с.о. МАНАСТИРСКИ РИД БЧД 517-4": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. МАНАСТИРСКИ РИД, БЧД 517-4, ГРАО 13": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"МАНАСТИРСКИ РИД, БДЧ 517-4\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. БЯЛАТА ЧЕШМА И ДЪБРАВАТА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. МАНАСТИРСКИ РИД БЧД 517-1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. Бялата чешма - Дъбравата": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"ДЕЛИ САВА\"": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "с.о. \"Дели Сава 2519\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. Дели сава, ГРАО 18": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"ДЕЛИ САВА\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. ФАТРИКО ДЕРЕ": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"Траката 520\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"ТРАКАТА-520\", ГРАО 10135    1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"ТРАКАТА\", ГРАО 10135   12": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "\"Траката разширение\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. Бриз, м-ст \"Акчелар": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. АКЧЕЛАР": {
+   "buildings": 42,
+   "with_addr": 42,
+   "with_street": 7,
+   "with_num": 4,
+   "street_and_num": 0,
+   "addr_is_stub": 31,
+   "no_addr": 0
+  },
+  "ж.к. Бриз,м-ст Св.Никола": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "кв. \"СВ.НИКОЛА\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "м. \"Св. Никола 526\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 5,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. Св.Никола": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "кв. \"СВ. НИКОЛА\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 3,
+   "with_num": 3,
+   "street_and_num": 3,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "Местност \"Св.Никола\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 4,
+   "no_addr": 0
+  },
+  "кв. \"Свети Никола\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. \"Бриз\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. Св.Никола": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "ж.к. БРИЗ-": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. СВЕТИ НИКОЛА": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "кв. БРИЗ": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"Свети Никола 1\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. М-СТ\"СВЕТИ НИКОЛА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м.КОВАНЛЪКА": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "с.о. \"Франга дере и Кокарджа\"": {
+   "buildings": 48,
+   "with_addr": 48,
+   "with_street": 4,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 44,
+   "no_addr": 0
+  },
+  "м. \"ФРАНГА ДЕРЕ И КОКАРДЖА\"": {
+   "buildings": 25,
+   "with_addr": 25,
+   "with_street": 5,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 20,
+   "no_addr": 0
+  },
+  "ж.к. \"ИЗГРЕВ-551\"": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 0,
+   "with_num": 7,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "\"ФРАНГА ДЕРЕ И КОКАРДЖА\"": {
+   "buildings": 12,
+   "with_addr": 12,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 12,
+   "no_addr": 0
+  },
+  "м. ФРАНГА ДЕРЕ": {
+   "buildings": 17,
+   "with_addr": 17,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 16,
+   "no_addr": 0
+  },
+  "ж.к. ИЗГРЕВ": {
+   "buildings": 13,
+   "with_addr": 13,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 11,
+   "no_addr": 0
+  },
+  "\"Изгрев\"": {
+   "buildings": 7,
+   "with_addr": 7,
+   "with_street": 5,
+   "with_num": 4,
+   "street_and_num": 4,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. ИЗГРЕВ-1": {
+   "buildings": 894,
+   "with_addr": 894,
+   "with_street": 35,
+   "with_num": 38,
+   "street_and_num": 27,
+   "addr_is_stub": 848,
+   "no_addr": 0
+  },
+  "м. ФРАНГА ДЕРЕ И КОКАРДЖА, ГРАО 10135    1": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "кв. Изгрев": {
+   "buildings": 16,
+   "with_addr": 16,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 14,
+   "no_addr": 0
+  },
+  "м. Голяма Кокарджа": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "ж.к. \"ИЗГРЕВ-1\"": {
+   "buildings": 6,
+   "with_addr": 6,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 6,
+   "no_addr": 0
+  },
+  "с.о. \"ТРАКАТА\", ГРАО 10135 568": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "кв. ВИНИЦА, с.о.ТРАКАТА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"Траката 520-5\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"ТРАКАТА-520-6\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 5,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"ТРАКАТА - разширение\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "СО\"ТРАКАТА-520\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"АКЧЕЛАР-ВИНИЦА\"": {
+   "buildings": 17,
+   "with_addr": 17,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 17,
+   "no_addr": 0
+  },
+  "с.о. АКЧЕЛАР 521-3": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. АКЧЕЛАР": {
+   "buildings": 12,
+   "with_addr": 12,
+   "with_street": 6,
+   "with_num": 3,
+   "street_and_num": 2,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "с.о. АКЧЕЛАР 522": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв.Виница, местност \"Акчелар\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. \"РУСКИ ОКОПИ\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "СО \"Акчелар 522-1\"": {
+   "buildings": 4,
+   "with_addr": 4,
+   "with_street": 3,
+   "with_num": 4,
+   "street_and_num": 3,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. Акчелар 522-1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "жк\"ИЗГРЕВ\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "р-н \"Приморски\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"ИЗГРАВ\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. Изгрев\", м. \"Кемер дере": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. \"Изгрев 1\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 3,
+   "no_addr": 0
+  },
+  "ж.к. ИЗГРЕВ 552-1": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. \"МАЛКА КОКАРДЖА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "ж.к. \"ИЗГРЕВ 552-2\"": {
+   "buildings": 8,
+   "with_addr": 8,
+   "with_street": 5,
+   "with_num": 8,
+   "street_and_num": 5,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"ИЗГРЕВ 3\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "\"Изгрев 1\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "кв. ИЗГРЕВ\" ул. \"ПЕРУНИКА": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Изгрев-": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \" ПОБЕДА \"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 5,
+   "with_num": 4,
+   "street_and_num": 4,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"Победа\" до бл.12": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. \"Победа\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "ж.к. \"ПОБЕДА\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 2,
+   "street_and_num": 2,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "кв. \".ПОБЕДА\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "м. Ален мак-1\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "С.О.\"АЛЕН МАК-515-1\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 0,
+   "with_num": 2,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "СО ,,Ален мак''": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "м. Ален мак": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "с.о. Ален мак\"": {
+   "buildings": 5,
+   "with_addr": 5,
+   "with_street": 0,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "м. Манастирски рид,Бялата чешма  и Дъбравата": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. МАНАСТИРСКИ РИД БЧД 516": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 0,
+   "with_num": 3,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "С.О. \"Бялата  чешма и Дъбравата\" 1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"Манастирски рид\", \"Бялата чешма-Дъбравата\", м. \"Дилбер чешма\"": {
+   "buildings": 2,
+   "with_addr": 2,
+   "with_street": 2,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"МАНАСТИРСКИ РИД\", \"Бялата чешма - Дъбравата\"": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 2,
+   "no_addr": 0
+  },
+  "м. БЯЛАТА ЧЕШМА-ДЪБРАВАТА 516-2, ГРАО 10135   21": {
+   "buildings": 10,
+   "with_addr": 10,
+   "with_street": 10,
+   "with_num": 10,
+   "street_and_num": 10,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. МАНАСТИРСКИ РИД БЧД 516-4": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "СО \"Бялата чешма и Дъбравата\"": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 1,
+   "with_num": 1,
+   "street_and_num": 1,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "с.о. \"Бялата  чешма и Дъбравата\" 1": {
+   "buildings": 1,
+   "with_addr": 1,
+   "with_street": 0,
+   "with_num": 1,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  }
+ },
+ "by_func_top5": {
+  "Жилищна сграда - еднофамилна": {
+   "buildings": 20476,
+   "with_addr": 20421,
+   "with_street": 14326,
+   "with_num": 12755,
+   "street_and_num": 12213,
+   "addr_is_stub": 5553,
+   "no_addr": 55
+  },
+  "Вилна сграда - еднофамилна": {
+   "buildings": 12313,
+   "with_addr": 12309,
+   "with_street": 5775,
+   "with_num": 1484,
+   "street_and_num": 1330,
+   "addr_is_stub": 6380,
+   "no_addr": 4
+  },
+  "Селскостопанска сграда": {
+   "buildings": 10985,
+   "with_addr": 10983,
+   "with_street": 7593,
+   "with_num": 5746,
+   "street_and_num": 5393,
+   "addr_is_stub": 3037,
+   "no_addr": 2
+  },
+  "Жилищна сграда - многофамилна": {
+   "buildings": 9253,
+   "with_addr": 9231,
+   "with_street": 8892,
+   "with_num": 7766,
+   "street_and_num": 7701,
+   "addr_is_stub": 274,
+   "no_addr": 22
+  },
+  "Друг вид сграда за обитаване": {
+   "buildings": 7990,
+   "with_addr": 7988,
+   "with_street": 6073,
+   "with_num": 4655,
+   "street_and_num": 4359,
+   "addr_is_stub": 1619,
+   "no_addr": 2
+  }
+ },
+ "by_func_all": {
+  "Курортна, туристическа сграда": {
+   "buildings": 1001,
+   "with_addr": 1001,
+   "with_street": 683,
+   "with_num": 111,
+   "street_and_num": 109,
+   "addr_is_stub": 316,
+   "no_addr": 0
+  },
+  "Друг вид сграда за обитаване": {
+   "buildings": 7990,
+   "with_addr": 7988,
+   "with_street": 6073,
+   "with_num": 4655,
+   "street_and_num": 4359,
+   "addr_is_stub": 1619,
+   "no_addr": 2
+  },
+  "Спортна сграда, база": {
+   "buildings": 111,
+   "with_addr": 110,
+   "with_street": 100,
+   "with_num": 44,
+   "street_and_num": 43,
+   "addr_is_stub": 9,
+   "no_addr": 1
+  },
+  "Сграда за енергопроизводство": {
+   "buildings": 1360,
+   "with_addr": 1358,
+   "with_street": 936,
+   "with_num": 626,
+   "street_and_num": 548,
+   "addr_is_stub": 344,
+   "no_addr": 2
+  },
+  "Хотел": {
+   "buildings": 407,
+   "with_addr": 407,
+   "with_street": 256,
+   "with_num": 72,
+   "street_and_num": 68,
+   "addr_is_stub": 147,
+   "no_addr": 0
+  },
+  "Гараж": {
+   "buildings": 4935,
+   "with_addr": 4930,
+   "with_street": 3956,
+   "with_num": 3535,
+   "street_and_num": 3307,
+   "addr_is_stub": 746,
+   "no_addr": 5
+  },
+  "Жилищна сграда - еднофамилна": {
+   "buildings": 20476,
+   "with_addr": 20421,
+   "with_street": 14326,
+   "with_num": 12755,
+   "street_and_num": 12213,
+   "addr_is_stub": 5553,
+   "no_addr": 55
+  },
+  "Здравно заведение": {
+   "buildings": 134,
+   "with_addr": 134,
+   "with_street": 123,
+   "with_num": 105,
+   "street_and_num": 103,
+   "addr_is_stub": 9,
+   "no_addr": 0
+  },
+  "Сграда за търговия": {
+   "buildings": 1971,
+   "with_addr": 1969,
+   "with_street": 1542,
+   "with_num": 1000,
+   "street_and_num": 914,
+   "addr_is_stub": 341,
+   "no_addr": 2
+  },
+  "Складова база, склад": {
+   "buildings": 1513,
+   "with_addr": 1506,
+   "with_street": 1075,
+   "with_num": 547,
+   "street_and_num": 531,
+   "addr_is_stub": 415,
+   "no_addr": 7
+  },
+  "Постройка на допълващото застрояване": {
+   "buildings": 1886,
+   "with_addr": 1882,
+   "with_street": 1225,
+   "with_num": 1146,
+   "street_and_num": 1102,
+   "addr_is_stub": 613,
+   "no_addr": 4
+  },
+  "Вилна сграда - еднофамилна": {
+   "buildings": 12313,
+   "with_addr": 12309,
+   "with_street": 5775,
+   "with_num": 1484,
+   "street_and_num": 1330,
+   "addr_is_stub": 6380,
+   "no_addr": 4
+  },
+  "Сграда за обществено хранене": {
+   "buildings": 482,
+   "with_addr": 481,
+   "with_street": 366,
+   "with_num": 140,
+   "street_and_num": 131,
+   "addr_is_stub": 106,
+   "no_addr": 1
+  },
+  "Сграда за водоснабдяване и/или канализация": {
+   "buildings": 149,
+   "with_addr": 149,
+   "with_street": 93,
+   "with_num": 32,
+   "street_and_num": 31,
+   "addr_is_stub": 55,
+   "no_addr": 0
+  },
+  "Жилищна сграда - многофамилна": {
+   "buildings": 9253,
+   "with_addr": 9231,
+   "with_street": 8892,
+   "with_num": 7766,
+   "street_and_num": 7701,
+   "addr_is_stub": 274,
+   "no_addr": 22
+  },
+  "Сграда за битови услуги": {
+   "buildings": 324,
+   "with_addr": 324,
+   "with_street": 209,
+   "with_num": 111,
+   "street_and_num": 101,
+   "addr_is_stub": 105,
+   "no_addr": 0
+  },
+  "Сграда със специално предназначение": {
+   "buildings": 166,
+   "with_addr": 165,
+   "with_street": 110,
+   "with_num": 56,
+   "street_and_num": 44,
+   "addr_is_stub": 43,
+   "no_addr": 1
+  },
+  "Промишлена сграда": {
+   "buildings": 1500,
+   "with_addr": 1496,
+   "with_street": 960,
+   "with_num": 574,
+   "street_and_num": 547,
+   "addr_is_stub": 509,
+   "no_addr": 4
+  },
+  "Сграда на транспорта": {
+   "buildings": 303,
+   "with_addr": 303,
+   "with_street": 231,
+   "with_num": 112,
+   "street_and_num": 108,
+   "addr_is_stub": 68,
+   "no_addr": 0
+  },
+  "Сграда със смесено предназначение": {
+   "buildings": 356,
+   "with_addr": 355,
+   "with_street": 289,
+   "with_num": 225,
+   "street_and_num": 214,
+   "addr_is_stub": 55,
+   "no_addr": 1
+  },
+  "Селскостопанска сграда": {
+   "buildings": 10985,
+   "with_addr": 10983,
+   "with_street": 7593,
+   "with_num": 5746,
+   "street_and_num": 5393,
+   "addr_is_stub": 3037,
+   "no_addr": 2
+  },
+  "Друг вид производствена, складова, инфраструктурна сграда": {
+   "buildings": 513,
+   "with_addr": 512,
+   "with_street": 267,
+   "with_num": 147,
+   "street_and_num": 141,
+   "addr_is_stub": 239,
+   "no_addr": 1
+  },
+  "Жилищна сграда със смесено предназначение": {
+   "buildings": 280,
+   "with_addr": 278,
+   "with_street": 241,
+   "with_num": 232,
+   "street_and_num": 226,
+   "addr_is_stub": 31,
+   "no_addr": 2
+  },
+  "Сграда за култура и изкуство": {
+   "buildings": 129,
+   "with_addr": 129,
+   "with_street": 123,
+   "with_num": 104,
+   "street_and_num": 103,
+   "addr_is_stub": 5,
+   "no_addr": 0
+  },
+  "Сграда за детско заведение": {
+   "buildings": 214,
+   "with_addr": 214,
+   "with_street": 140,
+   "with_num": 149,
+   "street_and_num": 117,
+   "addr_is_stub": 42,
+   "no_addr": 0
+  },
+  "Общежитие": {
+   "buildings": 46,
+   "with_addr": 45,
+   "with_street": 37,
+   "with_num": 31,
+   "street_and_num": 29,
+   "addr_is_stub": 6,
+   "no_addr": 1
+  },
+  "Административна, делова сграда": {
+   "buildings": 577,
+   "with_addr": 577,
+   "with_street": 469,
+   "with_num": 332,
+   "street_and_num": 319,
+   "addr_is_stub": 95,
+   "no_addr": 0
+  },
+  "Култова, религиозна сграда": {
+   "buildings": 67,
+   "with_addr": 67,
+   "with_street": 57,
+   "with_num": 38,
+   "street_and_num": 38,
+   "addr_is_stub": 10,
+   "no_addr": 0
+  },
+  "Апартаментен хотел": {
+   "buildings": 64,
+   "with_addr": 63,
+   "with_street": 55,
+   "with_num": 40,
+   "street_and_num": 38,
+   "addr_is_stub": 6,
+   "no_addr": 1
+  },
+  "Друг вид обществена сграда": {
+   "buildings": 301,
+   "with_addr": 299,
+   "with_street": 236,
+   "with_num": 174,
+   "street_and_num": 167,
+   "addr_is_stub": 56,
+   "no_addr": 2
+  },
+  "Сграда за образование": {
+   "buildings": 287,
+   "with_addr": 287,
+   "with_street": 233,
+   "with_num": 245,
+   "street_and_num": 226,
+   "addr_is_stub": 35,
+   "no_addr": 0
+  },
+  "Сграда на съобщенията": {
+   "buildings": 50,
+   "with_addr": 50,
+   "with_street": 32,
+   "with_num": 15,
+   "street_and_num": 12,
+   "addr_is_stub": 15,
+   "no_addr": 0
+  },
+  "Хангар, депо": {
+   "buildings": 97,
+   "with_addr": 95,
+   "with_street": 71,
+   "with_num": 54,
+   "street_and_num": 52,
+   "addr_is_stub": 22,
+   "no_addr": 2
+  },
+  "Сграда за научна и проектантска дейност": {
+   "buildings": 59,
+   "with_addr": 59,
+   "with_street": 57,
+   "with_num": 44,
+   "street_and_num": 43,
+   "addr_is_stub": 1,
+   "no_addr": 0
+  },
+  "Заведение за социални грижи": {
+   "buildings": 20,
+   "with_addr": 20,
+   "with_street": 20,
+   "with_num": 8,
+   "street_and_num": 8,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "(без функция)": {
+   "buildings": 3,
+   "with_addr": 3,
+   "with_street": 3,
+   "with_num": 0,
+   "street_and_num": 0,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  },
+  "Вилна сграда - многофамилна": {
+   "buildings": 145,
+   "with_addr": 142,
+   "with_street": 107,
+   "with_num": 93,
+   "street_and_num": 89,
+   "addr_is_stub": 31,
+   "no_addr": 3
+  },
+  "Сграда - паметник на културата": {
+   "buildings": 30,
+   "with_addr": 30,
+   "with_street": 30,
+   "with_num": 30,
+   "street_and_num": 30,
+   "addr_is_stub": 0,
+   "no_addr": 0
+  }
+ },
+ "worst_quarters_ge300": [
+  {
+   "quar": "с.о. \"КОЧМАР\"",
+   "buildings": 449,
+   "with_addr": 449,
+   "with_street": 2,
+   "with_num": 22,
+   "street_and_num": 0,
+   "addr_is_stub": 425,
+   "no_addr": 0
+  },
+  {
+   "quar": "с.о. \"СЪЛЗИЦА\"",
+   "buildings": 599,
+   "with_addr": 599,
+   "with_street": 5,
+   "with_num": 18,
+   "street_and_num": 1,
+   "addr_is_stub": 577,
+   "no_addr": 0
+  },
+  {
+   "quar": "с.о. \"БОРОВЕЦ СЕВЕР\"",
+   "buildings": 438,
+   "with_addr": 438,
+   "with_street": 2,
+   "with_num": 64,
+   "street_and_num": 2,
+   "addr_is_stub": 374,
+   "no_addr": 0
+  },
+  {
+   "quar": "к.к. \"ЗЛАТНИ ПЯСЪЦИ\"",
+   "buildings": 442,
+   "with_addr": 442,
+   "with_street": 365,
+   "with_num": 4,
+   "street_and_num": 3,
+   "addr_is_stub": 76,
+   "no_addr": 0
+  },
+  {
+   "quar": "ЮЖНА ПРОМИШЛЕНА ЗОНА",
+   "buildings": 608,
+   "with_addr": 608,
+   "with_street": 56,
+   "with_num": 41,
+   "street_and_num": 7,
+   "addr_is_stub": 518,
+   "no_addr": 0
+  },
+  {
+   "quar": "местност \"СОТИРА\"",
+   "buildings": 886,
+   "with_addr": 886,
+   "with_street": 29,
+   "with_num": 16,
+   "street_and_num": 14,
+   "addr_is_stub": 855,
+   "no_addr": 0
+  },
+  {
+   "quar": "с.о. \"МЕНТЕШЕ\"",
+   "buildings": 747,
+   "with_addr": 745,
+   "with_street": 13,
+   "with_num": 561,
+   "street_and_num": 12,
+   "addr_is_stub": 183,
+   "no_addr": 2
+  },
+  {
+   "quar": "м. РАКИТНИКА-І",
+   "buildings": 724,
+   "with_addr": 724,
+   "with_street": 17,
+   "with_num": 15,
+   "street_and_num": 12,
+   "addr_is_stub": 704,
+   "no_addr": 0
+  },
+  {
+   "quar": "с.о. \"ПРИБОЙ\"",
+   "buildings": 874,
+   "with_addr": 874,
+   "with_street": 49,
+   "with_num": 21,
+   "street_and_num": 18,
+   "addr_is_stub": 822,
+   "no_addr": 0
+  },
+  {
+   "quar": "ж.к. ИЗГРЕВ-1",
+   "buildings": 894,
+   "with_addr": 894,
+   "with_street": 35,
+   "with_num": 38,
+   "street_and_num": 27,
+   "addr_is_stub": 848,
+   "no_addr": 0
+  }
+ ]
+}

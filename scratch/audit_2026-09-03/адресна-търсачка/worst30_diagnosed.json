@@ -1,0 +1,2413 @@
+{
+ "head": "fd2c315",
+ "score_slice": "5193-5220",
+ "validated_rows": 40,
+ "worst": [
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "parcel",
+   "kind": "parcel",
+   "raion": "Приморски",
+   "label": "17 ta 17",
+   "pin": [
+    43.22914,
+    27.99869
+   ],
+   "query": "17 ta 17",
+   "n_ded": 2,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "ул 17 та",
+   "diag": {
+    "toks": [
+     "17",
+     "ta",
+     "17"
+    ],
+    "target": {
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ул 17 та",
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "13 ta 17",
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "17",
+      "ta",
+      "1"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "TIE cut off by SEARCH_LIMIT=8 (equal score; order decided by tk-length then _ord)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 95
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "7 ma 7",
+   "pin": [
+    43.22471,
+    27.97837
+   ],
+   "query": "7 ma 7",
+   "n_ded": 3,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "27 ma 7",
+   "diag": {
+    "toks": [
+     "7",
+     "ma",
+     "7"
+    ],
+    "target": {
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "27 ma 7",
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "ул 7 ма",
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "7",
+      "ma"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "TIE cut off by SEARCH_LIMIT=8 (equal score; order decided by tk-length then _ord)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 203
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "8 ma 114",
+   "pin": [
+    43.22992,
+    27.99543
+   ],
+   "query": "8 ma 114",
+   "n_ded": 1,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "8 ма",
+   "diag": {
+    "toks": [
+     "8",
+     "ma",
+     "114"
+    ],
+    "target": null,
+    "shown_first": {
+     "label": "8 ма",
+     "all": false,
+     "matched": 2,
+     "exact": 2,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "8 ма",
+     "all": false,
+     "matched": 2,
+     "exact": 2,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "8",
+     "ma",
+     "114"
+    ],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "dragan",
+      "danailov",
+      "131"
+     ],
+     "qtk": null,
+     "dtk": [
+      "primorski"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "no-token-matched-at-all (matched===0 -> never scored)"
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "8 ma 124",
+   "pin": [
+    43.22864,
+    27.99187
+   ],
+   "query": "8 ma 124",
+   "n_ded": 2,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "к.к. Св. Св. Константин и Елена, 8-ма №124",
+   "diag": {
+    "toks": [
+     "8",
+     "ma",
+     "124"
+    ],
+    "target": {
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "к.к. Св. Св. Константин и Елена, 8-ма №124",
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "к.к. Св. Св. Константин и Елена, 8-ма №124",
+     "all": true,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "8",
+      "ma",
+      "124"
+     ],
+     "qtk": null,
+     "dtk": [
+      "primorski"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "TIE cut off by SEARCH_LIMIT=8 (equal score; order decided by tk-length then _ord)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 75
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Аспарухово",
+   "label": "аспарухово зеленика",
+   "pin": [
+    43.16222,
+    27.92758
+   ],
+   "query": "аспарухово зеленика",
+   "n_ded": 1,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "зеленика",
+   "diag": {
+    "toks": [
+     "asparuhovo",
+     "zelenika"
+    ],
+    "target": {
+     "all": true,
+     "matched": 2,
+     "exact": 2,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "зеленика",
+     "all": true,
+     "matched": 2,
+     "exact": 2,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "зеленика",
+     "all": true,
+     "matched": 2,
+     "exact": 2,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "asparuhovo",
+      "zelenika"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "TIE cut off by SEARCH_LIMIT=8 (equal score; order decided by tk-length then _ord)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 984
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "entrance",
+   "kind": "mf",
+   "raion": "Младост",
+   "label": "бул владислав варненчик · вх. А",
+   "pin": [
+    43.2194,
+    27.87688
+   ],
+   "query": "бул владислав варненчик · вх. А",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "бул владислав варненчик 265 · вх. А",
+   "diag": {
+    "toks": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "·",
+     "vh",
+     "a"
+    ],
+    "target": {
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "бул владислав варненчик 265 · вх. А",
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "бул владислав варненчик 106 · вх. А",
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "·"
+    ],
+    "target_tokens": {
+     "tk": [
+      "bul",
+      "vladislav",
+      "varnenchik",
+      "1",
+      "267",
+      "bl",
+      "vh",
+      "a"
+     ],
+     "qtk": [
+      "troshevo"
+     ],
+     "dtk": [
+      "mladost"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 34
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "в.з. Варна, Адрес: 22 ра 26",
+   "pin": [
+    43.2286,
+    27.99819
+   ],
+   "query": "в.з. Варна, Адрес: 22 ра 26",
+   "n_ded": 5,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "ул 2 ра 32 · вх. В",
+   "diag": {
+    "toks": [
+     "v",
+     "z",
+     "varna",
+     "adres:",
+     "22",
+     "ra",
+     "26"
+    ],
+    "target": {
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ул 2 ра 32 · вх. В",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "гр варна район аспарухово в з зеленика",
+     "all": false,
+     "matched": 4,
+     "exact": 3,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "v",
+     "z",
+     "varna",
+     "adres:"
+    ],
+    "target_tokens": {
+     "tk": [
+      "22",
+      "ra",
+      "26"
+     ],
+     "qtk": null,
+     "dtk": [
+      "primorski"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 79,
+     "equal_score": 9
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "гр варна район приморски м акчелар виница",
+   "pin": [
+    43.23138,
+    27.96436
+   ],
+   "query": "гр варна район приморски м акчелар виница",
+   "n_ded": 1,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "гр варна район приморски м акчелар",
+   "diag": {
+    "toks": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "m",
+     "akchelar",
+     "vinitsa"
+    ],
+    "target": {
+     "all": true,
+     "matched": 7,
+     "exact": 7,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "гр варна район приморски м акчелар",
+     "all": true,
+     "matched": 7,
+     "exact": 7,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "гр варна район приморски м акчелар",
+     "all": true,
+     "matched": 7,
+     "exact": 7,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "gr",
+      "varna",
+      "raion",
+      "primorski",
+      "m",
+      "akchelar",
+      "vinitsa"
+     ],
+     "qtk": [
+      "vinitsa"
+     ],
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "TIE cut off by SEARCH_LIMIT=8 (equal score; order decided by tk-length then _ord)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 50
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Одесос",
+   "label": "Гръцката махала, Цар Симеон I 23",
+   "pin": [
+    43.20065,
+    27.91319
+   ],
+   "query": "Гръцката махала, Цар Симеон I 23",
+   "n_ded": 7,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "tsar simeon i 30",
+   "diag": {
+    "toks": [
+     "gratskata",
+     "mahala",
+     "tsar",
+     "simeon",
+     "i",
+     "23"
+    ],
+    "target": {
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "tsar simeon i 30",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "tsar simeon i 11",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "gratskata",
+     "mahala",
+     "i"
+    ],
+    "target_tokens": {
+     "tk": [
+      "tsar",
+      "simeon",
+      "23"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 20,
+     "equal_score": 87
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "Долна Трака, Адрес: ул 7 ма 11",
+   "pin": [
+    43.22477,
+    27.98838
+   ],
+   "query": "Долна Трака, Адрес: ул 7 ма 11",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "ул 7 ма 40",
+   "diag": {
+    "toks": [
+     "dolna",
+     "traka",
+     "adres:",
+     "ul",
+     "7",
+     "ma",
+     "11"
+    ],
+    "target": {
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ул 7 ма 40",
+     "all": false,
+     "matched": 6,
+     "exact": 6,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "12 ta 27",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "dolna",
+     "traka",
+     "adres:"
+    ],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "7",
+      "ma",
+      "11"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 7,
+     "equal_score": 35
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "Евксиноград, Адрес: 21 ва 11",
+   "pin": [
+    43.22688,
+    27.99642
+   ],
+   "query": "Евксиноград, Адрес: 21 ва 11",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "21 va 14",
+   "diag": {
+    "toks": [
+     "evksinograd",
+     "adres:",
+     "21",
+     "va",
+     "11"
+    ],
+    "target": {
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "21 va 14",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "21 va 16",
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "evksinograd",
+     "adres:"
+    ],
+    "target_tokens": {
+     "tk": [
+      "21",
+      "va",
+      "11"
+     ],
+     "qtk": null,
+     "dtk": [
+      "primorski"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 4,
+     "equal_score": 7
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "Евксиноград, Адрес: ул 13 та 1",
+   "pin": [
+    43.22678,
+    27.99267
+   ],
+   "query": "Евксиноград, Адрес: ул 13 та 1",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "13 ta 14",
+   "diag": {
+    "toks": [
+     "evksinograd",
+     "adres:",
+     "ul",
+     "13",
+     "ta",
+     "1"
+    ],
+    "target": {
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "13 ta 14",
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "23 ta 11",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "evksinograd",
+     "adres:"
+    ],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "13",
+      "ta",
+      "1"
+     ],
+     "qtk": null,
+     "dtk": [
+      "primorski"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 4,
+     "equal_score": 21
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Аспарухово",
+   "label": "ж.к. Дружба, ул. Перник №5",
+   "pin": [
+    43.18204,
+    27.89152
+   ],
+   "query": "ж.к. Дружба, ул. Перник №5",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "pernik 5",
+   "diag": {
+    "toks": [
+     "zh",
+     "k",
+     "druzhba",
+     "ul",
+     "pernik",
+     "5"
+    ],
+    "target": {
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "pernik 5",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "mir 91",
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "zh",
+     "k",
+     "druzhba"
+    ],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "pernik",
+      "5"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 1,
+     "equal_score": 27
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "entrance",
+   "kind": "mf",
+   "raion": "Младост",
+   "label": "ж.к. Младост 1, бл. 3 · вх. 1",
+   "pin": [
+    43.22664,
+    27.87347
+   ],
+   "query": "ж.к. Младост 1, бл. 3 · вх. 1",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "ж.к. Възраждане, бл. 3 · вх. А",
+   "diag": {
+    "toks": [
+     "zh",
+     "k",
+     "mladost",
+     "1",
+     "bl",
+     "3",
+     "·",
+     "vh",
+     "1"
+    ],
+    "target": {
+     "all": false,
+     "matched": 6,
+     "exact": 6,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ж.к. Възраждане, бл. 3 · вх. А",
+     "all": false,
+     "matched": 7,
+     "exact": 6,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "жк възраждане 1 бл 18 · вх. 3",
+     "all": false,
+     "matched": 7,
+     "exact": 6,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "zh",
+     "k",
+     "·"
+    ],
+    "target_tokens": {
+     "tk": [
+      "bul",
+      "slivnitsa",
+      "187",
+      "bl",
+      "3",
+      "1",
+      "vh"
+     ],
+     "qtk": [
+      "mladost"
+     ],
+     "dtk": null,
+     "stk": null,
+     "btk": [
+      "3"
+     ],
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 49,
+     "equal_score": 5
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "entrance",
+   "kind": "mf",
+   "raion": "Владислав Варненчик",
+   "label": "ж.к. Младост 1, бл. А · вх. 2",
+   "pin": [
+    43.23064,
+    27.86551
+   ],
+   "query": "ж.к. Младост 1, бл. А · вх. 2",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "кв. Трошево, бл. 1 · вх. А",
+   "diag": {
+    "toks": [
+     "zh",
+     "k",
+     "mladost",
+     "1",
+     "bl",
+     "a",
+     "·",
+     "vh",
+     "2"
+    ],
+    "target": {
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "кв. Трошево, бл. 1 · вх. А",
+     "all": false,
+     "matched": 6,
+     "exact": 6,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "ж.к. Възраждане 1, бл. 2 · вх. 2",
+     "all": false,
+     "matched": 6,
+     "exact": 5,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "zh",
+     "k",
+     "1",
+     "·"
+    ],
+    "target_tokens": {
+     "tk": [
+      "bul",
+      "slivnitsa",
+      "210",
+      "bl",
+      "a",
+      "vh",
+      "2"
+     ],
+     "qtk": [
+      "mladost"
+     ],
+     "dtk": [
+      "vladislav",
+      "varnenchik",
+      "vladislavovo"
+     ],
+     "stk": null,
+     "btk": [
+      "a"
+     ],
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 90,
+     "equal_score": 31
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "entrance",
+   "kind": "mf",
+   "raion": "Младост",
+   "label": "ж.к. Младост, бл. 4 · вх. 3",
+   "pin": [
+    43.22754,
+    27.89017
+   ],
+   "query": "ж.к. Младост, бл. 4 · вх. 3",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "ж.к. Възраждане 3, бл. 54 · вх. 4",
+   "diag": {
+    "toks": [
+     "zh",
+     "k",
+     "mladost",
+     "bl",
+     "4",
+     "·",
+     "vh",
+     "3"
+    ],
+    "target": {
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ж.к. Възраждане 3, бл. 54 · вх. 4",
+     "all": false,
+     "matched": 6,
+     "exact": 5,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "ж.к. Възраждане, бл. 69 · вх. 4",
+     "all": false,
+     "matched": 6,
+     "exact": 5,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "zh",
+     "k",
+     "·"
+    ],
+    "target_tokens": {
+     "tk": [
+      "viara",
+      "bl",
+      "4",
+      "mladost",
+      "vh",
+      "3"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": [
+      "4"
+     ],
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 8,
+     "equal_score": 2
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "entrance",
+   "kind": "mf",
+   "raion": "Младост",
+   "label": "ж.к. Младост, бл. 4 · вх. 4",
+   "pin": [
+    43.22751,
+    27.89043
+   ],
+   "query": "ж.к. Младост, бл. 4 · вх. 4",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "ж.к. Възраждане 1, бл. 4 · вх. 1",
+   "diag": {
+    "toks": [
+     "zh",
+     "k",
+     "mladost",
+     "bl",
+     "4",
+     "·",
+     "vh",
+     "4"
+    ],
+    "target": {
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ж.к. Възраждане 1, бл. 4 · вх. 1",
+     "all": false,
+     "matched": 6,
+     "exact": 5,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "ж.к. Възраждане 4, бл. 18 · вх. 4",
+     "all": false,
+     "matched": 6,
+     "exact": 5,
+     "prefix": 1,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "zh",
+     "k",
+     "·"
+    ],
+    "target_tokens": {
+     "tk": [
+      "viara",
+      "bl",
+      "4",
+      "mladost",
+      "vh"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": [
+      "4"
+     ],
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 115,
+     "equal_score": 51
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Младост",
+   "label": "ж.к. Победа, Адрес: м ст пчелина 6",
+   "pin": [
+    43.22986,
+    27.90474
+   ],
+   "query": "ж.к. Победа, Адрес: м ст пчелина 6",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "м ст пчелина 36а",
+   "diag": {
+    "toks": [
+     "zh",
+     "k",
+     "pobeda",
+     "adres:",
+     "m",
+     "st",
+     "pchelina",
+     "6"
+    ],
+    "target": {
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "м ст пчелина 36а",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "м ст пчелина 45",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "zh",
+     "k",
+     "pobeda",
+     "adres:"
+    ],
+    "target_tokens": {
+     "tk": [
+      "m",
+      "st",
+      "pchelina",
+      "6"
+     ],
+     "qtk": null,
+     "dtk": [
+      "mladost"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 17
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Младост",
+   "label": "жк възраждане 2 бл 30",
+   "pin": [
+    43.23532,
+    27.88366
+   ],
+   "query": "жк възраждане 2 бл 30",
+   "n_ded": 6,
+   "rank": -1,
+   "rawRank": 1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": true,
+   "fold_reason": "address-suppressed-by-sgrada",
+   "absorbed_by": "ж.к. Възраждане, бл. 30",
+   "fold_dist_m": 35,
+   "top1": "ж.к. Възраждане, бл. 30",
+   "diag": {
+    "toks": [
+     "zhk",
+     "vazrazhdane",
+     "2",
+     "bl",
+     "30"
+    ],
+    "target": {
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ж.к. Възраждане, бл. 30",
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "ж.к. Възраждане 2, бл. 31",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "zhk",
+      "vazrazhdane",
+      "2",
+      "bl",
+      "30"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 7
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Младост",
+   "label": "жк възраждане 3 бл 69",
+   "pin": [
+    43.23302,
+    27.89521
+   ],
+   "query": "жк възраждане 3 бл 69",
+   "n_ded": 5,
+   "rank": -1,
+   "rawRank": 1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": true,
+   "fold_reason": "address-suppressed-by-sgrada",
+   "absorbed_by": "ж.к. Възраждане, бл. 69",
+   "fold_dist_m": 33,
+   "top1": "ж.к. Възраждане, бл. 69",
+   "diag": {
+    "toks": [
+     "zhk",
+     "vazrazhdane",
+     "3",
+     "bl",
+     "69"
+    ],
+    "target": {
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ж.к. Възраждане, бл. 69",
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "жк възраждане 3 бл 56",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "zhk",
+      "vazrazhdane",
+      "3",
+      "bl",
+      "69"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 8
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Младост",
+   "label": "жк младост 2 бл 122",
+   "pin": [
+    43.2326,
+    27.88057
+   ],
+   "query": "жк младост 2 бл 122",
+   "n_ded": 7,
+   "rank": -1,
+   "rawRank": 1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": true,
+   "fold_reason": "address-suppressed-by-sgrada",
+   "absorbed_by": "Западна промишлена зона, бл. 122",
+   "fold_dist_m": 104,
+   "top1": "Западна промишлена зона, бл. 122",
+   "diag": {
+    "toks": [
+     "zhk",
+     "mladost",
+     "2",
+     "bl",
+     "122"
+    ],
+    "target": {
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "Западна промишлена зона, бл. 122",
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "ж.к. Възраждане 2, бл. 31",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "zhk",
+      "mladost",
+      "2",
+      "bl",
+      "122"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 15
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Младост",
+   "label": "жк младост 2 бл 134",
+   "pin": [
+    43.23201,
+    27.88855
+   ],
+   "query": "жк младост 2 бл 134",
+   "n_ded": 6,
+   "rank": -1,
+   "rawRank": 1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": true,
+   "fold_reason": "address-suppressed-by-sgrada",
+   "absorbed_by": "ж.к. Младост 2, бл. 134",
+   "fold_dist_m": 101,
+   "top1": "ж.к. Младост 2, бл. 134",
+   "diag": {
+    "toks": [
+     "zhk",
+     "mladost",
+     "2",
+     "bl",
+     "134"
+    ],
+    "target": {
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ж.к. Младост 2, бл. 134",
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "ж.к. Възраждане, бл. 30",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "zhk",
+      "mladost",
+      "2",
+      "bl",
+      "134"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 14
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "зона виница север 0",
+   "pin": [
+    43.24952,
+    27.97438
+   ],
+   "query": "зона виница север 0",
+   "n_ded": 1,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "zona vinitsa sever 0",
+   "diag": {
+    "toks": [
+     "zona",
+     "vinitsa",
+     "sever",
+     "0"
+    ],
+    "target": {
+     "all": true,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "zona vinitsa sever 0",
+     "all": true,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "zona vinitsa sever 0",
+     "all": true,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "zona",
+      "vinitsa",
+      "sever",
+      "0"
+     ],
+     "qtk": [
+      "vinitsa"
+     ],
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "TIE cut off by SEARCH_LIMIT=8 (equal score; order decided by tk-length then _ord)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 151
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "entrance",
+   "kind": "mf",
+   "raion": "Приморски",
+   "label": "к.к. Чайка, бл. 3 · вх. 3",
+   "pin": [
+    43.24856,
+    28.02511
+   ],
+   "query": "к.к. Чайка, бл. 3 · вх. 3",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "к.к. Чайка, бл. Б · вх. 3",
+   "diag": {
+    "toks": [
+     "k",
+     "k",
+     "chaika",
+     "bl",
+     "3",
+     "·",
+     "vh",
+     "3"
+    ],
+    "target": {
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "к.к. Чайка, бл. Б · вх. 3",
+     "all": false,
+     "matched": 7,
+     "exact": 7,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "к.к. Чайка, бл. Б · вх. 6",
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "k",
+     "k",
+     "·"
+    ],
+    "target_tokens": {
+     "tk": [
+      "zhk",
+      "chaika",
+      "18",
+      "bl",
+      "3",
+      "adres:",
+      "vh"
+     ],
+     "qtk": null,
+     "dtk": [
+      "primorski"
+     ],
+     "stk": null,
+     "btk": [
+      "3"
+     ],
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 1,
+     "equal_score": 35
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Владислав Варненчик",
+   "label": "кв кайсиева градина бл 205",
+   "pin": [
+    43.2394,
+    27.85872
+   ],
+   "query": "кв кайсиева градина бл 205",
+   "n_ded": 5,
+   "rank": -1,
+   "rawRank": 1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": true,
+   "fold_reason": "address-suppressed-by-sgrada",
+   "absorbed_by": "кв. Владиславово, бл. 205",
+   "fold_dist_m": 43,
+   "top1": "кв. Владиславово, бл. 205",
+   "diag": {
+    "toks": [
+     "kv",
+     "kaisieva",
+     "gradina",
+     "bl",
+     "205"
+    ],
+    "target": {
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "кв. Владиславово, бл. 205",
+     "all": true,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "кв. Кайсиева градина, бл. 210",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [],
+    "target_tokens": {
+     "tk": [
+      "kv",
+      "kaisieva",
+      "gradina",
+      "bl",
+      "205"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 6
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "entrance",
+   "kind": "mf",
+   "raion": "Аспарухово",
+   "label": "кв. Аспарухово, бл. 30 · вх. 30",
+   "pin": [
+    43.18059,
+    27.90204
+   ],
+   "query": "кв. Аспарухово, бл. 30 · вх. 30",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "кв. Владиславово, бл. 30 · вх. 1",
+   "diag": {
+    "toks": [
+     "kv",
+     "asparuhovo",
+     "bl",
+     "30",
+     "·",
+     "vh",
+     "30"
+    ],
+    "target": {
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "кв. Владиславово, бл. 30 · вх. 1",
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "кв. Чайка, бл. 30 · вх. В",
+     "all": false,
+     "matched": 5,
+     "exact": 5,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "kv",
+     "·"
+    ],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "parvi",
+      "mai",
+      "30",
+      "bl",
+      "adres:",
+      "vh"
+     ],
+     "qtk": [
+      "asparuhovo"
+     ],
+     "dtk": null,
+     "stk": null,
+     "btk": [
+      "30"
+     ],
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 9
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Аспарухово",
+   "label": "кв. Аспарухово, ул. св.св. Кирил и Методи №157",
+   "pin": [
+    43.17686,
+    27.89179
+   ],
+   "query": "кв. Аспарухово, ул. св.св. Кирил и Методи №157",
+   "n_ded": 8,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "кв. Аспарухово, ул. св.св. Кирил и Методи №145",
+   "diag": {
+    "toks": [
+     "kv",
+     "asparuhovo",
+     "ul",
+     "sv",
+     "sv",
+     "kiril",
+     "i",
+     "metodi",
+     "157"
+    ],
+    "target": {
+     "all": false,
+     "matched": 7,
+     "exact": 7,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "кв. Аспарухово, ул. св.св. Кирил и Методи №145",
+     "all": false,
+     "matched": 7,
+     "exact": 7,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "sv sv kiril i metodi 171",
+     "all": false,
+     "matched": 7,
+     "exact": 7,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "kv",
+     "asparuhovo"
+    ],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "sv",
+      "kiril",
+      "i",
+      "metodi",
+      "157"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 33
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "кв. Виница, Адрес: настирски рид 48",
+   "pin": [
+    43.24286,
+    28.00995
+   ],
+   "query": "кв. Виница, Адрес: настирски рид 48",
+   "n_ded": 4,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "настирски рид 70",
+   "diag": {
+    "toks": [
+     "kv",
+     "vinitsa",
+     "adres:",
+     "nastirski",
+     "rid",
+     "48"
+    ],
+    "target": {
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "настирски рид 70",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "настирски рид",
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "kv",
+     "vinitsa",
+     "adres:"
+    ],
+    "target_tokens": {
+     "tk": [
+      "nastirski",
+      "rid",
+      "48"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 3,
+     "equal_score": 994
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "кв. Виница, ул. НАЙДЕН РАЙКОВ №11",
+   "pin": [
+    43.24147,
+    27.98125
+   ],
+   "query": "кв. Виница, ул. НАЙДЕН РАЙКОВ №11",
+   "n_ded": 4,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "ул найден райков",
+   "diag": {
+    "toks": [
+     "kv",
+     "vinitsa",
+     "ul",
+     "naiden",
+     "raikov",
+     "11"
+    ],
+    "target": {
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "ул найден райков",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "кв. Виница, naiden raikov 14",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "kv",
+     "vinitsa"
+    ],
+    "target_tokens": {
+     "tk": [
+      "ul",
+      "naiden",
+      "raikov",
+      "11"
+     ],
+     "qtk": null,
+     "dtk": null,
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 0,
+     "equal_score": 67
+    }
+   }
+  },
+  {
+   "sev": 0,
+   "why": "label-not-in-dropdown",
+   "qname": "Q1",
+   "group": "address",
+   "kind": "address",
+   "raion": "Приморски",
+   "label": "кв. Виница, osmi primorski polk 291",
+   "pin": [
+    43.2265,
+    27.95939
+   ],
+   "query": "кв. Виница, osmi primorski polk 291",
+   "n_ded": 4,
+   "rank": -1,
+   "rawRank": -1,
+   "labelRank": -1,
+   "labelDist_m": null,
+   "folded": false,
+   "fold_reason": null,
+   "absorbed_by": null,
+   "fold_dist_m": null,
+   "top1": "кв. Виница, osmi primorski polk 181",
+   "diag": {
+    "toks": [
+     "kv",
+     "vinitsa",
+     "osmi",
+     "primorski",
+     "polk",
+     "291"
+    ],
+    "target": {
+     "all": false,
+     "matched": 3,
+     "exact": 3,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_first": {
+     "label": "кв. Виница, osmi primorski polk 181",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "shown_last": {
+     "label": "кв. Виница, osmi primorski polk 202",
+     "all": false,
+     "matched": 4,
+     "exact": 4,
+     "prefix": 0,
+     "fuzzy": 0
+    },
+    "unmatched_tokens": [
+     "kv",
+     "osmi",
+     "polk"
+    ],
+    "target_tokens": {
+     "tk": [
+      "mestnost",
+      "akchelar",
+      "291"
+     ],
+     "qtk": [
+      "vinitsa"
+     ],
+     "dtk": [
+      "primorski"
+     ],
+     "stk": null,
+     "btk": null,
+     "alias_tk": null
+    },
+    "cause": "outranked on the comparator (see vectors)",
+    "competitors": {
+     "strictly_better": 25,
+     "equal_score": 209
+    }
+   }
+  }
+ ]
+}

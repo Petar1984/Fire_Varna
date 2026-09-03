@@ -1,0 +1,188 @@
+==============================================================================
+CHAST 1 — FIZICHESKI DUBLETI (ADR-038)
+==============================================================================
+sidecar _schema: adr038_physical_building_sidecar_rev4
+sidecar stats  : {"candidate_multi_member_groups": 208, "collapsible_rows": 285, "eff_mf": 10553, "eff_mf_orphans_null_key": 3384, "eff_mf_with_key": 7169, "numeric_block_veto_groups": 10, "sections": 80513, "sidecar_entries": 483, "surviving_groups": 198}
+  sekcii v sidecara: 483 | fizicheski sgradi: 198 | sgavaemi redove: 285
+  razmer na grupite: {2: 156, 3: 22, 4: 11, 5: 6, 6: 2, 19: 1}
+  pravilo: same parcel AND touch<=1m (BGS2005) AND both effective-MF (functype-MF or P5 еднофам/вилна appcount>=5) AND same non-null section_addr_key; connected 
+
+GEOKODER geocoder_index.json: zapisi 86257 | s physical_building_id 483 | grupi 198 | physical_building_reps 198
+  cadnum(geokoder) == cadnum(sidecar): True
+
+DOSTAVKA Fire_Varna/data/search_index.json: zapisi 86232 | s physical_building_id 0 | s life_safety_rank 0
+  ot 483-te geokoderski zapisa s pbid — namereni v dostavkata: 483
+
+MENIUTO (dedupeDisplayRows, index.html:5085-5110 @ fd2c315):
+  grupi: 198 | svivat se do 1 red: 107 | ostavat >1 red: 91
+  hist. redove sled dedupe: {1: 107, 2: 78, 3: 10, 4: 2, 5: 1}
+  vid na dostavenite redove: {'mf': 420, 'address': 63}
+  483 dostaveni redove ->  306 sled dedupe; IZLISHNI: 108
+  grupi, koito pokazvat 2+ NAPALNO IDENTICHNI reda (edin i sasht tekst): 47
+  prostranstven obhvat na grupite: max 125 m | >50 m: 24 | >100 m: 3
+
+  PRIMERI (kadastralnite nomera maskirani):
+   sekcii= 5 dostaveni= 5 dedupe=3 obhvat= 87m | patriarh evtimi 42 | pin=[43.21459, 27.90115]
+   sekcii= 4 dostaveni= 4 dedupe=2 obhvat= 45m | slivnitsa 187 | pin=[43.22734, 27.87337]
+   sekcii= 4 dostaveni= 4 dedupe=2 obhvat= 19m | hristo smirnenski 29 | pin=[43.22679, 27.89921]
+   sekcii= 5 dostaveni= 5 dedupe=5 obhvat= 56m | кв. Трошево, Радост 9В / кв. Трошево, бл. А / кв. Трошево, бл. | pin=[43.22267, 27.8786]
+   sekcii=19 dostaveni=19 dedupe=4 obhvat=119m | ж.к. Възраждане, Ана Феликсова 18 / ж.к. Възраждане, бл. 14 /  | pin=[43.23674, 27.87882]
+   sekcii= 4 dostaveni= 4 dedupe=4 obhvat= 51m | кв. Виница, бл. 2а / кв. Виница, бл. 2б / кв. Виница, бл. 2в / | pin=[43.25306, 27.98382]
+-> dup_physical.json
+
+==============================================================================
+CHAST 2 — GEOMETRICHNI DUBLETI v varna_buildings_3d.geojson
+==============================================================================
+features: 80497 | info rows: 80497 | properties.i == index: True
+A. BAIT-IDENTICHNI prasteni (cialata geometriia): 2 grupi / 4 poligona
+A'. bait-identichen samo vanshen prasten: 2 grupi / 4 poligona
+
+B. centroid <=1 m I ploshch +-5 %: 2 grupi / 4 poligona (dvoiki: 2 )
+   po-hlabavi pragove (kontrola):
+     <=1m & area+-5%         2
+     <=1m & area any         7
+     <=3m & area+-5%       262
+     <=3m & area any      1298
+     <=5m & area+-5%      1058
+     <=5m & area any      8389
+
+C. poligon IZAALO vatre v drug: 1 dvoiki (bbox-kandidati 1232 )
+   ot tiah sas SASHTIA adresen niz: 1
+
+   PRIMERI B:
+     i=[6819, 6820] | ул. ТИХОМИР 66 | Жилищна сграда - еднофамил | район Младост | ploshch [57.2, 57.2] m2 | [27.88772, 43.225935]
+     i=[6821, 6822] | ул. ТИХОМИР 66 | Жилищна сграда - еднофамил | район Младост | ploshch [9.8, 9.8] m2 | [27.887745, 43.225884]
+   PRIMERI C:
+     vatre i=10371 (92 m2, Жилищна сграда - е) v i=10369 (1810 m2, Жилищна сграда - е) | ул. РАДОСТ 9 | [27.87923, 43.222675]
+   PRIMERI <=1m & proizvolna ploshch (7 dvoiki — vgnezdeni pristroiki, NE dubleti):
+     i=1665/1666 d=0.84 m dA=0.908 | ул. ПРОФ.КИРИЛ ПОПОВ 12 | 15.3 / 1.5 m2 | [27.891202, 43.209146]
+     i=6819/6820 d=0.0 m dA=0.0 | ул. ТИХОМИР 66 | 57.6 / 57.6 m2 | [27.88772, 43.225935]
+     i=6821/6822 d=0.0 m dA=0.0 | ул. ТИХОМИР 66 | 9.8 / 9.8 m2 | [27.887745, 43.225884]
+     i=12328/12329 d=0.81 m dA=0.958 | ул. Кап. Г. Георгиев 16 | 106.6 / 4.6 m2 | [27.890204, 43.214463]
+     i=25395/25398 d=0.94 m dA=0.955 | гр. Варна, район Аспарухово, ЮЖН | 14.4 / 310.1 m2 | [27.905659, 43.196072]
+     i=41994/41995 d=0.54 m dA=0.972 | ул. АЛ.ДЯКОВИЧ 3 | 317.2 / 8.9 m2 | [27.90777, 43.200039]
+     i=70878/70879 d=0.83 m dA=0.393 | гр. Варна, район Приморски | 1.8 / 1.2 m2 | [27.963159, 43.231495]
+
+D. TAVAN — sekcii, dopirashti se po TOCHEN spodelen vrah I sas SASHTIA ulica+nomer:
+   grupi: 7561 | sekcii v tiah: 19968 | sgavaemi redove: 12407
+   razmeri: {2: 4659, 3: 1845, 4: 618, 5: 253, 6: 95, 7: 44, 8: 11, 9: 14, 10: 7, 11: 4, 12: 2, 14: 1, 15: 3, 16: 2, 18: 2, 21: 1}
+   za sravnenie sidecar ADR-038: 483 sekcii / 198 sgradi / 285 sgavaemi redove
+   ot tiah grupi s pone EDNA effective-MF sekciia: 1291
+   grupi s >=2 effective-MF sekcii (sashtata populaciia, kakto sidecara): 448 | sekcii: 1205 | sgavaemi: 757
+   sidecarat pokriva 198 ot tiah -> nepokriti kandidati: 250
+   PRIMERI D (nai-golemite):
+     21 sekcii | ул. УИЛЯМ ФРУД 1 | Сграда за научна и про | район Аспарухово | i=[29922, 29923, 29924, 29925, 29926, 29927] | [27.874214, 43.189621]
+     18 sekcii | бул. "Вл. Варненчик" 327 | Промишлена сграда | район Владислав Варненчик | i=[19449, 19450, 19451, 19457, 19458, 19459] | [27.856002, 43.225561]
+     18 sekcii | ул. НАЙДЕН ГЕРОВ 49 | Гараж | район Приморски | i=[55256, 55257, 55258, 55259, 55260, 55261] | [27.925227, 43.215207]
+     16 sekcii | ул. "ЛАЙОШ КОШУТ" 143 | Гараж | район Аспарухово | i=[35600, 35601, 35602, 35603, 35604, 35605] | [27.898259, 43.178873]
+     16 sekcii | ул. НАЙДЕН ГЕРОВ 47 | Гараж | район Приморски | i=[55278, 55279, 55280, 55281, 55282, 55283] | [27.925858, 43.21479]
+     15 sekcii | ул. "Aна Феликсова" 16 | Жилищна сграда - много | район Младост | i=[8502, 8503, 8504, 8505, 8506, 8507] | [27.877998, 43.237586]
+-> dup_geometry.json
+
+==============================================================================
+CHAST 3 — POKRITIE S ADRES PO RAION / KVARTAL / FUNKCIIA
+==============================================================================
+
+== POKRITIE PO RAION ==
+                                                sgradi   adres      %   ulica      %   nomer      %  ul+nom%
+район Приморски                                  35006   34954  99.9%   20988  60.0%   13516  38.6%    37.1%
+район Аспарухово                                 17036   17017  99.9%   11633  68.3%    6974  40.9%    39.4%
+район Одесос                                     12944   12929  99.9%   12903  99.7%   12494  96.5%    96.5%
+район Младост                                    11313   11301  99.9%    9034  79.9%    7575  67.0%    62.5%
+район Владислав Варненчик                         4197    4170  99.4%    2432  57.9%    2019  48.1%    30.2%
+(без район)                                          1       1 100.0%       1 100.0%       0   0.0%     0.0%
+OBSHTO                                           80497   80372  99.8%   56991  70.8%   42578  52.9%    50.4%
+  ot tiah addr = SAMO raion/kvartal (bez ulica i bez nomer): 21338 (26.5%) | izobshto bez addr: 125
+
+== POKRITIE PO KVARTAL — TOP 30 po broi sgradi ==
+                                                sgradi   adres      %   ulica      %   nomer      %  ul+nom%
+(без квартал)                                    49381   49264  99.8%   45832  92.8%   37770  76.5%    76.2%
+кв. "ГАЛАТА"                                      3313    3313 100.0%    3243  97.9%     143   4.3%     4.3%
+кв. ВИНИЦА                                        2199    2199 100.0%    2140  97.3%     253  11.5%    11.5%
+с.о. "АЛЕН МАК"                                   1894    1894 100.0%      91   4.8%      84   4.4%     3.7%
+ж.к. БРИЗ                                         1555    1555 100.0%     139   8.9%     112   7.2%     6.9%
+с.о."Траката"                                     1447    1447 100.0%     122   8.4%     111   7.7%     7.3%
+с.о. "МАНАСТИРСКИ РИД"                            1382    1382 100.0%    1287  93.1%      70   5.1%     5.1%
+с.о. "ДОБРЕВА ЧЕШМА"                              1026    1026 100.0%      54   5.3%      44   4.3%     4.3%
+м. ТРАКАТА                                         968     968 100.0%      99  10.2%      85   8.8%     7.9%
+ж.к. ИЗГРЕВ-1                                      894     894 100.0%      35   3.9%      38   4.3%     3.0%
+местност "СОТИРА"                                  886     886 100.0%      29   3.3%      16   1.8%     1.6%
+с.о. "ПРИБОЙ"                                      874     874 100.0%      49   5.6%      21   2.4%     2.1%
+к.к. Чайка                                         775     775 100.0%      64   8.3%      81  10.5%     7.9%
+с.о. "МЕНТЕШЕ"                                     747     745  99.7%      13   1.7%     561  75.1%     1.6%
+м. РАКИТНИКА-І                                     724     724 100.0%      17   2.3%      15   2.1%     1.7%
+Западна промишлена зона                            646     646 100.0%     240  37.2%     107  16.6%    12.1%
+ж.к. "Възраждане"                                  628     628 100.0%     210  33.4%     487  77.5%    30.3%
+ж.к. "ВЛАДИСЛАВ ВАРНЕНЧИК"                         611     611 100.0%     175  28.6%      47   7.7%     6.7%
+ЮЖНА ПРОМИШЛЕНА ЗОНА                               608     608 100.0%      56   9.2%      41   6.7%     1.2%
+с.о. "СЪЛЗИЦА"                                     599     599 100.0%       5   0.8%      18   3.0%     0.2%
+ж.к. "Изгрев"                                      466     465  99.8%     279  59.9%      84  18.0%    15.7%
+с.о. "КОЧМАР"                                      449     449 100.0%       2   0.4%      22   4.9%     0.0%
+к.к. "ЗЛАТНИ ПЯСЪЦИ"                               442     442 100.0%     365  82.6%       4   0.9%     0.7%
+с.о. "БОРОВЕЦ СЕВЕР"                               438     438 100.0%       2   0.5%      64  14.6%     0.5%
+с.о. "ГОРНА ТРАКА"                                 418     418 100.0%      37   8.9%      24   5.7%     5.3%
+к.к "Св.св. Константин и Елена"                    349     349 100.0%     189  54.2%     151  43.3%    42.4%
+с.о. "МАНАСТИРСКИ РИД, БЯЛАТА ЧЕШМА И ДЪБРАВАТ     338     338 100.0%     102  30.2%      17   5.0%     4.7%
+с.о. "БОРОВЕЦ ЮГ"                                  305     304  99.7%     101  33.1%      19   6.2%     4.6%
+кв. "ИЗГРЕВ"                                       214     214 100.0%     119  55.6%      48  22.4%    21.5%
+кв. Свети Никола                                   207     207 100.0%      20   9.7%      20   9.7%     9.2%
+
+== POKRITIE PO FUNKCIIA — TOP 5 ==
+                                                sgradi   adres      %   ulica      %   nomer      %  ul+nom%
+Жилищна сграда - еднофамилна                     20476   20421  99.7%   14326  70.0%   12755  62.3%    59.6%
+Вилна сграда - еднофамилна                       12313   12309 100.0%    5775  46.9%    1484  12.1%    10.8%
+Селскостопанска сграда                           10985   10983 100.0%    7593  69.1%    5746  52.3%    49.1%
+Жилищна сграда - многофамилна                     9253    9231  99.8%    8892  96.1%    7766  83.9%    83.2%
+Друг вид сграда за обитаване                      7990    7988 100.0%    6073  76.0%    4655  58.3%    54.6%
+
+== TOP 10 kvartala s nai-nisko ul+nomer (>=300 sgradi) ==
+  с.о. "КОЧМАР"                                   449 sgradi | ul+nom   0.0%
+  с.о. "СЪЛЗИЦА"                                  599 sgradi | ul+nom   0.2%
+  с.о. "БОРОВЕЦ СЕВЕР"                            438 sgradi | ul+nom   0.5%
+  к.к. "ЗЛАТНИ ПЯСЪЦИ"                            442 sgradi | ul+nom   0.7%
+  ЮЖНА ПРОМИШЛЕНА ЗОНА                            608 sgradi | ul+nom   1.2%
+  местност "СОТИРА"                               886 sgradi | ul+nom   1.6%
+  с.о. "МЕНТЕШЕ"                                  747 sgradi | ul+nom   1.6%
+  м. РАКИТНИКА-І                                  724 sgradi | ul+nom   1.7%
+  с.о. "ПРИБОЙ"                                   874 sgradi | ul+nom   2.1%
+  ж.к. ИЗГРЕВ-1                                   894 sgradi | ul+nom   3.0%
+-> coverage_by_region.json
+
+==============================================================================
+CHAST 4 — KAIS SGRADI BEZ NITO EDIN RED V DOSTAVKATA
+==============================================================================
+sgradi: 80497 | pinove v search_index.json: 86232 | redove v address_rows.json: 80510
+
+raion                            sgradi  s ul+nom   bez red       % bez addr_row
+район Приморски                   35006     12995        18   0.14%           15
+район Аспарухово                  17036      6706         8   0.12%            8
+район Одесос                      12944     12494        28   0.22%           29
+район Младост                     11313      7074        21   0.30%           21
+район Владислав Варненчик          4197      1266        10   0.79%            2
+(без район)                           1         0         0   0.00%            0
+OBSHTO                            80497     40535        85   0.21%           75
+  VSICHKI sgradi (i bez adres) bez nito edin pin vatre: 254 (0.32%)
+  razstoianie do nai-blizkiia dostaven pin za 85-te:
+    <=5 m        72
+    5-15 m        4
+    15-50 m       9
+    50-250 m      0
+    >250 m        0
+
+  PRIMERI (nai-otdalechenite):
+   i=18330  СВ.СВ.КОНСТАНТИН И ЕЛЕНА 22        | Селскостопанска сграда | район Владислав Варненчик | 27.7 m2 | et.1 | najbliz pin 28.9 m | [27.8522, 43.246908]
+   i=51016  ул. Св.Св.Константин и Елена 4     | Административна, делов | район Приморски | 392.3 m2 | et.2 | najbliz pin 26.7 m | [27.933964, 43.221518]
+   i=18328  СВ.СВ.КОНСТАНТИН И ЕЛЕНА 22        | Жилищна сграда - едноф | район Владислав Варненчик | 57.2 m2 | et.1 | najbliz pin 26.4 m | [27.852044, 43.246796]
+   i=18329  СВ.СВ.КОНСТАНТИН И ЕЛЕНА 22        | Селскостопанска сграда | район Владислав Варненчик | 12.0 m2 | et.1 | najbliz pin 26.0 m | [27.852042, 43.246839]
+   i=18327  СВ.СВ.КОНСТАНТИН И ЕЛЕНА 22        | Жилищна сграда - едноф | район Владислав Варненчик | 59.4 m2 | et.1 | najbliz pin 22.8 m | [27.852139, 43.246814]
+   i=53859  ул. Янко Мустаков 4                | Вилна сграда - многофа | район Приморски | 55.0 m2 | et.2 | najbliz pin 19.4 m | [27.996838, 43.234274]
+
+KONTROLA po normaliziran adresen kliuch (ulica+nomer -> address_rows.normalized_address):
+  район Приморски                   12995    10734   82.6%
+  район Одесос                      12494    10878   87.1%
+  район Младост                      7074     6652   94.0%
+  район Аспарухово                   6706     6259   93.3%
+  район Владислав Варненчик          1266     1232   97.3%
+  OBSHTO                            40535    35755   88.2%
+  nesabrani po kliuch: 4780 | OT TIAH imat dostaven pin VATRE v poligona: 4774 (99.9%) -> raznicata e NORMALIZACIIA, ne lipsa
+-> missing_from_delivery.json

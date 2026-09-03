@@ -1,0 +1,6 @@
+ГРАДИНА | n= 46 | cat= M1-category | hasKey= None | ГРАДИНА rank= None | first3= ['ДЯ №4 „Приказен свят“', 'ДЯ №14 „Звънче“', '13 ЦДГ Звездичка']
+градина | n= 46 | cat= M1-category | hasKey= None | ГРАДИНА rank= None | first3= ['ДЯ №4 „Приказен свят“', 'ДЯ №14 „Звънче“', '13 ЦДГ Звездичка']
+хотел градина | n= 1 | cat= M2 | hasKey= None | ГРАДИНА rank= 1 | first3= ['ГРАДИНА']
+градин | n= 9 | cat= M3 | hasKey= None | ГРАДИНА rank= 1 | first3= ['ГРАДИНА', 'Детска градина "Жирафче"', 'Оздравителна Детска Градина №9 "Ален Мак"']
+детска градина | n= 46 | cat= M1-category | hasKey= None | ГРАДИНА rank= None | first3= ['ДЯ №4 „Приказен свят“', 'ДЯ №14 „Звънче“', '13 ЦДГ Звездичка']
+recall_sweep_rows.json sha before == after : True e56266f24e91d01b

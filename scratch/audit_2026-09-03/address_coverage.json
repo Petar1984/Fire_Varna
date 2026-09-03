@@ -1,0 +1,1500 @@
+{
+ "byte_parity": {
+  "sha256": {
+   "delivered_search_index": "c12f94259bd986dd8b874f4866a0e9e311ada713e49ff4d67afcd58d48467b0d",
+   "delivered_address_rows": "2a4766bd474f34817081e2d4e49b0ab2abbe54080c809b0402e079e1b9a0904a",
+   "staging_search_index": "c12f94259bd986dd8b874f4866a0e9e311ada713e49ff4d67afcd58d48467b0d",
+   "staging_address_rows": "2a4766bd474f34817081e2d4e49b0ab2abbe54080c809b0402e079e1b9a0904a"
+  },
+  "search_index_identical": true,
+  "address_rows_identical": true,
+  "manifest_generation_id": "a8fc1ca48bafd503",
+  "manifest_search_sha_matches": true,
+  "manifest_rows_sha_matches": true,
+  "manifest_entry_count": 86232,
+  "manifest_row_count": 80510,
+  "manifest_vocab_size": 2889
+ },
+ "authority_geocoder": {
+  "entries": 86257,
+  "by_kind": {
+   "address": 70584,
+   "mf": 14690,
+   "parcel": 983
+  },
+  "with_en": 4764,
+  "with_addr_key": 38331,
+  "unique_cadnum": 81493
+ },
+ "delivered_vs_authority": {
+  "authority_entries": 86257,
+  "delivered_entries": 86232,
+  "delta": 25,
+  "delta_by_kind": {
+   "address": 9,
+   "mf": 3,
+   "parcel": 13
+  },
+  "coverage_pct": 99.971,
+  "unmatched_authority_entries": 222,
+  "unmatched_note": "match key = (kind, lat, lng, tk, d, en); the delivery CLEANS tk (grao / >=5-digit region / dotted-cadnum tokens stripped), so a token-cleaned row can look unmatched without having been dropped -- candidate, not proof",
+  "unmatched_by_kind": {
+   "address": 167,
+   "mf": 36,
+   "parcel": 19
+  },
+  "unmatched_examples": [
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.15575,
+    "lng": 27.92031,
+    "tk": [
+     "borovets",
+     "iug",
+     "grao",
+     "10135",
+     "12"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": "vasil levski|68",
+    "lat": 43.21808,
+    "lng": 27.94775,
+    "tk": [
+     "bul",
+     "vasil",
+     "levski",
+     "68",
+     "bl",
+     "adres:",
+     "grao"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.21795,
+    "lng": 27.94758,
+    "tk": [
+     "bul",
+     "vasil",
+     "levski",
+     "68",
+     "bl",
+     "adres:",
+     "grao",
+     "vh",
+     "a"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.21807,
+    "lng": 27.94769,
+    "tk": [
+     "bul",
+     "vasil",
+     "levski",
+     "68",
+     "bl",
+     "adres:",
+     "grao",
+     "vh",
+     "b"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.21803,
+    "lng": 27.9479,
+    "tk": [
+     "bul",
+     "vasil",
+     "levski",
+     "68",
+     "bl",
+     "adres:",
+     "grao",
+     "vh",
+     "v"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": "vasil levski|68",
+    "lat": 43.21794,
+    "lng": 27.94814,
+    "tk": [
+     "bul",
+     "vasil",
+     "levski",
+     "grao",
+     "1",
+     "68"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": "vladislav varnenchik|267",
+    "lat": 43.21938,
+    "lng": 27.87787,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.21948,
+    "lng": 27.87793,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "a"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.21926,
+    "lng": 27.8778,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "b"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": "vladislav varnenchik|267",
+    "lat": 43.21954,
+    "lng": 27.87688,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.2194,
+    "lng": 27.87688,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "a"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.21965,
+    "lng": 27.87689,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "b"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": "vladislav varnenchik|267",
+    "lat": 43.22002,
+    "lng": 27.87806,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.22015,
+    "lng": 27.87807,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "a"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.2199,
+    "lng": 27.87805,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "b"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": "vladislav varnenchik|267",
+    "lat": 43.22018,
+    "lng": 27.87707,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.22007,
+    "lng": 27.87702,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "a"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.2203,
+    "lng": 27.87715,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267",
+     "bl",
+     "vh",
+     "b"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": "vladislav varnenchik|267",
+    "lat": 43.22037,
+    "lng": 27.87846,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": "vladislav varnenchik|267",
+    "lat": 43.2204,
+    "lng": 27.87847,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": "vladislav varnenchik|267",
+    "lat": 43.22064,
+    "lng": 27.87701,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "1",
+     "267"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": "vladislav varnenchik grao 10135 1|75",
+    "lat": 43.21219,
+    "lng": 27.90462,
+    "tk": [
+     "bul",
+     "vladislav",
+     "varnenchik",
+     "grao",
+     "10135",
+     "1",
+     "75",
+     "bl",
+     "adres:"
+    ],
+    "d": "Одесос"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": "treti mart|25",
+    "lat": 43.23987,
+    "lng": 27.86699,
+    "tk": [
+     "bul",
+     "treti",
+     "mart",
+     "grao",
+     "1",
+     "25",
+     "bl",
+     "3"
+    ],
+    "d": "Владислав Варненчик"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": "tsar osvoboditel|195",
+    "lat": 43.22948,
+    "lng": 27.89873,
+    "tk": [
+     "bul",
+     "tsar",
+     "osvoboditel",
+     "grao",
+     "1",
+     "195"
+    ],
+    "d": "Младост"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.17136,
+    "lng": 27.92271,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "m",
+     "zelenika",
+     "grao",
+     "10135",
+     "12"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.15186,
+    "lng": 27.93683,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "m",
+     "patrabana",
+     "grao",
+     "10135",
+     "2"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.15188,
+    "lng": 27.93676,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "m",
+     "patrabana",
+     "grao",
+     "10135",
+     "2"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.15191,
+    "lng": 27.93685,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "m",
+     "patrabana",
+     "grao",
+     "10135",
+     "2"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.15192,
+    "lng": 27.93677,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "m",
+     "patrabana",
+     "grao",
+     "10135",
+     "2"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.14259,
+    "lng": 27.93095,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "m",
+     "priboi",
+     "grao",
+     "10135",
+     "3"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.12926,
+    "lng": 27.92751,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "m",
+     "rakitnika",
+     "grao",
+     "10135",
+     "1"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.15076,
+    "lng": 27.91911,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "s",
+     "o",
+     "borovets",
+     "iug",
+     "grao",
+     "0"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.14664,
+    "lng": 27.93475,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "s",
+     "o",
+     "priboi",
+     "grao",
+     "10135",
+     "11"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.13353,
+    "lng": 27.92599,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "s",
+     "o",
+     "rakitnika",
+     "grao",
+     "10135",
+     "2"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.13356,
+    "lng": 27.92596,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "asparuhovo",
+     "s",
+     "o",
+     "rakitnika",
+     "grao",
+     "10135",
+     "2"
+    ],
+    "d": "Аспарухово"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.23189,
+    "lng": 27.86839,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "vladislav",
+     "varnenchik",
+     "zhk",
+     "grao",
+     "10135",
+     "2"
+    ],
+    "d": "Владислав Варненчик"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.23739,
+    "lng": 27.85987,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "vladislav",
+     "varnenchik",
+     "zhk",
+     "mr",
+     "grao",
+     "10135",
+     "2010",
+     "bl",
+     "252",
+     "imr"
+    ],
+    "d": "Владислав Варненчик"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.22937,
+    "lng": 28.00629,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.2391,
+    "lng": 28.01623,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.2391,
+    "lng": 28.01627,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.23914,
+    "lng": 28.01624,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.2392,
+    "lng": 28.0163,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.24526,
+    "lng": 28.02028,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.24529,
+    "lng": 28.02019,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.24534,
+    "lng": 28.02016,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.24536,
+    "lng": 28.02021,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.24539,
+    "lng": 28.02027,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "sv",
+     "konstantin",
+     "i",
+     "elena",
+     "grao",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "mf",
+    "addr_key": null,
+    "lat": 43.26016,
+    "lng": 28.02929,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "k",
+     "chaika",
+     "grao",
+     "10135",
+     "11",
+     "bl"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.22793,
+    "lng": 27.90716,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "m",
+     "franga",
+     "dere",
+     "i",
+     "kokardzha",
+     "grao",
+     "10135",
+     "1"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.22802,
+    "lng": 27.90764,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "m",
+     "franga",
+     "dere",
+     "i",
+     "kokardzha",
+     "grao",
+     "10135",
+     "1"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.22823,
+    "lng": 27.90754,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "m",
+     "franga",
+     "dere",
+     "i",
+     "kokardzha",
+     "grao",
+     "10135",
+     "1"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.22824,
+    "lng": 27.90672,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "m",
+     "franga",
+     "dere",
+     "i",
+     "kokardzha",
+     "grao",
+     "10135",
+     "1"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.2283,
+    "lng": 27.90705,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "m",
+     "franga",
+     "dere",
+     "i",
+     "kokardzha",
+     "grao",
+     "10135",
+     "1"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.2578,
+    "lng": 28.02584,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "s",
+     "o",
+     "alen",
+     "mak",
+     "grao",
+     "10135",
+     "123"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.23093,
+    "lng": 27.96827,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "s",
+     "o",
+     "gorna",
+     "traka",
+     "grao",
+     "10135",
+     "0"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.24667,
+    "lng": 27.96266,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "s",
+     "o",
+     "dobreva",
+     "cheshma",
+     "grao",
+     "10135",
+     "1549"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.25677,
+    "lng": 27.9798,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "s",
+     "o",
+     "dobreva",
+     "cheshma",
+     "grao",
+     "10135",
+     "34"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.25678,
+    "lng": 27.97996,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "s",
+     "o",
+     "dobreva",
+     "cheshma",
+     "grao",
+     "10135",
+     "34"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.2568,
+    "lng": 27.97985,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "s",
+     "o",
+     "dobreva",
+     "cheshma",
+     "grao",
+     "10135",
+     "34"
+    ],
+    "d": "Приморски"
+   },
+   {
+    "cadnum": "10135.xxxx",
+    "kind": "address",
+    "addr_key": null,
+    "lat": 43.25682,
+    "lng": 27.97995,
+    "tk": [
+     "gr",
+     "varna",
+     "raion",
+     "primorski",
+     "s",
+     "o",
+     "dobreva",
+     "cheshma",
+     "grao",
+     "10135",
+     "34"
+    ],
+    "d": "Приморски"
+   }
+  ]
+ },
+ "authority_address_index": {
+  "rows": 80510,
+  "unique_cadnum": 80510,
+  "unique_normalized_address": 19220,
+  "unique_coord": 80510,
+  "delivered_rows": 80510,
+  "row_count_identical": true,
+  "rows_addr_and_coord_identical": false,
+  "by_func_top20": {
+   "Жилищна сграда - еднофамилна": 20437,
+   "Вилна сграда - еднофамилна": 12353,
+   "Селскостопанска сграда": 11037,
+   "Жилищна сграда - многофамилна": 9221,
+   "Друг вид сграда за обитаване": 8009,
+   "Гараж": 4922,
+   "Сграда за търговия": 1970,
+   "Постройка на допълващото застрояване": 1880,
+   "Складова база, склад": 1511,
+   "Промишлена сграда": 1497,
+   "Сграда за енергопроизводство": 1359,
+   "Курортна, туристическа сграда": 1001,
+   "Административна, делова сграда": 580,
+   "Друг вид производствена, складова, инфраструктурна сграда": 511,
+   "Сграда за обществено хранене": 484,
+   "Хотел": 409,
+   "Сграда със смесено предназначение": 355,
+   "Сграда за битови услуги": 325,
+   "Друг вид обществена сграда": 305,
+   "Сграда на транспорта": 303
+  }
+ },
+ "display_rows_reachability": {
+  "rows": 80510,
+  "rows_referenced_by_some_entry": 42229,
+  "rows_never_referenced": 38281,
+  "max_display_id_used": 80503,
+  "note": "an address whose entry carries its own label does NOT reference its row; unreferenced rows are not necessarily lost addresses"
+ },
+ "authority_entrances": {
+  "documents": 5314,
+  "unique_document_ids": 5314,
+  "distinct_buildings_cadnum": 3079,
+  "geocoder_entrance_entries": 4764,
+  "delivered_entrance_entries": 4764,
+  "gap_docs_minus_delivered": 550,
+  "coverage_pct_vs_docs": 89.65,
+  "coverage_pct_vs_geocoder": 100.0,
+  "delivered_distinct_buildings_g": 1748
+ },
+ "kais_buildings_varna3d": {
+  "buildings": 80497,
+  "with_addr_string": 80372,
+  "with_street": 56991,
+  "with_num": 42578,
+  "addr_coverage_pct": 99.84,
+  "authority_address_index_rows": 80510,
+  "delivered_address_rows": 80510,
+  "by_district": {
+   "(без район)": {
+    "buildings": 1,
+    "with_addr": 1,
+    "pct": 100.0
+   },
+   "район Аспарухово": {
+    "buildings": 17036,
+    "with_addr": 17017,
+    "pct": 99.89
+   },
+   "район Владислав Варненчик": {
+    "buildings": 4197,
+    "with_addr": 4170,
+    "pct": 99.36
+   },
+   "район Младост": {
+    "buildings": 11313,
+    "with_addr": 11301,
+    "pct": 99.89
+   },
+   "район Одесос": {
+    "buildings": 12944,
+    "with_addr": 12929,
+    "pct": 99.88
+   },
+   "район Приморски": {
+    "buildings": 35006,
+    "with_addr": 34954,
+    "pct": 99.85
+   }
+  },
+  "by_func": {
+   "Жилищна сграда - еднофамилна": {
+    "buildings": 20476,
+    "with_addr": 20421,
+    "pct": 99.73
+   },
+   "Вилна сграда - еднофамилна": {
+    "buildings": 12313,
+    "with_addr": 12309,
+    "pct": 99.97
+   },
+   "Селскостопанска сграда": {
+    "buildings": 10985,
+    "with_addr": 10983,
+    "pct": 99.98
+   },
+   "Жилищна сграда - многофамилна": {
+    "buildings": 9253,
+    "with_addr": 9231,
+    "pct": 99.76
+   },
+   "Друг вид сграда за обитаване": {
+    "buildings": 7990,
+    "with_addr": 7988,
+    "pct": 99.97
+   },
+   "Гараж": {
+    "buildings": 4935,
+    "with_addr": 4930,
+    "pct": 99.9
+   },
+   "Сграда за търговия": {
+    "buildings": 1971,
+    "with_addr": 1969,
+    "pct": 99.9
+   },
+   "Постройка на допълващото застрояване": {
+    "buildings": 1886,
+    "with_addr": 1882,
+    "pct": 99.79
+   },
+   "Складова база, склад": {
+    "buildings": 1513,
+    "with_addr": 1506,
+    "pct": 99.54
+   },
+   "Промишлена сграда": {
+    "buildings": 1500,
+    "with_addr": 1496,
+    "pct": 99.73
+   },
+   "Сграда за енергопроизводство": {
+    "buildings": 1360,
+    "with_addr": 1358,
+    "pct": 99.85
+   },
+   "Курортна, туристическа сграда": {
+    "buildings": 1001,
+    "with_addr": 1001,
+    "pct": 100.0
+   },
+   "Административна, делова сграда": {
+    "buildings": 577,
+    "with_addr": 577,
+    "pct": 100.0
+   },
+   "Друг вид производствена, складова, инфраструктурна сграда": {
+    "buildings": 513,
+    "with_addr": 512,
+    "pct": 99.81
+   },
+   "Сграда за обществено хранене": {
+    "buildings": 482,
+    "with_addr": 481,
+    "pct": 99.79
+   },
+   "Хотел": {
+    "buildings": 407,
+    "with_addr": 407,
+    "pct": 100.0
+   },
+   "Сграда със смесено предназначение": {
+    "buildings": 356,
+    "with_addr": 355,
+    "pct": 99.72
+   },
+   "Сграда за битови услуги": {
+    "buildings": 324,
+    "with_addr": 324,
+    "pct": 100.0
+   },
+   "Сграда на транспорта": {
+    "buildings": 303,
+    "with_addr": 303,
+    "pct": 100.0
+   },
+   "Друг вид обществена сграда": {
+    "buildings": 301,
+    "with_addr": 299,
+    "pct": 99.34
+   },
+   "Сграда за образование": {
+    "buildings": 287,
+    "with_addr": 287,
+    "pct": 100.0
+   },
+   "Жилищна сграда със смесено предназначение": {
+    "buildings": 280,
+    "with_addr": 278,
+    "pct": 99.29
+   },
+   "Сграда за детско заведение": {
+    "buildings": 214,
+    "with_addr": 214,
+    "pct": 100.0
+   },
+   "Сграда със специално предназначение": {
+    "buildings": 166,
+    "with_addr": 165,
+    "pct": 99.4
+   },
+   "Сграда за водоснабдяване и/или канализация": {
+    "buildings": 149,
+    "with_addr": 149,
+    "pct": 100.0
+   },
+   "Вилна сграда - многофамилна": {
+    "buildings": 145,
+    "with_addr": 142,
+    "pct": 97.93
+   },
+   "Здравно заведение": {
+    "buildings": 134,
+    "with_addr": 134,
+    "pct": 100.0
+   },
+   "Сграда за култура и изкуство": {
+    "buildings": 129,
+    "with_addr": 129,
+    "pct": 100.0
+   },
+   "Спортна сграда, база": {
+    "buildings": 111,
+    "with_addr": 110,
+    "pct": 99.1
+   },
+   "Хангар, депо": {
+    "buildings": 97,
+    "with_addr": 95,
+    "pct": 97.94
+   },
+   "Култова, религиозна сграда": {
+    "buildings": 67,
+    "with_addr": 67,
+    "pct": 100.0
+   },
+   "Апартаментен хотел": {
+    "buildings": 64,
+    "with_addr": 63,
+    "pct": 98.44
+   },
+   "Сграда за научна и проектантска дейност": {
+    "buildings": 59,
+    "with_addr": 59,
+    "pct": 100.0
+   },
+   "Сграда на съобщенията": {
+    "buildings": 50,
+    "with_addr": 50,
+    "pct": 100.0
+   },
+   "Общежитие": {
+    "buildings": 46,
+    "with_addr": 45,
+    "pct": 97.83
+   },
+   "Сграда - паметник на културата": {
+    "buildings": 30,
+    "with_addr": 30,
+    "pct": 100.0
+   },
+   "Заведение за социални грижи": {
+    "buildings": 20,
+    "with_addr": 20,
+    "pct": 100.0
+   },
+   "(без функция)": {
+    "buildings": 3,
+    "with_addr": 3,
+    "pct": 100.0
+   }
+  },
+  "note": "varna_3d web/varna_buildings_info.json carries NO cadastral id (contains_cadastral_id=false), so this is a DISTRIBUTION comparison, not a per-building join with the delivery"
+ }
+}

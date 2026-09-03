@@ -1,0 +1,6308 @@
+{
+ "head_fire_varna": "6460961",
+ "sidecar_stats": {
+  "candidate_multi_member_groups": 208,
+  "collapsible_rows": 285,
+  "eff_mf": 10553,
+  "eff_mf_orphans_null_key": 3384,
+  "eff_mf_with_key": 7169,
+  "numeric_block_veto_groups": 10,
+  "sections": 80513,
+  "sidecar_entries": 483,
+  "surviving_groups": 198
+ },
+ "sidecar_rule": "same parcel AND touch<=1m (BGS2005) AND both effective-MF (functype-MF or P5 еднофам/вилна appcount>=5) AND same non-null section_addr_key; connected components; numeric-block divergence veto; id=min member cadnum",
+ "sidecar_sections": 483,
+ "sidecar_physical_buildings": 198,
+ "collapsible_rows": 285,
+ "group_size_hist": {
+  "2": 156,
+  "3": 22,
+  "4": 11,
+  "5": 6,
+  "6": 2,
+  "19": 1
+ },
+ "geocoder_entries": 86257,
+ "geocoder_with_pbid": 483,
+ "geocoder_groups": 198,
+ "geocoder_reps": 198,
+ "delivery_entries": 86232,
+ "delivery_with_pbid": 0,
+ "delivery_rows_for_the_483": 483,
+ "delivery_row_kinds": {
+  "mf": 420,
+  "address": 63
+ },
+ "menu_groups_folding_to_one": 107,
+ "menu_groups_still_multi": 91,
+ "menu_rows_after_dedupe": 306,
+ "menu_surplus_rows": 108,
+ "menu_groups_identical_text": 47,
+ "survive_hist": {
+  "1": 107,
+  "2": 78,
+  "3": 10,
+  "4": 2,
+  "5": 1
+ },
+ "groups": [
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 5,
+   "delivery_rows": 5,
+   "rows_after_dedupe": 5,
+   "visible_in_menu": 5,
+   "labels": [
+    "кв. Трошево, Радост 9В",
+    "кв. Трошево, бл. А",
+    "кв. Трошево, бл. Б",
+    "кв. Трошево, бл. Е",
+    "кв. Трошево, бл. Ж"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 56,
+   "pins": [
+    [
+     43.22267,
+     27.8786
+    ],
+    [
+     43.22255,
+     27.87907
+    ],
+    [
+     43.22269,
+     27.87901
+    ],
+    [
+     43.22298,
+     27.87876
+    ],
+    [
+     43.22285,
+     27.87924
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 19,
+   "delivery_rows": 19,
+   "rows_after_dedupe": 4,
+   "visible_in_menu": 4,
+   "labels": [
+    "ж.к. Възраждане, Ана Феликсова 18",
+    "ж.к. Възраждане, бл. 14",
+    "ж.к. Възраждане, бл. А",
+    "ж.к. Възраждане, бл. С"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 119,
+   "pins": [
+    [
+     43.23674,
+     27.87882
+    ],
+    [
+     43.23678,
+     27.87861
+    ],
+    [
+     43.23681,
+     27.87839
+    ],
+    [
+     43.23684,
+     27.87817
+    ],
+    [
+     43.23687,
+     27.87897
+    ],
+    [
+     43.23703,
+     27.87901
+    ],
+    [
+     43.23705,
+     27.87782
+    ],
+    [
+     43.23718,
+     27.87787
+    ],
+    [
+     43.23718,
+     27.87889
+    ],
+    [
+     43.2373,
+     27.87907
+    ],
+    [
+     43.23731,
+     27.87792
+    ],
+    [
+     43.23743,
+     27.87796
+    ],
+    [
+     43.23744,
+     27.87919
+    ],
+    [
+     43.23746,
+     27.87903
+    ],
+    [
+     43.23748,
+     27.87886
+    ],
+    [
+     43.23751,
+     27.87864
+    ],
+    [
+     43.23753,
+     27.87842
+    ],
+    [
+     43.23757,
+     27.8782
+    ],
+    [
+     43.23759,
+     27.878
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 4,
+   "visible_in_menu": 4,
+   "labels": [
+    "кв. Виница, бл. 2а",
+    "кв. Виница, бл. 2б",
+    "кв. Виница, бл. 2в",
+    "кв. Виница, бл. 2г"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 51,
+   "pins": [
+    [
+     43.25306,
+     27.98382
+    ],
+    [
+     43.25313,
+     27.984
+    ],
+    [
+     43.25319,
+     27.98419
+    ],
+    [
+     43.25323,
+     27.98441
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 5,
+   "delivery_rows": 5,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "ovech 12",
+    "кв. Виница, бл. А, ул. Овеч",
+    "кв. Виница, бл. В"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 76,
+   "pins": [
+    [
+     43.25242,
+     27.98538
+    ],
+    [
+     43.25258,
+     27.98529
+    ],
+    [
+     43.25274,
+     27.9852
+    ],
+    [
+     43.2529,
+     27.98509
+    ],
+    [
+     43.25305,
+     27.98503
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 5,
+   "delivery_rows": 5,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "patriarh evtimi 42"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 87,
+   "pins": [
+    [
+     43.21459,
+     27.90115
+    ],
+    [
+     43.21466,
+     27.9009
+    ],
+    [
+     43.21477,
+     27.90067
+    ],
+    [
+     43.21489,
+     27.90046
+    ],
+    [
+     43.21499,
+     27.90023
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "radost 10",
+    "кв. Трошево, бл. А, ул. Радост",
+    "кв. Трошево, бл. Б, ул. Радост"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 68,
+   "pins": [
+    [
+     43.22229,
+     27.87836
+    ],
+    [
+     43.22232,
+     27.87866
+    ],
+    [
+     43.22244,
+     27.87784
+    ],
+    [
+     43.22246,
+     27.87818
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "ж.к. Победа, бл. А",
+    "ж.к. Победа, бл. Б",
+    "ж.к. Победа, бл. В"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 57,
+   "pins": [
+    [
+     43.22309,
+     27.9018
+    ],
+    [
+     43.2233,
+     27.90159
+    ],
+    [
+     43.2235,
+     27.90137
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "бул генерал колев 83",
+    "ул генерал колев 83"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 86,
+   "pins": [
+    [
+     43.21593,
+     27.922
+    ],
+    [
+     43.21623,
+     27.92235
+    ],
+    [
+     43.21567,
+     27.92161
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "ген скобелев 13",
+    "ул генерал скобелев 13"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 46,
+   "pins": [
+    [
+     43.21085,
+     27.92428
+    ],
+    [
+     43.21099,
+     27.9241
+    ],
+    [
+     43.21071,
+     27.92451
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "кв. Трошево, бл. В",
+    "кв. Трошево, бл. Г",
+    "кв. Трошево, бл. Д"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 35,
+   "pins": [
+    [
+     43.22283,
+     27.87813
+    ],
+    [
+     43.22299,
+     27.87817
+    ],
+    [
+     43.22312,
+     27.87829
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "м. Траката, бл. А",
+    "м. Траката, бл. Б",
+    "м. Траката, бл. В"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 34,
+   "pins": [
+    [
+     43.22439,
+     27.97594
+    ],
+    [
+     43.22447,
+     27.97612
+    ],
+    [
+     43.22455,
+     27.9763
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "ж.к. Бриз, бл. А",
+    "ж.к. Бриз, бл. Б",
+    "ж.к. Бриз, бл. В, ул. Илия Пенев"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 47,
+   "pins": [
+    [
+     43.22386,
+     27.94444
+    ],
+    [
+     43.22405,
+     27.9443
+    ],
+    [
+     43.22421,
+     27.94412
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 3,
+   "visible_in_menu": 3,
+   "labels": [
+    "gen skobelev 57",
+    "Гръцката махала, бл. В",
+    "Гръцката махала, ул. \"Марин Дринов\" №57"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 27,
+   "pins": [
+    [
+     43.21245,
+     27.92203
+    ],
+    [
+     43.2126,
+     27.92184
+    ],
+    [
+     43.21269,
+     27.92195
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 6,
+   "delivery_rows": 6,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "Център, бл. 3, бул. Христо Ботев",
+    "бул христо ботев 18"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 125,
+   "pins": [
+    [
+     43.20416,
+     27.9015
+    ],
+    [
+     43.20418,
+     27.90179
+    ],
+    [
+     43.20419,
+     27.90208
+    ],
+    [
+     43.2042,
+     27.90236
+    ],
+    [
+     43.20424,
+     27.9027
+    ],
+    [
+     43.20436,
+     27.90302
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "slivnitsa 187"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 45,
+   "pins": [
+    [
+     43.22734,
+     27.87337
+    ],
+    [
+     43.22739,
+     27.87311
+    ],
+    [
+     43.22751,
+     27.87343
+    ],
+    [
+     43.22771,
+     27.87346
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "hristo smirnenski 29"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.22679,
+     27.89921
+    ],
+    [
+     43.22685,
+     27.89899
+    ],
+    [
+     43.22686,
+     27.89906
+    ],
+    [
+     43.22688,
+     27.89914
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "бул владислав варненчик 66",
+    "радко димитриев 53"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 49,
+   "pins": [
+    [
+     43.21005,
+     27.90871
+    ],
+    [
+     43.21034,
+     27.90853
+    ],
+    [
+     43.21049,
+     27.90868
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "osmi primorski polk 122",
+    "кв. Чайка, бл. 122"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 60,
+   "pins": [
+    [
+     43.21437,
+     27.92746
+    ],
+    [
+     43.21446,
+     27.92779
+    ],
+    [
+     43.21459,
+     27.92814
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "atanas tomov 3",
+    "ж.к. Победа, бл. секция Б"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 29,
+   "pins": [
+    [
+     43.21822,
+     27.90262
+    ],
+    [
+     43.2183,
+     27.90278
+    ],
+    [
+     43.21836,
+     27.90292
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "prof nikolai derzhavin 25"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.21178,
+     27.91492
+    ],
+    [
+     43.2118,
+     27.91488
+    ],
+    [
+     43.21186,
+     27.91491
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "8 микрорайон, 27-ми юли 5",
+    "8 микрорайон, 27-ми юли 7"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.20364,
+     27.9188
+    ],
+    [
+     43.20378,
+     27.91867
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "братя бъкстон 30",
+    "бул царевец 11"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 22,
+   "pins": [
+    [
+     43.21954,
+     27.91912
+    ],
+    [
+     43.21973,
+     27.9192
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "бул народни будители 15",
+    "ж.к. Дружба, бл. 15, бул. Народни будители"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.18272,
+     27.89402
+    ],
+    [
+     43.18282,
+     27.89416
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "ж.к. Възраждане 1, бл. В, бул. Република",
+    "ж.к. Възраждане 1, бл. Г, бул. Република"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 36,
+   "pins": [
+    [
+     43.23606,
+     27.88014
+    ],
+    [
+     43.23619,
+     27.87973
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "slivnitsa 10"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 14,
+   "pins": [
+    [
+     43.20474,
+     27.92142
+    ],
+    [
+     43.20486,
+     27.92147
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "Колхозен пазар, бл. 120",
+    "Колхозен пазар, бул. Сливница 124"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.2132,
+     27.90872
+    ],
+    [
+     43.2133,
+     27.90857
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "Колхозен пазар, Сливница 130",
+    "Колхозен пазар, бул. Сливница 130"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.21423,
+     27.90733
+    ],
+    [
+     43.21413,
+     27.90747
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "ж.к. Младост 1, бл. А",
+    "ж.к. Младост 1, бл. Б"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 31,
+   "pins": [
+    [
+     43.2305,
+     27.86572
+    ],
+    [
+     43.2307,
+     27.86546
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "кв. Левски, Евлоги Георгиев 2",
+    "кв. Левски, бл. секция Б"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.22632,
+     27.92128
+    ],
+    [
+     43.22648,
+     27.92133
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "edelvais 22"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.22322,
+     27.91695
+    ],
+    [
+     43.22323,
+     27.91687
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "elitsa 11"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 15,
+   "pins": [
+    [
+     43.22214,
+     27.93095
+    ],
+    [
+     43.22209,
+     27.93112
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "emanuil manolov 33"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.22315,
+     27.92222
+    ],
+    [
+     43.22317,
+     27.92213
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "zhelezni vrata 43"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.22379,
+     27.92432
+    ],
+    [
+     43.2237,
+     27.92431
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "ивайло 33 35 37"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.21124,
+     27.90039
+    ],
+    [
+     43.21129,
+     27.90028
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "iglika 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.22327,
+     27.91475
+    ],
+    [
+     43.22335,
+     27.91474
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "кв. Виница, бл. А",
+    "кв. Виница, бл. Б"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.24441,
+     27.97495
+    ],
+    [
+     43.24453,
+     27.97509
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "kapitan raicho 56"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.21276,
+     27.89873
+    ],
+    [
+     43.21285,
+     27.89878
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "kokiche 29",
+    "Цветен квартал, Кокиче 29А"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.22505,
+     27.90997
+    ],
+    [
+     43.22511,
+     27.90995
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "konstantin velichkov 59"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.21734,
+     27.90306
+    ],
+    [
+     43.21748,
+     27.90311
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "liuben karavelov 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.20745,
+     27.92047
+    ],
+    [
+     43.20755,
+     27.92061
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "marin drinov 58"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.21133,
+     27.92117
+    ],
+    [
+     43.21139,
+     27.92126
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "mihail koloni 5"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.20354,
+     27.91784
+    ],
+    [
+     43.20362,
+     27.9178
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "petr enchev 21"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 17,
+   "pins": [
+    [
+     43.20461,
+     27.91738
+    ],
+    [
+     43.20473,
+     27.91726
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "marin drinov 42",
+    "Гръцката махала, Проф. Марин Дринов 42Б"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 22,
+   "pins": [
+    [
+     43.21005,
+     27.91955
+    ],
+    [
+     43.20993,
+     27.91976
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "topola 12"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.21881,
+     27.90275
+    ],
+    [
+     43.21876,
+     27.90264
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "м. Траката, бл. Е",
+    "м. Траката, бл. Ж"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.2241,
+     27.97701
+    ],
+    [
+     43.2242,
+     27.97684
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "м. Траката, бл. Г",
+    "м. Траката, бл. Д"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.22447,
+     27.97682
+    ],
+    [
+     43.22456,
+     27.97666
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "aladzha manastir 41",
+    "кв. Виница, aladzha manastir 41"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.25156,
+     27.98559
+    ],
+    [
+     43.25158,
+     27.98566
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "angel georgiev 23"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.20926,
+     27.908
+    ],
+    [
+     43.2093,
+     27.90794
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "bdin 14"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.20519,
+     27.91375
+    ],
+    [
+     43.20523,
+     27.91382
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "кв. Виница, бл. 1, ул. Бисер",
+    "кв. Виница, бл. 2, ул. Бисер"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 25,
+   "pins": [
+    [
+     43.25191,
+     27.98055
+    ],
+    [
+     43.25192,
+     27.98024
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "bozhur 6",
+    "Цветен квартал, бл. Б"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.21987,
+     27.91041
+    ],
+    [
+     43.21988,
+     27.91054
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "bratia shkorpil 10"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.20671,
+     27.91328
+    ],
+    [
+     43.20679,
+     27.91321
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "кв. Чайка, бл. 6, ул. В.петлешков/а.маймункова/",
+    "кв. Чайка, бл. 6а"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 13,
+   "pins": [
+    [
+     43.22132,
+     27.93278
+    ],
+    [
+     43.22123,
+     27.93267
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "Център, бл. 5, ул. Георги Раковски",
+    "Център, ул. ГЕОРГИ РАКОВСКИ №57"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 23,
+   "pins": [
+    [
+     43.2108,
+     27.91357
+    ],
+    [
+     43.21096,
+     27.91339
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "glarus 29",
+    "кв. Виница, glarus 29"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.24686,
+     27.98764
+    ],
+    [
+     43.24686,
+     27.98772
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "d r liudvig zamenhof 4"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.20309,
+     27.91253
+    ],
+    [
+     43.20314,
+     27.91242
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "d r stoicho iordanov 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.2175,
+     27.95214
+    ],
+    [
+     43.21756,
+     27.95206
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "debar 9"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.20117,
+     27.91378
+    ],
+    [
+     43.20124,
+     27.91373
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "nikola korchev 13",
+    "Максуда, ул. ДОБРОВОЛЦИ №29"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 25,
+   "pins": [
+    [
+     43.21329,
+     27.89197
+    ],
+    [
+     43.2135,
+     27.89208
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "ул жеравна 6"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.22241,
+     27.92243
+    ],
+    [
+     43.22247,
+     27.92242
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "ж.к. Бриз, бл. Г, ул. Илия Пенев",
+    "ж.к. Бриз, бл. Д"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 25,
+   "pins": [
+    [
+     43.22366,
+     27.94411
+    ],
+    [
+     43.22382,
+     27.9439
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "kavala 11"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.2027,
+     27.90922
+    ],
+    [
+     43.20278,
+     27.90927
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "karamfil 24"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.22182,
+     27.91177
+    ],
+    [
+     43.22183,
+     27.91184
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "8 микрорайон, ул. КНЯЗ АЛ.БАТЕМБЕРГ №13",
+    "kniaz al batemberg 11"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 27,
+   "pins": [
+    [
+     43.20245,
+     27.91634
+    ],
+    [
+     43.20251,
+     27.91666
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "kniaz aleksandar batemberg 50"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.20091,
+     27.92038
+    ],
+    [
+     43.20105,
+     27.92044
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "kraibrezhna 49"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.16575,
+     27.93897
+    ],
+    [
+     43.16575,
+     27.9391
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "lambo paskov 23"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.24396,
+     27.98478
+    ],
+    [
+     43.24402,
+     27.98484
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "liuliak 19"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.2217,
+     27.91353
+    ],
+    [
+     43.22174,
+     27.91342
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "Гръцката махала, ул. \"Марин Дринов\" №70"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.2125,
+     27.92276
+    ],
+    [
+     43.21258,
+     27.9228
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "8 микрорайон, ул. \"Марко Балабанов\" №1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.20488,
+     27.91844
+    ],
+    [
+     43.205,
+     27.91859
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "nartsis 9"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.22265,
+     27.91579
+    ],
+    [
+     43.22266,
+     27.9157
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "nikola kanev 11",
+    "Център, бл. А, ул. Никола Кънев №11-а"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 27,
+   "pins": [
+    [
+     43.20521,
+     27.90595
+    ],
+    [
+     43.20533,
+     27.90624
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "patriarh maksim 60"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 25,
+   "pins": [
+    [
+     43.23565,
+     27.9001
+    ],
+    [
+     43.23581,
+     27.89988
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "peno penev 3",
+    "кв. Виница, peno penev 3"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.24695,
+     27.98026
+    ],
+    [
+     43.24703,
+     27.98029
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "petar beron 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 13,
+   "pins": [
+    [
+     43.21558,
+     27.90675
+    ],
+    [
+     43.2157,
+     27.90673
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "pop hariton 49"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.21211,
+     27.90105
+    ],
+    [
+     43.21216,
+     27.90095
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "pop hariton 64"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.2127,
+     27.90041
+    ],
+    [
+     43.21273,
+     27.90035
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "Гръцката махала, ул. \"Преслав\" №63"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.20255,
+     27.91408
+    ],
+    [
+     43.20258,
+     27.91399
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "rozova dolina 56"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 14,
+   "pins": [
+    [
+     43.1801,
+     27.88222
+    ],
+    [
+     43.18017,
+     27.88237
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "samarsko zname 27"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 14,
+   "pins": [
+    [
+     43.21489,
+     27.89143
+    ],
+    [
+     43.21496,
+     27.89128
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "sv sv kiril i metodi 149"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.17735,
+     27.89247
+    ],
+    [
+     43.17741,
+     27.89243
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "stanko valchanov 7"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 36,
+   "pins": [
+    [
+     43.26467,
+     28.03635
+    ],
+    [
+     43.26498,
+     28.03622
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "кв. Виница, бл. 3а",
+    "кв. Виница, бл. 3б"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.25281,
+     27.98431
+    ],
+    [
+     43.2529,
+     27.98412
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "han presian 8"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.20581,
+     27.89822
+    ],
+    [
+     43.20584,
+     27.8983
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "han tervel 39"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 13,
+   "pins": [
+    [
+     43.20659,
+     27.89362
+    ],
+    [
+     43.20671,
+     27.89362
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "saborni 31",
+    "Център, бл. Б, бул. Съборни"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 26,
+   "pins": [
+    [
+     43.20457,
+     27.90597
+    ],
+    [
+     43.20463,
+     27.90628
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "tsar boris i 78",
+    "кв. Виница, tsar boris i 78"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 15,
+   "pins": [
+    [
+     43.24896,
+     27.9866
+    ],
+    [
+     43.24897,
+     27.98679
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "tsar simeon i 7"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 14,
+   "pins": [
+    [
+     43.20185,
+     27.91342
+    ],
+    [
+     43.20189,
+     27.91326
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "tsaribrod 15"
+   ],
+   "kinds": [
+    "address",
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.20027,
+     27.91467
+    ],
+    [
+     43.20032,
+     27.91466
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 2,
+   "visible_in_menu": 2,
+   "labels": [
+    "кв. Левски, бл. 2",
+    "кв. Левски, бл. 55"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.22009,
+     27.91822
+    ],
+    [
+     43.22009,
+     27.91845
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 6,
+   "delivery_rows": 6,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "iane sandanski 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 102,
+   "pins": [
+    [
+     43.21342,
+     27.9041
+    ],
+    [
+     43.21344,
+     27.90438
+    ],
+    [
+     43.21352,
+     27.90462
+    ],
+    [
+     43.21367,
+     27.9048
+    ],
+    [
+     43.21379,
+     27.90497
+    ],
+    [
+     43.21393,
+     27.90514
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 5,
+   "delivery_rows": 5,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "patriarh evtimi 40"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 67,
+   "pins": [
+    [
+     43.21493,
+     27.90138
+    ],
+    [
+     43.21502,
+     27.90117
+    ],
+    [
+     43.21502,
+     27.90162
+    ],
+    [
+     43.21513,
+     27.90093
+    ],
+    [
+     43.21532,
+     27.90091
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 5,
+   "delivery_rows": 5,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Христо Ботев, бл. 13"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 77,
+   "pins": [
+    [
+     43.20706,
+     27.89543
+    ],
+    [
+     43.20712,
+     27.8952
+    ],
+    [
+     43.20714,
+     27.89497
+    ],
+    [
+     43.2072,
+     27.89474
+    ],
+    [
+     43.20722,
+     27.8945
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 5,
+   "delivery_rows": 5,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 55"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 73,
+   "pins": [
+    [
+     43.2201,
+     27.91688
+    ],
+    [
+     43.2201,
+     27.91711
+    ],
+    [
+     43.2201,
+     27.91733
+    ],
+    [
+     43.2201,
+     27.91755
+    ],
+    [
+     43.2201,
+     27.91778
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Цветен квартал, Брегалница бл. 3"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 49,
+   "pins": [
+    [
+     43.21779,
+     27.91562
+    ],
+    [
+     43.21795,
+     27.91584
+    ],
+    [
+     43.21801,
+     27.91614
+    ],
+    [
+     43.21802,
+     27.91569
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 11, бул. Царевец"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 66,
+   "pins": [
+    [
+     43.21976,
+     27.91949
+    ],
+    [
+     43.21976,
+     27.91976
+    ],
+    [
+     43.2196,
+     27.92028
+    ],
+    [
+     43.21972,
+     27.92005
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "makedonia 142"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 49,
+   "pins": [
+    [
+     43.21406,
+     27.91322
+    ],
+    [
+     43.21416,
+     27.91308
+    ],
+    [
+     43.21427,
+     27.91294
+    ],
+    [
+     43.21438,
+     27.91281
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Цветен квартал, бл. 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 63,
+   "pins": [
+    [
+     43.21687,
+     27.91134
+    ],
+    [
+     43.21702,
+     27.91114
+    ],
+    [
+     43.21713,
+     27.91094
+    ],
+    [
+     43.21725,
+     27.91077
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 67,
+   "pins": [
+    [
+     43.21701,
+     27.91981
+    ],
+    [
+     43.21711,
+     27.92005
+    ],
+    [
+     43.21728,
+     27.9202
+    ],
+    [
+     43.2174,
+     27.92044
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Христо Ботев, бл. 12"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 62,
+   "pins": [
+    [
+     43.20664,
+     27.89417
+    ],
+    [
+     43.20654,
+     27.89492
+    ],
+    [
+     43.20659,
+     27.89465
+    ],
+    [
+     43.20662,
+     27.89441
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 4,
+   "delivery_rows": 4,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Цветен квартал, бл. 2"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 52,
+   "pins": [
+    [
+     43.21789,
+     27.91044
+    ],
+    [
+     43.21794,
+     27.9107
+    ],
+    [
+     43.21803,
+     27.91024
+    ],
+    [
+     43.21822,
+     27.91018
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Цветен квартал, бл. 60"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 37,
+   "pins": [
+    [
+     43.21951,
+     27.91677
+    ],
+    [
+     43.21968,
+     27.91672
+    ],
+    [
+     43.21984,
+     27.91673
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ж.к. Младост 1, бл. 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 41,
+   "pins": [
+    [
+     43.22664,
+     27.87344
+    ],
+    [
+     43.22681,
+     27.87351
+    ],
+    [
+     43.22699,
+     27.8736
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "страхил войвода 5"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.21321,
+     27.90609
+    ],
+    [
+     43.21334,
+     27.90589
+    ],
+    [
+     43.21348,
+     27.9057
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул братя георгиевич 15"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 65,
+   "pins": [
+    [
+     43.20863,
+     27.91193
+    ],
+    [
+     43.20883,
+     27.91181
+    ],
+    [
+     43.20917,
+     27.91161
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул кракра 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.2048,
+     27.90268
+    ],
+    [
+     43.20494,
+     27.90248
+    ],
+    [
+     43.20507,
+     27.90228
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 1, ул. Люлебургас"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 88,
+   "pins": [
+    [
+     43.21536,
+     27.92093
+    ],
+    [
+     43.21567,
+     27.92059
+    ],
+    [
+     43.2159,
+     27.92014
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "petar slabakov 2"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 39,
+   "pins": [
+    [
+     43.22227,
+     27.95452
+    ],
+    [
+     43.22246,
+     27.95453
+    ],
+    [
+     43.22259,
+     27.95472
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Св. Иван Рилски, бл. 23"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 43,
+   "pins": [
+    [
+     43.21763,
+     27.88993
+    ],
+    [
+     43.21777,
+     27.8901
+    ],
+    [
+     43.21792,
+     27.89028
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Христо Ботев, бл. 12"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 37,
+   "pins": [
+    [
+     43.20732,
+     27.89399
+    ],
+    [
+     43.20735,
+     27.89379
+    ],
+    [
+     43.20739,
+     27.89355
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 9"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 88,
+   "pins": [
+    [
+     43.21872,
+     27.92209
+    ],
+    [
+     43.21896,
+     27.92165
+    ],
+    [
+     43.21919,
+     27.92121
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 3,
+   "delivery_rows": 3,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Христо Ботев, бл. 13"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 42,
+   "pins": [
+    [
+     43.20649,
+     27.89539
+    ],
+    [
+     43.20669,
+     27.89546
+    ],
+    [
+     43.20685,
+     27.89555
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "al diakovich 45"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.20254,
+     27.90611
+    ],
+    [
+     43.20258,
+     27.90633
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Колхозен пазар, бл. 10"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 14,
+   "pins": [
+    [
+     43.2156,
+     27.91025
+    ],
+    [
+     43.21571,
+     27.91034
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 42,
+   "pins": [
+    [
+     43.21797,
+     27.92045
+    ],
+    [
+     43.21822,
+     27.92006
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 4"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.21747,
+     27.92221
+    ],
+    [
+     43.21777,
+     27.92256
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "4-ти микрорайон, бул. Владислав Варненчик 16А"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.20702,
+     27.91051
+    ],
+    [
+     43.20715,
+     27.91043
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Център, бул. Генерал Колев 47"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 17,
+   "pins": [
+    [
+     43.2109,
+     27.9155
+    ],
+    [
+     43.21101,
+     27.91564
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 87"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 43,
+   "pins": [
+    [
+     43.21683,
+     27.92314
+    ],
+    [
+     43.21709,
+     27.92354
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Гръцката махала, бул. КНЯЗ БОРИС I №72"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 20,
+   "pins": [
+    [
+     43.20694,
+     27.92167
+    ],
+    [
+     43.20707,
+     27.92184
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "primorski 131"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.20607,
+     27.92463
+    ],
+    [
+     43.20613,
+     27.9247
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "slivnitsa 98"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.21175,
+     27.91095
+    ],
+    [
+     43.21185,
+     27.91077
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 7, бул царевец"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.21821,
+     27.92318
+    ],
+    [
+     43.21844,
+     27.92274
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "bial krem 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.22208,
+     27.91197
+    ],
+    [
+     43.22209,
+     27.91206
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 2"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 43,
+   "pins": [
+    [
+     43.21621,
+     27.92057
+    ],
+    [
+     43.2165,
+     27.92021
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 4"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.2168,
+     27.92134
+    ],
+    [
+     43.21705,
+     27.92092
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "d r anastasia zhelezkova 42"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 14,
+   "pins": [
+    [
+     43.21856,
+     27.92817
+    ],
+    [
+     43.21862,
+     27.92802
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 43,
+   "pins": [
+    [
+     43.21684,
+     27.92213
+    ],
+    [
+     43.21713,
+     27.92177
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Чайка, бл. 10, ул. В.петлешков/а.маймункова/"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 27,
+   "pins": [
+    [
+     43.22135,
+     27.9336
+    ],
+    [
+     43.22154,
+     27.9334
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "edelvais 11"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.22283,
+     27.91655
+    ],
+    [
+     43.22291,
+     27.91656
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ж.к. Възраждане 1, бл. 11"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.23825,
+     27.87266
+    ],
+    [
+     43.23836,
+     27.87214
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Център, Иван Драсов 16"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.21023,
+     27.91662
+    ],
+    [
+     43.21036,
+     27.91678
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Владиславово, бл. 407"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.25084,
+     27.84885
+    ],
+    [
+     43.25101,
+     27.84885
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Чайка, бл. 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 37,
+   "pins": [
+    [
+     43.21635,
+     27.93199
+    ],
+    [
+     43.21665,
+     27.93178
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "kotel 3"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.20311,
+     27.9121
+    ],
+    [
+     43.20312,
+     27.9122
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "liuben karavelov 54"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.21251,
+     27.92791
+    ],
+    [
+     43.21258,
+     27.92784
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "makedonia 14"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.20675,
+     27.92363
+    ],
+    [
+     43.20682,
+     27.9237
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 2"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 54,
+   "pins": [
+    [
+     43.22192,
+     27.92898
+    ],
+    [
+     43.22237,
+     27.92924
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "mir 32"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.22192,
+     27.92948
+    ],
+    [
+     43.22198,
+     27.92954
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "marin drinov 7"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 13,
+   "pins": [
+    [
+     43.20839,
+     27.91684
+    ],
+    [
+     43.20847,
+     27.91695
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "general radko dimitriev 7"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.20731,
+     27.91083
+    ],
+    [
+     43.20739,
+     27.91066
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "radost 8"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.22189,
+     27.87893
+    ],
+    [
+     43.22193,
+     27.87871
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "roshtok 3"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.22152,
+     27.92969
+    ],
+    [
+     43.22158,
+     27.92961
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ruzha 27"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.22209,
+     27.91009
+    ],
+    [
+     43.22211,
+     27.91017
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Цветен квартал, Ружа 34"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.22379,
+     27.9099
+    ],
+    [
+     43.2238,
+     27.91002
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Цветен квартал, Ружа 48"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.22499,
+     27.90968
+    ],
+    [
+     43.22504,
+     27.90971
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ruzha 53"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.22421,
+     27.90943
+    ],
+    [
+     43.22426,
+     27.90942
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "sofroni vrachanski 3"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.20123,
+     27.91469
+    ],
+    [
+     43.20123,
+     27.91477
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "stara planina 39"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.2104,
+     27.8993
+    ],
+    [
+     43.21046,
+     27.89937
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 4, ул. Студентска-"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 53,
+   "pins": [
+    [
+     43.22329,
+     27.93141
+    ],
+    [
+     43.22312,
+     27.93202
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 6"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.21776,
+     27.92174
+    ],
+    [
+     43.21806,
+     27.92209
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "12 ta 24"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.22435,
+     27.98161
+    ],
+    [
+     43.2244,
+     27.98154
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "20 ta 59"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.22739,
+     27.99927
+    ],
+    [
+     43.22746,
+     27.9993
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "4 ta 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.22373,
+     27.97448
+    ],
+    [
+     43.2238,
+     27.97457
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул ана феликсова 20"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 32,
+   "pins": [
+    [
+     43.23852,
+     27.87922
+    ],
+    [
+     43.2388,
+     27.87928
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул ана феликсова 20"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 36,
+   "pins": [
+    [
+     43.23854,
+     27.87981
+    ],
+    [
+     43.23886,
+     27.87979
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул ана феликсова 20"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 27,
+   "pins": [
+    [
+     43.23858,
+     27.87863
+    ],
+    [
+     43.23882,
+     27.87869
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 35"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 18,
+   "pins": [
+    [
+     43.21956,
+     27.91843
+    ],
+    [
+     43.21957,
+     27.91821
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "bregalnitsa 65"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 28,
+   "pins": [
+    [
+     43.21876,
+     27.91614
+    ],
+    [
+     43.2186,
+     27.91587
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Чайка, бл. 8, ул. В.петлешков/а.маймункова/"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 13,
+   "pins": [
+    [
+     43.22139,
+     27.9329
+    ],
+    [
+     43.22144,
+     27.93304
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Колхозен пазар, ул. \"Велес\" №9"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.21586,
+     27.90424
+    ],
+    [
+     43.21594,
+     27.90419
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "general kolev 94"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 22,
+   "pins": [
+    [
+     43.21657,
+     27.92505
+    ],
+    [
+     43.21669,
+     27.92484
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул георги бенковски 64"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 50,
+   "pins": [
+    [
+     43.20745,
+     27.90384
+    ],
+    [
+     43.20765,
+     27.90439
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "gotse delchev 16"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 16,
+   "pins": [
+    [
+     43.21744,
+     27.90758
+    ],
+    [
+     43.21746,
+     27.90778
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "d r vasilaki papadopulu 45"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 21,
+   "pins": [
+    [
+     43.21757,
+     27.95705
+    ],
+    [
+     43.21776,
+     27.95705
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "d r vasilaki papadopulu 45"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.21772,
+     27.95766
+    ],
+    [
+     43.21788,
+     27.95758
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Максуда, бл. 2"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 20,
+   "pins": [
+    [
+     43.21297,
+     27.88892
+    ],
+    [
+     43.21307,
+     27.88872
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Максуда, бл. 4"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.21257,
+     27.88874
+    ],
+    [
+     43.21267,
+     27.88855
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул деветашка пещера 10"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 14,
+   "pins": [
+    [
+     43.2456,
+     28.01234
+    ],
+    [
+     43.24572,
+     28.0124
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ideal petrov 1"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 33,
+   "pins": [
+    [
+     43.23656,
+     27.87698
+    ],
+    [
+     43.23669,
+     27.87662
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "kozlodui 44"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.2017,
+     27.90839
+    ],
+    [
+     43.20174,
+     27.9085
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, konstantin iliev 12"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.24156,
+     27.97588
+    ],
+    [
+     43.2416,
+     27.97593
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, konstantin iliev 13"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.24172,
+     27.97551
+    ],
+    [
+     43.24174,
+     27.97558
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, konstantin iliev 16"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.2418,
+     27.9761
+    ],
+    [
+     43.24183,
+     27.97616
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, konstantin iliev 17"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.24194,
+     27.97579
+    ],
+    [
+     43.24197,
+     27.97585
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, konstantin iliev 18"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.24193,
+     27.97623
+    ],
+    [
+     43.24196,
+     27.9763
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 3, ул. Лозенград"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 44,
+   "pins": [
+    [
+     43.21627,
+     27.92139
+    ],
+    [
+     43.21653,
+     27.92098
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, morska zvezda 16"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 27,
+   "pins": [
+    [
+     43.24037,
+     27.9797
+    ],
+    [
+     43.2406,
+     27.9796
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "neofit bozveli 57"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 24,
+   "pins": [
+    [
+     43.21287,
+     27.90061
+    ],
+    [
+     43.21299,
+     27.90037
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "neofit rilski 20"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.21808,
+     27.90704
+    ],
+    [
+     43.21808,
+     27.90712
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "panaiot mednikarov 4"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 19,
+   "pins": [
+    [
+     43.20611,
+     27.89208
+    ],
+    [
+     43.20625,
+     27.89195
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Галата, ул. Панорамна №11"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.16514,
+     27.93201
+    ],
+    [
+     43.16523,
+     27.93206
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "Център, бл. 2, ул. Парижка Комуна"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 26,
+   "pins": [
+    [
+     43.20683,
+     27.90688
+    ],
+    [
+     43.20701,
+     27.90709
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "patriarh evtimi 98"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 9,
+   "pins": [
+    [
+     43.20958,
+     27.89643
+    ],
+    [
+     43.20963,
+     27.89652
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "perekop 9"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.18295,
+     27.88206
+    ],
+    [
+     43.18295,
+     27.88215
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ж.к. Победа, Адрес: ул петко стайнов 11"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 40,
+   "pins": [
+    [
+     43.22405,
+     27.89859
+    ],
+    [
+     43.22427,
+     27.89898
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, sv prokopi varnenski 41"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 8,
+   "pins": [
+    [
+     43.24726,
+     27.97391
+    ],
+    [
+     43.24729,
+     27.974
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Виница, sv sedmochislenitsi 10"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 7,
+   "pins": [
+    [
+     43.247,
+     27.97391
+    ],
+    [
+     43.24705,
+     27.97396
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "svoboda 32"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 23,
+   "pins": [
+    [
+     43.21563,
+     27.89072
+    ],
+    [
+     43.2157,
+     27.89045
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "sirma voivoda 3"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 15,
+   "pins": [
+    [
+     43.22381,
+     27.94273
+    ],
+    [
+     43.2239,
+     27.9426
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ул христо ботев 6"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 31,
+   "pins": [
+    [
+     43.20437,
+     27.90508
+    ],
+    [
+     43.20445,
+     27.90545
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "tsaribrod 5"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 11,
+   "pins": [
+    [
+     43.20038,
+     27.91547
+    ],
+    [
+     43.2004,
+     27.9156
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "shesti septemvri 28"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 21,
+   "pins": [
+    [
+     43.24689,
+     27.85334
+    ],
+    [
+     43.24697,
+     27.85357
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "8 микрорайон, ул. Шумен №6"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 10,
+   "pins": [
+    [
+     43.20407,
+     27.91303
+    ],
+    [
+     43.20414,
+     27.91295
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "ianko karagiaurov 3"
+   ],
+   "kinds": [
+    "address"
+   ],
+   "extent_m": 6,
+   "pins": [
+    [
+     43.20828,
+     27.89221
+    ],
+    [
+     43.20833,
+     27.8922
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "tsar simeon i 36"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 36,
+   "pins": [
+    [
+     43.19891,
+     27.91256
+    ],
+    [
+     43.1992,
+     27.91275
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  },
+  {
+   "pbid_masked": "10135.xxxx",
+   "sections": 2,
+   "delivery_rows": 2,
+   "rows_after_dedupe": 1,
+   "visible_in_menu": 1,
+   "labels": [
+    "кв. Левски, бл. 99"
+   ],
+   "kinds": [
+    "mf"
+   ],
+   "extent_m": 29,
+   "pins": [
+    [
+     43.21541,
+     27.91984
+    ],
+    [
+     43.21558,
+     27.91957
+    ]
+   ],
+   "_pbid_private": "10135.xxxx",
+   "_cadnums_private": [
+    "10135.xxxx",
+    "10135.xxxx"
+   ]
+  }
+ ]
+}
