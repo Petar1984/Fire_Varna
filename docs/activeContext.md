@@ -1,6 +1,6 @@
 # Active context — Fire_Varna
 
-**Date:** 2026-09-03 · **last verified against commit** 1b540c9 (`main`; ahead of `origin/main` by the places-search cycle's commits (see the table) until Petar's push) · verified by: Opus (executor), audited by: Opus (auditor, C6 and C14) · signed: __
+**Date:** 2026-09-03 · **last verified against commit** ecfaf93 (`main`; ahead of `origin/main` by the places-search cycle's commits (see the table) until Petar's push) · verified by: Opus (executor), audited by: Opus (auditor, C6, C14 and C14b) · signed: __
 > Every number here is the output of the command next to it, run on the date above (`verify_numbers.py` checks it). A number without a command does not enter.
 > The previous chronicle (state as of 2026-07-04) is frozen in [archive/activeContext_2026-07-04.md](archive/activeContext_2026-07-04.md).
 
@@ -13,7 +13,7 @@ Public mobile-first web app (README calls it a PWA; there is no web manifest —
 ## Open theme
 - The next moderation cycle (after cycle #30 in `docs/moderation_log.md`): the open reports (count in the table; `gh issue list -R Petar1984/Fire_Varna --state open`) — run through `/firehydrants`, not part of the ordering plan.
 - ADR 005 service-worker cache lifecycle — `Proposed — awaiting Petar (Gate 1)` (`decisions/005_sw_cache_lifecycle.md`, 2026-08-11).
-- Places in the search — plan v2.7 (hotels, C0–C10) + phase-2 plan v1.5 (schools, universities, hospitals, ДКЦ, hospices, kindergartens; quarter/district on every place; key-first ordering — C11–C13, C12 = 0d68d0f) executed locally; audits C6 ГОДНО and C14 ГОДНО С УСЛОВИЯ (the conditions closed in C15 or listed for Petar in the evening report §6/§8). Waiting for Gate 2, Petar's local probe (report §3) and push. Reports: audits/ДОКЛАД_03.09_търсачка_места.md (the night), audits/ДОКЛАД_03.09_добавка_вечерта.md (the evening + phase 2). П7 quarter aliases in the zone tokens — signed as rule v2.1 (plan §11) and executed in C16 = 1b540c9: 6 added tokens in 5 zones, „владиславово детска градина" → 2 (`_meta.p7_added` in `scratch/places_search/recall_sweep_rows.json`; the gate is `tests/test_places_search_gate.py`, 11 tests). Open, for signature: lot Д5 (the 53 municipal kindergartens of the registry onto the KAIS plots — 2 of at least 5 in Владиславово today).
+- Places in the search — plan v2.7 (hotels, C0–C10) + phase-2 plan v1.5 (schools, universities, hospitals, ДКЦ, hospices, kindergartens; quarter/district on every place; key-first ordering — C11–C13, C12 = 0d68d0f) executed locally; audits C6 ГОДНО and C14 ГОДНО С УСЛОВИЯ (the conditions closed in C15 or listed for Petar in the evening report §6/§8). Waiting for Gate 2, Petar's local probe (report §3) and push. Reports: audits/ДОКЛАД_03.09_търсачка_места.md (the night), audits/ДОКЛАД_03.09_добавка_вечерта.md (the evening + phase 2). П7 quarter aliases in the zone tokens — signed as rule v2.1 (plan §11) and executed in C16 = 1b540c9: 6 added tokens in 5 zones, „владиславово детска градина" → 2 (`_meta.p7_added` in `scratch/places_search/recall_sweep_rows.json`; the gate is `tests/test_places_search_gate.py`, 11 tests). Audit C14b ГОДНО (8 hygiene findings, folded into plan §12 as lot К2). Signed 03.09: §12 К1 — colours by group (hotels orange, education violet, health teal, addresses blue; C18) and К2 — gate hygiene (C19). Running 03.09: the system audit Petar asked for (address-index coverage and duplicates, places coverage vs the registries, full search recall over all 361 records, kind/zone/coordinate correctness) — measurement phase, read-only; report to land in `audits/`. Open, for signature: lot Д5 (the 53 municipal kindergartens of the registry onto the KAIS plots — 2 of at least 5 in Владиславово today).
 
 ## Waiting for signature
 - `plans/hotels_search_plan.md` (2026-08-22) and `plans/sw_cache_lifecycle_fixes.md` (2026-08-11): `DRAFT — AWAITING PETAR SIGNATURE (Gate 1)`.
@@ -30,10 +30,11 @@ Public mobile-first web app (README calls it a PWA; there is no web manifest —
 | open reports (issues) | 18 | `gh issue list -R Petar1984/Fire_Varna --state open --limit 200 --json number --jq length` |
 | closed reports | 709 | `gh api "search/issues?q=repo:Petar1984/Fire_Varna+is:issue+is:closed" --jq .total_count` |
 | commits on `main` | 234 | `git rev-list --count main` |
-| last pushed commit | ca25595 2026-09-02 | `git log -1 --format='%h %cs' origin/main` |
+| last pushed commit | 8190f52 2026-09-03 | `git log -1 --format='%h %cs' origin/main` |
+| commits on `origin/main` not on `main` (cycle #32 pushed from `hydrants-c32`; `main` carries the same patch as ef09d91 — a `git rebase origin/main` before the next push drops it) | 1 | `git rev-list --count main..origin/main` |
 | commits ahead of `origin/main` (the places-search cycle, unpushed) | 20 | `git rev-list --count origin/main..main` |
 | last data commit (moderation cycle) | 2026-09-01 data: cycle #30 — 15 reports, and the Golden Sands import left alone | `git log -1 --format='%cs %s' -- data/hydrants.json docs/moderation_log.md` |
-| `index.html` bytes | 521751 | `wc -c < index.html` |
+| `index.html` bytes | 524074 | `wc -c < index.html` |
 | `data/hydrants.json` bytes | 1311397 | `wc -c < data/hydrants.json` |
 | `data/hotels.json` bytes | 78491 | `wc -c < data/hotels.json` |
 | hotels in `data/hotels.json` | 226 | `PYTHONIOENCODING=utf-8 python -c "import json;print(json.load(open('data/hotels.json',encoding='utf-8'))['_meta']['count'])"` |
