@@ -49,6 +49,7 @@ import math
 import re
 import sys
 import io
+import pathlib
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -60,10 +61,14 @@ if hasattr(sys.stdout, "reconfigure"):
 HOTELS = r"C:/git/Fire_Varna/data/hotels.json"
 PLACES2 = r"C:/git/Fire_Varna/data/places.json"
 CATS = r"C:/git/Fire_Varna/data/place_categories.json"
-REPO_ROWS_OUT = r"C:/git/Fire_Varna/scratch/places_search/recall_sweep_rows.json"
+# The two artefacts land in the checkout this script lives in, never in a fixed
+# path: a worktree must be able to re-freeze its own reference (F2-к0).
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+REPO_ROWS_OUT = str(REPO_ROOT / "scratch" / "places_search" / "recall_sweep_rows.json")
 # С6′: the tokeniser-parity corpus the probe replays in the page. One generator,
 # one file — the probe never invents the input list.
-REPO_PARITY_OUT = r"C:/git/Fire_Varna/scratch/places_search/probe_out/token_parity.json"
+REPO_PARITY_OUT = str(REPO_ROOT / "scratch" / "places_search" / "probe_out"
+                      / "token_parity.json")
 OUTDIR = (r"C:/Users/Petar/AppData/Local/Temp/claude/C--git/"
           r"fb0c0608-7fdb-4635-a8fc-44575d26700a/scratchpad/measures/")
 
