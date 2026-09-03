@@ -47,16 +47,17 @@ PLACES = pathlib.Path(os.environ.get("FIRE_VARNA_PLACES_PATH") or (REPO / "data"
 
 # The tracked LF blob, measured at C11 (varna_3d HEAD ba78a25, branch rezhimi):
 #   git -C ../varna_3d show HEAD:data/fire_varna_places.json > data/places.json
-PLACES_SHA256 = "bc4022b5d0eac5cef12d216640b3a134817b36debd53989b7e278b96c7a132d3"
-PLACES_BYTES = 61170
-PLACES_GZIP9 = 8226
+PLACES_SHA256 = "939513fcde65da618a522ae2a6f4411e8850573a86ca681cd8aa520b9b4e6064"
+PLACES_BYTES = 70912
+PLACES_GZIP9 = 9265
 
-EXPECTED_COUNT = 135
+EXPECTED_COUNT = 150
 TOP_LEVEL_KEYS = {"_meta", "places"}
 # Phase-2 plan §2 Д1: exactly these eight keys on every record — no `i`, no notes, no
 # cadastral identifier.
 RECORD_KEYS = {"kind", "lat", "lon", "name", "old_names", "src", "status", "zone"}
-ALLOWED_KIND = {"училище", "университет", "болница", "ДКЦ", "хоспис", "детска градина"}
+ALLOWED_KIND = {"училище", "университет", "болница", "ДКЦ", "хоспис", "детска градина",
+                "детска ясла", "общежитие"}
 ALLOWED_SRC = {"OSM",
                "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
                "Регистър на лечебните заведения (ИАМН)",

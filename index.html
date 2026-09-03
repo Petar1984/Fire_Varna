@@ -6252,10 +6252,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     const PLACES_URL = 'data/hotels.json', CATS_URL = 'data/place_categories.json';
     const PLACES2_URL = 'data/places.json';            // фаза 2: училища/университети/болници/градини
-    const PLACES_CACHE = 'fire-varna-hotels-v2-226';   // our own namespace (Д3)
+    const PLACES_CACHE = 'fire-varna-hotels-v2-225';   // our own namespace (Д3)
     const TOP = 8, MIN_Q = 2, DEBOUNCE_MS = 120, FETCH_TIMEOUT_MS = 8000;
     const TOP_TOTAL = 16, GEN_CAP = 300;               // фаза 2 С3: per group / per class
-    const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 226, EXPECT2_COUNT = 135;
+    const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 225, EXPECT2_COUNT = 150;
     const MX = 81152, MY = 110574;               // metres per degree of lon/lat in Varna (М1)
     const LAT_MIN = 43.13, LAT_MAX = 43.35, LON_MIN = 27.65, LON_MAX = 28.10;  // delivery box (Д2)
     const EXPECT_KEYS = ['beds', 'cat', 'kind', 'lat', 'lon', 'name', 'no_uin', 'old_names', 'src', 'status', 'uins', 'zone'];
@@ -6263,13 +6263,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // Фаза 2 (places_phase2_plan.md Д1/Д3): the second delivery - 8 keys, its own
     // kind enum. Same box, same status enum, same cadastral refusal as the hotels.
     const EXPECT2_KEYS = ['kind', 'lat', 'lon', 'name', 'old_names', 'src', 'status', 'zone'];
-    const KINDS2 = ['училище', 'университет', 'болница', 'ДКЦ', 'хоспис', 'детска градина'];
+    const KINDS2 = ['училище', 'университет', 'болница', 'ДКЦ', 'хоспис', 'детска градина',
+                     'детска ясла', 'общежитие'];
     const STATUSES = ['', 'бивш'];
     const CADASTRAL = /\b\d{4,5}\.\d+\.\d+/;     // a cadastral id never rides a public bundle (Д2)
     // §12 В7 + §14 — the exact bytes the browser may trust (the tracked LF blobs).
-    const HOTELS_SHA256 = 'fd4b6989d63c1f8b7563d1ab9b78f72a0ea0d9fe93386a8080ee64211476a15c';
-    const PLACES2_SHA256 = 'bc4022b5d0eac5cef12d216640b3a134817b36debd53989b7e278b96c7a132d3';
-    const CATS_SHA256 = 'be215b452723a3f5123630c4d33e941aae2d1099a111a4f50bdfee6183fd61b6';
+    const HOTELS_SHA256 = 'b9ec6b6d62c25fc465d7db80e47241021ee03e4da62977a268199041ccc04d11';
+    const PLACES2_SHA256 = '939513fcde65da618a522ae2a6f4411e8850573a86ca681cd8aa520b9b4e6064';
+    const CATS_SHA256 = '7cf4140b84b29bf3bc68c80197dd10fcd5534e18fa66326650d3157c94e4f926';
     // Д7 — the source line of a record, worded from the delivery's own licence.
     const SRC_LINE = {
       'НТР УИН': 'име: Национален туристически регистър · координати: КАИС Отворени данни (АГКК)',
@@ -6289,7 +6290,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       'Хотел': 'Хотели', 'Семеен хотел': 'Хотели',
       'хотел · без категоризация': 'Хотели', 'апарт-хотел': 'Хотели',
       'училище': 'Училища', 'университет': 'Университети', 'болница': 'Болници',
-      'ДКЦ': 'ДКЦ', 'хоспис': 'Хосписи', 'детска градина': 'Детски градини'
+      'ДКЦ': 'ДКЦ', 'хоспис': 'Хосписи', 'детска градина': 'Детски градини',
+      // ЛОТ 1, амандамент №8 П2 (подписът на Петър, 03.09): the two new kinds of
+      // the delivery get a heading each — the nursery is NOT a kindergarten.
+      'детска ясла': 'Детски ясли', 'общежитие': 'Общежития'
     };
     const KIND_CHIP = {
       'Хотел': 'хотел', 'Семеен хотел': 'хотел',
@@ -6303,7 +6307,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const GROUP_COLOUR = {
       'Хотели': 'hotel',
       'Училища': 'edu', 'Университети': 'edu', 'Детски градини': 'edu',
+      'Детски ясли': 'edu', 'Общежития': 'edu',
       'Болници': 'health', 'ДКЦ': 'health', 'Хосписи': 'health'
+    };
+
+    // ЛОТ 1, амандамент №8 П2: the words that ask for MORE THAN ONE delivered
+    // kind. The dictionary already maps a form to a SET of chips („заведение“ ->
+    // three), but its own „детско заведение“ chip counts 3D bodies, not our rows,
+    // and the dictionary is a delivery from varna_3d that we never edit by hand —
+    // so the binding of the word to OUR kinds lives here. recall_sweep.py carries
+    // the same table (EXTRA_FORMS); a drift between the two is a failed gate.
+    const EXTRA_FORMS = {
+      'детско заведение': ['детска градина', 'детска ясла'],
+      'детски заведения': ['детска градина', 'детска ясла']
     };
 
     // ---- primitives: VERBATIM copies of the address search (index.html:4786-4788).
@@ -6563,6 +6579,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
         let entry = FORMS.get(fk);
         if (!entry) { entry = { chips: new Set(), heads: new Set() }; FORMS.set(fk, entry); }
         for (const chip of cats.forms[form]) { entry.chips.add(keyOf(chip)); entry.heads.add(keyOf(head[chip] || chip)); }
+      }
+      // П2: one form, two kinds. Only the chip set is widened — `heads` drives the
+      // ONE-token A2 rule, and both words here are two tokens, so a head would be
+      // dead weight with a reach we did not measure.
+      for (const form of Object.keys(EXTRA_FORMS)) {
+        const fk = keyOf(form);
+        if (!fk) continue;
+        let entry = FORMS.get(fk);
+        if (!entry) { entry = { chips: new Set(), heads: new Set() }; FORMS.set(fk, entry); }
+        for (const kind of EXTRA_FORMS[form]) entry.chips.add(keyOf(kind));
       }
       for (const fk of FORMS.keys()) CLASS_OF.set(fk, RECS.filter((r) => inClass(r, fk)));
     }

@@ -50,19 +50,23 @@ CATEGORIES = REPO / "data" / "place_categories.json"
 # (45 zones re-labelled, 10 distinct values → 24).
 #   git -C ../varna_3d show HEAD:data/fire_varna_hotels.json > data/hotels.json
 #   git -C ../varna_3d show HEAD:data/place_categories.json  > data/place_categories.json
-HOTELS_SHA256 = "fd4b6989d63c1f8b7563d1ab9b78f72a0ea0d9fe93386a8080ee64211476a15c"
-HOTELS_BYTES = 78491
-HOTELS_GZIP9 = 9140
+# ЛОТ 1 (F1-д, varna_3d dee1f76 „P2-д“, branch rezhimi): the delivery is 225 now —
+# decision 10 merged „Явор“ into „ГОЛДЪН ЛАЙН“ (one building, two records at 0,00 m;
+# the old name lives on as an alias) and the reason line moved into `_meta.excluded`.
+# The three numbers below are re-measured on that blob; nothing else in it moved.
+HOTELS_SHA256 = "b9ec6b6d62c25fc465d7db80e47241021ee03e4da62977a268199041ccc04d11"
+HOTELS_BYTES = 79691
+HOTELS_GZIP9 = 9301
 # C16 (§11 П7): the dictionary was re-delivered with a `zones` key — the quarter
 # aliases of the 28 zones that carry a registry entry, schema still 1. `chips` and
 # `forms` are byte-identical to the previous blob (35 600 bytes, sha256
 # 715b96ed6d63f0b7…), so only the three numbers below moved.
 #   git -C ../varna_3d show HEAD:data/place_categories.json > data/place_categories.json
-CATEGORIES_SHA256 = "be215b452723a3f5123630c4d33e941aae2d1099a111a4f50bdfee6183fd61b6"
-CATEGORIES_BYTES = 45765
-CATEGORIES_GZIP9 = 5844
+CATEGORIES_SHA256 = "7cf4140b84b29bf3bc68c80197dd10fcd5534e18fa66326650d3157c94e4f926"
+CATEGORIES_BYTES = 48382
+CATEGORIES_GZIP9 = 6358
 
-EXPECTED_COUNT = 226
+EXPECTED_COUNT = 225
 TOP_LEVEL_KEYS = {"_meta", "hotels"}
 # Plan §2 Д2: exactly these twelve keys on every record, no more and no less.
 RECORD_KEYS = {"beds", "cat", "kind", "lat", "lon", "name",

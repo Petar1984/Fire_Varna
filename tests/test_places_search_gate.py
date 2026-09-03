@@ -12,7 +12,8 @@ Until C16 nothing here could go red without a human reading a report:
      „училище бриз“, which did not differentiate, with „детска градина
      приморски“, which does (12 rows on M2-failopen with the guard, 4 on A3
      without it), and gates the guard itself here;
-  3. `p7_added` is exactly the six tokens in five zones §11 v2.1 measured;
+  3. `p7_added` is exactly the seven tokens in six zones measured (§11 v2.1 plus
+     the seventh, `konstanin`, that the renamed resort zone unlocked — Амандамент №10);
   4. the frozen diff: the 72 queries that existed before П7 give byte-identical
      ordered rows and the same branch as `git show 7a6ea1d:…rows.json` — with
      the ONE signed exception of ЛОТ 1 решение 2 („градина“), named below;
@@ -100,7 +101,7 @@ class ImportGuardTest(unittest.TestCase):
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
         self.assertEqual(proc.returncode, 0,
                          proc.stderr.decode("utf-8", "replace"))
-        self.assertEqual(proc.stdout.decode("utf-8").split(), ["plan", "361"])
+        self.assertEqual(proc.stdout.decode("utf-8").split(), ["plan", "375"])
         after = hashlib.sha256(ROWS.read_bytes()).hexdigest()
         self.assertEqual(before, after, "importing recall_sweep.py rewrote the reference rows")
 
@@ -113,12 +114,16 @@ class ImportGuardTest(unittest.TestCase):
 
 
 class P7RuleTest(unittest.TestCase):
-    """§11 v2.1: six tokens, five zones — and nothing in the name path."""
+    """§11 v2.1: seven tokens, six zones — and nothing in the name path.
 
-    def test_added_tokens_are_the_measured_six(self):
+    Six were signed as the rule; the seventh (`konstanin`, к.к. Св. Св. Константин
+    и Елена) came with ЛОТ 1's data, not with a rule change, and is signed in
+    Амандамент №10 (3). Р5 says exactly this is allowed — with a measure."""
+
+    def test_added_tokens_are_the_measured_seven(self):
         self.assertEqual(REF.P7_ADDED, REF.P7_EXPECTED)
-        self.assertEqual(sum(len(v) for v in REF.P7_ADDED.values()), 6)
-        self.assertEqual(len(REF.P7_ADDED), 5)
+        self.assertEqual(sum(len(v) for v in REF.P7_ADDED.values()), 7)
+        self.assertEqual(len(REF.P7_ADDED), 6)
 
     def test_no_added_token_is_a_name_token(self):
         """Р4: the claim holds for `nset`; `varnenchik` IS an old-name token of

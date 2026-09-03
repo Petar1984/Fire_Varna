@@ -119,6 +119,32 @@ const W = MOB ? 375 : 1400;
 const H = MOB ? 812 : 900;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Амандамент №10 (1): details/ is gitignored, so a checkout can be missing it
+// ENTIRELY — and then every /details/buildings/v1/*.json is a 404, the app falls
+// back to the leaflet popup and the pin stays in the middle of the map. A base
+// record taken in such a checkout differs from this one in 97 leaves with the
+// address code byte-equal, which is exactly the accident that cost F1-д a STOP.
+// The environment therefore carries the details/ folder too: how many files it
+// holds and what ONE real request for the first of them answers. Sorted, so two
+// runs write the same name; counted, not compared — the folder is a local build
+// artefact and its size is nobody's contract. The gate is „both sides had one".
+const DETAILS_REL = "details/buildings/v1";
+const DETAILS_DIR = path.join(REPO, "details", "buildings", "v1");
+let DETAILS = null;                  // filled once, in main(), before anything is written
+async function readDetailsEnv() {
+  let files = [];
+  try { files = fs.readdirSync(DETAILS_DIR).filter((f) => f.endsWith(".json")).sort(); }
+  catch (e) { return { dir: DETAILS_REL, files: 0, sample: null, status: null }; }
+  const sample = files.length ? files[0] : null;
+  let status = null;
+  if (sample) {
+    try { status = (await fetch(BASE + DETAILS_REL + "/" + sample)).status; }
+    catch (e) { status = null; }
+  }
+  return { dir: DETAILS_REL, files: files.length, sample, status };
+}
+const detailsUsable = (env) => !!env && env.files > 0 && env.status === 200;
 const isDetailUrl = (url) => /\/details?\//.test(url);
 const warnings = [];
 function warn(msg) { warnings.push(msg); console.log("  ! " + msg); }
@@ -738,17 +764,21 @@ const CATS_BAD_ZONES = (function () {
 // is unusable must land back on exactly these — that is what "fail-soft" has to
 // mean to be a gate rather than a hope.
 const P7_BEFORE = [
-  ["владиславово детска градина", 1, true, "ОДЗ Маргаритка"],
-  ["детска градина владислав варненчик", 1, true, 'ДГ 39 "Приказка"'],
+  // Амандамент №10 (2): ЛОТ 1 премести три от тези осем — не правилото,
+  // а данните: ДГ№40 „Детски свят“ и ОДЗ Маргаритка са вече две градини в
+  // кв. Владиславово, третата е в ж.к. Владислав Варненчик, а „ДКЦ Чайка“ ЕООД
+  // води шест реда по fail-open. Мерени 04.09 с този сценарий, не преписани.
+  ["владиславово детска градина", 2, true, "ДГ№40 „Детски свят“"],
+  ["детска градина владислав варненчик", 3, true, 'ДГ 39 "Приказка"'],
   ["владиславово училище", 4, false, "Спортно училище Георги Бенковски"],
   ["хотел владиславово", 22, false, "Hotel Color"],
-  ["дкц владиславово", 5, false, "„ДКЦ Чайка“ ЕООД"],
+  ["дкц владиславово", 6, false, "„ДКЦ Чайка“ ЕООД"],
   ["хотел зпз", 22, false, "Hotel Color"],
   ["горчива чешма хотел", 22, false, "Hotel Color"],
   ["училище жкизгрев", 4, false, "Спортно училище Георги Бенковски"],
 ];
 
-const PLACES_CACHE = "fire-varna-hotels-v2-226";
+const PLACES_CACHE = "fire-varna-hotels-v2-225";
 const HOTELS_URL = BASE + "data/hotels.json";
 
 const PL_VISIBLE_JS = "document.getElementById('placesSearchResults').classList.contains('visible')";
@@ -1653,12 +1683,20 @@ function scenariosDigest(scenarios) {
     // and a checkout path is nobody's business outside this machine (F3-к).
     env: { repo: path.basename(REPO), port: HTTP_PORT, pageUrl: PAGE_URL, viewport: view },
     beforeEnv: beforeDoc ? { pageUrl: beforeDoc.pageUrl || null, viewport: beforeDoc.viewport || null } : null,
+    details: DETAILS,
+    beforeDetails: beforeDoc ? (beforeDoc.details || null) : null,
     before: before === undefined || before === null ? null : sha(before),
     after: sha(scenarios),
     error,
   };
+  out.detailsOk = detailsUsable(DETAILS);
+  out.beforeDetailsOk = !!beforeDoc && detailsUsable(beforeDoc.details);
   out.sameEnv = !!beforeDoc && beforeDoc.pageUrl === PAGE_URL
-    && JSON.stringify(beforeDoc.viewport) === JSON.stringify(view);
+    && JSON.stringify(beforeDoc.viewport) === JSON.stringify(view)
+    // Амандамент №10 (1): a base written without details/ can never be equalled
+    // by a checkout that has it, so „no details/ on either side" is not the same
+    // environment — it is a base that must be re-recorded.
+    && out.detailsOk && out.beforeDetailsOk;
   out.equal = out.before !== null && out.before === out.after;
   return out;
 }
@@ -1912,6 +1950,8 @@ async function main() {
               `${SCREENS ? "375×812" : `${W}×${H}`}${MOB ? " (мобилен)" : ""} ===`);
   fs.mkdirSync(OUT_DIR, { recursive: true });
   await startServer();
+  DETAILS = await readDetailsEnv();
+  console.log(`  ${DETAILS_REL}: ${DETAILS.files} файла · пробна заявка ${DETAILS.sample || "-"} → ${DETAILS.status}`);
   await startChrome();
   if (SCREENS) { await runScreens(); return; }
   const s = await openSession();
@@ -1938,6 +1978,7 @@ async function main() {
     mode: MODE,
     viewport: { width: W, height: H, mobile: MOB },
     pageUrl: PAGE_URL,
+    details: DETAILS,
     corpus: G3_QUERIES,
     scenarios,
     errs: s.errs,
@@ -1958,7 +1999,8 @@ async function main() {
   if (MODE === "after") {
     const digest = scenariosDigest(scenarios);
     console.log(`  G3 дайджест: before ${digest.before} · after ${digest.after} · равни: ${digest.equal}`);
-    console.log(`  G3 среда: порт ${HTTP_PORT} · ${W}×${H}${MOB ? " (мобилен)" : ""} · същата като before.json: ${digest.sameEnv}`);
+    console.log(`  G3 среда: порт ${HTTP_PORT} · ${W}×${H}${MOB ? " (мобилен)" : ""} · същата като before.json: ${digest.sameEnv}`
+                + ` (details/ тук: ${digest.detailsOk} · в базата: ${digest.beforeDetailsOk})`);
     const g4 = await runG4(s);
     g4.scenariosDigest = digest;
     const g4Path = path.join(OUT_DIR, "g4.json");

@@ -253,6 +253,26 @@ for form, chips in cats["forms"].items():
     for c in chips:
         e["chips"].add(key_of(c))
         e["heads"].add(key_of(CHIP_HEAD.get(c, c)))
+
+# LOT 1, amendment 8 P2 (Petar's signature, 03.09): the words that ask for MORE
+# THAN ONE delivered kind. The dictionary already maps a form to a SET of chips
+# („заведение“ -> three), but its own „детско заведение“ chip counts 3D bodies,
+# not our rows, and the dictionary is a delivery from varna_3d that is never
+# hand-edited — so the binding of the word to OUR kinds lives here. index.html
+# carries the same table (EXTRA_FORMS); a drift between the two is a failed gate.
+# Only the chip set is widened: `heads` drives the ONE-token A2 rule and both
+# words here are two tokens, so a head would be dead weight.
+EXTRA_FORMS = {
+    u"детско заведение": [u"детска градина", u"детска ясла"],
+    u"детски заведения": [u"детска градина", u"детска ясла"],
+}
+for form, kinds in EXTRA_FORMS.items():
+    fk = key_of(form)
+    if fk:
+        e = FORM_IDX.setdefault(fk, {"chips": set(), "heads": set(), "forms": set()})
+        e["forms"].add(form)
+        for c in kinds:
+            e["chips"].add(key_of(c))
 MAXFORM = 3   # plan sec.3 T2: forms up to 3 tokens
 
 # A5: address markers are never significant (post-norm forms: блок->бл, вход->вх)
@@ -488,6 +508,10 @@ KIND_GROUP = {
     u"ДКЦ": u"ДКЦ",
     u"хоспис": u"Хосписи",
     u"детска градина": u"Детски градини",
+    # LOT 1, amendment 8 P2: the two new kinds of the delivery get a heading each
+    # — the nursery is NOT a kindergarten (Petar's words, 03.09).
+    u"детска ясла": u"Детски ясли",
+    u"общежитие": u"Общежития",
 }
 GEN_CAP = 300                                    # M3/B2: the generosity ceiling
 
@@ -1100,6 +1124,12 @@ chk2(u"йо", u"Йо (голата 2-знакова заявка — по П5)",
 P7_EXPECTED = {
     u"Западна промишлена зона": [u"zpz"],
     u"ж.к. Владислав Варненчик": [u"vladislavovo"],
+    # Амандамент №10 (3): the SEVENTH token, and it came from the data, not from
+    # the rule. Решение „к.к. Св. Константин“ -> „к.к. Св. Св. Константин и Елена“
+    # made the zone match its registry family, and the registry spells the family
+    # „Кк Св. Констанин и Елена“ — a typo IN THE SOURCE, kept because it is what a
+    # human types. Р5: a zone that enters the delivery legitimately changes this.
+    u"к.к. Св. Св. Константин и Елена": [u"konstanin"],
     u"кв. Владиславово": [u"varnenchik", u"vladislav"],
     u"кв. Изгрев": [u"zhkizgrev"],
     u"м-т Горчивата чешма": [u"gorchiva"],
@@ -1138,6 +1168,15 @@ P7_GAINS = [
         (u'I ЕГ', u'кв. Изгрев', u'училище'),
         (u'3 ОУ Ангел Кънчев', u'кв. Изгрев', u'училище'),
         (u'ОУ Черноризец Храбър', u'кв. Изгрев', u'училище'),
+    ]),
+    # Амандамент №10 (3): the query for the seventh token. Measured 04.09 on the
+    # ЛОТ 1 delivery: the misspelling „констанин“ used to be 25 rows of fail-open by
+    # name; with the alias it is the category+zone list of the resort itself.
+    (u'хотел констанин', u'A3-category+zone/kind', 37,
+     u'§11 С2′: хотелите в к.к. Св. Св. Константин и Елена по регистровото изписване', [
+        (u'Калифорния', u'к.к. Св. Св. Константин и Елена', u'Семеен хотел'),
+        (u'Амфора', u'к.к. Св. Св. Константин и Елена', u'Семеен хотел'),
+        (u'Адия Блу', u'к.к. Св. Св. Константин и Елена', u'Семеен хотел'),
     ]),
 ]
 
@@ -1290,6 +1329,35 @@ LOT1_GAINS = [
         (u'ГРАДИНА', u'к.к. Чайка', u'Хотел'),
         (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска градина'),
     ]),
+    # Амандамент №8 П2 (подписът на Петър, 03.09) — трите нови думи на доставката
+    # и Владиславово. Стойностите са МЕРЕНИ върху d9c6c06, не преписани.
+    (u'детско заведение', u"M1-category", 61,
+     u'П2: една форма, два вида — 51 градини + 10 ясли в един отговор', [
+        (u'ДГ№12 „Ян Бибиян“', u'м-т Шашкъна', u'детска градина'),
+        (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска ясла'),
+    ]),
+    (u'детски заведения', u"M1-category", 61,
+     u'П2: същото в множествено число — същият набор, същата подредба', [
+        (u'ДГ№12 „Ян Бибиян“', u'м-т Шашкъна', u'детска градина'),
+        (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска ясла'),
+    ]),
+    (u'ясла', u"M1-category", 10,
+     u'нов вид „детска ясла“: главата на чипа е ключ сама по себе си', [
+        (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска ясла'),
+    ]),
+    (u'детска ясла', u"M1-category", 10,
+     u'нов вид „детска ясла“: пълната форма; яслите НЕ са в „детска градина“', [
+        (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска ясла'),
+    ]),
+    (u'общежитие', u"M1-category", 1,
+     u'нов вид „общежитие“: единственият ред на доставката', [
+        (u'ЦПЛР – Средношколско общежитие „Михаил Колони“', u'м-т Шашкъна', u'общежитие'),
+    ]),
+    (u'детска градина владиславово', u"A3-category+zone/kind", 5,
+     u'Владиславово: 4 положени по регистър + ОДЗ Маргаритка (ДГ№42 е на борда)', [
+        (u'ДГ 39 "Приказка"', u'ж.к. Владислав Варненчик', u'детска градина'),
+        (u'ДГ№40 „Детски свят“', u'кв. Владиславово', u'детска градина'),
+    ]),
 ]
 
 LOT1_CONTROLS = [
@@ -1311,6 +1379,18 @@ LOT1_CONTROLS = [
     (u'детска градина', u"M1-category", 46,
      u'решение 2: няма запис с точно това име — категорийният списък стои сам', [
         (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска градина'),
+    ]),
+    # Амандамент №2 (ж) -> §В на подписаното превю: старата П7 контрола „детска
+    # градина приморски“ е обезсилена от законна данна (ДГ№19 „Славейче“ е първата
+    # градина със зона „район Приморски“). Тези две я заместват: всяка сама държи
+    # и клона, и броя, и всяка пада, ако предпазителят (д)+(д′) на П7 отпадне.
+    (u'детска ясла аспарухово', u'M2-failopen', 13,
+     u'В1: няма ясла в „кв. Аспарухово“ → fail-open по имена, не А3 списък', [
+        (u'ДЯ №14 „Звънче“', u'район Одесос', u'детска ясла'),
+    ]),
+    (u'университет приморски', u'M2-failopen', 9,
+     u'В2: няма университет в „район Приморски“ → fail-open; води хотел ПРИМОРСКИ', [
+        (u'ПРИМОРСКИ', u'к.к. Св. Св. Константин и Елена', u'Хотел'),
     ]),
 ]
 
@@ -1343,8 +1423,8 @@ def check_p7_gate():
     a regression is red in the suite without a human eye."""
     bad = []
     n_tok = sum(len(v) for v in P7_ADDED.values())
-    if n_tok != 6 or len(P7_ADDED) != 5:
-        bad.append(u"p7_added: expected 6 tokens in 5 zones, got %d in %d (%s)"
+    if n_tok != 7 or len(P7_ADDED) != 6:
+        bad.append(u"p7_added: expected 7 tokens in 6 zones, got %d in %d (%s)"
                    % (n_tok, len(P7_ADDED),
                       json.dumps(P7_ADDED, ensure_ascii=False, sort_keys=True)))
     if P7_ADDED != P7_EXPECTED:
@@ -1784,7 +1864,7 @@ def main():
                      "the search. No cadastral identifiers are read or written."),
             # П7 (§11 v2.1): what the quarter aliases actually added, and why
             # every other candidate fell. The C16 gate reads p7_added and goes
-            # red on any drift from the six tokens in five zones.
+            # red on any drift from the seven tokens in six zones (Амандамент №10).
             "p7_added": P7_ADDED,
             "p7_dropped": P7_DROPPED,
             "p7_zones_with_aliases": len(P7_ADDED),
