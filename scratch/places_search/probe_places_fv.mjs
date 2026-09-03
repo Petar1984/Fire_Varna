@@ -676,6 +676,18 @@ const PARITY = JSON.parse(fs.readFileSync(path.join(OUT_DIR, "token_parity.json"
 // (EXPECTATIONS). checkTokenTable() also counts the rows over there, so a row added
 // to the test without being added here is loud rather than silent.
 const CYR_I_UPPER = "І";
+const CYR_I_LOWER = "і";
+// К2 (plan §12, в): the ONE difference between the two tokenisers' `orig` that the
+// audit of C16 measured, written down instead of masked. Python (recall_sweep.py
+// place_tokens) rewrites the Cyrillic „І“ to the Latin „I“ BEFORE norm(), so the
+// ORIGINAL word of that token is already „i“ there; the client rewrites it inside
+// rewriteToken(), AFTER norm(), so its original stays „і“. `s` and `num` are equal
+// on both sides, so the effect on the search is zero — but it is a difference, and
+// it is listed here by name. Any OTHER difference in `orig` is a failed gate.
+const PARITY_KNOWN_ORIG = [
+  { s: CYR_I_UPPER + " ОУ „Свети княз Борис I“", index: 0, python: "i", js: CYR_I_LOWER,
+    why: "Python заменя кирилското І преди norm(); клиентът — в rewriteToken(), след norm()" },
+];
 const TOKEN_TABLE = [
   ["VII СУ „Найден Геров“", ["7", "su", "naiden", "gerov"]],
   ["седмо су", ["7", "su"]],
@@ -942,27 +954,82 @@ async function checkTokenTable(s) {
 // record name, in order. What the shipped export hands out is the `s` sequence —
 // the very thing that becomes ntk/ztk/zkset — plus `num`, which follows from `s`
 // by the same rule on both sides (a token is numeric exactly when it is digits).
-// `orig` is not reachable through window.__places and C16 opens no new export;
-// it stays covered by the 18-row table of G12б and the unit test.
+// К2 (в): `orig` is the third field of a token and `window.__places.tokens` does not
+// export it (it maps to `t.s`), while index.html is byte-untouched by this lot. So the
+// probe lifts the page's OWN tokeniser source out of index.html — the exact range from
+// `function norm(` to the line above `const keyOf` — and builds a second copy of it in
+// the page under a name of its own. The copy is trusted for `orig` only after it answers
+// `s` identically to the live `window.__places.tokens` for every string of the corpus;
+// a drift between the copy and the live one is a mismatch like any other, never a silent
+// fallback, and a source that cannot be found or built ends the run with 1.
+function tokenizerSource() {
+  const html = fs.readFileSync(path.join(REPO, "index.html"), "utf8");
+  const anchor = html.indexOf("// ---- Т1/Б1 tokenizer");
+  const start = anchor === -1 ? -1 : html.lastIndexOf("function norm(s){return", anchor);
+  const end = html.indexOf("const keyOf = (s) => placeTokens(s)");
+  if (anchor === -1 || start === -1 || end === -1 || end <= start) return null;
+  return html.slice(start, end);
+}
+
 async function checkTokenParity(s) {
   const strings = PARITY.strings;
-  const mismatches = [];
+  const source = tokenizerSource();
+  const installed = source === null
+    ? "ПАДА: изворът на токенизатора не се намери в index.html"
+    : await s.ev(`(function () { try {
+        window.__probeTokens = new Function(${JSON.stringify(source + "\nreturn placeTokens;")})();
+        return typeof window.__probeTokens === "function";
+      } catch (e) { return "ПАДА: " + String(e); } })()`);
+  const mismatches = [], expectedOrig = [];
+  if (installed !== true)
+    mismatches.push({ s: "(копие на токенизатора)", diffs: [{ field: "install", got: installed }] });
   for (let i = 0; i < strings.length; i += 60) {
     const chunk = strings.slice(i, i + 60);
+    const list = JSON.stringify(chunk.map((x) => x.s));
     const got = JSON.parse(await s.ev(
-      `JSON.stringify(${JSON.stringify(chunk.map((x) => x.s))}.map(function (q) { return window.__places.tokens(q); }))`));
+      `JSON.stringify(${list}.map(function (q) { return window.__places.tokens(q); }))`));
+    const full = installed === true ? JSON.parse(await s.ev(
+      `JSON.stringify(${list}.map(function (q) { return window.__probeTokens(q); }))`)) : null;
     for (let j = 0; j < chunk.length; j++) {
       const want = chunk[j].tokens.map((t) => t.s);
       const wantNum = chunk[j].tokens.map((t) => !!t.num);
-      const gotNum = got[j].map((t) => /^[0-9]+$/.test(t));
-      if (JSON.stringify(got[j]) !== JSON.stringify(want)
-          || JSON.stringify(gotNum) !== JSON.stringify(wantNum))
-        mismatches.push({ s: chunk[j].s, want, got: got[j], wantNum, gotNum });
+      const wantOrig = chunk[j].tokens.map((t) => t.orig);
+      const gotNum = full ? full[j].map((t) => !!t.num) : got[j].map((t) => /^[0-9]+$/.test(t));
+      const diffs = [];
+      if (JSON.stringify(got[j]) !== JSON.stringify(want))
+        diffs.push({ field: "s", want, got: got[j] });
+      if (JSON.stringify(gotNum) !== JSON.stringify(wantNum))
+        diffs.push({ field: "num", want: wantNum, got: gotNum });
+      if (full) {
+        const copyS = full[j].map((t) => t.s);
+        if (JSON.stringify(copyS) !== JSON.stringify(got[j]))
+          diffs.push({ field: "copy", want: got[j], got: copyS });
+        const gotOrig = full[j].map((t) => t.orig);
+        const unknown = [];
+        for (let k = 0; k < Math.max(gotOrig.length, wantOrig.length); k++) {
+          if (gotOrig[k] === wantOrig[k]) continue;
+          const one = { s: chunk[j].s, index: k, python: wantOrig[k] === undefined ? null : wantOrig[k],
+                        js: gotOrig[k] === undefined ? null : gotOrig[k] };
+          const known = PARITY_KNOWN_ORIG.some((x) => x.s === one.s && x.index === one.index
+                                                   && x.python === one.python && x.js === one.js);
+          if (known) expectedOrig.push(one); else unknown.push(one);
+        }
+        if (unknown.length) diffs.push({ field: "orig", got: unknown });
+      }
+      if (diffs.length) mismatches.push({ s: chunk[j].s, diffs });
     }
   }
+  // A known difference that is no longer there is information, not a regression:
+  // it is written down and warned about, never quietly dropped.
+  const notSeen = PARITY_KNOWN_ORIG.filter(
+    (x) => !expectedOrig.some((e) => e.s === x.s && e.index === x.index));
+  if (notSeen.length) warn(`очаквана разлика в orig, която вече я няма: ${notSeen.length}`);
   return { total: strings.length, aliases: PARITY._meta.aliases,
            records: PARITY._meta.records, passed: strings.length - mismatches.length,
-           compares: "s + num (orig is not exported)", mismatches: mismatches.slice(0, 20) };
+           compares: "s + orig + num (orig през копие на токенизатора от index.html)",
+           copyInstalled: installed === true, copyNote: installed === true ? null : installed,
+           expectedOrigDifferences: expectedOrig, expectedOrigNotSeen: notSeen,
+           mismatches: mismatches.slice(0, 20) };
 }
 
 // С8′ — the dictionary's own load: cold, warm (our cache namespace), held past
@@ -1404,6 +1471,58 @@ async function checkOrdering(s) {
   return out;
 }
 
+// К2 (plan §12, а; C14 condition 3) — the transition Petar reported: „хотел адмирал“
+// EDITED down to „адмирал“, with NO empty field in between. Everything above goes
+// through clearField(), which hides exactly the moment that matters: on an empty field
+// our list closes and the remainder is removed anyway. Here the „хотел “ is deleted the
+// way a keyboard deletes it — the value changes and an `input` event is dispatched —
+// and their inline style is read SYNCHRONOUSLY, inside the very same expression, i.e.
+// in the same task as our input listener and before their 120 ms debounce has mutated
+// anything (С1: bareTheirs() is synchronous, and G3 reads their FIRST mutation).
+const EDIT_FIELD_JS = (text) => `(function () {
+  var input = document.getElementById('addrSearchInput');
+  var theirs = document.getElementById('addrSearchResults');
+  var before = theirs.getAttribute('style');
+  input.value = ${JSON.stringify(text)};
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  return JSON.stringify({ styleBeforeInput: before,
+                          styleAfterInput: theirs.getAttribute('style'),
+                          value: input.value });
+})()`;
+
+async function checkEditTransition(s) {
+  await navigateFresh(s, "К2 редакция без изпразване");
+  if (!(await placesReady(s))) return { ready: false, ok: false };
+  const keyedRows = await typePlaces(s, "хотел адмирал");
+  const keyed = await s.ev(GEOM_JS);
+  await focusInput(s);
+  const edit = JSON.parse(await s.ev(EDIT_FIELD_JS("адмирал")));
+  await sleep(POLL_MS * 8);
+  await waitSettled(s, 30000);
+  const rows = await s.ev(PL_ROWS_JS);
+  const after = await s.ev(GEOM_JS);
+  const out = {
+    ready: true,
+    keyed: { rows: keyedRows.rows.length, headers: keyed.headers, mineFirst: keyed.mineFirst,
+             theirStyle: keyed.theirStyle, theirRows: keyed.theirRows },
+    edited: { value: edit.value, styleBeforeInput: edit.styleBeforeInput,
+              styleImmediatelyAfterInput: edit.styleAfterInput,
+              styleSettled: after.theirStyle, mineFirst: after.mineFirst,
+              headers: after.headers, rows: rows.rows.length, theirRows: after.theirRows,
+              mineVisible: after.mineVisible, theirVisible: after.theirVisible },
+  };
+  // The gate, in Petar's words: with the key we stand on top; the moment „хотел “ is
+  // gone their container carries NO style of ours (immediately, not after a settle),
+  // the addresses are back on top and the Хотели group stands under them.
+  out.ok = keyed.mineFirst === true && keyed.theirStyle !== null
+    && edit.styleAfterInput === null && after.theirStyle === null
+    && after.mineFirst === false && after.mineVisible === true && after.theirVisible === true
+    && rows.rows.length > 0 && after.theirRows > 0
+    && JSON.stringify(after.headers) === JSON.stringify(["Хотели"]);
+  await clearField(s);
+  return out;
+}
+
 // Sol C2 — Enter while a key is in the field is OURS, decided by a capture
 // listener; their handler never starts (one popup, one pin, their list quiet).
 async function checkEnterKeyed(s) {
@@ -1495,6 +1614,29 @@ async function checkMobileKeyed(s) {
   return out;
 }
 
+// К2 (plan §12, г; C14b finding 5): G3 is „the address corpus did not move a byte“,
+// and until now the digest in the report was carried over by hand — the one in the C16
+// report did not reproduce from the recorded scenarios at all. The probe computes both
+// sides ITSELF, over `JSON.stringify(scenarios)` (the object as it holds it, before.json
+// as it reads it from disk), writes both into g4.json and ends the run with 1 if they
+// differ. A missing or unreadable before.json is a failed gate, not a skipped one.
+function scenariosDigest(scenarios) {
+  const sha = (value) => crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
+  const beforePath = path.join(OUT_DIR, "before.json");
+  let before = null, error = null;
+  try { before = JSON.parse(fs.readFileSync(beforePath, "utf8")).scenarios; }
+  catch (e) { error = String(e && e.message ? e.message : e); }
+  const out = {
+    what: "sha256(JSON.stringify(scenarios)) — before.json срещу този прогон",
+    file: path.relative(REPO, beforePath).split(path.sep).join("/"),
+    before: before === undefined || before === null ? null : sha(before),
+    after: sha(scenarios),
+    error,
+  };
+  out.equal = out.before !== null && out.before === out.after;
+  return out;
+}
+
 // G12г — the constants against the bytes of the tracked files.
 function checkShaPins() {
   const index = fs.readFileSync(path.join(REPO, "index.html"), "utf8");
@@ -1524,6 +1666,9 @@ async function runG4(s) {
   out.parity = await checkTokenParity(s);
   console.log(`     С6′ токенизатори: ${out.parity.passed}/${out.parity.total} ` +
               `(${out.parity.aliases} псевдонима + ${out.parity.records} имена, ${out.parity.compares})`);
+  console.log(`     К2 orig: копие ${out.parity.copyInstalled ? "вдигнато" : "ПАДА"}, ` +
+              `очаквани разлики ${out.parity.expectedOrigDifferences.length}` +
+              `${out.parity.expectedOrigNotSeen.length ? ` (липсващи очаквани: ${out.parity.expectedOrigNotSeen.length})` : ""}`);
   out.reference = await checkReferenceRows(s);
   console.log(`     G12в: ${out.reference.passedOrdered}/${out.reference.total} подредени, ` +
               `${out.reference.passedSets}/${out.reference.total} като множества, режим ${out.reference.mode}`);
@@ -1541,6 +1686,10 @@ async function runG4(s) {
   out.ordering = await checkOrdering(s);
   console.log(`     подредбата: "хотел адмирал" наши отгоре: ${out.ordering["хотел адмирал"].mineFirst}, ` +
               `"адмирал" наши отгоре: ${out.ordering["адмирал"].mineFirst}`);
+  out.editTransition = await checkEditTransition(s);
+  console.log(`     К2 преход „хотел адмирал“ → „адмирал“ без изпразване: `
+              + `стил веднага след input ${JSON.stringify(out.editTransition.edited ? out.editTransition.edited.styleImmediatelyAfterInput : null)}, `
+              + `адресите отгоре: ${out.editTransition.edited ? !out.editTransition.edited.mineFirst : null}`);
   out.enterKeyed = await checkEnterKeyed(s);
   out.popupRule = await checkPopupRule(s);
   out.mobileKeyed = await checkMobileKeyed(s);
@@ -1781,7 +1930,10 @@ async function main() {
   // or a dictionary scenario that fell are gates now - they end the run with 1.
   const hard = [];
   if (MODE === "after") {
+    const digest = scenariosDigest(scenarios);
+    console.log(`  G3 дайджест: before ${digest.before} · after ${digest.after} · равни: ${digest.equal}`);
     const g4 = await runG4(s);
+    g4.scenariosDigest = digest;
     const g4Path = path.join(OUT_DIR, "g4.json");
     fs.writeFileSync(g4Path, JSON.stringify(g4, null, 2) + "\n");
     console.log(`  записах ${g4Path} (кука за C4)`);
@@ -1795,6 +1947,10 @@ async function main() {
       hard.push(`G12в ${g4.reference.passedOrdered}/${g4.reference.total} подредени`);
     if (g4.m5 && g4.m5.some((r) => !r.ok)) hard.push(`М5 ${g4.m5.filter((r) => r.ok).length}/${g4.m5.length}`);
     if (g4.cats && !g4.cats.ok) hard.push("С8′ речник");
+    if (g4.editTransition && !g4.editTransition.ok)
+      hard.push("К2 преход „хотел адмирал“ → „адмирал“ без изпразване");
+    if (!digest.equal)
+      hard.push(`G3 дайджест на scenarios: ${digest.before} ≠ ${digest.after}${digest.error ? " (" + digest.error + ")" : ""}`);
   }
 
   console.log(`  конзолни грешки: ${s.errs.length}`);

@@ -1128,8 +1128,18 @@ P7_CONTROLS = [
     (u'др шишманов', u'M3', 1, u'§11 Р10: голото „др“ → доктор (примитивният тест)', [
         (u'СУУНЗ Проф. д-р Иван Шишманов', u'Аспарухово/Галата', u'училище'),
     ]),
-    (u'училище бриз', u'A3-category+zone/kind', 1, u'§11 С3′ диференциал: 1 (без предпазителя и v1-данни: 2)', [
-        (u'IV ЕГ Жолио Кюри', u'ж.к. Бриз', u'училище'),
+    # К2 (§12, д): the replacement for „училище бриз“, which did NOT differentiate
+    # (C14b finding 3, re-measured 03.09 against a copy of this file with the
+    # foreign-token step cut out: училище бриз 1/1, детска градина бриз 1/1,
+    # хотел бриз 6/6, хотел бриз юг 6/6 — `briz` never enters the index either
+    # way, so no бриз query can tell the guard apart). This one does: with the
+    # guard 12 rows on M2-failopen, without it 4 rows on A3 (`primorski` opens the
+    # category+zone filter for the kindergartens of Морска градина/Салтанат)
+    # — count AND branch AND first row all move.
+    (u'детска градина приморски', u'M2-failopen', 12, u'§12 К2(д) диференциал: 12 на M2-failopen (без предпазителя: 4 на A3)', [
+        (u'Детска градина "Жирафче"', u'кв. Изгрев', u'детска градина'),
+        (u'Оздравителна Детска Градина №9 "Ален Мак"', u'кв. Чайка', u'детска градина'),
+        (u'ДЯ №14 „Звънче“', u'район Одесос', u'детска градина'),
     ]),
     (u'детска градина аспарухово', u'A3-category+zone/kind', 2, u'§11 С3′ диференциал: 2 (без предпазителя: 4)', [
         (u'ДГ№44 „Валентина Терешкова"', u'кв. Аспарухово', u'детска градина'),

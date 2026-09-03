@@ -91,11 +91,26 @@ _MOJIBAKE_RE = re.compile("[\u00d0\u00d1\u00c2][\u0080-\u00ff]")
 # old_names, so the rule was fixed rather than the expectation (plan §10 doctrine):
 # "0, 8, any digit, then seven more digits, each optionally separated". Strictly more
 # sensitive than the brief's pattern, and still zero hits on the delivery.
+#
+# К2 (plan §12, closing C14 finding 6): the mobile rule above cannot see a VARNA
+# LANDLINE — nine digits, "052 123 456" / "052/123-456" / "052123456" — which is
+# exactly the number a hotel or a practice publishes. Measured 03.09 over the free
+# text of all three delivered files (data/hotels.json 467 values, data/places.json
+# 314, data/place_categories.json 1732 strings) and over their raw bytes: zero hits,
+# so the rule costs nothing today: the longest digit run anywhere in the three
+# files is FOUR („ЧОУ "Феникс 2020"“; „ж.к. ИЗГРЕВ 552-2“ has three, „ЦДГ 43
+# "Пинокио"“ two), five short of the nine the pattern needs, so no house number
+# and no school number can trip it. The doctor rule likewise becomes the WHOLE WORD
+# „д-р“/„доктор“/„dr“ standing IN FRONT OF a name — the sibling gate's pattern
+# verbatim (test_places_public_bundle._DOCTOR_RE), so "доктор Иванов" is caught
+# here too, where "\bд-р\b" alone let it through. Zero hits on the hotels
+# delivery before and after.
 _PII_PATTERNS = {
     "phone": re.compile(r"(\+359|\b0)8\d(?:[\s-]?\d){7}"),
+    "landline": re.compile(r"0\d{2}[\s/-]?\d{3}[\s-]?\d{3}"),
     "email": re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"),
     "ten_digit_run": re.compile(r"\d{10}"),
-    "doctor": re.compile(r"(?i)\bд-р\b|\bdr\.?\s"),
+    "doctor": re.compile(r"(?:^|[^а-яА-Яa-zA-Z])(?:д-?р|доктор|dr)\b\.?\s+\S", re.I),
     "sole_trader": re.compile(r"\bЕТ\s"),
 }
 

@@ -8,7 +8,10 @@ Until C16 nothing here could go red without a human reading a report:
   1. importing `scratch/places_search/recall_sweep.py` must write NOT ONE BYTE
      (the `if __name__` guard) — measured in a subprocess, sha before/after;
   2. the П7 gains and controls of §11 Р3/С2′–С4′ — {name, zone, kind} AND the
-     branch, not a row count;
+     branch, not a row count; К2 (§12, д) replaced the differential control
+     „училище бриз“, which did not differentiate, with „детска градина
+     приморски“, which does (12 rows on M2-failopen with the guard, 4 on A3
+     without it), and gates the guard itself here;
   3. `p7_added` is exactly the six tokens in five zones §11 v2.1 measured;
   4. the frozen diff: the 72 queries that existed before П7 give byte-identical
      ordered rows and the same branch as `git show 7a6ea1d:…rows.json`.
@@ -113,6 +116,33 @@ class P7RuleTest(unittest.TestCase):
                 self.assertIn(token, rec.zkset, rec.name)
                 self.assertNotIn(token, rec.nset, rec.name)
                 self.assertNotIn(token, rec.aset, rec.name)
+
+    def test_the_foreign_token_guard_is_load_bearing(self):
+        """К2 (§12, д): the guard of step (д)/(д′), measured instead of asserted.
+
+        The replaced control („детска градина приморски“) differentiates because
+        of this: the foreign-token step is the ONLY thing that keeps `primorski`
+        and `primorskiat` (own tokens of район Приморски) out of the zone tokens
+        of Морска градина, and `asparuhovo` (кв. Аспарухово) out of ж.к. Дружба.
+        The guard is fed by the OTHER zones of the delivery, so it can be starved
+        without editing one byte of it — a call with a single zone has nothing
+        foreign to compare against. Measured 03.09; the same four tokens that a
+        copy of the reference with the step cut out adds back."""
+        cats = json.loads((REPO / "data" / "place_categories.json").read_text(encoding="utf-8"))
+        _, added, dropped = REF.zone_alias_tokens(cats, REF.ZONES_IN)
+        # the tag is `foreign:<the foreign token>:<the candidate>` — „primorskiat“
+        # falls against „primorski“ through the lev<=2 step (д′) of §11 Р1.
+        for zone, token, tag in (
+                (u"Морска градина", "primorski", "foreign:primorski:primorski"),
+                (u"Морска градина", "primorskiat", "foreign:primorski:primorskiat"),
+                (u"м-т Салтанат", "primorski", "foreign:primorski:primorski"),
+                (u"ж.к. Дружба", "asparuhovo", "foreign:asparuhovo:asparuhovo")):
+            self.assertNotIn(token, added.get(zone, []), zone)
+            self.assertIn(tag, dropped.get(zone, []), zone)
+        _, alone, _ = REF.zone_alias_tokens(cats, [u"Морска градина"])
+        self.assertEqual(alone.get(u"Морска градина"), ["primorski", "primorskiat"])
+        _, alone, _ = REF.zone_alias_tokens(cats, [u"ж.к. Дружба"])
+        self.assertEqual(alone.get(u"ж.к. Дружба"), ["asparuhovo"])
 
     def test_fail_soft_without_a_dictionary(self):
         """С7′: no `zones`, a `zones` that is not an object, aliases that are not

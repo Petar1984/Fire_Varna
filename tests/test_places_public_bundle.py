@@ -73,11 +73,19 @@ LICENCE_REGISTRY = 'Имената и регистровите данни: от�
 _CADASTRAL_RE = re.compile(r"\b\d{4,5}\.\d+\.\d+")
 # UTF-8 read back as cp1252 leaves these two-byte signatures (AGENTS.md § encoding).
 _MOJIBAKE_RE = re.compile("[\u00d0\u00d1\u00c2][\u0080-\u00ff]")
-# Personal data in the free text. The four patterns below are the hotel gate's, verbatim
-# (including its widened phone rule, which the 02.09 G2 run proved necessary); the doctor
-# rule is separate, see _DOCTOR_RE.
+# Personal data in the free text. The five patterns below are the hotel gate's, verbatim
+# (its widened phone rule, which the 02.09 G2 run proved necessary, and the К2 landline
+# below); the doctor rule is separate, see _DOCTOR_RE.
+# К2 (plan §12, closing C14 finding 6): a VARNA LANDLINE is nine digits and the
+# mobile rule above cannot see it ("052 123 456" / "052/123-456" / "052123456").
+# Measured 03.09 over the free text of all three delivered files (hotels 467
+# values, places 314, place_categories 1732 strings) and over their raw bytes:
+# zero hits. The longest digit run anywhere in the three is FOUR („ЧОУ "Феникс
+# 2020"“), five short of the nine this pattern needs — a school number („ЦДГ 43
+# "Пинокио"“) or a block number can never trip it.
 _PII_PATTERNS = {
     "phone": re.compile(r"(\+359|\b0)8\d(?:[\s-]?\d){7}"),
+    "landline": re.compile(r"0\d{2}[\s/-]?\d{3}[\s-]?\d{3}"),
     "email": re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"),
     "ten_digit_run": re.compile(r"\d{10}"),
     "sole_trader": re.compile(r"\bЕТ\s"),
@@ -86,6 +94,18 @@ _PII_PATTERNS = {
 # the Latin `dr` alternative the hotel gate carries. Measured on the delivery: the wider
 # pattern finds the same ten names, all institutional, so it costs nothing and catches
 # "Dr Ivanov" too.
+#
+# К2 (plan §12): „д-р“/„доктор“/„dr“ is matched as a WHOLE WORD standing in front of a
+# name — no letter before it (the leading class), a word boundary after it, then a
+# space and a following word. The same pattern now stands in the hotels gate, which
+# until К2 only knew the hyphenated „д-р“ and missed „доктор Иванов“ altogether.
+# Measured 03.09: ten hits on the delivery, the same ten as before, all institutional.
+# NOT closed here, and named so it is not mistaken for closed: institutional() below
+# matches its words as a PREFIX, so a private practice whose family name happens to
+# start with an abbreviation of the list („д-р Мутафов“ — „МУ“) is still let through.
+# Turning that prefix into a whole word is NOT free: measured, it turns one of the ten
+# legitimate names red („ПГТ „Проф. д-р Асен Златаров"“ — „ПГТ“ is caught only by the
+# „ПГ*“ prefix of §6 К7), so the repair needs its own measure and Petar's word.
 _DOCTOR_RE = re.compile(r"(?:^|[^а-яА-Яa-zA-Z])(?:д-?р|доктор|dr)\b\.?\s+\S", re.I)
 # §6 К7 ∪ plan §2 Д1 — the institutional words, matched as a PREFIX of a word. Copied from
 # the exporter gate; not one word more, because every added word loosens the check.

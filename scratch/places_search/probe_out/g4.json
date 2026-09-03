@@ -267,7 +267,18 @@
     "aliases": 62,
     "records": 361,
     "passed": 421,
-    "compares": "s + num (orig is not exported)",
+    "compares": "s + orig + num (orig през копие на токенизатора от index.html)",
+    "copyInstalled": true,
+    "copyNote": null,
+    "expectedOrigDifferences": [
+      {
+        "s": "І ОУ „Свети княз Борис I“",
+        "index": 0,
+        "python": "i",
+        "js": "і"
+      }
+    ],
+    "expectedOrigNotSeen": [],
     "mismatches": []
   },
   "reference": {
@@ -2342,19 +2353,23 @@
         "diffRef": null
       },
       {
-        "q": "училище бриз",
-        "expect": "§11 С3′ диференциал: 1 (без предпазителя и v1-данни: 2)",
+        "q": "детска градина приморски",
+        "expect": "§12 К2(д) диференциал: 12 на M2-failopen (без предпазителя: 4 на A3)",
         "bucket": "gate_p7",
-        "category": true,
-        "n": 1,
-        "refN": 1,
+        "category": false,
+        "n": 12,
+        "refN": 12,
         "ordered": true,
         "sets": true,
         "first3": [
-          "IV ЕГ Жолио Кюри · ж.к. Бриз"
+          "Детска градина \"Жирафче\" · кв. Изгрев",
+          "Оздравителна Детска Градина №9 \"Ален Мак\" · кв. Чайка",
+          "ДЯ №14 „Звънче“ · район Одесос"
         ],
         "refFirst3": [
-          "IV ЕГ Жолио Кюри · ж.к. Бриз"
+          "Детска градина \"Жирафче\" · кв. Изгрев",
+          "Оздравителна Детска Градина №9 \"Ален Мак\" · кв. Чайка",
+          "ДЯ №14 „Звънче“ · район Одесос"
         ],
         "firstDiffAt": null,
         "diffOurs": null,
@@ -2406,7 +2421,7 @@
     "passedOrdered": 103,
     "passedSets": 103,
     "total": 103,
-    "rows": 1478
+    "rows": 1489
   },
   "m5": [
     {
@@ -4378,20 +4393,24 @@
       "ok": true
     },
     {
-      "q": "училище бриз",
-      "expect": "§11 С3′ диференциал: 1 (без предпазителя и v1-данни: 2)",
-      "jsN": 1,
-      "refN": 1,
-      "category": true,
+      "q": "детска градина приморски",
+      "expect": "§12 К2(д) диференциал: 12 на M2-failopen (без предпазителя: 4 на A3)",
+      "jsN": 12,
+      "refN": 12,
+      "category": false,
       "jsFirst3": [
-        "IV ЕГ Жолио Кюри · ж.к. Бриз"
+        "Детска градина \"Жирафче\" · кв. Изгрев",
+        "Оздравителна Детска Градина №9 \"Ален Мак\" · кв. Чайка",
+        "ДЯ №14 „Звънче“ · район Одесос"
       ],
       "domVisible": true,
-      "domHeader": "Училища",
-      "domRows": 1,
-      "domMore": null,
+      "domHeader": "Детски градини",
+      "domRows": 10,
+      "domMore": "…и още 2",
       "domFirst3": [
-        "IV ЕГ Жолио Кюри | ж.к. Бриз"
+        "Детска градина \"Жирафче\" | кв. Изгрев",
+        "Оздравителна Детска Градина №9 \"Ален Мак\" | кв. Чайка",
+        "ДЯ №14 „Звънче“ · старо: 14 Детска ясла Звънче | район Одесос"
       ],
       "ok": true
     },
@@ -4889,6 +4908,33 @@
       "settled": null
     }
   },
+  "editTransition": {
+    "ready": true,
+    "keyed": {
+      "rows": 3,
+      "headers": [
+        "Хотели"
+      ],
+      "mineFirst": true,
+      "theirStyle": "top: 228px; max-height: 531px;",
+      "theirRows": 5
+    },
+    "edited": {
+      "value": "адмирал",
+      "styleBeforeInput": "top: 228px; max-height: 531px;",
+      "styleImmediatelyAfterInput": null,
+      "styleSettled": null,
+      "mineFirst": false,
+      "headers": [
+        "Хотели"
+      ],
+      "rows": 3,
+      "theirRows": 4,
+      "mineVisible": true,
+      "theirVisible": true
+    },
+    "ok": true
+  },
   "enterKeyed": {
     "ready": true,
     "picked": true,
@@ -5187,5 +5233,13 @@
     },
     "consoleErrsDuringScenario": 0
   },
-  "consoleWarns": []
+  "consoleWarns": [],
+  "scenariosDigest": {
+    "what": "sha256(JSON.stringify(scenarios)) — before.json срещу този прогон",
+    "file": "scratch/places_search/probe_out/before.json",
+    "before": "ba13967327a7a7f8b494c5f6c6de61413138785d326507cd9a6923aef4bbf062",
+    "after": "ba13967327a7a7f8b494c5f6c6de61413138785d326507cd9a6923aef4bbf062",
+    "error": null,
+    "equal": true
+  }
 }
