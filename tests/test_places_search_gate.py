@@ -222,14 +222,22 @@ class FrozenDiffTest(unittest.TestCase):
         self.assertEqual(rows, 1338)
 
     def test_committed_rows_match_the_frozen_baseline(self):
-        """And the artefact the probe replays says the same thing."""
+        """And the artefact the probe replays says the same thing — the frozen
+        rows plus the ONE signed prepend of решение 2, named in LOT1_PREPENDED."""
         current = json.loads(ROWS.read_text(encoding="utf-8"))
+        prepended = 0
         for bucket in OLD_BUCKETS:
+            want = []
+            for e in self.frozen[bucket]:
+                rows = [(r["name"], r["zone"]) for r in e["rows"]]
+                if e["q"] in LOT1_PREPENDED:
+                    rows = [LOT1_PREPENDED[e["q"]]] + rows
+                    prepended += 1
+                want.append((e["q"], e["branch"], rows))
             self.assertEqual(
                 [(e["q"], e["branch"], [(r["name"], r["zone"]) for r in e["rows"]])
-                 for e in current[bucket]],
-                [(e["q"], e["branch"], [(r["name"], r["zone"]) for r in e["rows"]])
-                 for e in self.frozen[bucket]])
+                 for e in current[bucket]], want)
+        self.assertEqual(prepended, 1)
 
     def test_rows_carry_the_p7_measure(self):
         current = json.loads(ROWS.read_text(encoding="utf-8"))
@@ -248,6 +256,16 @@ class Lot1GateTest(unittest.TestCase):
     def test_gate(self):
         failures = REF.check_lot1_gate()
         self.assertEqual(failures, [], "\n".join(failures))
+
+    def test_the_committed_artefact_carries_the_lot1_bucket(self):
+        """F2-к: the re-frozen artefact carries the ЛОТ 1 bucket the probe replays
+        — one row per signed query (10), every one of them green."""
+        current = json.loads(ROWS.read_text(encoding="utf-8"))
+        bucket = current["gate_lot1"]
+        self.assertEqual(len(bucket), len(REF.LOT1_GAINS) + len(REF.LOT1_CONTROLS))
+        self.assertEqual(len(bucket), 10)
+        for entry in bucket:
+            self.assertTrue(entry["ok"], entry["q"])
 
     def test_the_three_moved_p7_rows_and_no_others(self):
         """The П7 bucket of the frozen artefact, re-run live: exactly the three
