@@ -2,15 +2,15 @@
   "window": "Page.navigate -> first focus of #addrSearchInput",
   "page": [
     {
-      "url": "http://localhost:8000/data/hydrants.json",
+      "url": "http://localhost:8010/data/hydrants.json",
       "status": 200
     },
     {
-      "url": "http://localhost:8000/favicon.ico",
+      "url": "http://localhost:8010/favicon.ico",
       "status": 404
     },
     {
-      "url": "http://localhost:8000/index.html",
+      "url": "http://localhost:8010/index.html",
       "status": 200
     }
   ],

@@ -338,8 +338,52 @@ def zone_alias_tokens(cats_doc, zones):
     return extra, added, dropped
 
 
+def zone_phrases(cats_doc, zones, added):
+    """ЛОТ 1, decision 1 — the canonical zone and each ACCEPTED П7 form of it as
+    ORDERED phrases, one string per form.
+
+    The significant part of a form is its token list minus numbers, tokens of
+    <=2 characters, address markers (ADDR) and the dictionary's own generic zone
+    words — the very filter П7 steps (а)-(г) use. The ORDER and the boundaries
+    are what `zkset` throws away, and they are the whole point here: „морска
+    градина“ is a phrase, „градина“ alone is not.
+
+    An alias form counts only if EVERY significant token of it is already a zone
+    token of that zone — its own, or one П7 accepted (`added`). „Приморски парк“
+    is an alias of Морска градина that П7 threw out as foreign, so it never
+    becomes a phrase; „кв. Владиславово“ was accepted, so it does.
+    Returns {zone: {phrase}}."""
+    zdict = (cats_doc or {}).get("zones")
+    zdict = zdict if isinstance(zdict, dict) else {}
+    generic = set()
+    for word in (((cats_doc or {}).get("_meta") or {}).get("zone_generic_words") or []):
+        for t in place_tokens(word):
+            generic.add(t.s)
+
+    def tokens(s):
+        return [t.s for t in place_tokens(s)
+                if not t.num and len(t.orig) > 2 and len(t.s) > 2
+                and t.orig not in ADDR and t.s not in generic]
+
+    out = {}
+    for z in zones:
+        own = tokens(z)
+        allowed = set(own) | set(added.get(z) or ())
+        out[z] = set([u" ".join(own)]) if own else set()
+        e = zdict.get(z)
+        aliases = e.get("aliases") if isinstance(e, dict) else None
+        for alias in (aliases if isinstance(aliases, list) else []):
+            if not isinstance(alias, str):
+                continue
+            tk = tokens(alias)
+            if tk and all(t in allowed for t in tk):
+                out[z].add(u" ".join(tk))
+    return out
+
+
 ZONES_IN = sorted(set([h["zone"] for h in hotels] + [p["zone"] for p in places2]))
 ZONE_EXTRA, P7_ADDED, P7_DROPPED = zone_alias_tokens(cats, ZONES_IN)
+ZONE_PHRASES = zone_phrases(cats, ZONES_IN, P7_ADDED)
 
 
 class Rec(object):
@@ -365,6 +409,7 @@ class Rec(object):
                 self.ztk.append(t.s)
                 self.p7.append(t.s)
         self.zkset = set(self.ztk) | set(self.ktk)
+        self.zph = ZONE_PHRASES.get(self.zone) or set()   # decision 1: the phrases
         self.kkey = " ".join(self.ktk)
         # A6: old_names are NAME TOKENS, minus <=2 chars and address markers
         self.aset = set()
@@ -384,6 +429,13 @@ class Rec(object):
 # (hotels: 4 kinds; places: school/university/hospital/DKC/hospice/kindergarten).
 # Nothing else in the matcher knows which file a row came from.
 RECS = [Rec(h) for h in hotels] + [Rec(p) for p in places2]
+
+# ЛОТ 1, decision 2 — the exact-CURRENT-name index: joined name tokens -> records.
+# old_names stay out of it on purpose (measured: 0 old-name keys coincide with a
+# populated category key, and a global alias index would wake „ИУ“/„МУ“).
+EXACT_NAME = {}
+for _rec in RECS:
+    EXACT_NAME.setdefault(u" ".join(_rec.ntk), []).append(_rec)
 
 
 def in_class(rec, fk):
@@ -606,6 +658,29 @@ def order_category(recs):
     return sorted(recs, key=lambda r: (r.dist, len(r.name), r.name.lower()))
 
 
+def stable_unique(recs):
+    """ЛОТ 1: dedupe by the RECORD OBJECT, keeping the first place; the already
+    ordered lists are never re-sorted."""
+    out, seen = [], set()
+    for r in recs:
+        if id(r) not in seen:
+            seen.add(id(r))
+            out.append(r)
+    return out
+
+
+def name_has_phrase(rec, R):
+    """ЛОТ 1, decision 1: R as an EXACT ordered run of the CURRENT name tokens
+    (no prefix, no fuzzy). An alias proves the sequence only when it is a single
+    token — `aset` keeps tokens, not phrases, so a longer R through it would be
+    a sum of different aliases, which the rule forbids."""
+    seq = [t.s for t in R]
+    for i in range(len(rec.ntk) - len(seq) + 1):
+        if rec.ntk[i:i + len(seq)] == seq:
+            return True
+    return len(seq) == 1 and seq[0] in rec.aset
+
+
 # --------------------------------------------------------------------- search
 def split_keys(qt):
     """T2 + A1: longest form at each position, but ONLY forms whose class holds
@@ -674,7 +749,14 @@ def search(q):
         R = [t for (t, ki) in slots]
         has_key = False
     if not R:
-        return order_category(cls), "M1-category"          # M1: key only
+        # M1: key only. ЛОТ 1, decision 2 — a record whose CURRENT name is the
+        # very same ordered token sequence as the whole query stands ABOVE the
+        # category list; the category order itself is not recomputed.
+        rows = order_category(cls)
+        exact = EXACT_NAME.get(u" ".join(t.s for t in qt)) or []
+        if exact:
+            rows = stable_unique(order_category(exact) + rows)
+        return rows, "M1-category"
     if not has_key:                                        # M3/B2 gate, PER CLASS
         cls = [r for r in cls if gen_ok(r)]
         if not cls:
@@ -686,9 +768,21 @@ def search(q):
         for r in cls:
             zk_all |= r.zkset
             nm_all |= r.nset
+        # ЛОТ 1, decision 1: the class-wide name veto below is right about the
+        # class and wrong about the record. When the remainder is the WHOLE
+        # significant phrase of some record's zone (canonical or accepted П7
+        # form) and only that veto stands in the way, the choice is made PER
+        # RECORD: the exact name/alias sequence first, then the zone's own rows.
+        vetoed = any(t.s in nm_all for t in R)
+        phrase = u" ".join(t.s for t in R)
+        if R and vetoed and any(phrase in r.zph for r in cls):
+            rows = stable_unique(order_category([r for r in cls if name_has_phrase(r, R)])
+                                 + order_category([r for r in cls if phrase in r.zph]))
+            if rows:
+                return rows, "A3-record+zone-phrase"
         # A3' (see report sec. г): A4's priority also governs the branch --
         # a token that matches a NAME exactly is a name token, not a filter.
-        if R and all(t.s in zk_all for t in R) and not any(t.s in nm_all for t in R):
+        if R and all(t.s in zk_all for t in R) and not vetoed:
             flt = [r for r in cls if all(t.s in r.zkset for t in R)]
             if flt:
                 return order_category(flt), "A3-category+zone/kind"
@@ -879,9 +973,11 @@ chk(u"парк", u"А8 (фаза 2): 22 реда — първите 12 с точ
                and not any(u"park" in x.nset for x in r[12:])))
 # фаза 2: класът „детска градина“ вече е НАСЕЛЕН, затова по А1 формата
 # „градина“ е КЛЮЧ (точно както „болница“ и „дкц“) → категориен списък.
-# Хотел ГРАДИНА се вади с ключа на своя клас: „хотел градина“ (extra).
-chk(u"градина", u"фаза 2 §3: категорийният списък на детските градини (46)",
-    lambda r: len(r) == 46 and all(x.kind == u"детска градина" for x in r))
+# ЛОТ 1 решение 2 (подписано 03.09): хотел ГРАДИНА носи ТОЧНО това име, така че
+# застава НАД списъка; 46-те детски градини остават в същия ред след него.
+chk(u"градина", u"ЛОТ 1 решение 2: хотел ГРАДИНА + категорийният списък (1+46)",
+    lambda r: (len(r) == 47 and r[0].name == u"ГРАДИНА"
+               and all(x.kind == u"детска градина" for x in r[1:])))
 chk(u"блок с", u"0 наши реда", lambda r: len(r) == 0)
 chk(u"402", u"0 наши реда", lambda r: len(r) == 0)
 chk(u"бл. 402", u"0 наши реда", lambda r: len(r) == 0)
@@ -1047,8 +1143,13 @@ P7_CONTROLS = [
         (u'Marina Varna Apartments', u'кв. Аспарухово', u'апарт-хотел'),
         (u'ГОЛДЪН ТЮЛИП ВАРНА', u'район Одесос', u'Хотел'),
     ]),
-    (u'хотел приморски', u'M2', 1, u'§11: ПРИМОРСКИ (к.к. Св. Константин)', [
+    (u'хотел приморски', u"A3-record+zone-phrase", 5,
+     u'ЛОТ 1 решение 1 (беше M2/1): ПРИМОРСКИ по име + 4-те в район Приморски', [
         (u'ПРИМОРСКИ', u'к.к. Св. Константин', u'Хотел'),
+        (u'Маргарита', u'район Приморски', u'Семеен хотел'),
+        (u'Вемара сити', u'район Приморски', u'Семеен хотел'),
+        (u'Траката', u'район Приморски', u'Семеен хотел'),
+        (u'Еллинис', u'район Приморски', u'Семеен хотел'),
     ]),
     (u'хотел бриз', u'M2', 6, u'§11 Р3: 6 реда, ПАРК ХОТЕЛ БРИЗ първи, Камелия липсва', [
         (u'ПАРК ХОТЕЛ БРИЗ', u'к.к. Златни пясъци', u'Хотел'),
@@ -1062,21 +1163,17 @@ P7_CONTROLS = [
         (u'Камелия', u'м. Св. Никола', u'Семеен хотел'),
         (u'Казабланка Грийн', u'кв. Свети Никола', u'Семеен хотел'),
     ]),
-    (u'училище свети никола', u'M2', 8, u'§11 Р3: 8 реда по име, непроменени', [
-        (u'Морска гимназия "Св. Николай Чудотворец"', u'кв. Аспарухово', u'училище'),
-        (u'бивше ОУ „Д-р Никола Димитров“', u'к.к. Св. Константин', u'училище'),
-        (u'ОУ „Св. Климент Охридски“', u'Морска градина', u'училище'),
-        (u'ОУ „Свети Иван Рилски“', u'ж.к. Възраждане', u'училище'),
-        (u'ОУ "Св.св.Кирил и Методий"', u'Морска градина', u'училище'),
-        (u'II ОУ „Никола Йонков Вапцаров“', u'ж.к. Възраждане', u'училище'),
-        (u'І ОУ „Свети княз Борис I“', u'ж.к. Владислав Варненчик', u'училище'),
-        (u'ПГГСД „Николай Хайтов“', u'м-т Шашкъна', u'училище'),
+    (u'училище свети никола', u"A3-record+zone-phrase", 1,
+     u'ЛОТ 1 решение 1 (беше M2/8): пълната зонова фраза — Менделеев в м-т Свети Никола', [
+        (u'Професионална гимназия по химични и хранително-вкусови технологии "Д. И. Менделеев"', u'м-т Свети Никола', u'училище'),
     ]),
     (u'менделеев', u'M3', 1, u'§11 Р3: ПГ „Менделеев“ (1)', [
         (u'Професионална гимназия по химични и хранително-вкусови технологии "Д. И. Менделеев"', u'м-т Свети Никола', u'училище'),
     ]),
-    (u'хотел зеленика', u'M2', 1, u'§11 Р3: Зеленика първи', [
+    (u'хотел зеленика', u"A3-record+zone-phrase", 2,
+     u'ЛОТ 1 решение 1 (беше M2/1): Зеленика по име (дедуплиран) + Джоя от зоната', [
         (u'Зеленика', u'с.о. Зеленика', u'Семеен хотел'),
+        (u'Джоя', u'м. Зеленика', u'Семеен хотел'),
     ]),
     (u'хотел варненчик', u'A3-category+zone/kind', 2, u'§11 Р4: Комитово/Станкино; КАРНИВАЛ не е в А3′ и днес', [
         (u'Хотел-ресторант „Комитово ханче“', u'ж.к. Владислав Варненчик', u'хотел · без категоризация'),
@@ -1150,6 +1247,82 @@ P7_CONTROLS = [
         (u'ПГ по Компютърно Моделиране и Компютърни Системи "Акад. Благовест Сендов"', u'район Приморски', u'училище'),
     ]),
 ]
+
+
+# ------------------------------------------------------------------ ЛОТ 1 gate
+# The two client rules of ЛОТ 1, as {name, zone, kind} + branch — never a row
+# count alone. Decision 2 is the exact CURRENT name above the category list;
+# decision 1 is the per-record zone phrase when the class-wide name veto blocks
+# an otherwise valid full zone phrase. The four rows of the 103 that these two
+# rules move are gated where they live (gate_m5_a8 „градина“ and the three П7
+# controls); everything below is new.
+LOT1_GAINS = [
+    (u'хотел одесос', u"A3-record+zone-phrase", 23,
+     u'решение 1: ПАРК ХОТЕЛ ОДЕСОС по име + 22-та в район Одесос', [
+        (u'ПАРК ХОТЕЛ ОДЕСОС', u'к.к. Златни пясъци', u'Хотел'),
+        (u'Каприз', u'район Одесос', u'Семеен хотел'),
+    ]),
+    (u'хотел морска градина', u"A3-record+zone-phrase", 18,
+     u'решение 1: двутокенова пълна зона — 18-те в Морска градина', [
+        (u'Орбита', u'Морска градина', u'Хотел'),
+    ]),
+    (u'училище морска градина', u"A3-record+zone-phrase", 6,
+     u'решение 1: същата фраза в класа „училище“ — 6 реда', [
+        (u'8 СОУПЧЕ', u'Морска градина', u'училище'),
+    ]),
+    (u'ГРАДИНА', u"M1-category", 47,
+     u'решение 2: хотел ГРАДИНА над 46-те детски градини (главни букви)', [
+        (u'ГРАДИНА', u'к.к. Чайка', u'Хотел'),
+        (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска градина'),
+    ]),
+    (u'градина', u"M1-category", 47,
+     u'решение 2: същото с малки букви', [
+        (u'ГРАДИНА', u'к.к. Чайка', u'Хотел'),
+        (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска градина'),
+    ]),
+]
+
+LOT1_CONTROLS = [
+    (u'хотел одес', u'M2', 2, u'решение 1: частична фраза — няма override', [
+        (u'ПАРК ХОТЕЛ ОДЕСОС', u'к.к. Златни пясъци', u'Хотел'),
+        (u'Модус', u'Морска градина', u'Хотел'),
+    ]),
+    (u'хотел градина', u'M2', 1, u'решение 1: „градина“ не е пълната зона „морска градина“', [
+        (u'ГРАДИНА', u'к.к. Чайка', u'Хотел'),
+    ]),
+    (u'хотел владиславово', u'A3-category+zone/kind', 2,
+     u'решение 1: приетата П7 форма минава по стария клон — непроменено', [
+        (u'Хотел-ресторант „Комитово ханче“', u'ж.к. Владислав Варненчик', u'хотел · без категоризация'),
+        (u'Станкино ханче', u'ж.к. Владислав Варненчик', u'Семеен хотел'),
+    ]),
+    (u'хотел златни', u'A3-category+zone/kind', 85, u'решение 1: legacy А3′ непокътнат', [
+        (u'Меркурий', u'к.к. Златни пясъци', u'Хотел'),
+    ]),
+    (u'детска градина', u"M1-category", 46,
+     u'решение 2: няма запис с точно това име — категорийният списък стои сам', [
+        (u'ДЯ №4 „Приказен свят“', u'кв. Изгрев', u'детска градина'),
+    ]),
+]
+
+
+def check_lot1_gate():
+    """The ЛОТ 1 gate; returns the list of failures (empty list = green).
+
+    Same shape and same fail-loud contract as check_p7_gate(): main() exits 1 on
+    any entry, and tests/test_places_search_gate.py runs this very function."""
+    bad = []
+    for label, spec in ((u"gain", LOT1_GAINS), (u"control", LOT1_CONTROLS)):
+        for q, branch, n, why, want in spec:
+            rows, br = search(q)
+            got = [(r.name.strip(), r.zone, r.kind) for r in rows]
+            if br != branch:
+                bad.append(u"%s `%s`: branch %s, expected %s" % (label, q, br, branch))
+            if len(rows) != n:
+                bad.append(u"%s `%s`: %d rows, expected %d" % (label, q, len(rows), n))
+            if got[:len(want)] != want:
+                bad.append(u"%s `%s`: rows differ from the signed expectation "
+                           u"(first %d): %s" % (label, q, len(want), got[:len(want)]))
+    return bad
 
 
 def check_p7_gate():
@@ -1615,10 +1788,24 @@ def main():
         # С2′: one query per added token plus the controls of §11 Р3 — the probe
         # replays this bucket too, so the JS↔Python parity covers П7 itself.
         "gate_p7": [],
+        # ЛОТ 1: the two client rules, in their own bucket — the 103 rows above
+        # keep their identity, so the signed change list stays readable.
+        "gate_lot1": [],
     }
     for _q, _br, _n, _why, _want in P7_GAINS + P7_CONTROLS:
         _r, _b = search(_q)
         ROWS["gate_p7"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+        })
+    for _q, _br, _n, _why, _want in LOT1_GAINS + LOT1_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1"].append({
             "q": _q,
             "expect": _why,
             "branch": _b,
@@ -1707,7 +1894,15 @@ def main():
     for line in p7_bad:
         print(u"  ЧЕРВЕНО: %s" % line)
 
-    return 1 if (bad or badx or p7_bad) else 0
+    # ЛОТ 1 (решения 2 и 1): the second gate that can FAIL.
+    lot1_bad = check_lot1_gate()
+    print(u"ЛОТ 1: гейт %d/%d"
+          % (len(LOT1_GAINS) + len(LOT1_CONTROLS) - len(lot1_bad),
+             len(LOT1_GAINS) + len(LOT1_CONTROLS)))
+    for line in lot1_bad:
+        print(u"  ЧЕРВЕНО: %s" % line)
+
+    return 1 if (bad or badx or p7_bad or lot1_bad) else 0
 
 
 if __name__ == "__main__":

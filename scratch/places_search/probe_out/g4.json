@@ -828,22 +828,22 @@
       },
       {
         "q": "градина",
-        "expect": "фаза 2 §3: категорийният списък на детските градини (46)",
+        "expect": "ЛОТ 1 решение 2: хотел ГРАДИНА + категорийният списък (1+46)",
         "bucket": "gate_m5_a8",
         "category": true,
-        "n": 46,
-        "refN": 46,
+        "n": 47,
+        "refN": 47,
         "ordered": true,
         "sets": true,
         "first3": [
+          "ГРАДИНА · к.к. Чайка",
           "ДЯ №4 „Приказен свят“ · кв. Изгрев",
-          "ДЯ №14 „Звънче“ · район Одесос",
-          "13 ЦДГ Звездичка · район Одесос"
+          "ДЯ №14 „Звънче“ · район Одесос"
         ],
         "refFirst3": [
+          "ГРАДИНА · к.к. Чайка",
           "ДЯ №4 „Приказен свят“ · кв. Изгрев",
-          "ДЯ №14 „Звънче“ · район Одесос",
-          "13 ЦДГ Звездичка · район Одесос"
+          "ДЯ №14 „Звънче“ · район Одесос"
         ],
         "firstDiffAt": null,
         "diffOurs": null,
@@ -1995,18 +1995,22 @@
       },
       {
         "q": "хотел приморски",
-        "expect": "§11: ПРИМОРСКИ (к.к. Св. Константин)",
+        "expect": "ЛОТ 1 решение 1 (беше M2/1): ПРИМОРСКИ по име + 4-те в район Приморски",
         "bucket": "gate_p7",
-        "category": false,
-        "n": 1,
-        "refN": 1,
+        "category": true,
+        "n": 5,
+        "refN": 5,
         "ordered": true,
         "sets": true,
         "first3": [
-          "ПРИМОРСКИ · к.к. Св. Константин"
+          "ПРИМОРСКИ · к.к. Св. Константин",
+          "Маргарита · район Приморски",
+          "Вемара сити · район Приморски"
         ],
         "refFirst3": [
-          "ПРИМОРСКИ · к.к. Св. Константин"
+          "ПРИМОРСКИ · к.к. Св. Константин",
+          "Маргарита · район Приморски",
+          "Вемара сити · район Приморски"
         ],
         "firstDiffAt": null,
         "diffOurs": null,
@@ -2058,22 +2062,18 @@
       },
       {
         "q": "училище свети никола",
-        "expect": "§11 Р3: 8 реда по име, непроменени",
+        "expect": "ЛОТ 1 решение 1 (беше M2/8): пълната зонова фраза — Менделеев в м-т Свети Никола",
         "bucket": "gate_p7",
-        "category": false,
-        "n": 8,
-        "refN": 8,
+        "category": true,
+        "n": 1,
+        "refN": 1,
         "ordered": true,
         "sets": true,
         "first3": [
-          "Морска гимназия \"Св. Николай Чудотворец\" · кв. Аспарухово",
-          "бивше ОУ „Д-р Никола Димитров“ · к.к. Св. Константин",
-          "ОУ „Св. Климент Охридски“ · Морска градина"
+          "Професионална гимназия по химични и хранително-вкусови технологии \"Д. И. Менделеев\" · м-т Свети Никола"
         ],
         "refFirst3": [
-          "Морска гимназия \"Св. Николай Чудотворец\" · кв. Аспарухово",
-          "бивше ОУ „Д-р Никола Димитров“ · к.к. Св. Константин",
-          "ОУ „Св. Климент Охридски“ · Морска градина"
+          "Професионална гимназия по химични и хранително-вкусови технологии \"Д. И. Менделеев\" · м-т Свети Никола"
         ],
         "firstDiffAt": null,
         "diffOurs": null,
@@ -2100,18 +2100,20 @@
       },
       {
         "q": "хотел зеленика",
-        "expect": "§11 Р3: Зеленика първи",
+        "expect": "ЛОТ 1 решение 1 (беше M2/1): Зеленика по име (дедуплиран) + Джоя от зоната",
         "bucket": "gate_p7",
-        "category": false,
-        "n": 1,
-        "refN": 1,
+        "category": true,
+        "n": 2,
+        "refN": 2,
         "ordered": true,
         "sets": true,
         "first3": [
-          "Зеленика · с.о. Зеленика"
+          "Зеленика · с.о. Зеленика",
+          "Джоя · м. Зеленика"
         ],
         "refFirst3": [
-          "Зеленика · с.о. Зеленика"
+          "Зеленика · с.о. Зеленика",
+          "Джоя · м. Зеленика"
         ],
         "firstDiffAt": null,
         "diffOurs": null,
@@ -2416,12 +2418,234 @@
         "firstDiffAt": null,
         "diffOurs": null,
         "diffRef": null
+      },
+      {
+        "q": "хотел одесос",
+        "expect": "решение 1: ПАРК ХОТЕЛ ОДЕСОС по име + 22-та в район Одесос",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 23,
+        "refN": 23,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ПАРК ХОТЕЛ ОДЕСОС · к.к. Златни пясъци",
+          "Каприз · район Одесос",
+          "БУТИК СПЛЕНДИД/BOUTIQUE SPLENDID · район Одесос"
+        ],
+        "refFirst3": [
+          "ПАРК ХОТЕЛ ОДЕСОС · к.к. Златни пясъци",
+          "Каприз · район Одесос",
+          "БУТИК СПЛЕНДИД/BOUTIQUE SPLENDID · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел морска градина",
+        "expect": "решение 1: двутокенова пълна зона — 18-те в Морска градина",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 18,
+        "refN": 18,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Орбита · Морска градина",
+          "РЕВЕРАНС · Морска градина",
+          "Family Hotel Astra · Морска градина"
+        ],
+        "refFirst3": [
+          "Орбита · Морска градина",
+          "РЕВЕРАНС · Морска градина",
+          "Family Hotel Astra · Морска градина"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "училище морска градина",
+        "expect": "решение 1: същата фраза в класа „училище“ — 6 реда",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 6,
+        "refN": 6,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "8 СОУПЧЕ · Морска градина",
+          "ОУ \"Св.св.Кирил и Методий\" · Морска градина",
+          "ВТГ „Георги Стойков Раковски\" · Морска градина"
+        ],
+        "refFirst3": [
+          "8 СОУПЧЕ · Морска градина",
+          "ОУ \"Св.св.Кирил и Методий\" · Морска градина",
+          "ВТГ „Георги Стойков Раковски\" · Морска градина"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "ГРАДИНА",
+        "expect": "решение 2: хотел ГРАДИНА над 46-те детски градини (главни букви)",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 47,
+        "refN": 47,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ГРАДИНА · к.к. Чайка",
+          "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+          "ДЯ №14 „Звънче“ · район Одесос"
+        ],
+        "refFirst3": [
+          "ГРАДИНА · к.к. Чайка",
+          "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+          "ДЯ №14 „Звънче“ · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "градина",
+        "expect": "решение 2: същото с малки букви",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 47,
+        "refN": 47,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ГРАДИНА · к.к. Чайка",
+          "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+          "ДЯ №14 „Звънче“ · район Одесос"
+        ],
+        "refFirst3": [
+          "ГРАДИНА · к.к. Чайка",
+          "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+          "ДЯ №14 „Звънче“ · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел одес",
+        "expect": "решение 1: частична фраза — няма override",
+        "bucket": "gate_lot1",
+        "category": false,
+        "n": 2,
+        "refN": 2,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ПАРК ХОТЕЛ ОДЕСОС · к.к. Златни пясъци",
+          "Модус · Морска градина"
+        ],
+        "refFirst3": [
+          "ПАРК ХОТЕЛ ОДЕСОС · к.к. Златни пясъци",
+          "Модус · Морска градина"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел градина",
+        "expect": "решение 1: „градина“ не е пълната зона „морска градина“",
+        "bucket": "gate_lot1",
+        "category": false,
+        "n": 1,
+        "refN": 1,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ГРАДИНА · к.к. Чайка"
+        ],
+        "refFirst3": [
+          "ГРАДИНА · к.к. Чайка"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел владиславово",
+        "expect": "решение 1: приетата П7 форма минава по стария клон — непроменено",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 2,
+        "refN": 2,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Хотел-ресторант „Комитово ханче“ · ж.к. Владислав Варненчик",
+          "Станкино ханче · ж.к. Владислав Варненчик"
+        ],
+        "refFirst3": [
+          "Хотел-ресторант „Комитово ханче“ · ж.к. Владислав Варненчик",
+          "Станкино ханче · ж.к. Владислав Варненчик"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "хотел златни",
+        "expect": "решение 1: legacy А3′ непокътнат",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 85,
+        "refN": 85,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "Меркурий · к.к. Златни пясъци",
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АПОЛО РИЗОРТ · к.к. Златни пясъци"
+        ],
+        "refFirst3": [
+          "Меркурий · к.к. Златни пясъци",
+          "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+          "АПОЛО РИЗОРТ · к.к. Златни пясъци"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
+      },
+      {
+        "q": "детска градина",
+        "expect": "решение 2: няма запис с точно това име — категорийният списък стои сам",
+        "bucket": "gate_lot1",
+        "category": true,
+        "n": 46,
+        "refN": 46,
+        "ordered": true,
+        "sets": true,
+        "first3": [
+          "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+          "ДЯ №14 „Звънче“ · район Одесос",
+          "13 ЦДГ Звездичка · район Одесос"
+        ],
+        "refFirst3": [
+          "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+          "ДЯ №14 „Звънче“ · район Одесос",
+          "13 ЦДГ Звездичка · район Одесос"
+        ],
+        "firstDiffAt": null,
+        "diffOurs": null,
+        "diffRef": null
       }
     ],
-    "passedOrdered": 103,
-    "passedSets": 103,
-    "total": 103,
-    "rows": 1489
+    "passedOrdered": 113,
+    "passedSets": 113,
+    "total": 113,
+    "rows": 1765
   },
   "m5": [
     {
@@ -2437,6 +2661,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2459,6 +2688,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2481,6 +2715,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2503,6 +2742,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2525,6 +2769,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2547,6 +2796,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2569,6 +2823,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 218"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 218",
       "domFirst3": [
@@ -2591,6 +2852,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 218"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 218",
       "domFirst3": [
@@ -2613,6 +2881,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 218"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 218",
       "domFirst3": [
@@ -2635,6 +2910,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 42"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 42",
       "domFirst3": [
@@ -2657,6 +2939,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 77"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 77",
       "domFirst3": [
@@ -2679,6 +2968,15 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Училища",
+        "Детски градини"
+      ],
+      "domMores": [
+        "…и още 8"
+      ],
+      "domChildren": 16,
       "domRows": 12,
       "domMore": "…и още 8",
       "domFirst3": [
@@ -2701,6 +2999,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Училища",
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 8,
       "domRows": 5,
       "domMore": null,
       "domFirst3": [
@@ -2721,6 +3026,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -2741,6 +3051,12 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 7,
       "domRows": 5,
       "domMore": null,
       "domFirst3": [
@@ -2763,6 +3079,12 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 7,
       "domRows": 5,
       "domMore": null,
       "domFirst3": [
@@ -2784,6 +3106,12 @@
       ],
       "domVisible": true,
       "domHeader": "Детски градини",
+      "domHeaders": [
+        "Детски градини",
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -2803,6 +3131,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -2823,6 +3156,12 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 6,
       "domRows": 4,
       "domMore": null,
       "domFirst3": [
@@ -2845,6 +3184,14 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Болници"
+      ],
+      "domMores": [
+        "…и още 2"
+      ],
+      "domChildren": 14,
       "domRows": 11,
       "domMore": "…и още 2",
       "domFirst3": [
@@ -2867,6 +3214,14 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Болници"
+      ],
+      "domMores": [
+        "…и още 2"
+      ],
+      "domChildren": 14,
       "domRows": 11,
       "domMore": "…и още 2",
       "domFirst3": [
@@ -2889,6 +3244,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2911,6 +3271,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -2933,6 +3298,16 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Болници",
+        "Хосписи",
+        "Детски градини"
+      ],
+      "domMores": [
+        "…и още 11"
+      ],
+      "domChildren": 16,
       "domRows": 11,
       "domMore": "…и още 11",
       "domFirst3": [
@@ -2944,23 +3319,31 @@
     },
     {
       "q": "градина",
-      "expect": "фаза 2 §3: категорийният списък на детските градини (46)",
-      "jsN": 46,
-      "refN": 46,
+      "expect": "ЛОТ 1 решение 2: хотел ГРАДИНА + категорийният списък (1+46)",
+      "jsN": 47,
+      "refN": 47,
       "category": true,
       "jsFirst3": [
+        "ГРАДИНА · к.к. Чайка",
         "ДЯ №4 „Приказен свят“ · кв. Изгрев",
-        "ДЯ №14 „Звънче“ · район Одесос",
-        "13 ЦДГ Звездичка · район Одесос"
+        "ДЯ №14 „Звънче“ · район Одесос"
       ],
       "domVisible": true,
-      "domHeader": "Детски градини",
-      "domRows": 8,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Детски градини"
+      ],
+      "domMores": [
+        "…и още 38"
+      ],
+      "domChildren": 12,
+      "domRows": 9,
       "domMore": "…и още 38",
       "domFirst3": [
+        "ГРАДИНА | к.к. Чайка",
         "ДЯ №4 „Приказен свят“ · старо: Приказен свят | кв. Изгрев",
-        "ДЯ №14 „Звънче“ · старо: 14 Детска ясла Звънче | район Одесос",
-        "13 ЦДГ Звездичка | район Одесос"
+        "ДЯ №14 „Звънче“ · старо: 14 Детска ясла Звънче | район Одесос"
       ],
       "ok": true
     },
@@ -2973,6 +3356,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -2987,6 +3373,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3001,6 +3390,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3015,6 +3407,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3029,6 +3424,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3047,6 +3445,13 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [
+        "…и още 52"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 52",
       "domFirst3": [
@@ -3069,6 +3474,13 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [
+        "…и още 52"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 52",
       "domFirst3": [
@@ -3091,6 +3503,11 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети"
+      ],
+      "domMores": [],
+      "domChildren": 8,
       "domRows": 7,
       "domMore": null,
       "domFirst3": [
@@ -3113,6 +3530,13 @@
       ],
       "domVisible": true,
       "domHeader": "Болници",
+      "domHeaders": [
+        "Болници"
+      ],
+      "domMores": [
+        "…и още 5"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 5",
       "domFirst3": [
@@ -3135,6 +3559,13 @@
       ],
       "domVisible": true,
       "domHeader": "Детски градини",
+      "domHeaders": [
+        "Детски градини"
+      ],
+      "domMores": [
+        "…и още 38"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 38",
       "domFirst3": [
@@ -3157,6 +3588,11 @@
       ],
       "domVisible": true,
       "domHeader": "ДКЦ",
+      "domHeaders": [
+        "ДКЦ"
+      ],
+      "domMores": [],
+      "domChildren": 7,
       "domRows": 6,
       "domMore": null,
       "domFirst3": [
@@ -3179,6 +3615,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хосписи",
+      "domHeaders": [
+        "Хосписи"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -3199,6 +3640,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3217,6 +3663,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3235,6 +3686,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3253,6 +3709,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3271,6 +3732,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3290,6 +3756,12 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети",
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -3309,6 +3781,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3327,6 +3804,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3345,6 +3827,11 @@
       ],
       "domVisible": true,
       "domHeader": "ДКЦ",
+      "domHeaders": [
+        "ДКЦ"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3363,6 +3850,11 @@
       ],
       "domVisible": true,
       "domHeader": "ДКЦ",
+      "domHeaders": [
+        "ДКЦ"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3382,6 +3874,11 @@
       ],
       "domVisible": true,
       "domHeader": "ДКЦ",
+      "domHeaders": [
+        "ДКЦ"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -3403,6 +3900,11 @@
       ],
       "domVisible": true,
       "domHeader": "Болници",
+      "domHeaders": [
+        "Болници"
+      ],
+      "domMores": [],
+      "domChildren": 8,
       "domRows": 7,
       "domMore": null,
       "domFirst3": [
@@ -3425,6 +3927,15 @@
       ],
       "domVisible": true,
       "domHeader": "Болници",
+      "domHeaders": [
+        "Болници",
+        "ДКЦ",
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 6"
+      ],
+      "domChildren": 20,
       "domRows": 16,
       "domMore": "…и още 6",
       "domFirst3": [
@@ -3445,6 +3956,11 @@
       ],
       "domVisible": true,
       "domHeader": "Болници",
+      "domHeaders": [
+        "Болници"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3461,6 +3977,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3475,6 +3994,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3489,6 +4011,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3506,6 +4031,11 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -3525,6 +4055,11 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3543,6 +4078,11 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3563,6 +4103,15 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети",
+        "Хотели",
+        "Училища"
+      ],
+      "domMores": [
+        "…и още 27"
+      ],
+      "domChildren": 17,
       "domRows": 13,
       "domMore": "…и още 27",
       "domFirst3": [
@@ -3583,6 +4132,11 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3601,6 +4155,11 @@
       ],
       "domVisible": true,
       "domHeader": "Университети",
+      "domHeaders": [
+        "Университети"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3617,6 +4176,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3631,6 +4193,9 @@
       "jsFirst3": [],
       "domVisible": false,
       "domHeader": null,
+      "domHeaders": [],
+      "domMores": [],
+      "domChildren": 0,
       "domRows": 0,
       "domMore": null,
       "domFirst3": [],
@@ -3647,6 +4212,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3665,6 +4235,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3685,6 +4260,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 42"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 42",
       "domFirst3": [
@@ -3707,6 +4289,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -3729,6 +4316,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -3751,6 +4343,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 6,
       "domRows": 5,
       "domMore": null,
       "domFirst3": [
@@ -3771,6 +4368,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3789,6 +4391,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3808,6 +4415,12 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -3827,6 +4440,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3846,6 +4464,11 @@
       ],
       "domVisible": true,
       "domHeader": "Детски градини",
+      "domHeaders": [
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -3866,6 +4489,11 @@
       ],
       "domVisible": true,
       "domHeader": "Детски градини",
+      "domHeaders": [
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -3887,6 +4515,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 5,
       "domRows": 4,
       "domMore": null,
       "domFirst3": [
@@ -3908,6 +4541,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -3927,6 +4565,11 @@
       ],
       "domVisible": true,
       "domHeader": "ДКЦ",
+      "domHeaders": [
+        "ДКЦ"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3945,6 +4588,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3963,6 +4611,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -3983,6 +4636,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 5,
       "domRows": 4,
       "domMore": null,
       "domFirst3": [
@@ -4003,6 +4661,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -4021,6 +4684,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -4041,6 +4709,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 3"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 3",
       "domFirst3": [
@@ -4052,19 +4727,28 @@
     },
     {
       "q": "хотел приморски",
-      "expect": "§11: ПРИМОРСКИ (к.к. Св. Константин)",
-      "jsN": 1,
-      "refN": 1,
-      "category": false,
+      "expect": "ЛОТ 1 решение 1 (беше M2/1): ПРИМОРСКИ по име + 4-те в район Приморски",
+      "jsN": 5,
+      "refN": 5,
+      "category": true,
       "jsFirst3": [
-        "ПРИМОРСКИ · к.к. Св. Константин"
+        "ПРИМОРСКИ · к.к. Св. Константин",
+        "Маргарита · район Приморски",
+        "Вемара сити · район Приморски"
       ],
       "domVisible": true,
       "domHeader": "Хотели",
-      "domRows": 1,
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 6,
+      "domRows": 5,
       "domMore": null,
       "domFirst3": [
-        "ПРИМОРСКИ | к.к. Св. Константин"
+        "ПРИМОРСКИ | к.к. Св. Константин",
+        "Маргарита | район Приморски",
+        "Вемара сити | район Приморски"
       ],
       "ok": true
     },
@@ -4081,6 +4765,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 7,
       "domRows": 6,
       "domMore": null,
       "domFirst3": [
@@ -4102,6 +4791,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -4112,23 +4806,24 @@
     },
     {
       "q": "училище свети никола",
-      "expect": "§11 Р3: 8 реда по име, непроменени",
-      "jsN": 8,
-      "refN": 8,
-      "category": false,
+      "expect": "ЛОТ 1 решение 1 (беше M2/8): пълната зонова фраза — Менделеев в м-т Свети Никола",
+      "jsN": 1,
+      "refN": 1,
+      "category": true,
       "jsFirst3": [
-        "Морска гимназия \"Св. Николай Чудотворец\" · кв. Аспарухово",
-        "бивше ОУ „Д-р Никола Димитров“ · к.к. Св. Константин",
-        "ОУ „Св. Климент Охридски“ · Морска градина"
+        "Професионална гимназия по химични и хранително-вкусови технологии \"Д. И. Менделеев\" · м-т Свети Никола"
       ],
       "domVisible": true,
       "domHeader": "Училища",
-      "domRows": 8,
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
+      "domRows": 1,
       "domMore": null,
       "domFirst3": [
-        "Морска гимназия \"Св. Николай Чудотворец\" | кв. Аспарухово",
-        "бивше ОУ „Д-р Никола Димитров“ · бивш | к.к. Св. Константин",
-        "ОУ „Св. Климент Охридски“ · старо: CОУ Св. Климент Охридски | Морска градина"
+        "Професионална гимназия по химични и хранително-вкусови технологии \"Д. И. Менделеев\" | м-т Свети Никола"
       ],
       "ok": true
     },
@@ -4143,6 +4838,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -4152,19 +4852,26 @@
     },
     {
       "q": "хотел зеленика",
-      "expect": "§11 Р3: Зеленика първи",
-      "jsN": 1,
-      "refN": 1,
-      "category": false,
+      "expect": "ЛОТ 1 решение 1 (беше M2/1): Зеленика по име (дедуплиран) + Джоя от зоната",
+      "jsN": 2,
+      "refN": 2,
+      "category": true,
       "jsFirst3": [
-        "Зеленика · с.о. Зеленика"
+        "Зеленика · с.о. Зеленика",
+        "Джоя · м. Зеленика"
       ],
       "domVisible": true,
       "domHeader": "Хотели",
-      "domRows": 1,
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 3,
+      "domRows": 2,
       "domMore": null,
       "domFirst3": [
-        "Зеленика | с.о. Зеленика"
+        "Зеленика | с.о. Зеленика",
+        "Джоя | м. Зеленика"
       ],
       "ok": true
     },
@@ -4180,6 +4887,11 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -4201,6 +4913,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 19"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 19",
       "domFirst3": [
@@ -4223,6 +4942,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -4245,6 +4969,13 @@
       ],
       "domVisible": true,
       "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 30"
+      ],
+      "domChildren": 10,
       "domRows": 8,
       "domMore": "…и още 30",
       "domFirst3": [
@@ -4267,6 +4998,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 6,
       "domRows": 5,
       "domMore": null,
       "domFirst3": [
@@ -4289,6 +5025,11 @@
       ],
       "domVisible": true,
       "domHeader": "Болници",
+      "domHeaders": [
+        "Болници"
+      ],
+      "domMores": [],
+      "domChildren": 4,
       "domRows": 3,
       "domMore": null,
       "domFirst3": [
@@ -4311,6 +5052,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 6,
       "domRows": 5,
       "domMore": null,
       "domFirst3": [
@@ -4331,6 +5077,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -4349,6 +5100,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -4367,6 +5123,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -4385,6 +5146,11 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 2,
       "domRows": 1,
       "domMore": null,
       "domFirst3": [
@@ -4405,6 +5171,14 @@
       ],
       "domVisible": true,
       "domHeader": "Детски градини",
+      "domHeaders": [
+        "Детски градини",
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 2"
+      ],
+      "domChildren": 13,
       "domRows": 10,
       "domMore": "…и още 2",
       "domFirst3": [
@@ -4426,6 +5200,11 @@
       ],
       "domVisible": true,
       "domHeader": "Детски градини",
+      "domHeaders": [
+        "Детски градини"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
@@ -4446,11 +5225,292 @@
       ],
       "domVisible": true,
       "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 3,
       "domRows": 2,
       "domMore": null,
       "domFirst3": [
         "ЧОУ \"Феникс 2020\" | район Приморски",
         "ПГ по Компютърно Моделиране и Компютърни Системи \"Акад. Благовест Сендов\" · старо: Професионалната гимназия по компютърно моделиране и компютърни системи „акд. Благовест Сендов“ | район Приморски"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел одесос",
+      "expect": "решение 1: ПАРК ХОТЕЛ ОДЕСОС по име + 22-та в район Одесос",
+      "jsN": 23,
+      "refN": 23,
+      "category": true,
+      "jsFirst3": [
+        "ПАРК ХОТЕЛ ОДЕСОС · к.к. Златни пясъци",
+        "Каприз · район Одесос",
+        "БУТИК СПЛЕНДИД/BOUTIQUE SPLENDID · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 15"
+      ],
+      "domChildren": 10,
+      "domRows": 8,
+      "domMore": "…и още 15",
+      "domFirst3": [
+        "ПАРК ХОТЕЛ ОДЕСОС | к.к. Златни пясъци",
+        "Каприз | район Одесос",
+        "БУТИК СПЛЕНДИД/BOUTIQUE SPLENDID | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел морска градина",
+      "expect": "решение 1: двутокенова пълна зона — 18-те в Морска градина",
+      "jsN": 18,
+      "refN": 18,
+      "category": true,
+      "jsFirst3": [
+        "Орбита · Морска градина",
+        "РЕВЕРАНС · Морска градина",
+        "Family Hotel Astra · Морска градина"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 10"
+      ],
+      "domChildren": 10,
+      "domRows": 8,
+      "domMore": "…и още 10",
+      "domFirst3": [
+        "Орбита | Морска градина",
+        "РЕВЕРАНС | Морска градина",
+        "Family Hotel Astra | Морска градина"
+      ],
+      "ok": true
+    },
+    {
+      "q": "училище морска градина",
+      "expect": "решение 1: същата фраза в класа „училище“ — 6 реда",
+      "jsN": 6,
+      "refN": 6,
+      "category": true,
+      "jsFirst3": [
+        "8 СОУПЧЕ · Морска градина",
+        "ОУ \"Св.св.Кирил и Методий\" · Морска градина",
+        "ВТГ „Георги Стойков Раковски\" · Морска градина"
+      ],
+      "domVisible": true,
+      "domHeader": "Училища",
+      "domHeaders": [
+        "Училища"
+      ],
+      "domMores": [],
+      "domChildren": 7,
+      "domRows": 6,
+      "domMore": null,
+      "domFirst3": [
+        "8 СОУПЧЕ | Морска градина",
+        "ОУ \"Св.св.Кирил и Методий\" | Морска градина",
+        "ВТГ „Георги Стойков Раковски\" · старо: Варненска търговска гимназия Г.С.Раковски | Морска градина"
+      ],
+      "ok": true
+    },
+    {
+      "q": "ГРАДИНА",
+      "expect": "решение 2: хотел ГРАДИНА над 46-те детски градини (главни букви)",
+      "jsN": 47,
+      "refN": 47,
+      "category": true,
+      "jsFirst3": [
+        "ГРАДИНА · к.к. Чайка",
+        "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+        "ДЯ №14 „Звънче“ · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Детски градини"
+      ],
+      "domMores": [
+        "…и още 38"
+      ],
+      "domChildren": 12,
+      "domRows": 9,
+      "domMore": "…и още 38",
+      "domFirst3": [
+        "ГРАДИНА | к.к. Чайка",
+        "ДЯ №4 „Приказен свят“ · старо: Приказен свят | кв. Изгрев",
+        "ДЯ №14 „Звънче“ · старо: 14 Детска ясла Звънче | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "градина",
+      "expect": "решение 2: същото с малки букви",
+      "jsN": 47,
+      "refN": 47,
+      "category": true,
+      "jsFirst3": [
+        "ГРАДИНА · к.к. Чайка",
+        "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+        "ДЯ №14 „Звънче“ · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели",
+        "Детски градини"
+      ],
+      "domMores": [
+        "…и още 38"
+      ],
+      "domChildren": 12,
+      "domRows": 9,
+      "domMore": "…и още 38",
+      "domFirst3": [
+        "ГРАДИНА | к.к. Чайка",
+        "ДЯ №4 „Приказен свят“ · старо: Приказен свят | кв. Изгрев",
+        "ДЯ №14 „Звънче“ · старо: 14 Детска ясла Звънче | район Одесос"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел одес",
+      "expect": "решение 1: частична фраза — няма override",
+      "jsN": 2,
+      "refN": 2,
+      "category": false,
+      "jsFirst3": [
+        "ПАРК ХОТЕЛ ОДЕСОС · к.к. Златни пясъци",
+        "Модус · Морска градина"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 3,
+      "domRows": 2,
+      "domMore": null,
+      "domFirst3": [
+        "ПАРК ХОТЕЛ ОДЕСОС | к.к. Златни пясъци",
+        "Модус | Морска градина"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел градина",
+      "expect": "решение 1: „градина“ не е пълната зона „морска градина“",
+      "jsN": 1,
+      "refN": 1,
+      "category": false,
+      "jsFirst3": [
+        "ГРАДИНА · к.к. Чайка"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 2,
+      "domRows": 1,
+      "domMore": null,
+      "domFirst3": [
+        "ГРАДИНА | к.к. Чайка"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел владиславово",
+      "expect": "решение 1: приетата П7 форма минава по стария клон — непроменено",
+      "jsN": 2,
+      "refN": 2,
+      "category": true,
+      "jsFirst3": [
+        "Хотел-ресторант „Комитово ханче“ · ж.к. Владислав Варненчик",
+        "Станкино ханче · ж.к. Владислав Варненчик"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [],
+      "domChildren": 3,
+      "domRows": 2,
+      "domMore": null,
+      "domFirst3": [
+        "Хотел-ресторант „Комитово ханче“ | ж.к. Владислав Варненчик",
+        "Станкино ханче | ж.к. Владислав Варненчик"
+      ],
+      "ok": true
+    },
+    {
+      "q": "хотел златни",
+      "expect": "решение 1: legacy А3′ непокътнат",
+      "jsN": 85,
+      "refN": 85,
+      "category": true,
+      "jsFirst3": [
+        "Меркурий · к.к. Златни пясъци",
+        "ХОТЕЛ  ХЕЛИОС СПА · к.к. Златни пясъци",
+        "АПОЛО РИЗОРТ · к.к. Златни пясъци"
+      ],
+      "domVisible": true,
+      "domHeader": "Хотели",
+      "domHeaders": [
+        "Хотели"
+      ],
+      "domMores": [
+        "…и още 77"
+      ],
+      "domChildren": 10,
+      "domRows": 8,
+      "domMore": "…и още 77",
+      "domFirst3": [
+        "Меркурий | к.к. Златни пясъци",
+        "ХОТЕЛ  ХЕЛИОС СПА | к.к. Златни пясъци",
+        "АПОЛО РИЗОРТ | к.к. Златни пясъци"
+      ],
+      "ok": true
+    },
+    {
+      "q": "детска градина",
+      "expect": "решение 2: няма запис с точно това име — категорийният списък стои сам",
+      "jsN": 46,
+      "refN": 46,
+      "category": true,
+      "jsFirst3": [
+        "ДЯ №4 „Приказен свят“ · кв. Изгрев",
+        "ДЯ №14 „Звънче“ · район Одесос",
+        "13 ЦДГ Звездичка · район Одесос"
+      ],
+      "domVisible": true,
+      "domHeader": "Детски градини",
+      "domHeaders": [
+        "Детски градини"
+      ],
+      "domMores": [
+        "…и още 38"
+      ],
+      "domChildren": 10,
+      "domRows": 8,
+      "domMore": "…и още 38",
+      "domFirst3": [
+        "ДЯ №4 „Приказен свят“ · старо: Приказен свят | кв. Изгрев",
+        "ДЯ №14 „Звънче“ · старо: 14 Детска ясла Звънче | район Одесос",
+        "13 ЦДГ Звездичка | район Одесос"
       ],
       "ok": true
     }
@@ -4499,7 +5559,7 @@
     "ready": true,
     "theirRows": 8,
     "mineRows": 3,
-    "sheetHidden": true,
+    "sheetHidden": null,
     "pins": 1,
     "popups": 1,
     "title": "Адмирал",
@@ -5237,9 +6297,28 @@
   "scenariosDigest": {
     "what": "sha256(JSON.stringify(scenarios)) — before.json срещу този прогон",
     "file": "scratch/places_search/probe_out/before.json",
-    "before": "ba13967327a7a7f8b494c5f6c6de61413138785d326507cd9a6923aef4bbf062",
-    "after": "ba13967327a7a7f8b494c5f6c6de61413138785d326507cd9a6923aef4bbf062",
+    "env": {
+      "repo": "C:/git/_wt/fv_lot1_client",
+      "port": "8010",
+      "pageUrl": "http://localhost:8010/index.html",
+      "viewport": {
+        "width": 1400,
+        "height": 900,
+        "mobile": false
+      }
+    },
+    "beforeEnv": {
+      "pageUrl": "http://localhost:8010/index.html",
+      "viewport": {
+        "width": 1400,
+        "height": 900,
+        "mobile": false
+      }
+    },
+    "before": "a9c935e420c72e1e0ecf42c2865a04bd29df10479bc2dc0d8380714526748931",
+    "after": "a9c935e420c72e1e0ecf42c2865a04bd29df10479bc2dc0d8380714526748931",
     "error": null,
+    "sameEnv": true,
     "equal": true
   }
 }

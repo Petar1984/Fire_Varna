@@ -6369,6 +6369,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     // ---- Д2/Д3/В7: load once, validate before trusting, cache only what validated
     let RECS = [], FORMS = null, CLASS_OF = null, placesPromise = null, GROUP_SIZE = null;
+    let EXACT_NAME = null;                       // ЛОТ 1 решение 2: joined name tokens -> records
     const groupOf = (rec) => KIND_GROUP[rec.e.kind] || rec.e.kind;
     const colourOf = (kind) => GROUP_COLOUR[KIND_GROUP[kind]] || 'hotel';   // К1
     // С3 - the bug Sol found: the <=300 generosity of М3/Б2 was read off the WHOLE
@@ -6505,6 +6506,27 @@ window._hydrantDataReady = (async function loadHydrantData() {
                 keep.push(t);
         if (keep.length) zoneExtra.set(z, keep);
       }
+      // ЛОТ 1 решение 1 — the PHRASE index: the canonical zone and each ACCEPTED
+      // П7 form of it as an ORDERED token sequence, through the very filter of
+      // steps (а)-(г). An alias counts only when every significant token of it is
+      // already a zone token (its own, or one П7 accepted), so „Приморски парк“ —
+      // thrown out of Морска градина as foreign — never becomes a phrase, while
+      // „кв. Владиславово“ does. ztk/zkset lose the order and the boundaries; the
+      // whole point here is that „морска градина“ is a phrase and „градина“ is not.
+      const phraseTk = (s) => placeTokens(s).filter((t) => !t.num && t.orig.length > 2 &&
+        t.s.length > 2 && ADDR.indexOf(t.orig) < 0 && !generic.has(t.s)).map((t) => t.s);
+      const zonePhrase = new Map();
+      for (const z of zones) {
+        const own = phraseTk(z);
+        const allowed = new Set(own.concat((zoneExtra.get(z) || []).map((t) => t.s)));
+        const forms = new Set(own.length ? [own.join(' ')] : []);
+        for (const alias of (((zdict[z] || {}).aliases) || [])) {
+          if (typeof alias !== 'string') continue;
+          const tk = phraseTk(alias);
+          if (tk.length && tk.every((v) => allowed.has(v))) forms.add(tk.join(' '));
+        }
+        zonePhrase.set(z, forms);
+      }
       RECS = hotels.concat(places2).map(function (h) {
         const ntk = placeTokens(h.name).map((t) => t.s);
         const ztk = placeTokens(h.zone).map((t) => t.s);
@@ -6517,8 +6539,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
           for (const t of placeTokens(old))
             if (!t.num && t.orig.length > 2 && ADDR.indexOf(t.orig) < 0) aset.add(t.s);
         return { e: h, ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, kkey: ktk.join(' '),
-                 zkset: new Set(ztk.concat(ktk)) };
+                 zkset: new Set(ztk.concat(ktk)), zph: zonePhrase.get(h.zone) || new Set() };
       });
+      // ЛОТ 1 решение 2: the exact-CURRENT-name index. old_names stay out of it on
+      // purpose — measured, 0 old-name keys coincide with a populated category key,
+      // and a global alias index would wake the short „ИУ“/„МУ“ (today 0 rows).
+      EXACT_NAME = new Map();
+      for (const rec of RECS) {
+        const key = rec.ntk.join(' ');
+        const list = EXACT_NAME.get(key);
+        if (list) list.push(rec); else EXACT_NAME.set(key, [rec]);
+      }
       GROUP_SIZE = new Map();                    // С3: the size of every class
       for (const rec of RECS) GROUP_SIZE.set(groupOf(rec), (GROUP_SIZE.get(groupOf(rec)) || 0) + 1);
       FORMS = new Map();
@@ -6611,6 +6642,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
     const orderCategory = (recs, c) =>           // М1: nearest to the centre of the frame first
       recs.map((r) => ({ rec: r, d: distOf(r, c) })).sort(tail).map((x) => x.rec);
+    function stableUnique(recs) {                // ЛОТ 1: dedupe by the RECORD itself,
+      const out = [], seen = new Set();          // keeping the first place; the lists
+      for (const r of recs) if (!seen.has(r)) { seen.add(r); out.push(r); }   // are
+      return out;                                // already ordered and never re-sorted
+    }
+    function nameHasPhrase(rec, R) {             // ЛОТ 1 решение 1: R as an EXACT ordered
+      for (let i = 0; i + R.length <= rec.ntk.length; i++) {   // run of the CURRENT name
+        let hit = true;                          // tokens — no prefix, no fuzzy. An alias
+        for (let j = 0; j < R.length; j++) if (rec.ntk[i + j] !== R[j].s) { hit = false; break; }
+        if (hit) return true;                    // proves the sequence only when it is ONE
+      }                                          // token: `aset` keeps tokens, not phrases,
+      return R.length === 1 && rec.aset.has(R[0].s);   // and a sum of aliases is forbidden
+    }
     function centre() {
       try { const c = map.getCenter(); if (c && isFinite(c.lat) && isFinite(c.lng)) return c; } catch (e) {}
       return null;
@@ -6659,7 +6703,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const c = centre(), sk = splitKeys(qt), hasKey = sk.keys.length > 0;
       let cls = hasKey ? CLASS_OF.get(sk.keys[0]) : RECS;     // А1: the leftmost key is the class
       const R = sk.slots.filter((x) => x.ki !== 0).map((x) => x.t);
-      if (!R.length) return { category: true, hasKey: hasKey, rows: orderCategory(cls, c) };  // М1: the key alone
+      if (!R.length) {                           // М1: the key alone
+        // ЛОТ 1 решение 2: a record whose CURRENT name is the very same ordered
+        // token sequence as the WHOLE query stands above the category list; the
+        // category order itself is not recomputed, only prepended to.
+        const rows = orderCategory(cls, c), exact = EXACT_NAME.get(qt.map((t) => t.s).join(' '));
+        return { category: true, hasKey: hasKey,
+                 rows: exact ? stableUnique(orderCategory(exact, c).concat(rows)) : rows };
+      }
       if (!hasKey) {                             // М3/Б2 generosity gate, PER CLASS (С3)
         cls = cls.filter(genOk);
         if (!cls.length) return { category: false, hasKey: false, rows: [] };
@@ -6667,7 +6718,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (hasKey) {                              // А3′: key + a purely zone/kind rest = filtered list
         const zk = new Set(), nm = new Set();
         for (const r of cls) { for (const v of r.zkset) zk.add(v); for (const v of r.nset) nm.add(v); }
-        if (R.every((t) => zk.has(t.s)) && !R.some((t) => nm.has(t.s))) {
+        // ЛОТ 1 решение 1: the class-wide name veto below is right about the CLASS
+        // and wrong about the RECORD. When the rest is the WHOLE significant phrase
+        // of some record's zone (canonical or accepted П7 form) and only that veto
+        // stands in the way, the choice is made PER RECORD: the exact name/alias
+        // sequence first, then the rows of the zone itself.
+        const vetoed = R.some((t) => nm.has(t.s)), phrase = R.map((t) => t.s).join(' ');
+        if (vetoed && cls.some((r) => r.zph.has(phrase))) {
+          const rows = stableUnique(orderCategory(cls.filter((r) => nameHasPhrase(r, R)), c)
+                                    .concat(orderCategory(cls.filter((r) => r.zph.has(phrase)), c)));
+          if (rows.length) return { category: true, hasKey: hasKey, rows: rows };
+        }
+        if (R.every((t) => zk.has(t.s)) && !vetoed) {
           const flt = cls.filter((r) => R.every((t) => r.zkset.has(t.s)));
           if (flt.length) return { category: true, hasKey: hasKey, rows: orderCategory(flt, c) };
         }

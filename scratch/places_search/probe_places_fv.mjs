@@ -13,6 +13,11 @@
 //   node scratch/places_search/probe_places_fv.mjs --mode before
 //   node scratch/places_search/probe_places_fv.mjs --mode after [--mob]
 //   optional: --out <basename>   (default: the mode; used for the ×2 determinism run)
+//   optional: --port <n>         (default 8000; a port that already serves ANOTHER
+//                                 checkout of this repo would be silently reused)
+//   optional: --ref <path>       (default recall_sweep_rows.json next to us; the
+//                                 report-only candidate rows go in through here,
+//                                 so the frozen reference is never re-written)
 //
 // It brings its OWN world up and takes it down again:
 //   * python -m http.server 8000 --directory <repo>   (spawned, killed by PID)
@@ -66,14 +71,18 @@ const OUT_DIR = path.join(HERE, "probe_out");
 const PROFILE = path.join(HERE, "_cprof");
 const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const CDP_PORT = "9334";
-const HTTP_PORT = "8000";
-const BASE = `http://localhost:${HTTP_PORT}/`;
-const PAGE_URL = BASE + "index.html";
 
 function argOf(name, fallback) {
   const i = process.argv.indexOf(name);
   return i !== -1 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
 }
+// serverServesOurRepo() recognises the server by the SIZE of index.html, so a
+// server standing on 8000 for a different checkout of this same repo is reused
+// whenever the two files happen to be identical — and refused, loudly, when they
+// are not. A worktree therefore gets its own port instead of arguing for 8000.
+const HTTP_PORT = argOf("--port", "8000");
+const BASE = `http://localhost:${HTTP_PORT}/`;
+const PAGE_URL = BASE + "index.html";
 const MODE = argOf("--mode", "");
 const OUT_NAME = argOf("--out", MODE);
 const MOB = process.argv.includes("--mob");
@@ -666,10 +675,15 @@ function runG6(s) {
 // Lands with the branch it measures (C4). Everything here reads OUR container
 // (#placesSearchResults), OUR marker (.place-pin-wrapper) and OUR export
 // (window.__places); the G3 corpus above is untouched by construction.
-const REF_ROWS = JSON.parse(fs.readFileSync(path.join(HERE, "recall_sweep_rows.json"), "utf8"));
+// The reference rows. Until a signed change list is re-frozen (F2), the candidate
+// rows of a report-only sweep are handed in with --ref; the file in the repo is
+// never written by the probe either way.
+const REF_PATH = argOf("--ref", path.join(HERE, "recall_sweep_rows.json"));
+const REF_ROWS = JSON.parse(fs.readFileSync(REF_PATH, "utf8"));
 // С2′: the П7 gate is a bucket of its own, and it is replayed like the other
 // two — so the JS↔Python parity covers the quarter aliases as well.
-const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7"].filter((b) => Array.isArray(REF_ROWS[b]));
+const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7", "gate_lot1"]
+  .filter((b) => Array.isArray(REF_ROWS[b]));
 // С6′: the tokeniser-parity corpus, written by the reference next to us.
 const PARITY = JSON.parse(fs.readFileSync(path.join(OUT_DIR, "token_parity.json"), "utf8"));
 // The placeTokens contract, repeated verbatim from tests/test_places_search_primitives.py
@@ -756,7 +770,7 @@ const PL_ROWS_JS = `(function () {
   for (var k = 0; k < mn.length; k++) mores.push(mn[k].textContent);
   var r = box.getBoundingClientRect();
   return { visible: box.classList.contains('visible'), header: head ? head.textContent : null,
-           headers: heads, mores: mores,
+           headers: heads, mores: mores, children: box.children.length,
            rows: rows, more: more ? more.textContent : null,
            rect: { top: Math.round(r.top), bottom: Math.round(r.bottom), height: Math.round(r.height) },
            innerHeight: window.innerHeight };
@@ -1141,6 +1155,7 @@ async function checkM5Table(s) {
       const dom = await typePlaces(s, rec.q);
       out.push({ q: rec.q, expect: rec.expect, jsN: js.n, refN: rec.rows.length, category: js.category,
                  jsFirst3: js.first3, domVisible: dom.visible, domHeader: dom.header,
+                 domHeaders: dom.headers, domMores: dom.mores, domChildren: dom.children,
                  domRows: dom.rows.length, domMore: dom.more,
                  domFirst3: dom.rows.slice(0, 3).map((r) => r.title + " | " + r.meta),
                  ok: js.n === rec.rows.length });
@@ -1623,16 +1638,25 @@ async function checkMobileKeyed(s) {
 function scenariosDigest(scenarios) {
   const sha = (value) => crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
   const beforePath = path.join(OUT_DIR, "before.json");
-  let before = null, error = null;
-  try { before = JSON.parse(fs.readFileSync(beforePath, "utf8")).scenarios; }
+  let before = null, error = null, beforeDoc = null;
+  try { beforeDoc = JSON.parse(fs.readFileSync(beforePath, "utf8")); before = beforeDoc.scenarios; }
   catch (e) { error = String(e && e.message ? e.message : e); }
+  const view = { width: W, height: H, mobile: MOB };
   const out = {
     what: "sha256(JSON.stringify(scenarios)) — before.json срещу този прогон",
     file: path.relative(REPO, beforePath).split(path.sep).join("/"),
+    // The ENVIRONMENT travels next to the digest. The very same code on another
+    // port or in another viewport moves every recorded URL, the surface and the
+    // marker, so without this a base record made elsewhere cannot be told apart
+    // from a change in the code -- and that is exactly what happened once.
+    env: { repo: REPO.split(path.sep).join("/"), port: HTTP_PORT, pageUrl: PAGE_URL, viewport: view },
+    beforeEnv: beforeDoc ? { pageUrl: beforeDoc.pageUrl || null, viewport: beforeDoc.viewport || null } : null,
     before: before === undefined || before === null ? null : sha(before),
     after: sha(scenarios),
     error,
   };
+  out.sameEnv = !!beforeDoc && beforeDoc.pageUrl === PAGE_URL
+    && JSON.stringify(beforeDoc.viewport) === JSON.stringify(view);
   out.equal = out.before !== null && out.before === out.after;
   return out;
 }
@@ -1932,6 +1956,7 @@ async function main() {
   if (MODE === "after") {
     const digest = scenariosDigest(scenarios);
     console.log(`  G3 дайджест: before ${digest.before} · after ${digest.after} · равни: ${digest.equal}`);
+    console.log(`  G3 среда: порт ${HTTP_PORT} · ${W}×${H}${MOB ? " (мобилен)" : ""} · същата като before.json: ${digest.sameEnv}`);
     const g4 = await runG4(s);
     g4.scenariosDigest = digest;
     const g4Path = path.join(OUT_DIR, "g4.json");

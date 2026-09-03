@@ -14,7 +14,11 @@ Until C16 nothing here could go red without a human reading a report:
      without it), and gates the guard itself here;
   3. `p7_added` is exactly the six tokens in five zones §11 v2.1 measured;
   4. the frozen diff: the 72 queries that existed before П7 give byte-identical
-     ordered rows and the same branch as `git show 7a6ea1d:…rows.json`.
+     ordered rows and the same branch as `git show 7a6ea1d:…rows.json` — with
+     the ONE signed exception of ЛОТ 1 решение 2 („градина“), named below;
+  5. ЛОТ 1 (решения 2 и 1, signed 03.09): the new gate, the four rows of the 103
+     the two rules move, and the proof that each rule is load-bearing — inverted
+     in place, the old answer comes back.
 
 Read-only: it runs `git show` through subprocess and touches nothing on disk.
 """
@@ -33,6 +37,20 @@ ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
 FROZEN_COMMIT = "7a6ea1d"          # C15 — the last HEAD before П7 was written
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
 OLD_BUCKETS = ("gate_m5_a8", "extra")
+# ЛОТ 1, the signed change list (docs/plans/recommendations_2026-09-03.md §1,
+# решения 2 и 1): FOUR rows of the 103 move, and these are they. Решение 2 moves
+# „градина“ inside the 72 frozen at 7a6ea1d; решение 1 moves three П7 controls.
+LOT1_PREPENDED = {u"градина": (u"ГРАДИНА", u"к.к. Чайка")}
+LOT1_MOVED_P7 = {
+    u"хотел приморски": (u"A3-record+zone-phrase", 5,
+                         [(u"ПРИМОРСКИ", u"к.к. Св. Константин"),
+                          (u"Маргарита", u"район Приморски")]),
+    u"училище свети никола": (u"A3-record+zone-phrase", 1,
+                              [(u'Професионална гимназия по химични и хранително-вкусови '
+                                u'технологии "Д. И. Менделеев"', u"м-т Свети Никола")]),
+    u"хотел зеленика": (u"A3-record+zone-phrase", 2,
+                        [(u"Зеленика", u"с.о. Зеленика"), (u"Джоя", u"м. Зеленика")]),
+}
 
 
 def load_reference():
@@ -182,19 +200,26 @@ class FrozenDiffTest(unittest.TestCase):
         cls.frozen = frozen_rows()
 
     def test_seventy_two_queries_unchanged_live(self):
-        """Re-run through the LIVE reference, not through the artefact."""
-        compared, rows = 0, 0
+        """Re-run through the LIVE reference, not through the artefact.
+
+        ЛОТ 1 решение 2 moves exactly ONE of the 72: „градина“ now carries the
+        hotel ГРАДИНА above the 46 kindergartens, which keep their own order.
+        The exception is named in LOT1_PREPENDED; any other movement is red."""
+        compared, rows, prepended = 0, 0, 0
         for bucket in OLD_BUCKETS:
             for entry in self.frozen[bucket]:
                 got, branch = REF.search(entry["q"])
+                want = [(r["name"], r["zone"]) for r in entry["rows"]]
+                if entry["q"] in LOT1_PREPENDED:
+                    want = [LOT1_PREPENDED[entry["q"]]] + want
+                    prepended += 1
                 self.assertEqual(branch, entry["branch"], entry["q"])
-                self.assertEqual([(r.name, r.zone) for r in got],
-                                 [(r["name"], r["zone"]) for r in entry["rows"]],
-                                 entry["q"])
+                self.assertEqual([(r.name, r.zone) for r in got], want, entry["q"])
                 compared += 1
-                rows += len(entry["rows"])
+                rows += len(want)
         self.assertEqual(compared, 72)
-        self.assertEqual(rows, 1337)
+        self.assertEqual(prepended, 1)
+        self.assertEqual(rows, 1338)
 
     def test_committed_rows_match_the_frozen_baseline(self):
         """And the artefact the probe replays says the same thing."""
@@ -215,6 +240,95 @@ class FrozenDiffTest(unittest.TestCase):
                          len(REF.P7_GAINS) + len(REF.P7_CONTROLS))
         for entry in current["gate_p7"]:
             self.assertTrue(entry["ok"], entry["q"])
+
+
+class Lot1GateTest(unittest.TestCase):
+    """ЛОТ 1 — the two client rules of решения 2 и 1, signed 03.09."""
+
+    def test_gate(self):
+        failures = REF.check_lot1_gate()
+        self.assertEqual(failures, [], "\n".join(failures))
+
+    def test_the_three_moved_p7_rows_and_no_others(self):
+        """The П7 bucket of the frozen artefact, re-run live: exactly the three
+        rows of the signed list answer differently, every other one is byte-equal
+        (name, zone and branch). The artefact itself is re-frozen in F2, not here."""
+        current = json.loads(ROWS.read_text(encoding="utf-8"))
+        moved = 0
+        for entry in current["gate_p7"]:
+            got, branch = REF.search(entry["q"])
+            if entry["q"] in LOT1_MOVED_P7:
+                want_branch, want_n, want_first = LOT1_MOVED_P7[entry["q"]]
+                self.assertEqual(branch, want_branch, entry["q"])
+                self.assertEqual(len(got), want_n, entry["q"])
+                self.assertEqual([(r.name, r.zone) for r in got][:len(want_first)],
+                                 want_first, entry["q"])
+                moved += 1
+            else:
+                self.assertEqual(branch, entry["branch"], entry["q"])
+                self.assertEqual([(r.name, r.zone) for r in got],
+                                 [(r["name"], r["zone"]) for r in entry["rows"]],
+                                 entry["q"])
+        self.assertEqual(moved, 3)
+
+    def test_the_exact_name_prepend_is_load_bearing(self):
+        """Решение 2, inverted in place: with an empty exact-name index „градина“
+        falls back to the 46 kindergartens. Restored, the hotel is first again."""
+        saved = REF.EXACT_NAME
+        try:
+            REF.EXACT_NAME = {}
+            rows, branch = REF.search(u"градина")
+            self.assertEqual((branch, len(rows)), ("M1-category", 46))
+        finally:
+            REF.EXACT_NAME = saved
+        rows, branch = REF.search(u"градина")
+        self.assertEqual((branch, len(rows), rows[0].name), ("M1-category", 47, u"ГРАДИНА"))
+
+    def test_the_zone_phrase_override_is_load_bearing(self):
+        """Решение 1, inverted in place: with no phrase on any record the three
+        moved rows fall back to the answers the frozen artefact holds."""
+        queries = (u"хотел приморски", u"училище свети никола", u"хотел зеленика")
+        saved = [(rec, rec.zph) for rec in REF.RECS]
+        try:
+            for rec in REF.RECS:
+                rec.zph = set()
+            self.assertEqual([(REF.search(q)[1], len(REF.search(q)[0])) for q in queries],
+                             [("M2", 1), ("M2", 8), ("M2", 1)])
+        finally:
+            for rec, zph in saved:
+                rec.zph = zph
+        self.assertEqual([(REF.search(q)[1], len(REF.search(q)[0])) for q in queries],
+                         [("A3-record+zone-phrase", 5), ("A3-record+zone-phrase", 1),
+                          ("A3-record+zone-phrase", 2)])
+
+    def test_a_phrase_is_the_canonical_zone_or_an_accepted_p7_form(self):
+        """The admissibility rule, measured: „Приморски парк“ is an alias of
+        Морска градина that П7 threw out as foreign, so it is NOT a phrase there
+        — which is the whole difference between „хотел приморски“ = 5 and = 23.
+        „кв. Владиславово“ was accepted by П7, so it IS one."""
+        self.assertEqual(REF.ZONE_PHRASES[u"Морска градина"], {"morska gradina"})
+        self.assertEqual(REF.ZONE_PHRASES[u"район Приморски"], {"primorski"})
+        self.assertEqual(REF.ZONE_PHRASES[u"район Одесос"], {"odesos"})
+        self.assertIn("vladislavovo", REF.ZONE_PHRASES[u"ж.к. Владислав Варненчик"])
+        self.assertIn("zpz", REF.ZONE_PHRASES[u"Западна промишлена зона"])
+        for zone, phrases in REF.ZONE_PHRASES.items():
+            for phrase in phrases:
+                for token in phrase.split(" "):
+                    self.assertNotIn(token, ("raion", "kvartal", "kompleks", "zona",
+                                             "mestnost", "park", "chast"), zone)
+
+    def test_the_exact_index_carries_current_names_only(self):
+        """Решение 2 and the data judge: old_names stay OUT of the exact index."""
+        aliases = set()
+        for rec in REF.RECS:
+            aliases |= rec.aset
+        for key, recs in REF.EXACT_NAME.items():
+            for rec in recs:
+                self.assertEqual(key, u" ".join(rec.ntk), rec.name)
+        for token in aliases:
+            if token in REF.EXACT_NAME:
+                self.assertTrue(any(rec.ntk == [token] for rec in REF.EXACT_NAME[token]),
+                                token)
 
 
 if __name__ == "__main__":

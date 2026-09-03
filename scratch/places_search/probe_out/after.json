@@ -5,7 +5,7 @@
     "height": 900,
     "mobile": false
   },
-  "pageUrl": "http://localhost:8000/index.html",
+  "pageUrl": "http://localhost:8010/index.html",
   "corpus": [
     "бл. 402 вх. 3",
     "макгахан 15",
@@ -80,7 +80,7 @@
               "idx": "0",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
@@ -88,9 +88,9 @@
                 "https://www.google.com/maps?q=43.25021,27.84162",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -100,7 +100,7 @@
               "idx": "1",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Изгрев, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.23076,27.91095&navigate=yes",
@@ -108,9 +108,9 @@
                 "https://www.google.com/maps?q=43.23076,27.91095",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23076,27.91095"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b02fd254b3e55eccf.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b02fd254b3e55eccf.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -120,7 +120,7 @@
               "idx": "2",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Изгрев, бл. 2",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.23107,27.91068&navigate=yes",
@@ -128,9 +128,9 @@
                 "https://www.google.com/maps?q=43.23107,27.91068",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23107,27.91068"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b079e7b522ba2ac71.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b079e7b522ba2ac71.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -140,7 +140,7 @@
               "idx": "3",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "младост бл 147",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.22804,27.88348&navigate=yes",
@@ -148,9 +148,9 @@
                 "https://www.google.com/maps?q=43.22804,27.88348",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22804,27.88348"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/bcf4ac73b9c6a6703.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/bcf4ac73b9c6a6703.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -160,7 +160,7 @@
               "idx": "4",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "младост бл 149",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.23,27.88128&navigate=yes",
@@ -168,9 +168,9 @@
                 "https://www.google.com/maps?q=43.23,27.88128",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23,27.88128"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b13c307ef5687791a.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b13c307ef5687791a.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -180,7 +180,7 @@
               "idx": "5",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "ж.к. Победа, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.22573,27.90205&navigate=yes",
@@ -188,9 +188,9 @@
                 "https://www.google.com/maps?q=43.22573,27.90205",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22573,27.90205"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b689f885e2e2e95aa.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -200,7 +200,7 @@
               "idx": "6",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "ж.к. Победа, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.22562,27.90223&navigate=yes",
@@ -208,9 +208,9 @@
                 "https://www.google.com/maps?q=43.22562,27.90223",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22562,27.90223"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b689f885e2e2e95aa.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -220,7 +220,7 @@
               "idx": "7",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Левски, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.21791,27.92044&navigate=yes",
@@ -228,9 +228,9 @@
                 "https://www.google.com/maps?q=43.21791,27.92044",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.21791,27.92044"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/bc259f641b7198204.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/bc259f641b7198204.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -479,7 +479,7 @@
               "idx": "0",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
@@ -487,9 +487,9 @@
                 "https://www.google.com/maps?q=43.24967,27.84243",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -499,7 +499,7 @@
               "idx": "1",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 17",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24455,27.85035&navigate=yes",
@@ -507,9 +507,9 @@
                 "https://www.google.com/maps?q=43.24455,27.85035",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24455,27.85035"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/be23f14e575d7d45f.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/be23f14e575d7d45f.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -519,7 +519,7 @@
               "idx": "2",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 19",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.2464,27.85083&navigate=yes",
@@ -527,9 +527,9 @@
                 "https://www.google.com/maps?q=43.2464,27.85083",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2464,27.85083"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b7954a5cebbfe41e6.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b7954a5cebbfe41e6.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -539,7 +539,7 @@
               "idx": "3",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 20",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24769,27.8485&navigate=yes",
@@ -547,9 +547,9 @@
                 "https://www.google.com/maps?q=43.24769,27.8485",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24769,27.8485"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b10f03e889696cdfa.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b10f03e889696cdfa.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -559,7 +559,7 @@
               "idx": "4",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 25",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24832,27.85362&navigate=yes",
@@ -567,9 +567,9 @@
                 "https://www.google.com/maps?q=43.24832,27.85362",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24832,27.85362"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b10a7cfe6276045ff.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b10a7cfe6276045ff.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -648,7 +648,7 @@
               "idx": "0",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
@@ -656,9 +656,9 @@
                 "https://www.google.com/maps?q=43.24967,27.84243",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -668,7 +668,7 @@
               "idx": "1",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24988,27.84151&navigate=yes",
@@ -676,9 +676,9 @@
                 "https://www.google.com/maps?q=43.24988,27.84151",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24988,27.84151"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -688,7 +688,7 @@
               "idx": "2",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25004,27.84158&navigate=yes",
@@ -696,9 +696,9 @@
                 "https://www.google.com/maps?q=43.25004,27.84158",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25004,27.84158"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -708,7 +708,7 @@
               "idx": "3",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
@@ -716,9 +716,9 @@
                 "https://www.google.com/maps?q=43.25021,27.84162",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -728,7 +728,7 @@
               "idx": "4",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25035,27.84176&navigate=yes",
@@ -736,9 +736,9 @@
                 "https://www.google.com/maps?q=43.25035,27.84176",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25035,27.84176"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -748,7 +748,7 @@
               "idx": "5",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25048,27.8419&navigate=yes",
@@ -756,9 +756,9 @@
                 "https://www.google.com/maps?q=43.25048,27.8419",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25048,27.8419"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -768,7 +768,7 @@
               "idx": "6",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25062,27.842&navigate=yes",
@@ -776,9 +776,9 @@
                 "https://www.google.com/maps?q=43.25062,27.842",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25062,27.842"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -788,7 +788,7 @@
               "idx": "7",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.2507,27.84229&navigate=yes",
@@ -796,9 +796,9 @@
                 "https://www.google.com/maps?q=43.2507,27.84229",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2507,27.84229"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -808,7 +808,7 @@
               "idx": "8",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25064,27.84249&navigate=yes",
@@ -816,9 +816,9 @@
                 "https://www.google.com/maps?q=43.25064,27.84249",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25064,27.84249"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -828,7 +828,7 @@
               "idx": "9",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25059,27.84271&navigate=yes",
@@ -836,9 +836,9 @@
                 "https://www.google.com/maps?q=43.25059,27.84271",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25059,27.84271"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1126,7 +1126,7 @@
               "idx": "0",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
@@ -1134,9 +1134,9 @@
                 "https://www.google.com/maps?q=43.25021,27.84162",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1146,7 +1146,7 @@
               "idx": "1",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Изгрев, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.23076,27.91095&navigate=yes",
@@ -1154,9 +1154,9 @@
                 "https://www.google.com/maps?q=43.23076,27.91095",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23076,27.91095"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b02fd254b3e55eccf.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b02fd254b3e55eccf.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1166,7 +1166,7 @@
               "idx": "2",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Изгрев, бл. 2",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.23107,27.91068&navigate=yes",
@@ -1174,9 +1174,9 @@
                 "https://www.google.com/maps?q=43.23107,27.91068",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23107,27.91068"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b079e7b522ba2ac71.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b079e7b522ba2ac71.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1186,7 +1186,7 @@
               "idx": "3",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "младост бл 147",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.22804,27.88348&navigate=yes",
@@ -1194,9 +1194,9 @@
                 "https://www.google.com/maps?q=43.22804,27.88348",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22804,27.88348"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/bcf4ac73b9c6a6703.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/bcf4ac73b9c6a6703.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1206,7 +1206,7 @@
               "idx": "4",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "младост бл 149",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.23,27.88128&navigate=yes",
@@ -1214,9 +1214,9 @@
                 "https://www.google.com/maps?q=43.23,27.88128",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.23,27.88128"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b13c307ef5687791a.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b13c307ef5687791a.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1226,7 +1226,7 @@
               "idx": "5",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "ж.к. Победа, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.22573,27.90205&navigate=yes",
@@ -1234,9 +1234,9 @@
                 "https://www.google.com/maps?q=43.22573,27.90205",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22573,27.90205"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b689f885e2e2e95aa.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1246,7 +1246,7 @@
               "idx": "6",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "ж.к. Победа, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.22562,27.90223&navigate=yes",
@@ -1254,9 +1254,9 @@
                 "https://www.google.com/maps?q=43.22562,27.90223",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.22562,27.90223"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b689f885e2e2e95aa.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b689f885e2e2e95aa.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1266,7 +1266,7 @@
               "idx": "7",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Левски, бл. 3",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.21791,27.92044&navigate=yes",
@@ -1274,9 +1274,9 @@
                 "https://www.google.com/maps?q=43.21791,27.92044",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.21791,27.92044"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/bc259f641b7198204.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/bc259f641b7198204.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1525,7 +1525,7 @@
               "idx": "0",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
@@ -1533,9 +1533,9 @@
                 "https://www.google.com/maps?q=43.24967,27.84243",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1545,7 +1545,7 @@
               "idx": "1",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 17",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24455,27.85035&navigate=yes",
@@ -1553,9 +1553,9 @@
                 "https://www.google.com/maps?q=43.24455,27.85035",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24455,27.85035"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/be23f14e575d7d45f.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/be23f14e575d7d45f.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1565,7 +1565,7 @@
               "idx": "2",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 19",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.2464,27.85083&navigate=yes",
@@ -1573,9 +1573,9 @@
                 "https://www.google.com/maps?q=43.2464,27.85083",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2464,27.85083"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b7954a5cebbfe41e6.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b7954a5cebbfe41e6.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1585,7 +1585,7 @@
               "idx": "3",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 20",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24769,27.8485&navigate=yes",
@@ -1593,9 +1593,9 @@
                 "https://www.google.com/maps?q=43.24769,27.8485",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24769,27.8485"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b10f03e889696cdfa.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b10f03e889696cdfa.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1605,7 +1605,7 @@
               "idx": "4",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 25",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24832,27.85362&navigate=yes",
@@ -1613,9 +1613,9 @@
                 "https://www.google.com/maps?q=43.24832,27.85362",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24832,27.85362"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b10a7cfe6276045ff.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b10a7cfe6276045ff.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1694,7 +1694,7 @@
               "idx": "0",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
@@ -1702,9 +1702,9 @@
                 "https://www.google.com/maps?q=43.24967,27.84243",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1714,7 +1714,7 @@
               "idx": "1",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.24988,27.84151&navigate=yes",
@@ -1722,9 +1722,9 @@
                 "https://www.google.com/maps?q=43.24988,27.84151",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24988,27.84151"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1734,7 +1734,7 @@
               "idx": "2",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25004,27.84158&navigate=yes",
@@ -1742,9 +1742,9 @@
                 "https://www.google.com/maps?q=43.25004,27.84158",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25004,27.84158"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1754,7 +1754,7 @@
               "idx": "3",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25021,27.84162&navigate=yes",
@@ -1762,9 +1762,9 @@
                 "https://www.google.com/maps?q=43.25021,27.84162",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25021,27.84162"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1774,7 +1774,7 @@
               "idx": "4",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25035,27.84176&navigate=yes",
@@ -1782,9 +1782,9 @@
                 "https://www.google.com/maps?q=43.25035,27.84176",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25035,27.84176"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1794,7 +1794,7 @@
               "idx": "5",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25048,27.8419&navigate=yes",
@@ -1802,9 +1802,9 @@
                 "https://www.google.com/maps?q=43.25048,27.8419",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25048,27.8419"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1814,7 +1814,7 @@
               "idx": "6",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25062,27.842&navigate=yes",
@@ -1822,9 +1822,9 @@
                 "https://www.google.com/maps?q=43.25062,27.842",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25062,27.842"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1834,7 +1834,7 @@
               "idx": "7",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.2507,27.84229&navigate=yes",
@@ -1842,9 +1842,9 @@
                 "https://www.google.com/maps?q=43.2507,27.84229",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.2507,27.84229"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1854,7 +1854,7 @@
               "idx": "8",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25064,27.84249&navigate=yes",
@@ -1862,9 +1862,9 @@
                 "https://www.google.com/maps?q=43.25064,27.84249",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25064,27.84249"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -1874,7 +1874,7 @@
               "idx": "9",
               "clicked": true,
               "surfaceAppeared": true,
-              "surface": "sheet",
+              "surface": "popup",
               "title": "кв. Владиславово, бл. 402",
               "navHrefs": [
                 "https://waze.com/ul?ll=43.25059,27.84271&navigate=yes",
@@ -1882,9 +1882,9 @@
                 "https://www.google.com/maps?q=43.25059,27.84271",
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.25059,27.84271"
               ],
-              "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+              "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
               "pinRect": {
-                "x": 513,
+                "x": 691,
                 "y": 516,
                 "w": 18,
                 "h": 18
@@ -2251,7 +2251,7 @@
       "query": "бл. 402",
       "settled": "<div id=\"addrSearchResults\" class=\"search-results\" role=\"listbox\" aria-label=\"Резултати от търсенето\"></div>",
       "rows": [],
-      "surface": "sheet",
+      "surface": "popup",
       "title": "кв. Владиславово, бл. 402",
       "navHrefs": [
         "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
@@ -2260,7 +2260,7 @@
         "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
       ],
       "pinRect": {
-        "x": 513,
+        "x": 691,
         "y": 516,
         "w": 18,
         "h": 18
@@ -2284,7 +2284,7 @@
         "idx": "0",
         "clicked": true,
         "surfaceAppeared": true,
-        "surface": "sheet",
+        "surface": "popup",
         "title": "кв. Владиславово, бл. 402",
         "navHrefs": [
           "https://waze.com/ul?ll=43.24967,27.84243&navigate=yes",
@@ -2292,16 +2292,16 @@
           "https://www.google.com/maps?q=43.24967,27.84243",
           "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.24967,27.84243"
         ],
-        "detailUrl": "http://localhost:8000/details/buildings/v1/b6a65df330b20943c.json",
+        "detailUrl": "http://localhost:8010/details/buildings/v1/b6a65df330b20943c.json",
         "pinRect": {
-          "x": 513,
+          "x": 691,
           "y": 516,
           "w": 18,
           "h": 18
         }
       },
       "pinBeforeClear": {
-        "x": 513,
+        "x": 691,
         "y": 516,
         "w": 18,
         "h": 18
