@@ -77,8 +77,12 @@ function argOf(name, fallback) {
 const MODE = argOf("--mode", "");
 const OUT_NAME = argOf("--out", MODE);
 const MOB = process.argv.includes("--mob");
-if (MODE !== "before" && MODE !== "after") {
-  console.error("usage: node probe_places_fv.mjs --mode before|after [--mob] [--out name]");
+// К1 (plan §12): --screens is a THIRD, read-only run - three 375x812 PNGs of our
+// own dropdown for Petar's eye. It writes no JSON at all, so it can neither move
+// G3/G6 nor be moved by them.
+const SCREENS = process.argv.includes("--screens");
+if (!SCREENS && MODE !== "before" && MODE !== "after") {
+  console.error("usage: node probe_places_fv.mjs --mode before|after [--mob] [--out name] | --screens");
   process.exit(2);
 }
 
@@ -1687,11 +1691,54 @@ async function scenarioEmptyField(s) {
 }
 
 // --- main -------------------------------------------------------------------
+// К1 (plan §12) - one shot per colour family, at the phone size Petar reads the
+// map on. Chrome comes up on a fresh profile and goes down BY PID like every other
+// run of this probe; the only thing written is the three PNGs.
+async function runScreens() {
+  const dir = path.join(OUT_DIR, "screens");
+  fs.mkdirSync(dir, { recursive: true });
+  const s = await openSession();
+  await s.send("Emulation.setDeviceMetricsOverride",
+               { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
+  await navigateFresh(s, "375×812 снимки");
+  if (!(await placesReady(s))) { console.log("  ПАДНАЛ ГЕЙТ: клонът на местата не се вдигна"); await bye(1); }
+  for (const [name, q] of [["hotel", "хотел"], ["school", "училище"], ["hospital", "болница"]]) {
+    const list = await typePlaces(s, q);
+    // Headless Chrome has no position provider, so the "Достъпът е отказан" pill is
+    // always up, and at 375 px it lies across the first two rows (the very rows the
+    // shot is about). It is hidden for the capture only - the page is otherwise
+    // untouched, and no gate reads these PNGs.
+    await s.ev("(function () { var p = document.getElementById('pill');" +
+               " if (p) p.classList.add('hidden'); return true; })()");
+    const png = await s.send("Page.captureScreenshot", { format: "png" });
+    const file = path.join(dir, `${name}.png`);
+    fs.writeFileSync(file, Buffer.from(png.result.data, "base64"));
+    console.log(`  записах ${file} (${fs.statSync(file).size} B, ` +
+                `${list.rows.length} наши реда за „${q}", първа група „${list.headers[0] || "-"}")`);
+  }
+  // The PNGs show the list; the pin is on the map, so its colour is READ, not eyed:
+  // pick the first row of each family and report the pin's computed background.
+  for (const [name, q] of [["hotel", "хотел"], ["school", "училище"], ["hospital", "болница"]]) {
+    await typePlaces(s, q);
+    await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+    await waitFor(s, "document.querySelectorAll('.place-pin').length > 0", 20000);
+    const pin = await s.ev("(function () { var p = document.querySelector('.place-pin');" +
+                           " return p.dataset.grp + ' ' + getComputedStyle(p).backgroundColor; })()");
+    console.log(`  пинът за „${q}": ${pin}`);
+    await pressEscape(s);
+  }
+  console.log(`  конзолни грешки: ${s.errs.length}`);
+  for (const e of s.errs) console.log(`     ${String(e).slice(0, 200)}`);
+  await bye(s.errs.length ? 1 : 0);
+}
+
 async function main() {
-  console.log(`=== ПРОБА: адресната търсачка · режим ${MODE} · ${W}×${H}${MOB ? " (мобилен)" : ""} ===`);
+  console.log(`=== ПРОБА: адресната търсачка · режим ${SCREENS ? "снимки" : MODE} · ` +
+              `${SCREENS ? "375×812" : `${W}×${H}`}${MOB ? " (мобилен)" : ""} ===`);
   fs.mkdirSync(OUT_DIR, { recursive: true });
   await startServer();
   await startChrome();
+  if (SCREENS) { await runScreens(); return; }
   const s = await openSession();
 
   // G6 window: everything from Page.navigate to the first focus of the box.
