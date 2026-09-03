@@ -8,23 +8,30 @@ Until C16 nothing here could go red without a human reading a report:
   1. importing `scratch/places_search/recall_sweep.py` must write NOT ONE BYTE
      (the `if __name__` guard) — measured in a subprocess, sha before/after;
   2. the П7 gains and controls of §11 Р3/С2′–С4′ — {name, zone, kind} AND the
-     branch, not a row count; К2 (§12, д) replaced the differential control
-     „училище бриз“, which did not differentiate, with „детска градина
-     приморски“, which does (12 rows on M2-failopen with the guard, 4 on A3
-     without it), and gates the guard itself here;
+     branch, not a row count. К2 (§12, д) had made „детска градина приморски“
+     the differential control of the foreign-token guard; ЛОТ 1 brought a
+     legitimate row (ДГ№19 „Славейче“, район Приморски) that turned it into a
+     plain one-row A3 answer, so the control no longer differentiates —
+     Амандамент №2 (ж). Its job passed to В1/В2 („детска ясла аспарухово“,
+     „университет приморски“) in the ЛОТ 1 controls; the guard itself is still
+     gated directly, in `test_the_foreign_token_guard_is_load_bearing`;
   3. `p7_added` is exactly the seven tokens in six zones measured (§11 v2.1 plus
      the seventh, `konstanin`, that the renamed resort zone unlocked — Амандамент №10);
-  4. the frozen diff: the 72 queries that existed before П7 give byte-identical
-     ordered rows and the same branch as `git show 7a6ea1d:…rows.json` — with
-     the ONE signed exception of ЛОТ 1 решение 2 („градина“), named below;
-  5. ЛОТ 1 (решения 2 и 1, signed 03.09): the new gate, the four rows of the 103
-     the two rules move, and the proof that each rule is load-bearing — inverted
-     in place, the old answer comes back;
-  6. F3-к: the П7 bucket — the other 31 of the 103 — is anchored the same way,
-     against `git show 378a844:…rows.json`, with the three signed exceptions of
-     решение 1. Without it the bucket was gated only against an artefact
-     re-frozen in the same commit, so a fourth П7 row could have moved with it
-     and stayed green (audit of 03.09, СРЕДНА).
+  4. ONE data anchor (Амандамент №11): every row of the committed artefact is
+     equal by (q, branch, name, zone) to `git show 23af63f:…rows.json` EXCEPT
+     the 55 rows Petar signed (Амандамент №8 П1 — `LOT1_DATA_CHANGED`, the list
+     in `scratch/places_search/lot1_reference_preview_v2.md` §А+§Б) and the 9
+     rows F1-д added (`LOT1_DATA_ADDED`). A row on the signed list that did NOT
+     move is red as well, so the list cannot go stale in silence;
+  5. ЛОТ 1 (решения 2 и 1, signed 03.09): the gate itself, and the proof that
+     each rule is load-bearing — inverted in place, the old answer comes back;
+  6. RETIRED anchors: `FROZEN_COMMIT = 7a6ea1d` (buckets gate_m5_a8 + extra,
+     exception `LOT1_PREPENDED`) and `P7_ANCHOR_COMMIT = 378a844` (bucket
+     gate_p7, exceptions `LOT1_MOVED_P7` — „хотел приморски“, „училище свети
+     никола“, „хотел зеленика“) are gone. 23af63f INHERITS them: that commit is
+     the artefact frozen against both of them and green on both, so the chain
+     7a6ea1d → 378a844 → 23af63f is unbroken, and one anchor now covers all
+     four buckets and all 122 rows instead of two anchors over 103.
 
 Read-only: it runs `git show` through subprocess and touches nothing on disk.
 """
@@ -40,23 +47,59 @@ import unittest
 REPO = pathlib.Path(__file__).resolve().parents[1]
 REFERENCE = REPO / "scratch" / "places_search" / "recall_sweep.py"
 ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
-FROZEN_COMMIT = "7a6ea1d"          # C15 — the last HEAD before П7 was written
-P7_ANCHOR_COMMIT = "378a844"       # C23 — the last HEAD before the ЛОТ 1 client rules
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
-OLD_BUCKETS = ("gate_m5_a8", "extra")
-# ЛОТ 1, the signed change list (docs/plans/recommendations_2026-09-03.md §1,
-# решения 2 и 1): FOUR rows of the 103 move, and these are they. Решение 2 moves
-# „градина“ inside the 72 frozen at 7a6ea1d; решение 1 moves three П7 controls.
-LOT1_PREPENDED = {u"градина": (u"ГРАДИНА", u"к.к. Чайка")}
-LOT1_MOVED_P7 = {
-    u"хотел приморски": (u"A3-record+zone-phrase", 5,
-                         [(u"ПРИМОРСКИ", u"к.к. Св. Константин"),
-                          (u"Маргарита", u"район Приморски")]),
-    u"училище свети никола": (u"A3-record+zone-phrase", 1,
-                              [(u'Професионална гимназия по химични и хранително-вкусови '
-                                u'технологии "Д. И. Менделеев"', u"м-т Свети Никола")]),
-    u"хотел зеленика": (u"A3-record+zone-phrase", 2,
-                        [(u"Зеленика", u"с.о. Зеленика"), (u"Джоя", u"м. Зеленика")]),
+BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
+# The ONE anchor (Амандамент №11): the artefact as it stood before the ЛОТ 1
+# DATA landed — 113 rows over the four buckets, itself frozen against 7a6ea1d
+# and 378a844 (docstring 6).
+LOT1_DATA_ANCHOR = "23af63f"       # C30 — the last artefact before the ЛОТ 1 data
+# The signed change list: Petar's П1 „да“ of Амандамент №8 over
+# scratch/places_search/lot1_reference_preview_v2.md — §А (18 rows where only the
+# spelling of a label moved: the renamed zone „к.к. Св. Константин“ →
+# „к.к. Св. Св. Константин и Елена“ and the 9 canonised registry names) and §Б
+# (37 rows where the branch, the count or the records themselves moved). 55 in
+# all; the queries repeat across buckets, so the unique queries are 50.
+LOT1_DATA_CHANGED = {
+    # §А 11 + §Б 23
+    "gate_m5_a8": (
+        u"хотел адмирал", u"адмирал", u"хотел адмиралл", u"хотел амирал",
+        u"адмирал златни", u"хотел адмирал златни пясъци", u"роял", u"royal",
+        u"русалка", u"хелиос спа", u"спа хелиос",
+        u"хотели", u"хотел", u"хотелите", u"семеен хотел", u"хотел златни",
+        u"берлин голдън бийч", u"лти берлин", u"бонита", u"bonita", u"парк",
+        u"градина", u"училище", u"училища", u"болница", u"детска градина",
+        u"дкц", u"хоспис", u"болница света марина", u"св марина",
+        u"градина 12", u"дг 12", u"детска градина 12", u"ввму",
+    ),
+    # §А 3 + §Б 3
+    "extra": (
+        u"хотел йо", u"хотел адмирал", u"йо",
+        u"хотел градина", u"хотел семеен", u"ritsa",
+    ),
+    # §А 4 + §Б 6
+    "gate_p7": (
+        u"хотел приморският", u"приморският хотел", u"приморският хотел варна",
+        u"хотел приморски",
+        u"владиславово детска градина", u"детска градина владислав варненчик",
+        u"хотел марина парк", u"хотел чайка", u"болница изгрев",
+        u"детска градина приморски",
+    ),
+    # §А 0 + §Б 5
+    "gate_lot1": (
+        u"ГРАДИНА", u"градина", u"хотел градина", u"хотел златни",
+        u"детска градина",
+    ),
+}
+# The rows F1-д ADDED — they cannot be compared with the anchor because they do
+# not exist there: the seventh П7 token (Амандамент №10 (3)) and the eight ЛОТ 1
+# gate rows of Амандамент №8 П2/§В/§Г (the three new words, Владиславово, В1/В2).
+LOT1_DATA_ADDED = {
+    "gate_p7": (u"хотел констанин",),
+    "gate_lot1": (
+        u"детско заведение", u"детски заведения", u"ясла", u"детска ясла",
+        u"общежитие", u"детска градина владиславово",
+        u"детска ясла аспарухово", u"университет приморски",
+    ),
 }
 
 
@@ -68,7 +111,7 @@ def load_reference():
     return module
 
 
-def frozen_rows(commit=FROZEN_COMMIT):
+def frozen_rows(commit=LOT1_DATA_ANCHOR):
     """The baseline as git holds it — never as the working tree holds it."""
     out = subprocess.run(["git", "-C", str(REPO), "show",
                           commit + ":" + FROZEN_PATH],
@@ -204,97 +247,103 @@ class P7GateTest(unittest.TestCase):
 
 
 class FrozenDiffTest(unittest.TestCase):
-    """С5′: the 72 queries that existed before П7 must not have moved — and,
-    since F3-к, the 31 П7 queries that came with it must not have moved either.
-    Two anchors, two commits, one signed exception list each."""
+    """С5′ + Амандамент №11: ONE anchor for all four buckets.
+
+    Two things have to hold at once, or the re-freeze proves nothing:
+    the ARTEFACT the probe replays must differ from 23af63f in exactly the 55
+    signed rows (plus the 9 rows that did not exist there), and the LIVE engine
+    must answer exactly what the artefact holds. Either half alone can be fooled
+    — a row moving in the engine and in the artefact together would stay green
+    against the artefact, and an artefact edited by hand would stay green
+    against the anchor only if the engine agreed with it."""
 
     @classmethod
     def setUpClass(cls):
-        cls.frozen = frozen_rows()
-        cls.anchor_p7 = frozen_rows(P7_ANCHOR_COMMIT)
+        cls.anchor = frozen_rows()
+        cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
 
-    def test_seventy_two_queries_unchanged_live(self):
-        """Re-run through the LIVE reference, not through the artefact.
+    def signed(self, bucket, q):
+        return q in LOT1_DATA_CHANGED.get(bucket, ())
 
-        ЛОТ 1 решение 2 moves exactly ONE of the 72: „градина“ now carries the
-        hotel ГРАДИНА above the 46 kindergartens, which keep their own order.
-        The exception is named in LOT1_PREPENDED; any other movement is red."""
-        compared, rows, prepended = 0, 0, 0
-        for bucket in OLD_BUCKETS:
-            for entry in self.frozen[bucket]:
-                got, branch = REF.search(entry["q"])
-                want = [(r["name"], r["zone"]) for r in entry["rows"]]
-                if entry["q"] in LOT1_PREPENDED:
-                    want = [LOT1_PREPENDED[entry["q"]]] + want
-                    prepended += 1
-                self.assertEqual(branch, entry["branch"], entry["q"])
-                self.assertEqual([(r.name, r.zone) for r in got], want, entry["q"])
+    def added(self, bucket, q):
+        return q in LOT1_DATA_ADDED.get(bucket, ())
+
+    def test_the_signed_lists_are_the_measured_counts(self):
+        """55 signed + 9 added over 113 anchored rows = the 122 of the delivery."""
+        self.assertEqual(sum(len(v) for v in LOT1_DATA_CHANGED.values()), 55)
+        self.assertEqual(sum(len(v) for v in LOT1_DATA_ADDED.values()), 9)
+        self.assertEqual(sum(len(self.anchor[b]) for b in BUCKETS), 113)
+        self.assertEqual(sum(len(self.current[b]) for b in BUCKETS), 122)
+        for bucket in BUCKETS:
+            anchored = set(e["q"] for e in self.anchor[bucket])
+            live = set(e["q"] for e in self.current[bucket])
+            self.assertEqual(anchored - live, set(),
+                             "a row vanished from " + bucket)
+            self.assertEqual(live - anchored, set(LOT1_DATA_ADDED.get(bucket, ())),
+                             "unsigned new rows in " + bucket)
+
+    def test_every_row_outside_the_signed_list_equals_the_anchor(self):
+        """The half that catches a silent drift: any row that is neither signed
+        nor new must be equal to 23af63f by (q, branch, name, zone)."""
+        compared = 0
+        for bucket in BUCKETS:
+            anchor = dict((e["q"], e) for e in self.anchor[bucket])
+            for entry in self.current[bucket]:
+                if self.added(bucket, entry["q"]) or self.signed(bucket, entry["q"]):
+                    continue
+                was = anchor[entry["q"]]
+                self.assertEqual(
+                    (entry["branch"], [(r["name"], r["zone"]) for r in entry["rows"]]),
+                    (was["branch"], [(r["name"], r["zone"]) for r in was["rows"]]),
+                    "%s/%s moved against %s and is not on the signed list"
+                    % (bucket, entry["q"], LOT1_DATA_ANCHOR))
                 compared += 1
-                rows += len(want)
-        self.assertEqual(compared, 72)
-        self.assertEqual(prepended, 1)
-        self.assertEqual(rows, 1338)
+        self.assertEqual(compared, 113 - 55)
 
-    def test_committed_rows_match_the_frozen_baseline(self):
-        """And the artefact the probe replays says the same thing — the frozen
-        rows plus the ONE signed prepend of решение 2, named in LOT1_PREPENDED."""
-        current = json.loads(ROWS.read_text(encoding="utf-8"))
-        prepended = 0
-        for bucket in OLD_BUCKETS:
-            want = []
-            for e in self.frozen[bucket]:
-                rows = [(r["name"], r["zone"]) for r in e["rows"]]
-                if e["q"] in LOT1_PREPENDED:
-                    rows = [LOT1_PREPENDED[e["q"]]] + rows
-                    prepended += 1
-                want.append((e["q"], e["branch"], rows))
-            self.assertEqual(
-                [(e["q"], e["branch"], [(r["name"], r["zone"]) for r in e["rows"]])
-                 for e in current[bucket]], want)
-        self.assertEqual(prepended, 1)
-
-    def test_committed_p7_rows_match_the_p7_anchor(self):
-        """F3-к: the П7 bucket of the artefact against a commit OUTSIDE this lot.
-
-        `test_the_three_moved_p7_rows_and_no_others` reads the LIVE engine against
-        the artefact that was re-frozen in the same commit; had a fourth row moved,
-        both sides would carry the new value and the count of moved rows would
-        still be three. The anchor is what makes that impossible: every П7 row is
-        byte-equal (q, branch, name, zone) to 378a844 except the three named in
-        LOT1_MOVED_P7 — and those three must really differ from it, or the
-        exception list is stale."""
-        current = json.loads(ROWS.read_text(encoding="utf-8"))
-        anchor = dict((e["q"], e) for e in self.anchor_p7["gate_p7"])
-        self.assertEqual([e["q"] for e in current["gate_p7"]],
-                         [e["q"] for e in self.anchor_p7["gate_p7"]])
-        self.assertEqual(len(current["gate_p7"]), 31)
-        self.assertEqual(len(LOT1_MOVED_P7), 3)
+    def test_every_signed_row_really_moved(self):
+        """The half that catches a stale list: a query that is on the signed list
+        but answers exactly as it did at the anchor is red — the signature is
+        then describing a change that no longer exists."""
         moved = 0
-        for entry in current["gate_p7"]:
-            was = anchor[entry["q"]]
-            now_rows = [(r["name"], r["zone"]) for r in entry["rows"]]
-            was_rows = [(r["name"], r["zone"]) for r in was["rows"]]
-            if entry["q"] in LOT1_MOVED_P7:
-                want_branch, want_n, want_first = LOT1_MOVED_P7[entry["q"]]
-                self.assertEqual((entry["branch"], len(now_rows)),
-                                 (want_branch, want_n), entry["q"])
-                self.assertEqual(now_rows[:len(want_first)], want_first, entry["q"])
-                self.assertNotEqual((entry["branch"], now_rows),
-                                    (was["branch"], was_rows),
-                                    "%s is on the signed list but did not move against %s"
-                                    % (entry["q"], P7_ANCHOR_COMMIT))
+        for bucket in BUCKETS:
+            anchor = dict((e["q"], e) for e in self.anchor[bucket])
+            for q in LOT1_DATA_CHANGED[bucket]:
+                entry = [e for e in self.current[bucket] if e["q"] == q]
+                self.assertEqual(len(entry), 1, "%s/%s" % (bucket, q))
+                entry = entry[0]
+                was = anchor[q]
+                self.assertNotEqual(
+                    (entry["branch"], [(r["name"], r["zone"]) for r in entry["rows"]]),
+                    (was["branch"], [(r["name"], r["zone"]) for r in was["rows"]]),
+                    "%s/%s is on the signed list but did not move against %s"
+                    % (bucket, q, LOT1_DATA_ANCHOR))
                 moved += 1
-            else:
-                self.assertEqual((entry["branch"], now_rows), (was["branch"], was_rows),
-                                 "%s moved against %s and is not on the signed list"
-                                 % (entry["q"], P7_ANCHOR_COMMIT))
-        self.assertEqual(moved, 3)
+        self.assertEqual(moved, 55)
+
+    def test_the_live_engine_replays_the_artefact(self):
+        """And the engine says what the artefact says — all 122 queries, ordered
+        rows and branch, not a count."""
+        compared, rows = 0, 0
+        for bucket in BUCKETS:
+            for entry in self.current[bucket]:
+                got, branch = REF.search(entry["q"])
+                self.assertEqual(branch, entry["branch"], entry["q"])
+                self.assertEqual([(r.name, r.zone) for r in got],
+                                 [(r["name"], r["zone"]) for r in entry["rows"]],
+                                 entry["q"])
+                self.assertTrue(entry["ok"], entry["q"])
+                compared += 1
+                rows += len(got)
+        self.assertEqual(compared, 122)
+        self.assertEqual(rows, 1998)
 
     def test_rows_carry_the_p7_measure(self):
-        current = json.loads(ROWS.read_text(encoding="utf-8"))
+        current = self.current
         self.assertEqual(current["_meta"]["p7_added"], REF.P7_EXPECTED)
-        self.assertEqual(current["_meta"]["p7_tokens"], 6)
-        self.assertEqual(current["_meta"]["p7_zones_with_aliases"], 5)
+        # Амандамент №10 (3): six tokens were signed as the rule, the seventh came
+        # with the renamed resort zone — 7 tokens in 6 zones, measured.
+        self.assertEqual(current["_meta"]["p7_tokens"], 7)
+        self.assertEqual(current["_meta"]["p7_zones_with_aliases"], 6)
         self.assertEqual(len(current["gate_p7"]),
                          len(REF.P7_GAINS) + len(REF.P7_CONTROLS))
         for entry in current["gate_p7"]:
@@ -309,49 +358,28 @@ class Lot1GateTest(unittest.TestCase):
         self.assertEqual(failures, [], "\n".join(failures))
 
     def test_the_committed_artefact_carries_the_lot1_bucket(self):
-        """F2-к: the re-frozen artefact carries the ЛОТ 1 bucket the probe replays
-        — one row per signed query (10), every one of them green."""
+        """F2-д: the re-frozen artefact carries the ЛОТ 1 bucket the probe replays
+        — one row per signed query (18 = the 10 of F2-к plus the 6 gains and 2
+        controls of Амандамент №8 П2/§В/§Г), every one of them green."""
         current = json.loads(ROWS.read_text(encoding="utf-8"))
         bucket = current["gate_lot1"]
         self.assertEqual(len(bucket), len(REF.LOT1_GAINS) + len(REF.LOT1_CONTROLS))
-        self.assertEqual(len(bucket), 10)
+        self.assertEqual(len(bucket), 18)
         for entry in bucket:
             self.assertTrue(entry["ok"], entry["q"])
 
-    def test_the_three_moved_p7_rows_and_no_others(self):
-        """The П7 bucket of the frozen artefact, re-run live: exactly the three
-        rows of the signed list answer differently, every other one is byte-equal
-        (name, zone and branch). The artefact itself is re-frozen in F2, not here."""
-        current = json.loads(ROWS.read_text(encoding="utf-8"))
-        moved = 0
-        for entry in current["gate_p7"]:
-            got, branch = REF.search(entry["q"])
-            if entry["q"] in LOT1_MOVED_P7:
-                want_branch, want_n, want_first = LOT1_MOVED_P7[entry["q"]]
-                self.assertEqual(branch, want_branch, entry["q"])
-                self.assertEqual(len(got), want_n, entry["q"])
-                self.assertEqual([(r.name, r.zone) for r in got][:len(want_first)],
-                                 want_first, entry["q"])
-                moved += 1
-            else:
-                self.assertEqual(branch, entry["branch"], entry["q"])
-                self.assertEqual([(r.name, r.zone) for r in got],
-                                 [(r["name"], r["zone"]) for r in entry["rows"]],
-                                 entry["q"])
-        self.assertEqual(moved, 3)
-
     def test_the_exact_name_prepend_is_load_bearing(self):
         """Решение 2, inverted in place: with an empty exact-name index „градина“
-        falls back to the 46 kindergartens. Restored, the hotel is first again."""
+        falls back to the 51 kindergartens. Restored, the hotel is first again."""
         saved = REF.EXACT_NAME
         try:
             REF.EXACT_NAME = {}
             rows, branch = REF.search(u"градина")
-            self.assertEqual((branch, len(rows)), ("M1-category", 46))
+            self.assertEqual((branch, len(rows)), ("M1-category", 51))
         finally:
             REF.EXACT_NAME = saved
         rows, branch = REF.search(u"градина")
-        self.assertEqual((branch, len(rows), rows[0].name), ("M1-category", 47, u"ГРАДИНА"))
+        self.assertEqual((branch, len(rows), rows[0].name), ("M1-category", 52, u"ГРАДИНА"))
 
     def test_the_zone_phrase_override_is_load_bearing(self):
         """Решение 1, inverted in place: with no phrase on any record the three

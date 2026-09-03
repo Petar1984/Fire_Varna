@@ -2,10 +2,10 @@
  "_meta": {
   "source": "scratch/places_search/recall_sweep.py (place_tokens)",
   "what": "С6′ tokeniser parity corpus: kept zone aliases + record names",
-  "aliases": 62,
-  "zones_with_aliases": 28,
-  "records": 361,
-  "strings": 421
+  "aliases": 70,
+  "zones_with_aliases": 30,
+  "records": 375,
+  "strings": 443
  },
  "strings": [
   {
@@ -334,6 +334,206 @@
    ]
   },
   {
+   "s": "Кк Св. Констанин и Елена",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "кк",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "konstanin",
+     "orig": "констанин",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Св. Константин И Елена",
+   "tokens": [
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Св. Константин и Елена",
+   "tokens": [
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "к.к Св.св. Константин и Елена",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "к.к. СВЕТИ СВЕТИ КОНСТАНТИН И ЕЛЕНА",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "к.к. Св.св. Константин и Елена",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "konstantin",
+     "orig": "константин",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "elena",
+     "orig": "елена",
+     "num": false
+    }
+   ]
+  },
+  {
    "s": "кв. ВИНИЦА",
    "tokens": [
     {
@@ -494,6 +694,61 @@
     {
      "s": "izgrev",
      "orig": "изгрев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Св. Иван Рилски",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "rilski",
+     "orig": "рилски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. Свети Иван Рилски",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "rilski",
+     "orig": "рилски",
      "num": false
     }
    ]
@@ -4124,16 +4379,6 @@
    ]
   },
   {
-   "s": "Явор",
-   "tokens": [
-    {
-     "s": "iavor",
-     "orig": "явор",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "3 ОУ Ангел Кънчев",
    "tokens": [
     {
@@ -4204,46 +4449,6 @@
    ]
   },
   {
-   "s": "Частна профилирана гимназия \"Антонан дьо Сент-Екзюпери\"",
-   "tokens": [
-    {
-     "s": "chastna",
-     "orig": "частна",
-     "num": false
-    },
-    {
-     "s": "profilirana",
-     "orig": "профилирана",
-     "num": false
-    },
-    {
-     "s": "gimnazia",
-     "orig": "гимназия",
-     "num": false
-    },
-    {
-     "s": "antonan",
-     "orig": "антонан",
-     "num": false
-    },
-    {
-     "s": "do",
-     "orig": "дьо",
-     "num": false
-    },
-    {
-     "s": "sent",
-     "orig": "сент",
-     "num": false
-    },
-    {
-     "s": "ekziuperi",
-     "orig": "екзюпери",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "ЧОУ \"Феникс 2020\"",
    "tokens": [
     {
@@ -4260,6 +4465,36 @@
      "s": "2020",
      "orig": "2020",
      "num": true
+    }
+   ]
+  },
+  {
+   "s": "ЧПГ „Антоан дьо Сент-Екзюпери“",
+   "tokens": [
+    {
+     "s": "chpg",
+     "orig": "чпг",
+     "num": false
+    },
+    {
+     "s": "antoan",
+     "orig": "антоан",
+     "num": false
+    },
+    {
+     "s": "do",
+     "orig": "дьо",
+     "num": false
+    },
+    {
+     "s": "sent",
+     "orig": "сент",
+     "num": false
+    },
+    {
+     "s": "ekziuperi",
+     "orig": "екзюпери",
+     "num": false
     }
    ]
   },
@@ -4634,6 +4869,26 @@
    ]
   },
   {
+   "s": "ОУ „Иван Вазов“",
+   "tokens": [
+    {
+     "s": "ou",
+     "orig": "оу",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "vazov",
+     "orig": "вазов",
+     "num": false
+    }
+   ]
+  },
+  {
    "s": "ОУ Капитан Петко Войвода",
    "tokens": [
     {
@@ -4660,26 +4915,6 @@
   },
   {
    "s": "ОУ \"Константин Арабаджиев\"",
-   "tokens": [
-    {
-     "s": "ou",
-     "orig": "оу",
-     "num": false
-    },
-    {
-     "s": "konstantin",
-     "orig": "константин",
-     "num": false
-    },
-    {
-     "s": "arabadzhiev",
-     "orig": "арабаджиев",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "ОУ „Константин Арабаджиев“",
    "tokens": [
     {
      "s": "ou",
@@ -5019,26 +5254,6 @@
    ]
   },
   {
-   "s": "ПГ ИТOK \"Екзюпери\"",
-   "tokens": [
-    {
-     "s": "pg",
-     "orig": "пг",
-     "num": false
-    },
-    {
-     "s": "itok",
-     "orig": "итok",
-     "num": false
-    },
-    {
-     "s": "ekziuperi",
-     "orig": "екзюпери",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "ПГ по Компютърно Моделиране и Компютърни Системи \"Акад. Благовест Сендов\"",
    "tokens": [
     {
@@ -5094,36 +5309,6 @@
    ]
   },
   {
-   "s": "ПГ по сградостроителство \"Кольо Фичето\"",
-   "tokens": [
-    {
-     "s": "pg",
-     "orig": "пг",
-     "num": false
-    },
-    {
-     "s": "po",
-     "orig": "по",
-     "num": false
-    },
-    {
-     "s": "sgradostroitelstvo",
-     "orig": "сградостроителство",
-     "num": false
-    },
-    {
-     "s": "kolo",
-     "orig": "кольо",
-     "num": false
-    },
-    {
-     "s": "ficheto",
-     "orig": "фичето",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "ПГ по строителство, архитектура и геодезия \"Васил Левски\"",
    "tokens": [
     {
@@ -5164,41 +5349,6 @@
     {
      "s": "levski",
      "orig": "левски",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "ПГ по текстил и моден дизайн",
-   "tokens": [
-    {
-     "s": "pg",
-     "orig": "пг",
-     "num": false
-    },
-    {
-     "s": "po",
-     "orig": "по",
-     "num": false
-    },
-    {
-     "s": "tekstil",
-     "orig": "текстил",
-     "num": false
-    },
-    {
-     "s": "i",
-     "orig": "и",
-     "num": false
-    },
-    {
-     "s": "moden",
-     "orig": "моден",
-     "num": false
-    },
-    {
-     "s": "dizain",
-     "orig": "дизайн",
      "num": false
     }
    ]
@@ -5874,61 +6024,11 @@
    ]
   },
   {
-   "s": "Аджибадем Сити Клиник",
-   "tokens": [
-    {
-     "s": "adzhibadem",
-     "orig": "аджибадем",
-     "num": false
-    },
-    {
-     "s": "siti",
-     "orig": "сити",
-     "num": false
-    },
-    {
-     "s": "klinik",
-     "orig": "клиник",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "Eurohospital",
    "tokens": [
     {
      "s": "eurohospital",
      "orig": "eurohospital",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "Медицински комплекс \"Майчин дом\" - Варна",
-   "tokens": [
-    {
-     "s": "meditsinski",
-     "orig": "медицински",
-     "num": false
-    },
-    {
-     "s": "kompleks",
-     "orig": "комплекс",
-     "num": false
-    },
-    {
-     "s": "maichin",
-     "orig": "майчин",
-     "num": false
-    },
-    {
-     "s": "dom",
-     "orig": "дом",
-     "num": false
-    },
-    {
-     "s": "varna",
-     "orig": "варна",
      "num": false
     }
    ]
@@ -6129,7 +6229,7 @@
    ]
   },
   {
-   "s": "„Специализирана болница за активно лечение по кардиология – Кардиолайф“ ООД",
+   "s": "„Специализирана болница за активно лечение по детски болести – доктор Лисичкова“ ЕООД",
    "tokens": [
     {
      "s": "spetsializirana",
@@ -6162,18 +6262,28 @@
      "num": false
     },
     {
-     "s": "kardiologia",
-     "orig": "кардиология",
+     "s": "detski",
+     "orig": "детски",
      "num": false
     },
     {
-     "s": "kardiolaif",
-     "orig": "кардиолайф",
+     "s": "bolesti",
+     "orig": "болести",
      "num": false
     },
     {
-     "s": "od",
-     "orig": "оод",
+     "s": "doktor",
+     "orig": "доктор",
+     "num": false
+    },
+    {
+     "s": "lisichkova",
+     "orig": "лисичкова",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
      "num": false
     }
    ]
@@ -6539,6 +6649,36 @@
    ]
   },
   {
+   "s": "„ДКЦ Младост-М Варна“ ООД",
+   "tokens": [
+    {
+     "s": "dkts",
+     "orig": "дкц",
+     "num": false
+    },
+    {
+     "s": "mladost",
+     "orig": "младост",
+     "num": false
+    },
+    {
+     "s": "m",
+     "orig": "м",
+     "num": false
+    },
+    {
+     "s": "varna",
+     "orig": "варна",
+     "num": false
+    },
+    {
+     "s": "od",
+     "orig": "оод",
+     "num": false
+    }
+   ]
+  },
+  {
    "s": "II ДКЦ Св. Иван Рилски",
    "tokens": [
     {
@@ -6589,6 +6729,31 @@
    ]
   },
   {
+   "s": "„Хоспис Медицинска грижа“ ООД",
+   "tokens": [
+    {
+     "s": "hospis",
+     "orig": "хоспис",
+     "num": false
+    },
+    {
+     "s": "meditsinska",
+     "orig": "медицинска",
+     "num": false
+    },
+    {
+     "s": "grizha",
+     "orig": "грижа",
+     "num": false
+    },
+    {
+     "s": "od",
+     "orig": "оод",
+     "num": false
+    }
+   ]
+  },
+  {
    "s": "„Хоспис Мишел Паре“ ООД",
    "tokens": [
     {
@@ -6609,6 +6774,56 @@
     {
      "s": "od",
      "orig": "оод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Хоспис Надежда“ ЕООД",
+   "tokens": [
+    {
+     "s": "hospis",
+     "orig": "хоспис",
+     "num": false
+    },
+    {
+     "s": "nadezhda",
+     "orig": "надежда",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "„Хоспис Света Мария Магдалена“ ЕООД",
+   "tokens": [
+    {
+     "s": "hospis",
+     "orig": "хоспис",
+     "num": false
+    },
+    {
+     "s": "sveta",
+     "orig": "света",
+     "num": false
+    },
+    {
+     "s": "maria",
+     "orig": "мария",
+     "num": false
+    },
+    {
+     "s": "magdalena",
+     "orig": "магдалена",
+     "num": false
+    },
+    {
+     "s": "eod",
+     "orig": "еоод",
      "num": false
     }
    ]
@@ -6659,26 +6874,6 @@
    ]
   },
   {
-   "s": "13 ЦДГ Звездичка",
-   "tokens": [
-    {
-     "s": "13",
-     "orig": "13",
-     "num": true
-    },
-    {
-     "s": "tsdg",
-     "orig": "цдг",
-     "num": false
-    },
-    {
-     "s": "zvezdichka",
-     "orig": "звездичка",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "20 Логопедична ЦДГ",
    "tokens": [
     {
@@ -6714,26 +6909,6 @@
     {
      "s": "uspeh",
      "orig": "успех",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "28 ЦДГ Карамфилче",
-   "tokens": [
-    {
-     "s": "28",
-     "orig": "28",
-     "num": true
-    },
-    {
-     "s": "tsdg",
-     "orig": "цдг",
-     "num": false
-    },
-    {
-     "s": "karamfilche",
-     "orig": "карамфилче",
      "num": false
     }
    ]
@@ -6834,31 +7009,6 @@
    ]
   },
   {
-   "s": "9. Детска ясла Детелина",
-   "tokens": [
-    {
-     "s": "9",
-     "orig": "9",
-     "num": true
-    },
-    {
-     "s": "detska",
-     "orig": "детска",
-     "num": false
-    },
-    {
-     "s": "iasla",
-     "orig": "ясла",
-     "num": false
-    },
-    {
-     "s": "detelina",
-     "orig": "детелина",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "ЧДГ „Приятели\"",
    "tokens": [
     {
@@ -6894,92 +7044,97 @@
    ]
   },
   {
-   "s": "Детска Ясла №2 \"Моряче\"",
+   "s": "ДГ№10 „Карамфилче“",
    "tokens": [
     {
-     "s": "detska",
-     "orig": "детска",
+     "s": "dg",
+     "orig": "дг",
      "num": false
     },
     {
-     "s": "iasla",
-     "orig": "ясла",
-     "num": false
-    },
-    {
-     "s": "2",
-     "orig": "2",
+     "s": "10",
+     "orig": "10",
      "num": true
     },
     {
-     "s": "moriache",
-     "orig": "моряче",
+     "s": "karamfilche",
+     "orig": "карамфилче",
      "num": false
     }
    ]
   },
   {
-   "s": "Детска ясла № 7 \"Роза\"",
+   "s": "ДГ№11 „Незабравка“",
    "tokens": [
     {
-     "s": "detska",
-     "orig": "детска",
+     "s": "dg",
+     "orig": "дг",
      "num": false
     },
     {
-     "s": "iasla",
-     "orig": "ясла",
-     "num": false
-    },
-    {
-     "s": "7",
-     "orig": "7",
+     "s": "11",
+     "orig": "11",
      "num": true
     },
     {
-     "s": "roza",
-     "orig": "роза",
+     "s": "nezabravka",
+     "orig": "незабравка",
      "num": false
     }
    ]
   },
   {
-   "s": "Детска ясла (ДЯ) №3 „Зайо Байо“",
+   "s": "ДГ№12 „Ян Бибиян“",
    "tokens": [
     {
-     "s": "detska",
-     "orig": "детска",
+     "s": "dg",
+     "orig": "дг",
      "num": false
     },
     {
-     "s": "iasla",
-     "orig": "ясла",
-     "num": false
-    },
-    {
-     "s": "dia",
-     "orig": "дя",
-     "num": false
-    },
-    {
-     "s": "3",
-     "orig": "3",
+     "s": "12",
+     "orig": "12",
      "num": true
     },
     {
-     "s": "zaio",
-     "orig": "зайо",
+     "s": "ian",
+     "orig": "ян",
      "num": false
     },
     {
-     "s": "baio",
-     "orig": "байо",
+     "s": "bibian",
+     "orig": "бибиян",
      "num": false
     }
    ]
   },
   {
-   "s": "ДГ№17 „Петър Берон\" /с ЯГ/",
+   "s": "ДГ№16 „Слънчева Дъга“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "16",
+     "orig": "16",
+     "num": true
+    },
+    {
+     "s": "slancheva",
+     "orig": "слънчева",
+     "num": false
+    },
+    {
+     "s": "daga",
+     "orig": "дъга",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№17 „Петър Берон\"",
    "tokens": [
     {
      "s": "dg",
@@ -7000,21 +7155,81 @@
      "s": "beron",
      "orig": "берон",
      "num": false
-    },
+    }
+   ]
+  },
+  {
+   "s": "ДГ№19 „Славейче“",
+   "tokens": [
     {
-     "s": "s",
-     "orig": "с",
+     "s": "dg",
+     "orig": "дг",
      "num": false
     },
     {
-     "s": "iag",
-     "orig": "яг",
+     "s": "19",
+     "orig": "19",
+     "num": true
+    },
+    {
+     "s": "slaveiche",
+     "orig": "славейче",
      "num": false
     }
    ]
   },
   {
-   "s": "ДГ№23 „Иглика\" /с ЯГ/",
+   "s": "ДГ№21 „Калина Малина“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "21",
+     "orig": "21",
+     "num": true
+    },
+    {
+     "s": "kalina",
+     "orig": "калина",
+     "num": false
+    },
+    {
+     "s": "malina",
+     "orig": "малина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№22 „Мечо Пух“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "22",
+     "orig": "22",
+     "num": true
+    },
+    {
+     "s": "mecho",
+     "orig": "мечо",
+     "num": false
+    },
+    {
+     "s": "puh",
+     "orig": "пух",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№23 „Иглика\"",
    "tokens": [
     {
      "s": "dg",
@@ -7029,16 +7244,6 @@
     {
      "s": "iglika",
      "orig": "иглика",
-     "num": false
-    },
-    {
-     "s": "s",
-     "orig": "с",
-     "num": false
-    },
-    {
-     "s": "iag",
-     "orig": "яг",
      "num": false
     }
    ]
@@ -7064,6 +7269,31 @@
     {
      "s": "gradche",
      "orig": "градче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№25 „Златното зрънце“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "25",
+     "orig": "25",
+     "num": true
+    },
+    {
+     "s": "zlatnoto",
+     "orig": "златното",
+     "num": false
+    },
+    {
+     "s": "zrantse",
+     "orig": "зрънце",
      "num": false
     }
    ]
@@ -7124,6 +7354,26 @@
     {
      "s": "zvanche",
      "orig": "звънче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№3 „Звездичка“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "3",
+     "orig": "3",
+     "num": true
+    },
+    {
+     "s": "zvezdichka",
+     "orig": "звездичка",
      "num": false
     }
    ]
@@ -7209,6 +7459,26 @@
    ]
   },
   {
+   "s": "ДГ№34 „Лястовичка“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "34",
+     "orig": "34",
+     "num": true
+    },
+    {
+     "s": "liastovichka",
+     "orig": "лястовичка",
+     "num": false
+    }
+   ]
+  },
+  {
    "s": "ДГ 36 \"Морска звездица\"",
    "tokens": [
     {
@@ -7229,6 +7499,26 @@
     {
      "s": "zvezditsa",
      "orig": "звездица",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№37 „Пламъче“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "37",
+     "orig": "37",
+     "num": true
+    },
+    {
+     "s": "plamache",
+     "orig": "пламъче",
      "num": false
     }
    ]
@@ -7280,6 +7570,56 @@
      "s": "1",
      "orig": "1",
      "num": true
+    }
+   ]
+  },
+  {
+   "s": "ДГ№40 „Детски свят“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "40",
+     "orig": "40",
+     "num": true
+    },
+    {
+     "s": "detski",
+     "orig": "детски",
+     "num": false
+    },
+    {
+     "s": "sviat",
+     "orig": "свят",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№41 „Първи юни“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "41",
+     "orig": "41",
+     "num": true
+    },
+    {
+     "s": "1",
+     "orig": "първи",
+     "num": true
+    },
+    {
+     "s": "iuni",
+     "orig": "юни",
+     "num": false
     }
    ]
   },
@@ -7379,6 +7719,51 @@
    ]
   },
   {
+   "s": "ДГ№53 „Слънчево зайче“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "53",
+     "orig": "53",
+     "num": true
+    },
+    {
+     "s": "slanchevo",
+     "orig": "слънчево",
+     "num": false
+    },
+    {
+     "s": "zaiche",
+     "orig": "зайче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДГ№6 „Палечко“",
+   "tokens": [
+    {
+     "s": "dg",
+     "orig": "дг",
+     "num": false
+    },
+    {
+     "s": "6",
+     "orig": "6",
+     "num": true
+    },
+    {
+     "s": "palechko",
+     "orig": "палечко",
+     "num": false
+    }
+   ]
+  },
+  {
    "s": "ДГ 7 \"Ал.С. Пушкин\"",
    "tokens": [
     {
@@ -7425,91 +7810,6 @@
      "s": "13",
      "orig": "13",
      "num": true
-    }
-   ]
-  },
-  {
-   "s": "ДЯ №11 „Иглика“",
-   "tokens": [
-    {
-     "s": "dia",
-     "orig": "дя",
-     "num": false
-    },
-    {
-     "s": "11",
-     "orig": "11",
-     "num": true
-    },
-    {
-     "s": "iglika",
-     "orig": "иглика",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "ДЯ №13 „Русалка“",
-   "tokens": [
-    {
-     "s": "dia",
-     "orig": "дя",
-     "num": false
-    },
-    {
-     "s": "13",
-     "orig": "13",
-     "num": true
-    },
-    {
-     "s": "rusalka",
-     "orig": "русалка",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "ДЯ №14 „Звънче“",
-   "tokens": [
-    {
-     "s": "dia",
-     "orig": "дя",
-     "num": false
-    },
-    {
-     "s": "14",
-     "orig": "14",
-     "num": true
-    },
-    {
-     "s": "zvanche",
-     "orig": "звънче",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "ДЯ №4 „Приказен свят“",
-   "tokens": [
-    {
-     "s": "dia",
-     "orig": "дя",
-     "num": false
-    },
-    {
-     "s": "4",
-     "orig": "4",
-     "num": true
-    },
-    {
-     "s": "prikazen",
-     "orig": "приказен",
-     "num": false
-    },
-    {
-     "s": "sviat",
-     "orig": "свят",
-     "num": false
     }
    ]
   },
@@ -7679,6 +7979,256 @@
     {
      "s": "filial",
      "orig": "филиал",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №11 „Иглика“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "11",
+     "orig": "11",
+     "num": true
+    },
+    {
+     "s": "iglika",
+     "orig": "иглика",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №13 „Русалка“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "13",
+     "orig": "13",
+     "num": true
+    },
+    {
+     "s": "rusalka",
+     "orig": "русалка",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №14 „Звънче“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "14",
+     "orig": "14",
+     "num": true
+    },
+    {
+     "s": "zvanche",
+     "orig": "звънче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №2 „Моряче“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "2",
+     "orig": "2",
+     "num": true
+    },
+    {
+     "s": "moriache",
+     "orig": "моряче",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №3 „Зайо Байо“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "3",
+     "orig": "3",
+     "num": true
+    },
+    {
+     "s": "zaio",
+     "orig": "зайо",
+     "num": false
+    },
+    {
+     "s": "baio",
+     "orig": "байо",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №4 „Приказен свят“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "4",
+     "orig": "4",
+     "num": true
+    },
+    {
+     "s": "prikazen",
+     "orig": "приказен",
+     "num": false
+    },
+    {
+     "s": "sviat",
+     "orig": "свят",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №5 „Чуден свят“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "5",
+     "orig": "5",
+     "num": true
+    },
+    {
+     "s": "chuden",
+     "orig": "чуден",
+     "num": false
+    },
+    {
+     "s": "sviat",
+     "orig": "свят",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №6 „Мечо Пух“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "6",
+     "orig": "6",
+     "num": true
+    },
+    {
+     "s": "mecho",
+     "orig": "мечо",
+     "num": false
+    },
+    {
+     "s": "puh",
+     "orig": "пух",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №7 „Роза“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "7",
+     "orig": "7",
+     "num": true
+    },
+    {
+     "s": "roza",
+     "orig": "роза",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ДЯ №9 „Детелина“",
+   "tokens": [
+    {
+     "s": "dia",
+     "orig": "дя",
+     "num": false
+    },
+    {
+     "s": "9",
+     "orig": "9",
+     "num": true
+    },
+    {
+     "s": "detelina",
+     "orig": "детелина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ЦПЛР – Средношколско общежитие „Михаил Колони“",
+   "tokens": [
+    {
+     "s": "tsplr",
+     "orig": "цплр",
+     "num": false
+    },
+    {
+     "s": "srednoshkolsko",
+     "orig": "средношколско",
+     "num": false
+    },
+    {
+     "s": "obshtezhitie",
+     "orig": "общежитие",
+     "num": false
+    },
+    {
+     "s": "mihail",
+     "orig": "михаил",
+     "num": false
+    },
+    {
+     "s": "koloni",
+     "orig": "колони",
      "num": false
     }
    ]
