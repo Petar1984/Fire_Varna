@@ -91,6 +91,14 @@
 Хотелите не са част от офлайн пакета (sw.js): без връзка търсачката на
 места не работи.
 
+Същото важи за `data/places.json` и за речника `data/place_categories.json`
+— и те не са част от офлайн пакета (sw.js).
+
+Кварталните псевдоними в `data/place_categories.json` (`zones`) са дословни
+низове от собствения регистър на кварталите
+(`Varna_buildings/config/quarter_registry.json`) — ред за проследимост, не
+лиценз.
+
 ### Как се ползва
 
 1. Отвори линка на телефона и разреши достъп до локацията.
@@ -225,6 +233,14 @@ The delivery's two licence lines (`data/places.json`, `_meta.licence_osm` and
 
 The hotels bundle is not part of the offline pack (sw.js): without a
 connection the places search does not work.
+
+The same holds for `data/places.json` and for the `data/place_categories.json`
+dictionary — neither is part of the offline pack (sw.js) either.
+
+The quarter aliases in `data/place_categories.json` (`zones`) are verbatim
+strings from our own quarter registry
+(`Varna_buildings/config/quarter_registry.json`) — a traceability line, not a
+licence.
 
 ### Usage
 
