@@ -2485,7 +2485,14 @@ LOT1V_V_FIXTURE = (
 )
 
 
-def delivered_zones(commit=u"HEAD"):
+# The generation the manifest is measured AGAINST: the last commit of лот Б — the
+# one the frozen reference AND the previous delivery both come from. „HEAD“ would
+# answer with the new labels the moment the delivery is committed, and a manifest
+# that compares a thing to itself says „nothing moved“ in perfect good faith.
+BASE_COMMIT = u"f06ac06"
+
+
+def delivered_zones(commit=BASE_COMMIT):
     """{(bundle, ordinal): (name, zone)} as a COMMIT delivers it — None if git cannot.
 
     The manifest has to say how many RECORDS change their label, and the only
@@ -2606,8 +2613,13 @@ def write_manifest(rows_doc, candidate_path, candidate_text):
                      u"са ЧЕРВЕНИ до подписа — това е гейтът, не дефект."),
             "base": dict(sha_of(REPO_ROWS_OUT),
                          path=u"scratch/places_search/recall_sweep_rows.json",
-                         what=u"артефактът след лот Б (HEAD)"),
-            "candidate": {"path": candidate_path,
+                         commit=BASE_COMMIT,
+                         what=u"артефактът и доставката след лот Б"),
+            # The candidate is a MEASUREMENT and lives in the system temp; only its
+            # name and its digest belong in a tracked file (an absolute path would
+            # pin this artefact to one machine and one user).
+            "candidate": {"path": u"<system temp>/fv_measures/"
+                                  + candidate_path.rsplit(u"/", 1)[-1],
                           "sha256": hashlib.sha256(candidate_text.encode("utf-8")).hexdigest(),
                           "bytes": len(candidate_text.encode("utf-8"))},
             "inputs": {u"data/places.json": sha_of(PLACES2),
