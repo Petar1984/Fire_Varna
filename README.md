@@ -100,6 +100,13 @@
 
 > Разгърнати имена (псевдоними за търсене) на 3 места: Wikidata Q7035695, Q12291800, Q12299161, CC0 1.0 Universal, достъп 03.09.2026. Низовете са зафиксирани с датата на достъп (снапшотът), не се теглят живо; изворът на всеки псевдоним стои в `old_names_src`.
 
+Четвъртият лицензен ред (`_meta.licence_address`, един и същ в
+`data/places.json` и `data/hotels.json`) е за адресите на
+ЛОТ 1в-Б — нов извор няма, изворът на всеки
+адрес стои в `address.src`. Дословно:
+
+> Адресите: КАИС адресното поле на тялото под пина (© АГКК — отворените данни, върху които стоят и координатите; условията на ФАЗА_0_лицензи.md); регистровите адреси (Община Варна, МОН/НЕИСПУО, ИАМН) и Националният туристически регистър: отделни факти от регистрите (чл. 4 ЗАПСП), не копие на регистър; адресите от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0. Изворът на всеки адрес стои в `address.src`; токени за собственост не влизат в адреса.
+
 Хотелите не са част от офлайн пакета (sw.js): без връзка търсачката на
 места не работи.
 
@@ -255,6 +262,13 @@ expanded names enter as SEARCH ALIASES only — never as a displayed name.
 Verbatim (in Bulgarian, as published):
 
 > Разгърнати имена (псевдоними за търсене) на 3 места: Wikidata Q7035695, Q12291800, Q12299161, CC0 1.0 Universal, достъп 03.09.2026. Низовете са зафиксирани с датата на достъп (снапшотът), не се теглят живо; изворът на всеки псевдоним стои в `old_names_src`.
+
+The fourth licence line (`_meta.licence_address`, one and the same in
+`data/places.json` and `data/hotels.json`) covers the ЛОТ 1в-Б
+addresses — no new source, and the source of every address stands in
+`address.src`. Verbatim (in Bulgarian, as published):
+
+> Адресите: КАИС адресното поле на тялото под пина (© АГКК — отворените данни, върху които стоят и координатите; условията на ФАЗА_0_лицензи.md); регистровите адреси (Община Варна, МОН/НЕИСПУО, ИАМН) и Националният туристически регистър: отделни факти от регистрите (чл. 4 ЗАПСП), не копие на регистър; адресите от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0. Изворът на всеки адрес стои в `address.src`; токени за собственост не влизат в адреса.
 
 The hotels bundle is not part of the offline pack (sw.js): without a
 connection the places search does not work.
