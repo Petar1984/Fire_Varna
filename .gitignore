@@ -78,3 +78,5 @@ hydrants_varna (7).html.bak.*
 /scratch/shot_geo_fv.mjs
 # [fv_all] Точен път; отчетите и .mjs харнесите в същата папка остават видими за git add.
 /scratch/basemap_b2/index_html.diff
+# Гейтовете пишат тук (coverage.md/json, break_glass.log) — изход, не източник.
+gates/out/

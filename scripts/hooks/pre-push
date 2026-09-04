@@ -1,0 +1,52 @@
+#!/bin/sh
+# Push policy for Fire_Varna — the tracked source of .git/hooks/pre-push.
+# Install with:  cp scripts/hooks/pre-push .git/hooks/pre-push
+#
+# Two lines of defence, in this order:
+#   1. a human at an interactive terminal (agents and scripts are blocked);
+#   2. `python -m gates.run_gates` — one exit code for every gate.
+# Break-glass exists for the red gate only: it can never make an agent push.
+
+set -u
+
+# ---- 1. the human check (unchanged since the hook was introduced) ----
+if [ ! -t 2 ]; then
+  echo "" >&2
+  echo "  ⛔ push blocked — non-interactive (agent/script) push detected." >&2
+  echo "     A human must push from an interactive terminal." >&2
+  echo "" >&2
+  exit 1
+fi
+
+# ---- 2. the gates ----
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  echo "  ⛔ push blocked — not inside a git worktree." >&2
+  exit 1
+}
+cd "$ROOT" || exit 1
+
+PYTHONIOENCODING=utf-8 python -m gates.run_gates
+STATUS=$?
+
+if [ "$STATUS" -eq 0 ]; then
+  exit 0
+fi
+
+# Fail closed: a gate that could not run at all is a red gate, not a green one.
+if [ -n "${FV_BREAK_GLASS:-}" ]; then
+  mkdir -p gates/out
+  echo "$(date -u '+%Y-%m-%dT%H:%M:%SZ') exit=$STATUS reason=$FV_BREAK_GLASS" >> gates/out/break_glass.log
+  echo "" >&2
+  echo "  ⚠ break-glass push — gates red (exit $STATUS), pushed anyway." >&2
+  echo "     Довод: $FV_BREAK_GLASS" >&2
+  echo "     Записано в gates/out/break_glass.log" >&2
+  echo "" >&2
+  exit 0
+fi
+
+echo "" >&2
+echo "  ⛔ push blocked — gates red (python -m gates.run_gates → $STATUS)." >&2
+echo "     Виж таблицата по-горе и gates/out/coverage.md." >&2
+echo "     Break-glass: FV_BREAK_GLASS=\"<довод>\" git push …" >&2
+echo "" >&2
+exit 1
