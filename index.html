@@ -6284,18 +6284,20 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // §12 В7 + §14 — the exact bytes the browser may trust (the tracked LF blobs).
     const HOTELS_SHA256 = 'c30f7333d1a9a845b90ca46db0e41496cb722aa2640b6c862ccb8b211bd30100';
     const PLACES2_SHA256 = '35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9';
-    const CATS_SHA256 = '2d3d6af6909222b0e3fbb1af088e021edbc9c9c2dd6af140ab7a973b75c81289';
+    const CATS_SHA256 = '8e73c6c368a78e14f5d94e580ee495ce3349b10aa0d4ac752d018abeeef41da0';
     // ЛОТ 1в-В (ADR 008 D9, план §3ж S2) — `legacy_by_row` is keyed by the ORDINAL
     // of a row in its bundle, so it is only ever as true as the bundle it was built
     // against: a re-export that reorders the rows would move every old word onto a
     // stranger. The dictionary carries the SHA of both bundles and the pair below is
     // the measured one; anything else switches the old words off (fail-closed).
-    // The hotels digest is the CRLF twin of the very LF bytes pinned above — the
-    // exporter's own gate digests its WORKING-TREE file and that checkout stores
-    // this one with CRLF (measured 04.09). Same content, two line endings.
+    // Both digests are the LF blobs pinned above — the house rule, `git show
+    // <commit>:<path>`. The first delivery pinned the hotels by their CRLF twin,
+    // because the exporter digested its own working-tree file and that checkout
+    // writes CRLF; varna_3d P6-б normalises the bytes before hashing, so one
+    // content now has exactly one digest on every checkout (measured 04.09).
     const LEGACY_BUNDLE_SHA = {
       places: '35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9',
-      hotels: 'a8530d908de385f1ec28e96c5d3c2889380e95c9ef188092bbd280e095389766'
+      hotels: 'c30f7333d1a9a845b90ca46db0e41496cb722aa2640b6c862ccb8b211bd30100'
     };
     // ЛОТ 1в-В (ADR 008 D9, план §3г/§3ж S1/S4/S6) — the three TYPED location
     // fields. Each is `null` or EXACTLY {name, src, code}, the source and the code

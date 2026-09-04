@@ -70,9 +70,9 @@ HOTELS_GZIP9 = 13004
 # — `locations.quarter|district|locality` — and with `legacy_by_row`: the old zone
 # word of every row whose label changed, keyed by that row's ordinal in its bundle
 # and protected by the SHA of the bundle. chips 57, forms 276 → 283, zones 30 → 19.
-CATEGORIES_SHA256 = "2d3d6af6909222b0e3fbb1af088e021edbc9c9c2dd6af140ab7a973b75c81289"
-CATEGORIES_BYTES = 64424
-CATEGORIES_GZIP9 = 8663
+CATEGORIES_SHA256 = "8e73c6c368a78e14f5d94e580ee495ce3349b10aa0d4ac752d018abeeef41da0"
+CATEGORIES_BYTES = 64831
+CATEGORIES_GZIP9 = 8836
 # The closed lists the dictionary and the two payloads have to AGREE on: a code in a
 # record that the dictionary of the same delivery does not name is a broken delivery.
 LOCATION_COUNTS = {"quarter": 19, "district": 5, "locality": 4}
@@ -516,17 +516,19 @@ class CategoryDictionaryTest(unittest.TestCase):
     def test_the_legacy_bundle_sha_is_the_content_of_the_two_payloads(self):
         """S2: the ordinals are only as true as the bundle they were built against.
 
-        The exporter digests its own WORKING-TREE file and that checkout stores the
-        hotels export with CRLF, so one content has two digests (measured 04.09).
-        Both spellings of THIS content pass and nothing else does — a dictionary
-        built against another generation of the payloads is a broken delivery.
+        The digest is the LF BLOB's — the house rule, `git show <commit>:<path>`.
+        The first delivery pinned the hotels by their CRLF twin, because the
+        exporter digested its own working-tree file and that checkout writes
+        CRLF; varna_3d P6-б normalises the bytes before hashing, so one content
+        has exactly one digest again (measured 04.09). The bytes read here are
+        normalised for the same reason — a locally regenerated export is CRLF on
+        Windows and it is the CONTENT that protects the ordinals — but the twin
+        spelling is no longer accepted: it is the very drift this closes.
         """
         shas = self.doc["_meta"]["legacy_bundle_sha"]
         for key, path in (("places", REPO / "data" / "places.json"), ("hotels", HOTELS)):
             lf = pathlib.Path(path).read_bytes().replace(b"\r\n", b"\n")
-            self.assertIn(shas[key],
-                          {hashlib.sha256(lf).hexdigest(),
-                           hashlib.sha256(lf.replace(b"\n", b"\r\n")).hexdigest()}, key)
+            self.assertEqual(shas[key], hashlib.sha256(lf).hexdigest(), key)
 
     def test_encoding_is_utf8_without_bom_and_free_of_mojibake(self):
         self.assertFalse(self.raw.startswith(b"\xef\xbb\xbf"))
