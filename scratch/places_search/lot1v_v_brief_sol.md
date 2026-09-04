@@ -1,0 +1,17 @@
+# Brief for Sol (Codex) · LOT 1в-В "Quarters of places" — lens: mechanics, gates, the reference
+
+You are an adversarial reviewer with one lens: mechanics and verification. You do not execute. REFUTATIONS and verdicts with evidence; "cannot verify" when you cannot; nothing assumed. Read only.
+
+The plan: `C:/git/Fire_Varna/docs/plans/ПЛАН_ЛОТ1в-В_кварталите.md` (whole; §0 is the measurement). Code: `C:/git/varna_3d/src/place_zones.py` (the zone ladder: step 1 resort boxes, R reserve, 2 KAIS quar validated by the quarter registry, 3 drawn hulls with EDGE_M=5 m, 4 quarters layer polygons, H pending), `C:/git/Varna_buildings/config/quarter_registry.json` (display/aliases/kind), `C:/git/m6000_private/number_viewer/quarters_layer.geojson` (28 polygons + 1 MultiPolygon + 89 label points — read geometry only), the drawn hulls (find them: grep `quarters_drawn`, `drawn_calibration`), `C:/git/varna_3d/src/export_fire_varna_places.py` (drops step/note), Fire_Varna: `index.html` initPlacesSearch (zone tokens `zkset`, P7 zone aliases from `data/place_categories.json` zones), `scratch/places_search/recall_sweep.py` + frozen `recall_sweep_rows.json` (122 rows, anchor 23af63f; 204 of 2 106 shown rows carry an affected zone; 3 queries are zone phrases), `tests/test_places_search_gate.py`.
+
+## Questions
+
+S1. The source order (registry quarter token > KAIS quar with type gate > hull only if no smaller canonical hull within 100 m > label point ≤500 m > district): where does it break with overlapping hulls, with a registry token that names a sub-quarter ("Възраждане-1", "Младост-2"), with a KAIS quar that is a resort ("к.к. Чайка") while the registry says a street? Propose the minimal deterministic rule and its tie-breaks; measure on the artefact `scratchpad/zones_measure/zones_375.json` if you can read it.
+S2. Hulls below the IoU floor (0.128 vs 0.70): as a hint with a note, or refuse (district)? What gate proves "hint never decides alone"?
+S3. The label-point rule (≤500 m): how to gate it so it does not produce false confidence in the gaps (10.5 % of the area)? Distance cutoff per quarter type? Require the district to agree?
+S4. The frozen reference: 204 rows in 33 queries change zone labels; 3 zone-phrase queries ("хотел зпз", "хотел морска градина", "училище морска градина") would return 0 if the zone disappears. Propose the amendment procedure: keep the old zone names as P7 aliases mapped to the successor (which zone succeeds "Морска градина" and "ЗПЗ" — the district?), the signed old→new list, a freeze done once, fail-closed buckets, M5 parity, G3 byte-equal. What breaks in `check_p7_gate` / `P7_GAINS` / `LOT1_*` tables?
+S5. Silent failures: line 83 (MultiPolygon dropped), 34 drawn keys without a canon, `note` dropped at export, `by_zone_step` as a sum not a column — which gate catches each, and what is the minimal `zone_src`/`zone_note` schema per row (places 10 keys → 12? hotels 13 → 15?) that the validators in `index.html`, the reference corpus and the bundle tests accept?
+S6. One canon Владиславово/Владислав Варненчик: the mechanics of renaming a zone (13 records, P7 aliases, the reference rows, the dictionary zones list) without losing search recall for the other word.
+S7. Anything else that breaks this plan (≤5 points with evidence).
+
+Answer format: S1–S7; each: ACCEPT / REFUTE / WITH CONDITION + evidence (2–6 sentences) + the exact change to the plan (quote the line). No preamble, no summary.
