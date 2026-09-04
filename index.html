@@ -6257,8 +6257,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const PLACES2_URL = 'data/places.json';            // фаза 2: училища/университети/болници/градини
     // ADR 008 D8: the NAME is not a contract, the VERSION is — it changes with every
     // change of the blobs. ЛОТ 1в-А rewrote all three (v2 → v3); ЛОТ 1в-Б added the
-    // `address` key to two of them, so v3 → v4 (the count stays 225).
-    const PLACES_CACHE = 'fire-varna-hotels-v4-225';   // our own namespace (Д3)
+    // `address` key to two of them (v3 → v4); ЛОТ 1в-В replaced the single `zone`
+    // with the three typed fields in all three, so v4 → v5 (the count stays 225).
+    const PLACES_CACHE = 'fire-varna-hotels-v5-225';   // our own namespace (Д3)
     const TOP = 8, MIN_Q = 2, DEBOUNCE_MS = 120, FETCH_TIMEOUT_MS = 8000;
     const TOP_TOTAL = 16, GEN_CAP = 300;               // фаза 2 С3: per group / per class
     const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 225, EXPECT2_COUNT = 150;
@@ -6267,21 +6268,54 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // ЛОТ 1в (ADR 008 D1/S2): `old_names_src` is a parallel array of the SAME length
     // and order — the hotels' 13th key, the places' 9th. ЛОТ 1в-Б (D5) adds `address`
     // as the hotels' 14th and the places' 10th: `null` or the closed four-key object.
-    const EXPECT_KEYS = ['address', 'beds', 'cat', 'kind', 'lat', 'lon', 'name', 'no_uin',
-                         'old_names', 'old_names_src', 'src', 'status', 'uins', 'zone'];
+    // ЛОТ 1в-В (D9) adds the three typed location fields to both: 17 keys here, 13 there.
+    const EXPECT_KEYS = ['address', 'beds', 'cat', 'district', 'kind', 'lat', 'locality',
+                         'lon', 'name', 'no_uin', 'old_names', 'old_names_src', 'quarter',
+                         'src', 'status', 'uins', 'zone'];
     const KINDS = ['Хотел', 'Семеен хотел', 'хотел · без категоризация', 'апарт-хотел'];
     // Фаза 2 (places_phase2_plan.md Д1/Д3): the second delivery - 8 keys, its own
     // kind enum. Same box, same status enum, same cadastral refusal as the hotels.
-    const EXPECT2_KEYS = ['address', 'kind', 'lat', 'lon', 'name', 'old_names',
-                          'old_names_src', 'src', 'status', 'zone'];
+    const EXPECT2_KEYS = ['address', 'district', 'kind', 'lat', 'locality', 'lon', 'name',
+                          'old_names', 'old_names_src', 'quarter', 'src', 'status', 'zone'];
     const KINDS2 = ['училище', 'университет', 'болница', 'ДКЦ', 'хоспис', 'детска градина',
                      'детска ясла', 'общежитие'];
     const STATUSES = ['', 'бивш'];
     const CADASTRAL = /\b\d{4,5}\.\d+\.\d+/;     // a cadastral id never rides a public bundle (Д2)
     // §12 В7 + §14 — the exact bytes the browser may trust (the tracked LF blobs).
-    const HOTELS_SHA256 = '434d15d5af70a94c5240198dbd852055a23d57944872cfebc0a8c24e4ef0e2c2';
-    const PLACES2_SHA256 = 'c31a866e3ca9567a94ebb93713309bd68b6ff8ea61af6e008ffbe2ff93913a7d';
-    const CATS_SHA256 = '7fb4ddb6959144de831841aaec5236a7d0cd1e212f7244bff44352816497bc13';
+    const HOTELS_SHA256 = 'c30f7333d1a9a845b90ca46db0e41496cb722aa2640b6c862ccb8b211bd30100';
+    const PLACES2_SHA256 = '35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9';
+    const CATS_SHA256 = '2d3d6af6909222b0e3fbb1af088e021edbc9c9c2dd6af140ab7a973b75c81289';
+    // ЛОТ 1в-В (ADR 008 D9, план §3ж S2) — `legacy_by_row` is keyed by the ORDINAL
+    // of a row in its bundle, so it is only ever as true as the bundle it was built
+    // against: a re-export that reorders the rows would move every old word onto a
+    // stranger. The dictionary carries the SHA of both bundles and the pair below is
+    // the measured one; anything else switches the old words off (fail-closed).
+    // The hotels digest is the CRLF twin of the very LF bytes pinned above — the
+    // exporter's own gate digests its WORKING-TREE file and that checkout stores
+    // this one with CRLF (measured 04.09). Same content, two line endings.
+    const LEGACY_BUNDLE_SHA = {
+      places: '35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9',
+      hotels: 'a8530d908de385f1ec28e96c5d3c2889380e95c9ef188092bbd280e095389766'
+    };
+    // ЛОТ 1в-В (ADR 008 D9, план §3г/§3ж S1/S4/S6) — the three TYPED location
+    // fields. Each is `null` or EXACTLY {name, src, code}, the source and the code
+    // out of closed lists: a public row can carry no location nobody wrote down.
+    // The district list is the five city districts of §3ж S4 and nothing else;
+    // `zone` stays as the compat label (quarter?.name ?? „район “ + district.name)
+    // until G-ZERO-ZONE retires it.
+    const LOC_KEYS = ['name', 'src', 'code'];
+    const LOC_CLASSES = ['quarter', 'district', 'locality'];
+    const QUARTER_SRC = ['REG', 'KAIS', 'SIGNED_OVERRIDE'];
+    const DISTRICT_SRC = ['KAIS', 'SIGNED_OVERRIDE'];
+    const DISTRICT_CODES = ['primorski', 'odesos', 'mladost', 'asparuhovo',
+                            'vladislav_varnenchik'];
+    const QUARTER_CODES = ['asparuhovo', 'borovets_yug', 'chaika_kk', 'chaika_kv',
+                           'druzhba', 'galata', 'izgrev_kv', 'kk_konstantin_elena',
+                           'manastirski_rid', 'mladost2', 'pobeda', 'priboy', 'troshevo',
+                           'vazrazhdane', 'vazrazhdane1', 'vazrazhdane2', 'vinitsa',
+                           'vladislavovo', 'zlatni_pyasatsi'];
+    const LOCALITY_CODES = ['sveti_nikola', 'vilite', 'zelenika', 'zpz'];
+    const DISTRICT_MARK = 'район';                 // the word, in the card and in a query
     // ЛОТ 1в (ADR 008 D1, амандамент А3) — the CLOSED list of alias sources and the
     // word the card says for each. An old name used to inherit the source line of its
     // RECORD: up to 47 OSM strings sat under a registry row and the card claimed the
@@ -6476,6 +6510,28 @@ window._hydrantDataReady = (async function loadHydrantData() {
       for (const k of ADDR_KEYS) if (typeof a[k] !== 'string' || !a[k]) return false;
       return !!ADDR_SRC_LINE[a.src];
     }
+    // ЛОТ 1в-В (ADR 008 D9, план §3ж S1): `null` or EXACTLY the three keys, all
+    // three non-empty strings, the source and the code from THEIR closed lists.
+    // A location the lists do not know is a REFUSAL of the whole delivery, never
+    // a name printed on a card because it happened to be in the file.
+    function validLocation(value, srcs, codes) {
+      if (value === null) return true;
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+      if (Object.keys(value).length !== LOC_KEYS.length) return false;
+      for (const k of LOC_KEYS) if (typeof value[k] !== 'string' || !value[k]) return false;
+      return srcs.indexOf(value.src) >= 0 && codes.indexOf(value.code) >= 0;
+    }
+    function validTypedLocation(r) {
+      if (!validLocation(r.quarter, QUARTER_SRC, QUARTER_CODES)) return false;
+      if (!validLocation(r.locality, QUARTER_SRC, LOCALITY_CODES)) return false;
+      // S4: the district is the one field that is never null — „район X“ is the
+      // honest answer when nothing else can be sourced, so a row without one is
+      // not publishable at all.
+      if (!r.district || !validLocation(r.district, DISTRICT_SRC, DISTRICT_CODES)) return false;
+      // S1: `zone` is the compat label and it FOLLOWS from the typed fields. A row
+      // whose label does not follow is a different delivery, not a row.
+      return r.zone === (r.quarter ? r.quarter.name : DISTRICT_MARK + ' ' + r.district.name);
+    }
     function validateHotels(d, text) {
       if (!d || !d._meta || !Array.isArray(d.hotels)) return false;
       if (d.hotels.length !== EXPECT_COUNT || d._meta.count !== EXPECT_COUNT) return false;
@@ -6484,7 +6540,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (Object.keys(h).length !== EXPECT_KEYS.length) return false;
         for (const k of EXPECT_KEYS) if (!(k in h)) return false;
         for (const k of ['old_names', 'old_names_src', 'cat', 'beds', 'uins']) if (!Array.isArray(h[k])) return false;
-        if (!validAliasSrc(h) || !validAddress(h)) return false;
+        if (!validAliasSrc(h) || !validAddress(h) || !validTypedLocation(h)) return false;
         if (typeof h.name !== 'string' || !h.name || typeof h.zone !== 'string' || !h.zone) return false;
         if (typeof h.no_uin !== 'boolean') return false;
         if (KINDS.indexOf(h.kind) < 0 || STATUSES.indexOf(h.status) < 0 || !SRC_LINE[h.src]) return false;
@@ -6503,7 +6559,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (Object.keys(p).length !== EXPECT2_KEYS.length) return false;
         for (const k of EXPECT2_KEYS) if (!(k in p)) return false;
         if (!Array.isArray(p.old_names) || !Array.isArray(p.old_names_src)) return false;
-        if (!validAliasSrc(p) || !validAddress(p)) return false;
+        if (!validAliasSrc(p) || !validAddress(p) || !validTypedLocation(p)) return false;
         if (typeof p.name !== 'string' || !p.name || typeof p.zone !== 'string' || !p.zone) return false;
         if (KINDS2.indexOf(p.kind) < 0 || STATUSES.indexOf(p.status) < 0 || !SRC_LINE[p.src]) return false;
         if (!isFinite(p.lat) || !isFinite(p.lon)) return false;
@@ -6579,63 +6635,118 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return placesPromise;
     }
     function buildIndex(hotels, places2, cats) {
-      // П7 (§11 v2.1) — the registry's OTHER spellings of a quarter become ZONE
-      // tokens, so „владиславово“ reaches both cadastral spellings of one place.
-      // Steps (а)-(е) + (д′) are per zone, step (ж) per record below; the result
-      // enters ztk/zkset ONLY, never ntk/nset/aset, so the name path is untouched.
-      // Fail-soft (С7′): a `zones` that is not an object, or aliases that are not
-      // strings, switch П7 off — nothing throws and the rest of the index stands.
-      const zdict = (cats && cats.zones && typeof cats.zones === 'object') ? cats.zones : {};
-      const famOf = (z) => (zdict[z] && zdict[z].family) || z;   // no entry = own family
-      const zones = [...new Set(hotels.concat(places2).map((h) => h.zone))];
-      const ownTk = new Map(zones.map((z) => [z, new Set(placeTokens(z).map((t) => t.s))]));
-      // (д′) Р1: every own token of length >=3 with the family it belongs to. The
-      // floor is mandatory — without it `zpz` would die against „zh“.
-      const ownAll = zones.flatMap((z) => [...ownTk.get(z)].filter((v) => v.length >= 3).map((v) => [v, famOf(z)]));
+      // ЛОТ 1в-В (план §3г, §3ж S3) — THREE dictionaries, one per class. The class
+      // travels with the word because „младост“ is a quarter AND a district: one
+      // flat token set could not tell them apart, and that is how СУ „Гео Милев“
+      // ended up inside a drawn industrial-zone hull. ONE rule, two
+      // implementations: this and scratch/places_search/recall_sweep.py.
+      // Fail-soft (С7′): a `locations` that is not an object switches the location
+      // words off and nothing else — the class keys, the names, the aliases and
+      // the addresses all still stand.
+      const locs = (cats && cats.locations && typeof cats.locations === 'object') ? cats.locations : {};
       const generic = new Set();                 // (г) the dictionary's own word list
       for (const word of ((cats && cats._meta && cats._meta.zone_generic_words) || []))
         for (const t of placeTokens(word)) generic.add(t.s);
-      const zoneExtra = new Map();
-      for (const z of zones) {
-        const aliases = (zdict[z] || {}).aliases, own = ownTk.get(z), keep = [];
-        if (!Array.isArray(aliases)) continue;
-        for (const alias of aliases)
-          if (typeof alias === 'string')
-            for (const t of placeTokens(alias))
-              if (!t.num && t.orig.length > 2 && t.s.length > 2 && ADDR.indexOf(t.orig) < 0
-                  && !generic.has(t.s) && !own.has(t.s) && !keep.some((k) => k.s === t.s)
-                  && !ownAll.some((p) => p[1] !== famOf(z) && (p[0] === t.s || lev(t.s, p[0], 2) <= 2)))
-                keep.push(t);
-        if (keep.length) zoneExtra.set(z, keep);
-      }
-      // ЛОТ 1 решение 1 — the PHRASE index: the canonical zone and each ACCEPTED
-      // П7 form of it as an ORDERED token sequence, through the very filter of
-      // steps (а)-(г). An alias counts only when every significant token of it is
-      // already a zone token (its own, or one П7 accepted), so „Приморски парк“ —
-      // thrown out of Морска градина as foreign — never becomes a phrase, while
-      // „кв. Владиславово“ does. ztk/zkset lose the order and the boundaries; the
-      // whole point here is that „морска градина“ is a phrase and „градина“ is not.
-      const phraseTk = (s) => placeTokens(s).filter((t) => !t.num && t.orig.length > 2 &&
+      // The phrase filter of steps (а)-(г): a number, a token of <= 2 characters, an
+      // address marker and a generic word („район“, „квартал“, „зона“…) carry no
+      // place. The ORDER and the boundaries are the point — „морска градина“ is a
+      // phrase, „градина“ alone is not.
+      const sigTokens = (s) => placeTokens(s).filter((t) => !t.num && t.orig.length > 2 &&
         t.s.length > 2 && ADDR.indexOf(t.orig) < 0 && !generic.has(t.s)).map((t) => t.s);
-      const zonePhrase = new Map();
-      for (const z of zones) {
-        const own = phraseTk(z);
-        const allowed = new Set(own.concat((zoneExtra.get(z) || []).map((t) => t.s)));
-        const forms = new Set(own.length ? [own.join(' ')] : []);
-        for (const alias of (((zdict[z] || {}).aliases) || [])) {
-          if (typeof alias !== 'string') continue;
-          const tk = phraseTk(alias);
-          if (tk.length && tk.every((v) => allowed.has(v))) forms.add(tk.join(' '));
+      const LOC_INDEX = new Map();               // class -> code -> {name, extra, phrases}
+      for (const cls of LOC_CLASSES) {
+        const entries = (locs[cls] && typeof locs[cls] === 'object') ? locs[cls] : {};
+        const codes = Object.keys(entries).filter((c) => entries[c] && typeof entries[c] === 'object'
+          && typeof entries[c].name === 'string' && entries[c].name);
+        const own = new Map(codes.map((c) => [c, new Set(placeTokens(entries[c].name).map((t) => t.s))]));
+        const index = new Map();
+        for (const code of codes) {
+          // (д′) Р1, scoped INSIDE the class: a token that is, or is within lev <= 2
+          // of, an own token of ANOTHER entry of the SAME class is that entry's word.
+          // Across classes nothing is foreign — that is what „the class travels with
+          // the word“ means, and it is why the quarter Младост survives the district.
+          const foreign = [];
+          for (const other of codes)
+            if (other !== code) for (const v of own.get(other)) if (v.length >= 3) foreign.push(v);
+          const aliases = Array.isArray(entries[code].aliases) ? entries[code].aliases : [];
+          const keep = [];
+          for (const alias of aliases)
+            if (typeof alias === 'string')
+              for (const t of placeTokens(alias))
+                if (!t.num && t.orig.length > 2 && t.s.length > 2 && ADDR.indexOf(t.orig) < 0
+                    && !generic.has(t.s) && !own.get(code).has(t.s) && !keep.some((k) => k.s === t.s)
+                    && !foreign.some((v) => v === t.s || lev(t.s, v, 2) <= 2))
+                  keep.push(t);
+          const ownPhrase = sigTokens(entries[code].name);
+          const allowed = new Set(ownPhrase.concat(keep.map((t) => t.s)));
+          const phrases = new Set(ownPhrase.length ? [ownPhrase.join(' ')] : []);
+          for (const alias of aliases) {
+            if (typeof alias !== 'string') continue;
+            const tk = sigTokens(alias);
+            if (tk.length && tk.every((v) => allowed.has(v))) phrases.add(tk.join(' '));
+          }
+          index.set(code, { name: entries[code].name, extra: keep, phrases: phrases });
         }
-        zonePhrase.set(z, forms);
+        LOC_INDEX.set(cls, index);
       }
-      RECS = hotels.concat(places2).map(function (h) {
+      // ЛОТ 1в-В (план §3ж S2/S4) — the OLD zone words of a row. They are indexed
+      // per record, shown nowhere and never an alias over a whole district: „Морска
+      // градина“ split 24 → Одесос and 4 → Приморски, so a district-wide alias would
+      // answer with every record of a district. The key is the row's ORDINAL in its
+      // own bundle, so the words are only as true as the bundle they were built
+      // against — a dictionary whose bundle SHA is not the pinned pair switches them
+      // off (fail-closed) and says so once in the console.
+      const bundleSha = (cats && cats._meta && cats._meta.legacy_bundle_sha) || null;
+      const legacyOk = !!bundleSha && bundleSha.places === LEGACY_BUNDLE_SHA.places
+                                   && bundleSha.hotels === LEGACY_BUNDLE_SHA.hotels;
+      if (bundleSha && !legacyOk) warnOnce('legacy_by_row: друг пакет — старите зонови думи са изключени');
+      const legacyRows = (legacyOk && cats && cats.legacy_by_row
+                          && typeof cats.legacy_by_row === 'object') ? cats.legacy_by_row : {};
+      // A legacy word that IS a dictionary entry inherits ITS forms: „Западна
+      // промишлена зона“ was a zone yesterday and the dictionary knows „ЗПЗ“ for it,
+      // so the row that used to carry it stays reachable by both. Only quarter and
+      // locality are consulted — a district is never a per-row word.
+      const legacyLookup = new Map();
+      for (const cls of ['quarter', 'locality'])
+        for (const [code, entry] of LOC_INDEX.get(cls)) {
+          const own = sigTokens(entry.name).join(' ');
+          if (!own) continue;
+          if (!legacyLookup.has(own)) legacyLookup.set(own, []);
+          legacyLookup.get(own).push([cls, code]);
+        }
+      function makeRec(h, bundle, ordinal) {
         const ntk = placeTokens(h.name).map((t) => t.s);
-        const ztk = placeTokens(h.zone).map((t) => t.s);
         const ktk = placeTokens(h.kind).map((t) => t.s);
-        // П7 step (ж): a quarter alias never displaces a NAME path of THIS record
-        for (const t of (zoneExtra.get(h.zone) || []))
-          if (ztk.indexOf(t.s) < 0 && !ntk.some((v) => quality(t, v) > 0)) ztk.push(t.s);
+        // step (ж): a location alias never displaces a NAME path of THIS record — a
+        // candidate that matches a name token of it (exact, prefix or fuzzy) is
+        // dropped for this record alone.
+        const locTokens = (cls, field) => {
+          if (!field) return [];
+          const out = placeTokens(field.name).map((t) => t.s);
+          const entry = LOC_INDEX.get(cls).get(field.code);
+          for (const t of (entry ? entry.extra : []))
+            if (out.indexOf(t.s) < 0 && !ntk.some((v) => quality(t, v) > 0)) out.push(t.s);
+          return out;
+        };
+        const locPhrases = (cls, field) => {
+          const entry = field ? LOC_INDEX.get(cls).get(field.code) : null;
+          return entry ? entry.phrases : new Set();
+        };
+        const qtk = locTokens('quarter', h.quarter), ltk = locTokens('locality', h.locality);
+        const legacy = legacyRows[bundle + ':' + ordinal];
+        const legtk = [], gph = new Set();
+        for (const word of (Array.isArray(legacy) ? legacy : [])) {
+          if (typeof word !== 'string') continue;
+          const tk = sigTokens(word);
+          if (!tk.length) continue;
+          const forms = [tk.join(' ')];
+          for (const pair of (legacyLookup.get(tk.join(' ')) || []))
+            for (const form of LOC_INDEX.get(pair[0]).get(pair[1]).phrases) forms.push(form);
+          for (const form of forms) {
+            gph.add(form);
+            for (const t of form.split(' ')) if (legtk.indexOf(t) < 0) legtk.push(t);
+          }
+        }
         // А6 + ЛОТ 1в амандамент А4 т. 1: old names are name tokens minus the noise
         // AND minus the generic GEOGRAPHIC words — „Висше военноморско училище,
         // Варна“ must not answer for the whole city on „варна“. The CLASS words
@@ -6652,14 +6763,24 @@ window._hydrantDataReady = (async function loadHydrantData() {
         // ЛОТ 1в-Б (ADR 008 D6, план §2г S4): the ORDERED street phrase and the
         // house number as the DELIVERY wrote them — never parsed out of `text`
         // here. They stand OUTSIDE nset/aset/zkset/significant/A5, so A4's token
-        // priorities and П7's zone path cannot see them and cannot be moved by them.
+        // priorities and the location path can neither see them nor move them.
         const addr = h.address || null;
-        return { e: h, ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, atk: atk,
-                 kkey: ktk.join(' '), zkset: new Set(ztk.concat(ktk)),
-                 zph: zonePhrase.get(h.zone) || new Set(),
+        const qph = locPhrases('quarter', h.quarter), lph = locPhrases('locality', h.locality);
+        return { e: h, bundle: bundle, ordinal: ordinal,
+                 ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, atk: atk,
+                 kkey: ktk.join(' '),
+                 // The token set the matcher reads as „zone/kind“: kind + quarter +
+                 // locality + this row's own old words. The DISTRICT is deliberately
+                 // out of it — „младост“ must not filter every school of a district
+                 // through A3′; the district has a branch of its own (S3).
+                 zkset: new Set(qtk.concat(ltk, legtk, ktk)),
+                 qph: qph, lph: lph, gph: gph,
+                 dph: locPhrases('district', h.district),
                  spk: addr ? keyOf(addr.street_phrase) : '',
                  hkey: addr ? keyOf(addr.house_key) : '' };
-      });
+      }
+      RECS = hotels.map((h, i) => makeRec(h, 'hotels', i))
+                   .concat(places2.map((p, i) => makeRec(p, 'places', i)));
       // ЛОТ 1 решение 2: the exact-CURRENT-name index. old_names stay out of it on
       // purpose — measured, 0 old-name keys coincide with a populated category key,
       // and a global alias index would wake the short „ИУ“/„МУ“ (today 0 rows).
@@ -6902,19 +7023,56 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (!hasKey) {                             // М3/Б2 generosity gate, PER CLASS (С3)
         cls = cls.filter(genOk);
         if (!cls.length) return { category: false, hasKey: false, rows: [] };
+        // ЛОТ 1в-В (S3): „район X“ is explicit with or without a class word — the
+        // marker is the word the HUMAN wrote, and it asks for the district of every
+        // record. Nothing else of this lot fires without a key: a bare location
+        // phrase stays what it was, so the frozen reference keeps its keyless rows.
+        if (R.some((t) => t.orig === DISTRICT_MARK)) {
+          const rest = R.filter((t) => t.orig !== DISTRICT_MARK);
+          const dphrase = rest.map((t) => t.s).join(' ');
+          const rows = rest.length ? cls.filter((r) => r.dph.has(dphrase)) : [];
+          if (rows.length) return { category: true, hasKey: false, rows: orderCategory(rows, c) };
+        }
       }
       if (hasKey) {                              // А3′: key + a purely zone/kind rest = filtered list
         const zk = new Set(), nm = new Set();
         for (const r of cls) { for (const v of r.zkset) zk.add(v); for (const v of r.nset) nm.add(v); }
         // ЛОТ 1 решение 1: the class-wide name veto below is right about the CLASS
         // and wrong about the RECORD. When the rest is the WHOLE significant phrase
-        // of some record's zone (canonical or accepted П7 form) and only that veto
-        // stands in the way, the choice is made PER RECORD: the exact name/alias
-        // sequence first, then the rows of the zone itself.
+        // of some record's location and only that veto stands in the way, the choice
+        // is made PER RECORD: the exact name/alias sequence first, then the rows of
+        // the location itself.
         const vetoed = R.some((t) => nm.has(t.s)), phrase = R.map((t) => t.s).join(' ');
-        if (vetoed && cls.some((r) => r.zph.has(phrase))) {
-          const rows = stableUnique(orderCategory(cls.filter((r) => nameHasPhrase(r, R)), c)
-                                    .concat(orderCategory(cls.filter((r) => r.zph.has(phrase)), c)));
+        // ЛОТ 1в-В (S3): „ул./бул./пл. X“ is a STREET before it is anything else —
+        // „бул. Владислав Варненчик“ is a boulevard, and the quarter of the same
+        // name must never take the query off it.
+        if (R.some((t) => STREET_MARK.indexOf(t.orig) >= 0)) {
+          const marked = streetRows(R, cls, c);
+          if (marked) return { category: true, hasKey: hasKey, rows: marked };
+        }
+        // ЛОТ 1в-В (S3): the EXPLICIT „район X“ asks for the whole district —
+        // every record in it, with a quarter or without. It is recognised by the
+        // word the human wrote, never by the district name alone.
+        if (R.some((t) => t.orig === DISTRICT_MARK)) {
+          const rest = R.filter((t) => t.orig !== DISTRICT_MARK);
+          const dphrase = rest.map((t) => t.s).join(' ');
+          const rows = rest.length ? cls.filter((r) => r.dph.has(dphrase)) : [];
+          if (rows.length) return { category: true, hasKey: hasKey, rows: orderCategory(rows, c) };
+        }
+        // ЛОТ 1в-В (S3): the BARE location phrase — the quarter first, then the
+        // locality and the row's own old words, then the district and ONLY for
+        // records with no quarter of their own. With that restriction „училище
+        // младост“ is „the schools of the quarter plus the schools of the district
+        // that have no quarter“ — the two Petar named are in it; without it the
+        // same query is an unbounded district sweep that buries them.
+        const qRows = cls.filter((r) => r.qph.has(phrase));
+        const lRows = cls.filter((r) => r.lph.has(phrase) || r.gph.has(phrase));
+        const dRows = cls.filter((r) => !r.e.quarter && r.dph.has(phrase));
+        if (qRows.length || lRows.length || dRows.length) {
+          const head = vetoed ? orderCategory(cls.filter((r) => nameHasPhrase(r, R)), c) : [];
+          const rows = stableUnique(head.concat(orderCategory(qRows, c),
+                                                orderCategory(lRows, c),
+                                                orderCategory(dRows, c)));
           if (rows.length) return { category: true, hasKey: hasKey, rows: rows };
         }
         if (R.every((t) => zk.has(t.s)) && !vetoed) {
@@ -7051,7 +7209,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const bits = [h.kind];                     // С3: cat/beds ride the hotels only
       if (h.cat && h.cat.length) bits.push('★' + h.cat.join('/'));
       if (h.beds && h.beds.length) bits.push(h.beds.join('+') + ' легла');
-      bits.push(h.zone);
+      // ЛОТ 1в-В (план §3г т. 5 + К6 (5)): „вид · кв. X · район Y · доп.: Z“. Every
+      // part is NULL-SAFE — a record with no quarter simply has no quarter part and
+      // no empty separator, the district always carries its marker („район“), and a
+      // district that reads exactly like the quarter is printed once. Until this lot
+      // the card said one `zone` string and a drawn hull could speak as a quarter.
+      const district = h.district ? DISTRICT_MARK + ' ' + h.district.name : '';
+      const quarter = h.quarter ? h.quarter.name : '';
+      if (quarter) bits.push(quarter);
+      if (district && district !== quarter) bits.push(district);
+      if (!quarter && !district) bits.push(h.zone);        // compat: a pre-D9 payload
+      if (h.locality) bits.push('доп.: ' + h.locality.name);
       wrap.appendChild(span('pp-sub', bits.join(' · ')));
       // ЛОТ 1в-Б (ADR 008 D5, план §2 т. 2): the address stands under „вид · зона“ and
       // names the source of THAT string, not the record's. 185 of the 375 have none —
@@ -7240,6 +7408,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     // The ONE new global name (G12б/G12в read it; the page itself never does).
     const rowOut = (rec, qt) => ({ name: rec.e.name, zone: rec.e.zone, kind: rec.e.kind,
+                               // ЛОТ 1в-В (ADR 008 D9): the probe reads the three
+                               // typed fields off the export, not off the card's text.
+                               quarter: rec.e.quarter ? Object.assign({}, rec.e.quarter) : null,
+                               district: rec.e.district ? Object.assign({}, rec.e.district) : null,
+                               locality: rec.e.locality ? Object.assign({}, rec.e.locality) : null,
                                status: rec.e.status, old_names: rec.e.old_names.slice(),
                                old_names_src: rec.e.old_names_src.slice(),
                                // ЛОТ 1в-Б (ADR 008 D5): the probe reads the address

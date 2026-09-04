@@ -47,17 +47,34 @@ PLACES = pathlib.Path(os.environ.get("FIRE_VARNA_PLACES_PATH") or (REPO / "data"
 
 # The tracked LF blob, measured at C11 (varna_3d HEAD ba78a25, branch rezhimi):
 #   git -C ../varna_3d show HEAD:data/fire_varna_places.json > data/places.json
-PLACES_SHA256 = "c31a866e3ca9567a94ebb93713309bd68b6ff8ea61af6e008ffbe2ff93913a7d"
-PLACES_BYTES = 96314
-PLACES_GZIP9 = 12881
+PLACES_SHA256 = "35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9"
+PLACES_BYTES = 121621
+PLACES_GZIP9 = 13678
 
 EXPECTED_COUNT = 150
 TOP_LEVEL_KEYS = {"_meta", "places"}
 # Phase-2 plan §2 Д1 + ЛОТ 1в (ADR 008 D1/S2): exactly these TEN keys on every
 # record — no `i`, no notes, no cadastral identifier. `old_names_src` is the ninth,
 # `address` (ЛОТ 1в-Б, ADR 008 D5) the tenth.
-RECORD_KEYS = {"address", "kind", "lat", "lon", "name", "old_names", "old_names_src",
-               "src", "status", "zone"}
+RECORD_KEYS = {"address", "district", "kind", "lat", "locality", "lon", "name",
+               "old_names", "old_names_src", "quarter", "src", "status", "zone"}
+# ЛОТ 1в-В (ADR 008 D9, план §3г/§3ж S1/S4/S6) — the three TYPED location fields.
+# Each is `null` or EXACTLY {name, src, code}; the district is the one field that is
+# never null, because „район X“ is the honest answer when nothing else can be
+# sourced. The code lists are CLOSED: a public row may carry no location that the
+# dictionary of the same delivery does not name.
+LOCATION_KEYS = {"name", "src", "code"}
+QUARTER_SRC = {"REG", "KAIS", "SIGNED_OVERRIDE"}
+DISTRICT_SRC = {"KAIS", "SIGNED_OVERRIDE"}
+DISTRICT_CODES = {"primorski", "odesos", "mladost", "asparuhovo", "vladislav_varnenchik"}
+QUARTER_CODES = {"asparuhovo", "borovets_yug", "chaika_kk", "chaika_kv", "druzhba",
+                 "galata", "izgrev_kv", "kk_konstantin_elena", "manastirski_rid",
+                 "mladost2", "pobeda", "priboy", "troshevo", "vazrazhdane",
+                 "vazrazhdane1", "vazrazhdane2", "vinitsa", "vladislavovo",
+                 "zlatni_pyasatsi"}
+LOCALITY_CODES = {"sveti_nikola", "vilite", "zelenika", "zpz"}
+QUARTER_BY_SRC = {"REG": 34, "KAIS": 10}
+LOCALITY_COUNT = 4
 # ЛОТ 1в-Б (ADR 008 D5) — `address` is `null` or EXACTLY these four keys, and its
 # source is its OWN closed list: a school named by the МОН registry can carry a
 # КАИС address, so the card names the source of THAT string, not of the record.
@@ -255,6 +272,44 @@ class PlacesBundleTest(unittest.TestCase):
             self.assertIsInstance(lon, (int, float))
             self.assertTrue(min_lat <= lat <= max_lat, rec)
             self.assertTrue(min_lon <= lon <= max_lon, rec)
+
+    def test_every_typed_location_is_null_or_the_closed_three_key_object(self):
+        """ЛОТ 1в-В (S1): {name, src, code}, all three non-empty, from closed lists."""
+        for rec in self.records:
+            for field, srcs, codes in (("quarter", QUARTER_SRC, QUARTER_CODES),
+                                       ("locality", QUARTER_SRC, LOCALITY_CODES),
+                                       ("district", DISTRICT_SRC, DISTRICT_CODES)):
+                value = rec[field]
+                if value is None:
+                    self.assertNotEqual(field, "district", rec["name"])
+                    continue
+                self.assertIsInstance(value, dict, rec["name"])
+                self.assertEqual(set(value), LOCATION_KEYS, rec["name"])
+                for key in LOCATION_KEYS:
+                    self.assertIsInstance(value[key], str, rec["name"])
+                    self.assertTrue(value[key].strip(), rec["name"])
+                self.assertIn(value["src"], srcs, rec["name"])
+                self.assertIn(value["code"], codes, rec["name"])
+
+    def test_the_compat_label_follows_from_the_typed_fields(self):
+        """S1: `zone` === quarter?.name ?? „район “ + district.name — nothing else."""
+        for rec in self.records:
+            want = rec["quarter"]["name"] if rec["quarter"] else "район " + rec["district"]["name"]
+            self.assertEqual(rec["zone"], want, rec["name"])
+
+    def test_the_district_covers_every_record(self):
+        """S4: 100 % and the five city districts, measured — not assumed."""
+        self.assertEqual(sum(1 for r in self.records if r["district"]), len(self.records))
+        self.assertEqual({r["district"]["code"] for r in self.records} - DISTRICT_CODES, set())
+
+    def test_the_typed_coverage_is_the_measured_one(self):
+        """The numbers of the manifest Petar signs — a drift is a re-delivery."""
+        by_src = {}
+        for rec in self.records:
+            if rec["quarter"]:
+                by_src[rec["quarter"]["src"]] = by_src.get(rec["quarter"]["src"], 0) + 1
+        self.assertEqual(by_src, QUARTER_BY_SRC)
+        self.assertEqual(sum(1 for r in self.records if r["locality"]), LOCALITY_COUNT)
 
     def test_no_cadastral_identifier_reaches_the_public_payload(self):
         self.assertEqual(sorted(set(_CADASTRAL_RE.findall(self.text))), [])

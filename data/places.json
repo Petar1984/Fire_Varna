@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "generated": "2026-09-04 13:30:45 · python src/export_fire_varna_places.py",
+  "generated": "2026-09-04 17:10:35 · python src/export_fire_varna_places.py",
   "count": 150,
   "by_kind": {
    "училище": 57,
@@ -12,13 +12,10 @@
    "детска ясла": 10,
    "общежитие": 1
   },
-  "by_zone_step": {
-   "0": 22,
-   "1": 2,
-   "2": 32,
-   "3": 75,
-   "4": 16,
-   "H": 3
+  "by_zone_src": {
+   "KAIS": 10,
+   "REG": 34,
+   "district": 106
   },
   "licence_osm": "Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).",
   "licence_registry": "Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).",
@@ -513,7 +510,14 @@
    "kind": "училище",
    "lat": 43.224764,
    "lon": 27.91491,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -530,7 +534,14 @@
    "kind": "училище",
    "lat": 43.210734,
    "lon": 27.914668,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -547,7 +558,14 @@
    "kind": "училище",
    "lat": 43.232585,
    "lon": 28.002687,
-   "zone": "к.к. Св. Св. Константин и Елена",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -565,6 +583,13 @@
    "lat": 43.224644,
    "lon": 27.937475,
    "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -581,7 +606,14 @@
    "kind": "училище",
    "lat": 43.212544,
    "lon": 27.931822,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Частна профилирана гимназия Антонан дьо Сент-Екзюпери"
@@ -602,7 +634,18 @@
    "kind": "училище",
    "lat": 43.234387,
    "lon": 27.916874,
-   "zone": "Изгрев 1",
+   "zone": "кв. Изгрев",
+   "quarter": {
+    "name": "кв. Изгрев",
+    "src": "REG",
+    "code": "izgrev_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "ЧСУ Монтесори"
@@ -623,7 +666,14 @@
    "kind": "училище",
    "lat": 43.224438,
    "lon": 27.916859,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "Първа езикова гимназия, Варна"
@@ -644,7 +694,18 @@
    "kind": "училище",
    "lat": 43.236735,
    "lon": 27.884698,
-   "zone": "ж.к. Възраждане",
+   "zone": "ж.к. Възраждане 2",
+   "quarter": {
+    "name": "ж.к. Възраждане 2",
+    "src": "REG",
+    "code": "vazrazhdane2"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "2 ОУ Никола Вапцаров"
@@ -661,6 +722,13 @@
    "lat": 43.211819,
    "lon": 27.907794,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "ПМГ Акад. Методи Попов"
@@ -681,7 +749,14 @@
    "kind": "училище",
    "lat": 43.218811,
    "lon": 27.95187,
-   "zone": "ж.к. Бриз",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "Четвърта езикова гимназия „Фредерик Жолио-Кюри“",
@@ -705,6 +780,17 @@
    "lat": 43.217073,
    "lon": 27.93855,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "REG",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -717,6 +803,17 @@
    "lat": 43.228885,
    "lon": 28.007082,
    "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "KAIS",
+    "code": "kk_konstantin_elena"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -728,7 +825,14 @@
    "kind": "училище",
    "lat": 43.184491,
    "lon": 27.890665,
-   "zone": "кв. Аспарухово",
+   "zone": "район Аспарухово",
+   "quarter": null,
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -745,7 +849,14 @@
    "kind": "училище",
    "lat": 43.206107,
    "lon": 27.923234,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -762,7 +873,14 @@
    "kind": "училище",
    "lat": 43.179607,
    "lon": 27.89122,
-   "zone": "кв. Аспарухово",
+   "zone": "район Аспарухово",
+   "quarter": null,
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -779,7 +897,14 @@
    "kind": "училище",
    "lat": 43.224792,
    "lon": 27.927683,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -796,7 +921,14 @@
    "kind": "училище",
    "lat": 43.224087,
    "lon": 27.881577,
-   "zone": "кв. Трошево",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -814,6 +946,17 @@
    "lat": 43.216631,
    "lon": 27.935253,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "KAIS",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -826,6 +969,17 @@
    "lat": 43.181448,
    "lon": 27.897411,
    "zone": "кв. Аспарухово",
+   "quarter": {
+    "name": "кв. Аспарухово",
+    "src": "REG",
+    "code": "asparuhovo"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -842,7 +996,14 @@
    "kind": "училище",
    "lat": 43.216193,
    "lon": 27.90709,
-   "zone": "м-т Шашкъна",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -859,7 +1020,14 @@
    "kind": "училище",
    "lat": 43.22154,
    "lon": 27.90399,
-   "zone": "м-т Шашкъна",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -877,6 +1045,17 @@
    "lat": 43.162628,
    "lon": 27.937953,
    "zone": "кв. Галата",
+   "quarter": {
+    "name": "кв. Галата",
+    "src": "REG",
+    "code": "galata"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -894,6 +1073,13 @@
    "lat": 43.208718,
    "lon": 27.901339,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -910,7 +1096,14 @@
    "kind": "училище",
    "lat": 43.213391,
    "lon": 27.885634,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -928,6 +1121,13 @@
    "lat": 43.211724,
    "lon": 27.907666,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -945,6 +1145,17 @@
    "lat": 43.246062,
    "lon": 27.979952,
    "zone": "кв. Виница",
+   "quarter": {
+    "name": "кв. Виница",
+    "src": "KAIS",
+    "code": "vinitsa"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -961,7 +1172,18 @@
    "kind": "училище",
    "lat": 43.243646,
    "lon": 27.854759,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -978,7 +1200,14 @@
    "kind": "училище",
    "lat": 43.217661,
    "lon": 27.918406,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -995,7 +1224,18 @@
    "kind": "училище",
    "lat": 43.237477,
    "lon": 27.861652,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1007,7 +1247,14 @@
    "kind": "училище",
    "lat": 43.203029,
    "lon": 27.918154,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "CОУ Св. Климент Охридски"
@@ -1028,7 +1275,14 @@
    "kind": "училище",
    "lat": 43.207409,
    "lon": 27.919367,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1045,7 +1299,14 @@
    "kind": "училище",
    "lat": 43.218029,
    "lon": 27.889186,
-   "zone": "ж.к. Възраждане",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "ОУ Св. Иван Рилски"
@@ -1067,6 +1328,13 @@
    "lat": 43.21178,
    "lon": 27.902438,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1083,7 +1351,14 @@
    "kind": "училище",
    "lat": 43.214125,
    "lon": 27.91164,
-   "zone": "м-т Шашкъна",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1100,7 +1375,14 @@
    "kind": "училище",
    "lat": 43.21245,
    "lon": 27.92868,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1118,6 +1400,17 @@
    "lat": 43.21708,
    "lon": 27.939386,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "REG",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1129,7 +1422,14 @@
    "kind": "училище",
    "lat": 43.203016,
    "lon": 27.9192,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1147,6 +1447,13 @@
    "lat": 43.224056,
    "lon": 27.938117,
    "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "Професионалната гимназия по компютърно моделиране и компютърни системи „акд. Благовест Сендов“"
@@ -1167,7 +1474,14 @@
    "kind": "училище",
    "lat": 43.228082,
    "lon": 27.872155,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "ПГ по сградостроителство Кольо Фичето"
@@ -1188,7 +1502,18 @@
    "kind": "училище",
    "lat": 43.231451,
    "lon": 27.875069,
-   "zone": "ж.к. Младост",
+   "zone": "ж.к. Младост 2",
+   "quarter": {
+    "name": "ж.к. Младост 2",
+    "src": "REG",
+    "code": "mladost2"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "СУ Антон Страшимиров - ПГИ Д-р Иван Богоров"
@@ -1204,7 +1529,14 @@
    "kind": "училище",
    "lat": 43.22361,
    "lon": 27.899501,
-   "zone": "м-т Шашкъна",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "ПГСГД Николай Хайтов"
@@ -1225,7 +1557,14 @@
    "kind": "училище",
    "lat": 43.210426,
    "lon": 27.92938,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Професионална гимназия по туризъм „Проф. Асен Златаров“"
@@ -1246,7 +1585,14 @@
    "kind": "училище",
    "lat": 43.22154,
    "lon": 27.90399,
-   "zone": "м-т Шашкъна",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1263,7 +1609,14 @@
    "kind": "училище",
    "lat": 43.218693,
    "lon": 27.953835,
-   "zone": "м-т Свети Никола",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1280,7 +1633,14 @@
    "kind": "училище",
    "lat": 43.213581,
    "lon": 27.92463,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "ПГ по текстил и моден дизайн"
@@ -1301,7 +1661,14 @@
    "kind": "училище",
    "lat": 43.220803,
    "lon": 27.901205,
-   "zone": "м-т Шашкъна",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "Професионална Техническа Гимназия Варна"
@@ -1323,6 +1690,17 @@
    "lat": 43.217275,
    "lon": 27.944147,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "KAIS",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1335,6 +1713,13 @@
    "lat": 43.207792,
    "lon": 27.896237,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1351,7 +1736,14 @@
    "kind": "училище",
    "lat": 43.230911,
    "lon": 27.880884,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1369,6 +1761,17 @@
    "lat": 43.18298,
    "lon": 27.892452,
    "zone": "кв. Аспарухово",
+   "quarter": {
+    "name": "кв. Аспарухово",
+    "src": "REG",
+    "code": "asparuhovo"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "СОУ Любен Каравелов"
@@ -1389,7 +1792,14 @@
    "kind": "училище",
    "lat": 43.230786,
    "lon": 27.886868,
-   "zone": "ж.к. Младост",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "СОУ Неофит Бозвели"
@@ -1410,7 +1820,18 @@
    "kind": "училище",
    "lat": 43.243223,
    "lon": 27.845548,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "Пейо Яворов"
@@ -1427,6 +1848,13 @@
    "lat": 43.208742,
    "lon": 27.910957,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "Хуманитарна гимназия Константин Преславски"
@@ -1447,7 +1875,22 @@
    "kind": "училище",
    "lat": 43.173993,
    "lon": 27.904289,
-   "zone": "Аспарухово/Галата",
+   "zone": "кв. Аспарухово",
+   "quarter": {
+    "name": "кв. Аспарухово",
+    "src": "REG",
+    "code": "asparuhovo"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": {
+    "name": "м. Вилите",
+    "src": "REG",
+    "code": "vilite"
+   },
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1464,7 +1907,14 @@
    "kind": "училище",
    "lat": 43.216452,
    "lon": 27.926141,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "7 СОУ Найден Геров"
@@ -1485,7 +1935,14 @@
    "kind": "училище",
    "lat": 43.206888,
    "lon": 27.920518,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Варненска търговска гимназия Г.С.Раковски"
@@ -1506,7 +1963,18 @@
    "kind": "училище",
    "lat": 43.248177,
    "lon": 27.844906,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "KAIS",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "Алеко Константинов"
@@ -1522,7 +1990,14 @@
    "kind": "университет",
    "lat": 43.208937,
    "lon": 27.923521,
-   "zone": "Морска градина",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "ИУ",
@@ -1545,7 +2020,14 @@
    "kind": "университет",
    "lat": 43.224457,
    "lon": 27.921416,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1562,7 +2044,14 @@
    "kind": "университет",
    "lat": 43.21214,
    "lon": 27.921278,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "МУ",
@@ -1585,7 +2074,14 @@
    "kind": "университет",
    "lat": 43.223852,
    "lon": 27.935592,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "ВМЕИ"
@@ -1607,6 +2103,17 @@
    "lat": 43.25801,
    "lon": 28.027562,
    "zone": "к.к. Чайка",
+   "quarter": {
+    "name": "к.к. Чайка",
+    "src": "KAIS",
+    "code": "chaika_kk"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "ВСУ"
@@ -1628,6 +2135,13 @@
    "lat": 43.212122,
    "lon": 27.909243,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "Висше Училище по Мениджмънт",
@@ -1650,7 +2164,14 @@
    "kind": "университет",
    "lat": 43.212898,
    "lon": 27.932103,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [
     "Висше военноморско училище, Варна"
@@ -1672,6 +2193,17 @@
    "lat": 43.240808,
    "lon": 27.981249,
    "zone": "кв. Виница",
+   "quarter": {
+    "name": "кв. Виница",
+    "src": "KAIS",
+    "code": "vinitsa"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1683,7 +2215,14 @@
    "kind": "болница",
    "lat": 43.214206,
    "lon": 27.917381,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "МБАЛ Света Анна"
@@ -1705,6 +2244,13 @@
    "lat": 43.197781,
    "lon": 27.913348,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "МБАЛ Варна"
@@ -1725,7 +2271,18 @@
    "kind": "болница",
    "lat": 43.176094,
    "lon": 27.901099,
-   "zone": "м. Вилите",
+   "zone": "район Аспарухово",
+   "quarter": null,
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": {
+    "name": "м. Вилите",
+    "src": "KAIS",
+    "code": "vilite"
+   },
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1742,7 +2299,14 @@
    "kind": "болница",
    "lat": 43.215556,
    "lon": 27.914053,
-   "zone": "м-т Шашкъна",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "СБАГАЛ Проф. д-р Д. Стаматов"
@@ -1763,7 +2327,14 @@
    "kind": "болница",
    "lat": 43.231222,
    "lon": 27.878889,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -1780,7 +2351,14 @@
    "kind": "болница",
    "lat": 43.213541,
    "lon": 27.91808,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -1798,6 +2376,13 @@
    "lat": 43.210924,
    "lon": 27.906878,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "Хирургическа Болница Проф. Темелков"
@@ -1818,7 +2403,18 @@
    "kind": "болница",
    "lat": 43.227137,
    "lon": 27.936101,
-   "zone": "м-т Сотира",
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "МБАЛ Света Марина",
@@ -1841,7 +2437,14 @@
    "kind": "болница",
    "lat": 43.216694,
    "lon": 27.913707,
-   "zone": "м-т Шашкъна",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "СБОБАЛ Варна"
@@ -1862,7 +2465,14 @@
    "kind": "болница",
    "lat": 43.227768,
    "lon": 27.926486,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1880,6 +2490,13 @@
    "lat": 43.209744,
    "lon": 27.890788,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -1896,7 +2513,18 @@
    "kind": "ДКЦ",
    "lat": 43.248118,
    "lon": 27.847016,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "ДКЦ 3"
@@ -1912,7 +2540,14 @@
    "kind": "ДКЦ",
    "lat": 43.215004,
    "lon": 27.917583,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -1930,6 +2565,13 @@
    "lat": 43.208793,
    "lon": 27.895385,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "V ДКЦ Св. Екатерина"
@@ -1950,7 +2592,14 @@
    "kind": "ДКЦ",
    "lat": 43.212967,
    "lon": 27.935205,
-   "zone": "кв. Чайка",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [
     "ДКЦ Чайка – Курортна поликлиника"
@@ -1971,7 +2620,14 @@
    "kind": "ДКЦ",
    "lat": 43.231222,
    "lon": 27.878889,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -1988,7 +2644,14 @@
    "kind": "ДКЦ",
    "lat": 43.18133,
    "lon": 27.895675,
-   "zone": "ж.к. Дружба",
+   "zone": "район Аспарухово",
+   "quarter": null,
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2005,7 +2668,22 @@
    "kind": "хоспис",
    "lat": 43.168426,
    "lon": 27.921348,
-   "zone": "с.о. Зеленика",
+   "zone": "с.о. Боровец-юг",
+   "quarter": {
+    "name": "с.о. Боровец-юг",
+    "src": "REG",
+    "code": "borovets_yug"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": {
+    "name": "м-т Зеленика",
+    "src": "KAIS",
+    "code": "zelenika"
+   },
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -2022,7 +2700,14 @@
    "kind": "хоспис",
    "lat": 43.231222,
    "lon": 27.878889,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -2040,6 +2725,17 @@
    "lat": 43.229786,
    "lon": 27.996724,
    "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -2056,7 +2752,14 @@
    "kind": "хоспис",
    "lat": 43.231222,
    "lon": 27.878889,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -2073,7 +2776,14 @@
    "kind": "хоспис",
    "lat": 43.231222,
    "lon": 27.878889,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -2090,7 +2800,14 @@
    "kind": "хоспис",
    "lat": 43.231009,
    "lon": 27.878521,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
@@ -2103,6 +2820,13 @@
    "lat": 43.205668,
    "lon": 27.904685,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2119,7 +2843,14 @@
    "kind": "детска градина",
    "lat": 43.21283,
    "lon": 27.947946,
-   "zone": "м-т Салтанат",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2131,7 +2862,14 @@
    "kind": "детска градина",
    "lat": 43.225628,
    "lon": 27.898291,
-   "zone": "ж.к. Младост",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2148,7 +2886,14 @@
    "kind": "детска градина",
    "lat": 43.217812,
    "lon": 27.920193,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2166,6 +2911,17 @@
    "lat": 43.223932,
    "lon": 27.902627,
    "zone": "ж.к. Победа",
+   "quarter": {
+    "name": "ж.к. Победа",
+    "src": "REG",
+    "code": "pobeda"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2183,6 +2939,17 @@
    "lat": 43.217222,
    "lon": 27.934486,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "KAIS",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2194,7 +2961,14 @@
    "kind": "детска градина",
    "lat": 43.176708,
    "lon": 27.902524,
-   "zone": "м. Вилите",
+   "zone": "район Аспарухово",
+   "quarter": null,
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2207,6 +2981,13 @@
    "lat": 43.202527,
    "lon": 27.9106,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2223,7 +3004,14 @@
    "kind": "детска градина",
    "lat": 43.217801,
    "lon": 27.92736,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2240,7 +3028,14 @@
    "kind": "детска градина",
    "lat": 43.22176,
    "lon": 27.911188,
-   "zone": "ж.к. Победа",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "28 ЦДГ Карамфилче"
@@ -2261,7 +3056,14 @@
    "kind": "детска градина",
    "lat": 43.22542,
    "lon": 27.919512,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "ЦДГ Незабравка"
@@ -2277,7 +3079,14 @@
    "kind": "детска градина",
    "lat": 43.215999,
    "lon": 27.914557,
-   "zone": "м-т Шашкъна",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Ян Бибиян"
@@ -2298,7 +3107,14 @@
    "kind": "детска градина",
    "lat": 43.218395,
    "lon": 27.921465,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Слънчева дъга"
@@ -2319,7 +3135,14 @@
    "kind": "детска градина",
    "lat": 43.2167,
    "lon": 27.924116,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "17 ДГ Д-р Петър Берон",
@@ -2343,6 +3166,13 @@
    "lat": 43.222549,
    "lon": 27.933491,
    "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2360,6 +3190,17 @@
    "lat": 43.217509,
    "lon": 27.93833,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "REG",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Калина Малина"
@@ -2376,6 +3217,17 @@
    "lat": 43.216494,
    "lon": 27.940412,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "REG",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2388,6 +3240,17 @@
    "lat": 43.24779,
    "lon": 27.985381,
    "zone": "кв. Виница",
+   "quarter": {
+    "name": "кв. Виница",
+    "src": "REG",
+    "code": "vinitsa"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "ДГ№23 „Иглика /с ЯГ/"
@@ -2408,7 +3271,14 @@
    "kind": "детска градина",
    "lat": 43.225923,
    "lon": 27.872941,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2425,7 +3295,14 @@
    "kind": "детска градина",
    "lat": 43.231698,
    "lon": 27.882499,
-   "zone": "ж.к. Младост",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "ЦДГ Зрънчо"
@@ -2441,7 +3318,14 @@
    "kind": "детска градина",
    "lat": 43.221849,
    "lon": 27.882991,
-   "zone": "кв. Трошево",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "ЦДГ 7 Изворче"
@@ -2463,6 +3347,17 @@
    "lat": 43.223688,
    "lon": 27.883289,
    "zone": "кв. Трошево",
+   "quarter": {
+    "name": "кв. Трошево",
+    "src": "REG",
+    "code": "troshevo"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2480,6 +3375,17 @@
    "lat": 43.234822,
    "lon": 27.891744,
    "zone": "ж.к. Възраждане",
+   "quarter": {
+    "name": "ж.к. Възраждане",
+    "src": "REG",
+    "code": "vazrazhdane"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2492,6 +3398,13 @@
    "lat": 43.210604,
    "lon": 27.910455,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "13 ЦДГ Звездичка"
@@ -2512,7 +3425,14 @@
    "kind": "детска градина",
    "lat": 43.230535,
    "lon": 27.87528,
-   "zone": "ж.к. Младост",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2525,6 +3445,17 @@
    "lat": 43.235846,
    "lon": 27.886511,
    "zone": "ж.к. Възраждане",
+   "quarter": {
+    "name": "ж.к. Възраждане",
+    "src": "REG",
+    "code": "vazrazhdane"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2536,7 +3467,14 @@
    "kind": "детска градина",
    "lat": 43.230077,
    "lon": 27.886423,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2554,6 +3492,17 @@
    "lat": 43.236891,
    "lon": 27.880698,
    "zone": "ж.к. Възраждане",
+   "quarter": {
+    "name": "ж.к. Възраждане",
+    "src": "KAIS",
+    "code": "vazrazhdane"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2565,7 +3514,18 @@
    "kind": "детска градина",
    "lat": 43.236492,
    "lon": 27.873131,
-   "zone": "ж.к. Възраждане",
+   "zone": "ж.к. Възраждане 1",
+   "quarter": {
+    "name": "ж.к. Възраждане 1",
+    "src": "REG",
+    "code": "vazrazhdane1"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2577,7 +3537,18 @@
    "kind": "детска градина",
    "lat": 43.231797,
    "lon": 27.873446,
-   "zone": "Западна промишлена зона",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": {
+    "name": "Западна промишлена зона",
+    "src": "KAIS",
+    "code": "zpz"
+   },
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2589,7 +3560,18 @@
    "kind": "детска градина",
    "lat": 43.249607,
    "lon": 27.844244,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2601,7 +3583,18 @@
    "kind": "детска градина",
    "lat": 43.238592,
    "lon": 27.860506,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2614,6 +3607,13 @@
    "lat": 43.202028,
    "lon": 27.913021,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2630,7 +3630,14 @@
    "kind": "детска градина",
    "lat": 43.244721,
    "lon": 27.854091,
-   "zone": "кв. Владиславово",
+   "zone": "район Владислав Варненчик",
+   "quarter": null,
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2647,7 +3654,18 @@
    "kind": "детска градина",
    "lat": 43.244998,
    "lon": 27.845817,
-   "zone": "ж.к. Владислав Варненчик",
+   "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2659,7 +3677,14 @@
    "kind": "детска градина",
    "lat": 43.181567,
    "lon": 27.901215,
-   "zone": "кв. Аспарухово",
+   "zone": "район Аспарухово",
+   "quarter": null,
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "ДГ В.Терешкова"
@@ -2680,7 +3705,14 @@
    "kind": "детска градина",
    "lat": 43.185351,
    "lon": 27.888981,
-   "zone": "кв. Аспарухово",
+   "zone": "район Аспарухово",
+   "quarter": null,
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2697,7 +3729,14 @@
    "kind": "детска градина",
    "lat": 43.213995,
    "lon": 27.904122,
-   "zone": "ж.к. Възраждане",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2715,6 +3754,13 @@
    "lat": 43.209723,
    "lon": 27.890771,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2731,7 +3777,14 @@
    "kind": "детска градина",
    "lat": 43.21535,
    "lon": 27.892825,
-   "zone": "ж.к. Възраждане",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2749,6 +3802,13 @@
    "lat": 43.208041,
    "lon": 27.889194,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -2765,7 +3825,14 @@
    "kind": "детска градина",
    "lat": 43.20528,
    "lon": 27.922093,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2782,7 +3849,14 @@
    "kind": "детска градина",
    "lat": 43.209589,
    "lon": 27.926883,
-   "zone": "Морска градина",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2799,7 +3873,14 @@
    "kind": "детска градина",
    "lat": 43.225348,
    "lon": 27.925736,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2817,6 +3898,17 @@
    "lat": 43.165299,
    "lon": 27.935562,
    "zone": "кв. Галата",
+   "quarter": {
+    "name": "кв. Галата",
+    "src": "REG",
+    "code": "galata"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2834,6 +3926,17 @@
    "lat": 43.248081,
    "lon": 27.85084,
    "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2846,6 +3949,17 @@
    "lat": 43.216291,
    "lon": 27.945434,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "REG",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2857,7 +3971,14 @@
    "kind": "детска градина",
    "lat": 43.222134,
    "lon": 27.932365,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2875,6 +3996,17 @@
    "lat": 43.18297,
    "lon": 27.896081,
    "zone": "ж.к. Дружба",
+   "quarter": {
+    "name": "ж.к. Дружба",
+    "src": "KAIS",
+    "code": "druzhba"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2892,6 +4024,13 @@
    "lat": 43.20861,
    "lon": 27.897063,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2908,7 +4047,14 @@
    "kind": "детска градина",
    "lat": 43.200055,
    "lon": 27.919341,
-   "zone": "Морска градина",
+   "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -2926,6 +4072,17 @@
    "lat": 43.226039,
    "lon": 27.884314,
    "zone": "кв. Трошево",
+   "quarter": {
+    "name": "кв. Трошево",
+    "src": "REG",
+    "code": "troshevo"
+   },
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "11 Детска ясла Иглика",
@@ -2943,7 +4100,14 @@
    "kind": "детска ясла",
    "lat": 43.229977,
    "lon": 27.887315,
-   "zone": "ж.к. Младост",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "13 Детска ясла Русалка"
@@ -2965,6 +4129,13 @@
    "lat": 43.210858,
    "lon": 27.912866,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "14 Детска ясла Звънче"
@@ -2981,6 +4152,17 @@
    "lat": 43.21644,
    "lon": 27.944413,
    "zone": "кв. Чайка",
+   "quarter": {
+    "name": "кв. Чайка",
+    "src": "REG",
+    "code": "chaika_kv"
+   },
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Детска Ясла №2 Моряче"
@@ -2997,6 +4179,13 @@
    "lat": 43.205329,
    "lon": 27.904893,
    "zone": "район Одесос",
+   "quarter": null,
+   "district": {
+    "name": "Одесос",
+    "src": "KAIS",
+    "code": "odesos"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Детска ясла (ДЯ) №3 „Зайо Байо“"
@@ -3017,7 +4206,14 @@
    "kind": "детска ясла",
    "lat": 43.215864,
    "lon": 27.918634,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
    "old_names": [
     "Приказен свят"
@@ -3033,7 +4229,14 @@
    "kind": "детска ясла",
    "lat": 43.218744,
    "lon": 27.887083,
-   "zone": "кв. Св. Иван Рилски",
+   "zone": "район Младост",
+   "quarter": null,
+   "district": {
+    "name": "Младост",
+    "src": "KAIS",
+    "code": "mladost"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "5 ДЯ Чуден свят"
@@ -3055,6 +4258,17 @@
    "lat": 43.247098,
    "lon": 27.853926,
    "zone": "кв. Владиславово",
+   "quarter": {
+    "name": "кв. Владиславово",
+    "src": "REG",
+    "code": "vladislavovo"
+   },
+   "district": {
+    "name": "Владислав Варненчик",
+    "src": "KAIS",
+    "code": "vladislav_varnenchik"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
@@ -3071,7 +4285,14 @@
    "kind": "детска ясла",
    "lat": 43.225862,
    "lon": 27.914712,
-   "zone": "кв. Изгрев",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Детска ясла № 7 Роза"
@@ -3092,7 +4313,18 @@
    "kind": "детска ясла",
    "lat": 43.181757,
    "lon": 27.894401,
-   "zone": "ж.к. Дружба",
+   "zone": "кв. Аспарухово",
+   "quarter": {
+    "name": "кв. Аспарухово",
+    "src": "REG",
+    "code": "asparuhovo"
+   },
+   "district": {
+    "name": "Аспарухово",
+    "src": "KAIS",
+    "code": "asparuhovo"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "9. Детска ясла Детелина"
@@ -3113,7 +4345,14 @@
    "kind": "общежитие",
    "lat": 43.217129,
    "lon": 27.913503,
-   "zone": "м-т Шашкъна",
+   "zone": "район Приморски",
+   "quarter": null,
+   "district": {
+    "name": "Приморски",
+    "src": "KAIS",
+    "code": "primorski"
+   },
+   "locality": null,
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [
     "Средношколско общежитие Михаил Колони"

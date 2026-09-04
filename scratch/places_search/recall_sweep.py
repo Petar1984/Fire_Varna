@@ -48,6 +48,8 @@ Sources replicated 1:1:
   TYPO/MARKERS/kindOf -> C:/git/varna_3d/web/poi-search.js lines 49, 97-151
   T1..M5 + sec.10 -> C:/git/Fire_Varna/docs/plans/places_search_plan_2026-09-02.md
 """
+import datetime
+import hashlib
 import json
 import math
 import re
@@ -80,6 +82,16 @@ REPO_PARITY_OUT = str(REPO_ROOT / "scratch" / "places_search" / "probe_out"
 # not deliverables: they land in the system temp — never in the repo, never in a
 # session-specific scratch folder that dies with the session (F3-к).
 OUTDIR = (pathlib.Path(tempfile.gettempdir()) / "fv_measures").as_posix() + "/"
+# ЛОТ 1в-В (план §3ж S2) — the two modes. Until this lot every sweep rewrote the
+# TRACKED reference, so the artefact Petar is asked to sign and the artefact the
+# suite replays were one file: a run could freeze a change nobody had read. The
+# tracked write now needs `--freeze` in so many words; anything else is
+# REPORT-ONLY and writes the candidate + the old → new manifest into OUTDIR.
+FREEZE = "--freeze" in sys.argv
+REPORT_ONLY = not FREEZE
+# Date only, so two runs of the same day are byte-equal (the determinism gate
+# replays this script twice and compares).
+GENERATED_AT = datetime.date.today().isoformat()
 
 # Fire_Varna/index.html:1838  .setView([43.2141, 27.9147], 13)
 # stand-in for map.getCenter() -- there is no map in a headless sweep.
@@ -379,56 +391,204 @@ def zone_alias_tokens(cats_doc, zones):
     return extra, added, dropped
 
 
-def zone_phrases(cats_doc, zones, added):
-    """ЛОТ 1, decision 1 — the canonical zone and each ACCEPTED П7 form of it as
-    ORDERED phrases, one string per form.
+ZONES_IN = sorted(set([h["zone"] for h in hotels] + [p["zone"] for p in places2]))
+# ЛОТ 1в-В: `zones` + П7 are SUPERSEDED by the three typed dictionaries below and
+# feed nothing but `check_p7_gate()`, which pins the old flat zone list and is
+# RED until Petar signs the manifest. They are kept so that gate can fail loudly
+# with a named difference instead of crashing on a missing name.
+ZONE_EXTRA, P7_ADDED, P7_DROPPED = zone_alias_tokens(cats, ZONES_IN)
 
-    The significant part of a form is its token list minus numbers, tokens of
-    <=2 characters, address markers (ADDR) and the dictionary's own generic zone
-    words — the very filter П7 steps (а)-(г) use. The ORDER and the boundaries
-    are what `zkset` throws away, and they are the whole point here: „морска
-    градина“ is a phrase, „градина“ alone is not.
+# ============================================== ЛОТ 1в-В (план §3г, §3ж S3/S6)
+# The delivery stopped carrying ONE „zone“ string: every record now has three
+# TYPED fields — `quarter` | `district` | `locality`, each `null` or
+# {name, src, code} — and the dictionary answers with three SEPARATE (class,
+# code) dictionaries plus `legacy_by_row`. The class travels with the word
+# because „младост“ is a quarter AND a district; one flat token set could not
+# tell them apart, and that is exactly what put СУ „Гео Милев“ in a drawn
+# industrial-zone hull. `zone` stays as the compat label (quarter?.name ??
+# „район “ + district.name) until G-ZERO-ZONE.
+LOC_CLASSES = (u"quarter", u"district", u"locality")
 
-    An alias form counts only if EVERY significant token of it is already a zone
-    token of that zone — its own, or one П7 accepted (`added`). „Приморски парк“
-    is an alias of Морска градина that П7 threw out as foreign, so it never
-    becomes a phrase; „кв. Владиславово“ was accepted, so it does.
-    Returns {zone: {phrase}}."""
-    zdict = (cats_doc or {}).get("zones")
-    zdict = zdict if isinstance(zdict, dict) else {}
-    generic = set()
-    for word in (((cats_doc or {}).get("_meta") or {}).get("zone_generic_words") or []):
-        for t in place_tokens(word):
-            generic.add(t.s)
+GENERIC_TOKENS = set()
+for _w in ((cats.get("_meta") or {}).get("zone_generic_words") or []):
+    for _t in place_tokens(_w):
+        GENERIC_TOKENS.add(_t.s)
 
-    def tokens(s):
-        return [t.s for t in place_tokens(s)
-                if not t.num and len(t.orig) > 2 and len(t.s) > 2
-                and t.orig not in ADDR and t.s not in generic]
 
-    out = {}
-    for z in zones:
-        own = tokens(z)
-        allowed = set(own) | set(added.get(z) or ())
-        out[z] = set([u" ".join(own)]) if own else set()
-        e = zdict.get(z)
-        aliases = e.get("aliases") if isinstance(e, dict) else None
-        for alias in (aliases if isinstance(aliases, list) else []):
-            if not isinstance(alias, str):
+def significant_tokens(s):
+    """The phrase filter of П7 steps (а)-(г): what is left of a location string.
+
+    A number, a token of <=2 characters, an address marker and the dictionary's
+    own generic words („район“, „квартал“, „зона“…) never carry a place: that is
+    why „район Младост“ and „Младост“ are ONE phrase and „район“ alone is none."""
+    return [t.s for t in place_tokens(s)
+            if not t.num and len(t.orig) > 2 and len(t.s) > 2
+            and t.orig not in ADDR and t.s not in GENERIC_TOKENS]
+
+
+def location_dicts(cats_doc):
+    """{class: {code: {"name", "aliases"}}} — fail-soft exactly like П7.
+
+    A `locations` that is not an object, an entry without a name or an alias
+    that is not a string switches that class off; nothing throws and the rest
+    of the index still stands (С7′)."""
+    out = dict((c, {}) for c in LOC_CLASSES)
+    loc = (cats_doc or {}).get("locations")
+    if not isinstance(loc, dict):
+        return out
+    for cls in LOC_CLASSES:
+        entries = loc.get(cls)
+        if not isinstance(entries, dict):
+            continue
+        for code, e in entries.items():
+            if not isinstance(e, dict) or not isinstance(e.get("name"), str) or not e["name"]:
                 continue
-            tk = tokens(alias)
-            if tk and all(t in allowed for t in tk):
-                out[z].add(u" ".join(tk))
+            aliases = e.get("aliases")
+            out[cls][code] = {
+                "name": e["name"],
+                "aliases": [a for a in (aliases if isinstance(aliases, list) else [])
+                            if isinstance(a, str)],
+            }
     return out
 
 
-ZONES_IN = sorted(set([h["zone"] for h in hotels] + [p["zone"] for p in places2]))
-ZONE_EXTRA, P7_ADDED, P7_DROPPED = zone_alias_tokens(cats, ZONES_IN)
-ZONE_PHRASES = zone_phrases(cats, ZONES_IN, P7_ADDED)
+def location_alias_tokens(entries):
+    """П7 steps (а)-(е) + (д′), scoped INSIDE one class (план §3ж S3).
+
+    „Foreign“ is measured against the other entries OF THE SAME CLASS only. The
+    class travels with the word, so the district „Младост“ can no longer veto
+    the quarter „ж.к. Младост 2“ — as one flat zone list it did, and the two
+    spellings of one quarter fought each other. Returns (extra, added, dropped)
+    keyed by code; `extra` holds Tok objects, `added`/`dropped` are strings."""
+    own = dict((code, set(t.s for t in place_tokens(e["name"])))
+               for code, e in entries.items())
+    foreign = {}
+    for code in entries:
+        foreign[code] = set(tok for c2 in entries if c2 != code
+                            for tok in own[c2] if len(tok) >= 3)
+    extra, added, dropped = {}, {}, {}
+    for code, e in entries.items():
+        for alias in e["aliases"]:
+            for t in place_tokens(alias):
+                why = None
+                if t.num:                                        # (а)
+                    why = "num"
+                elif len(t.orig) <= 2 or len(t.s) <= 2:          # (б)
+                    why = "short"
+                elif t.orig in ADDR:                             # (в)
+                    why = "addr"
+                elif t.s in GENERIC_TOKENS:                      # (г)
+                    why = "generic"
+                elif t.s in own[code]:                           # (е)
+                    why = "own"
+                else:
+                    for fk in foreign[code]:                     # (д) + (д′)
+                        if fk == t.s or lev(t.s, fk, 2) <= 2:
+                            why = "foreign:" + fk
+                            break
+                if why:
+                    tag = why + ":" + t.s
+                    if tag not in dropped.setdefault(code, []):
+                        dropped[code].append(tag)
+                elif t.s not in added.setdefault(code, []):
+                    added[code].append(t.s)
+                    extra.setdefault(code, []).append(t)
+    for code in added:
+        added[code].sort()
+    return extra, added, dropped
+
+
+def location_phrases(entries, added):
+    """{code: {phrase}} — the canonical name and every ACCEPTED alias form.
+
+    Same rule as ЛОТ 1 decision 1, one class at a time: an alias becomes a
+    phrase only when every significant token of it is already a token of that
+    entry (its own, or one the step above accepted). The ORDER and the
+    boundaries are the point — „морска градина“ is a phrase, „градина“ is not."""
+    out = {}
+    for code, e in entries.items():
+        own = significant_tokens(e["name"])
+        allowed = set(own) | set(added.get(code) or ())
+        forms = set([u" ".join(own)]) if own else set()
+        for alias in e["aliases"]:
+            tk = significant_tokens(alias)
+            if tk and all(t in allowed for t in tk):
+                forms.add(u" ".join(tk))
+        out[code] = forms
+    return out
+
+
+LOCATIONS = location_dicts(cats)
+LOC_EXTRA, LOC_ADDED, LOC_DROPPED, LOC_PHRASES = {}, {}, {}, {}
+for _cls in LOC_CLASSES:
+    LOC_EXTRA[_cls], LOC_ADDED[_cls], LOC_DROPPED[_cls] = location_alias_tokens(LOCATIONS[_cls])
+    LOC_PHRASES[_cls] = location_phrases(LOCATIONS[_cls], LOC_ADDED[_cls])
+
+
+def bundle_digests(path):
+    """Both digests of ONE content: the LF blob and its CRLF twin.
+
+    Measured 04.09: varna_3d's own gate digests its WORKING-TREE bytes and that
+    checkout stores `fire_varna_hotels.json` with CRLF, so the dictionary
+    carries the CRLF digest for the hotels and the LF one for the places — the
+    same content, two line endings. Content identity is what protects the
+    ordinals, so both spellings of it are accepted and nothing else is."""
+    raw = pathlib.Path(path).read_bytes().replace(b"\r\n", b"\n")
+    return set([hashlib.sha256(raw).hexdigest(),
+                hashlib.sha256(raw.replace(b"\n", b"\r\n")).hexdigest()])
+
+
+# `legacy_by_row` is keyed by the ORDINAL of the row in its bundle, so it is only
+# ever as true as the bundle it was built against: a re-export that reorders the
+# rows would move every old word onto a stranger. The dictionary carries the SHA
+# of both bundles; a mismatch switches the legacy words OFF (fail-closed), it
+# never guesses. The words are INDEXED only — never shown, never a district alias.
+LEGACY_BUNDLE_SHA = ((cats.get("_meta") or {}).get("legacy_bundle_sha") or {})
+LEGACY_SHA_OK = all(LEGACY_BUNDLE_SHA.get(key) in bundle_digests(path)
+                    for key, path in (("places", PLACES2), ("hotels", HOTELS)))
+LEGACY_BY_ROW = (cats.get("legacy_by_row") or {}) if LEGACY_SHA_OK else {}
+if not isinstance(LEGACY_BY_ROW, dict):
+    LEGACY_BY_ROW = {}
+
+
+# A legacy word that IS a dictionary entry inherits ITS forms: „Западна
+# промишлена зона“ was delivered as a zone yesterday and the dictionary knows
+# „ЗПЗ“ for it, so the row that used to carry it stays reachable by both. Only
+# the quarter and the locality classes are consulted — a district is never a
+# per-row word, it has a branch of its own.
+LEGACY_LOOKUP = {}
+for _cls in (u"quarter", u"locality"):
+    for _code, _forms in LOC_PHRASES[_cls].items():
+        _own = u" ".join(significant_tokens(LOCATIONS[_cls][_code]["name"]))
+        if _own:
+            LEGACY_LOOKUP.setdefault(_own, []).append((_cls, _code))
+
+
+def legacy_of(bundle, ordinal):
+    """(words, tokens, phrases) of ONE row — [] when the SHA guard is closed."""
+    words = LEGACY_BY_ROW.get(u"%s:%d" % (bundle, ordinal))
+    words = [w for w in words if isinstance(w, str)] if isinstance(words, list) else []
+    tokens, phrases = [], set()
+
+    def add(tk):
+        phrases.add(u" ".join(tk))
+        for t in tk:
+            if t not in tokens:
+                tokens.append(t)
+
+    for word in words:
+        tk = significant_tokens(word)
+        if not tk:
+            continue
+        add(tk)
+        for cls, code in LEGACY_LOOKUP.get(u" ".join(tk), ()):
+            for form in LOC_PHRASES[cls][code]:
+                add(form.split(u" "))
+    return words, tokens, phrases
 
 
 class Rec(object):
-    def __init__(self, h):
+    def __init__(self, h, bundle=u"", ordinal=-1):
         self.name = h["name"]
         self.kind = h["kind"]
         self.zone = h["zone"]
@@ -437,20 +597,26 @@ class Rec(object):
         self.lon = h["lon"]
         self.ntk = [t.s for t in place_tokens(self.name)]
         self.nset = set(self.ntk)
-        self.ztk = [t.s for t in place_tokens(self.zone)]
         self.ktk = [t.s for t in place_tokens(self.kind)]
-        # П7 step (ж): a quarter alias never displaces a NAME path — a candidate
-        # that matches a name token of THIS record (exact, prefix or fuzzy) is
-        # dropped for this record alone. What survives joins the ZONE tokens only.
+        # ЛОТ 1в-В: the three TYPED fields of the delivery, each with its own
+        # token set and its own phrase set. `zone` is only the compat label now.
+        self.quarter = h.get("quarter") or None
+        self.district = h.get("district") or None
+        self.locality = h.get("locality") or None
         self.p7 = []
-        for t in ZONE_EXTRA.get(self.zone, ()):
-            if any(name_quality(t, v) > 0 for v in self.ntk):
-                continue
-            if t.s not in self.ztk:
-                self.ztk.append(t.s)
-                self.p7.append(t.s)
-        self.zkset = set(self.ztk) | set(self.ktk)
-        self.zph = ZONE_PHRASES.get(self.zone) or set()   # decision 1: the phrases
+        self.qtk = self._loc_tokens(u"quarter", self.quarter)
+        self.ltk = self._loc_tokens(u"locality", self.locality)
+        self.qph = self._loc_phrases(u"quarter", self.quarter)
+        self.lph = self._loc_phrases(u"locality", self.locality)
+        self.dph = self._loc_phrases(u"district", self.district)
+        self.bundle = bundle                              # „hotels“ | „places“
+        self.ordinal = ordinal                            # its row in THAT bundle
+        self.legacy, self.legtk, self.gph = legacy_of(bundle, ordinal)
+        # The token set the matcher reads as „zone/kind“: kind + quarter +
+        # locality + the row's own legacy words. The DISTRICT is deliberately
+        # out of it — „младост“ must not filter every school of the district
+        # through A3′; the district has a branch of its own (план §3ж S3).
+        self.zkset = set(self.qtk) | set(self.ltk) | set(self.legtk) | set(self.ktk)
         self.kkey = " ".join(self.ktk)
         # A6: old_names are NAME TOKENS, minus <=2 chars and address markers.
         # ЛОТ 1в А4 т. 1: minus the generic geographic words as well — the class
@@ -481,11 +647,36 @@ class Rec(object):
         dx = (self.lon - CENTER[1]) * 81152.0
         self.dist = math.hypot(dx, dy)
 
+    def _loc_tokens(self, cls, field):
+        """Own tokens of a typed field + the ACCEPTED aliases of its code.
+
+        П7 step (ж) survives whole: an alias token that touches a NAME token of
+        THIS record (exact, prefix or fuzzy) is dropped for this record alone,
+        so a location word can never displace the name path."""
+        if not field:
+            return []
+        out = [t.s for t in place_tokens(field.get("name") or u"")]
+        for t in LOC_EXTRA.get(cls, {}).get(field.get("code"), ()):
+            if any(name_quality(t, v) > 0 for v in self.ntk):
+                continue
+            if t.s not in out:
+                out.append(t.s)
+                if cls == u"quarter":
+                    self.p7.append(t.s)
+        return out
+
+    def _loc_phrases(self, cls, field):
+        """The phrase forms of a typed field — {} when the field is null."""
+        if not field:
+            return set()
+        return set(LOC_PHRASES.get(cls, {}).get(field.get("code")) or set())
+
 
 # Phase 2: ONE index, two deliveries. `kind` carries the class of every record
 # (hotels: 4 kinds; places: school/university/hospital/DKC/hospice/kindergarten).
 # Nothing else in the matcher knows which file a row came from.
-RECS = [Rec(h) for h in hotels] + [Rec(p) for p in places2]
+RECS = ([Rec(h, u"hotels", n) for n, h in enumerate(hotels)]
+        + [Rec(p, u"places", n) for n, p in enumerate(places2)])
 
 # ЛОТ 1, decision 2 — the exact-CURRENT-name index: joined name tokens -> records.
 # old_names stay out of it on purpose (measured: 0 old-name keys coincide with a
@@ -873,6 +1064,75 @@ def run_scored(cls, R, has_key, dead=()):
     return order_named(scored)
 
 
+# ============================== ЛОТ 1в-В (план §3ж S3) — the typed branches
+DISTRICT_MARK = u"район"
+
+
+def district_rows(R, cls):
+    """The EXPLICIT „район X“ branch: None = the query did not ask for one.
+
+    „район X“ is the one location phrase that searches the WHOLE district —
+    every record in it, with a quarter or without. It is recognised by the word
+    the human wrote („район“), never by the district name alone: bare „младост“
+    is the quarter first (below), or the district would swallow it."""
+    if not any(t.orig == DISTRICT_MARK for t in R):
+        return None
+    rest = [t for t in R if t.orig != DISTRICT_MARK]
+    if not rest:
+        return None
+    phrase = u" ".join(t.s for t in rest)
+    rows = [r for r in cls if phrase in r.dph]
+    return order_category(rows) if rows else None
+
+
+def location_rows(R, cls):
+    """The BARE location phrase → (quarter rows, locality/legacy rows, district rows).
+
+    None = the phrase is nobody's location. The district answers ONLY for
+    records with no quarter of their own (план §3ж S3): with that restriction
+    „училище младост“ is „the schools of the quarter Младост plus the schools
+    of район Младост that have no quarter“ — the two Petar named are in it —
+    and without it the same query is an unbounded district sweep that buries
+    them. The old zone words of a row live in `gph`: they are INDEXED here and
+    shown nowhere."""
+    if not R:
+        return None
+    phrase = u" ".join(t.s for t in R)
+    q_rows = [r for r in cls if phrase in r.qph]
+    l_rows = [r for r in cls if phrase in r.lph or phrase in r.gph]
+    d_rows = [r for r in cls if r.quarter is None and phrase in r.dph]
+    if not (q_rows or l_rows or d_rows):
+        return None
+    return order_category(q_rows), order_category(l_rows), order_category(d_rows)
+
+
+def has_key_of(q):
+    """The `hasKey` the CLIENT returns for this query — 1:1 with index.html.
+
+    A0 answers before A1 can spend a word on a class key, so an exact alias
+    carries no key however many dictionary words it contains."""
+    qt = place_tokens(q)
+    if not qt or exact_alias(qt):
+        return False
+    return bool(split_keys(qt)[0])
+
+
+def row_out(rec):
+    """One reference row: the compat label AND the three typed fields (S1).
+
+    The base artefact knows {name, zone} only, so the typed fields can only be
+    NEW in the comparison — never „changed“. `src` and `code` travel with the
+    name because the manifest has to say WHY a label is what it is."""
+    def loc(field):
+        if not field:
+            return None
+        return {"name": field.get("name"), "src": field.get("src"),
+                "code": field.get("code")}
+    return {"name": rec.name, "zone": rec.zone, "kind": rec.kind,
+            "quarter": loc(rec.quarter), "district": loc(rec.district),
+            "locality": loc(rec.locality)}
+
+
 def search(q):
     """Returns (rows, branch). rows is the FULL list (the TOP-8 cut is in render)."""
     qt = place_tokens(q)
@@ -906,6 +1166,13 @@ def search(q):
         cls = [r for r in cls if gen_ok(r)]
         if not cls:
             return [], "M3-too-big"
+        # ЛОТ 1в-В (S3): „район X“ is explicit with or without a class word — the
+        # marker is the word the HUMAN wrote, and it asks for the district of every
+        # record. Nothing else of this lot fires without a key: a bare location
+        # phrase stays what it was, so the frozen reference keeps its keyless rows.
+        explicit_district = district_rows(R, cls)
+        if explicit_district is not None:
+            return explicit_district, "A3-district"
     # ---- A3: key + remainder that is PURELY zone/kind -> filtered category list
     if has_key:
         zk_all = set()
@@ -915,16 +1182,28 @@ def search(q):
             nm_all |= r.nset
         # ЛОТ 1, decision 1: the class-wide name veto below is right about the
         # class and wrong about the record. When the remainder is the WHOLE
-        # significant phrase of some record's zone (canonical or accepted П7
-        # form) and only that veto stands in the way, the choice is made PER
-        # RECORD: the exact name/alias sequence first, then the zone's own rows.
+        # significant phrase of some record's location and only that veto stands
+        # in the way, the choice is made PER RECORD: the exact name/alias
+        # sequence first, then the rows of the location itself.
         vetoed = any(t.s in nm_all for t in R)
-        phrase = u" ".join(t.s for t in R)
-        if R and vetoed and any(phrase in r.zph for r in cls):
-            rows = stable_unique(order_category([r for r in cls if name_has_phrase(r, R)])
-                                 + order_category([r for r in cls if phrase in r.zph]))
+        # ЛОТ 1в-В (S3): „ул./бул./пл. X“ is a STREET before it is anything else
+        # — „бул. Владислав Варненчик“ is a boulevard, and the quarter of the
+        # same name must never take the query off it.
+        if any(t.orig in STREET_MARK for t in R):
+            marked = street_rows(R, cls)
+            if marked:
+                return marked, "A3-street"
+        # ЛОТ 1в-В: the explicit district first, then the bare location phrase.
+        explicit = district_rows(R, cls)
+        if explicit is not None:
+            return explicit, "A3-district"
+        loc = location_rows(R, cls)
+        if loc is not None:
+            head = (order_category([r for r in cls if name_has_phrase(r, R)])
+                    if vetoed else [])
+            rows = stable_unique(head + loc[0] + loc[1] + loc[2])
             if rows:
-                return rows, "A3-record+zone-phrase"
+                return rows, ("A3-record+zone-phrase" if head else "A3-location")
         # A3' (see report sec. г): A4's priority also governs the branch --
         # a token that matches a NAME exactly is a name token, not a filter.
         if R and all(t.s in zk_all for t in R) and not vetoed:
@@ -1769,6 +2048,140 @@ def check_lot1v_b_gate():
     return bad
 
 
+# --- ЛОТ 1в-В (04.09) — the typed-location gate: the six queries план §3ж S3
+# named, MEASURED on the P6 delivery (varna_3d 756d166), plus three controls.
+# Where Sol's expectation and the delivery disagreed the DELIVERY is written
+# down and the difference is named in the manifest, never smoothed over:
+#   · „училище възраждане“ = 2, not 1 — ОУ „Свети Иван Рилски“ keeps the row it
+#     always had through its OWN old zone word („ж.к. Възраждане“, indexed per
+#     record and shown nowhere). Its card now says „район Младост“, which is the
+#     repair Petar asked for; whether the old word should keep the row is a line
+#     in the manifest, not a decision for the executor;
+#   · „детска градина владиславово“ = 5 — ДГ№40 „Детски свят“ is the fifth and
+#     it arrives by the same old-word index, not by a registry segment.
+LOT1V_V_GAINS = [
+    (u'училище младост', u'A3-location', 11,
+     u'S3 гейт 1: кварталът пръв, после районът САМО за записите без квартал — '
+     u'2 в ж.к. Младост 2 + 9 в район Младост, между тях Гео Милев и Иван Рилски', [
+        (u'ПГИ „Д-р Иван Богоров“', u'ж.к. Младост 2', u'училище'),
+        (u'СУ „Неофит Бозвели“', u'район Младост', u'училище'),
+        (u'ОУ „Иван Вазов“', u'район Младост', u'училище'),
+    ]),
+    (u'училище възраждане', u'A3-location', 2,
+     u'S3 гейт 2: II ОУ по квартал; вторият ред е ОУ „Свети Иван Рилски“ по '
+     u'СТАРАТА си зонова дума — измерено, Сол очакваше 1', [
+        (u'II ОУ „Никола Йонков Вапцаров“', u'ж.к. Възраждане 2', u'училище'),
+        (u'ОУ „Свети Иван Рилски“', u'район Младост', u'училище'),
+    ]),
+    (u'хотел зпз', u'A3-location', 1,
+     u'S3 гейт 3: само АДАМО — „ЗПЗ“ е псевдоним на допълнителното място и '
+     u'живее в стария ред на записа, не върху цял район', [
+        (u'АДАМО', u'район Младост', u'Хотел'),
+    ]),
+    (u'хотел морска градина', u'A3-location', 18,
+     u'S3 гейт 4: 18-те стари реда остават намираеми по думата, която вече не '
+     u'се показва никъде', [
+        (u'Орбита', u'район Одесос', u'Хотел'),
+        (u'РЕВЕРАНС', u'район Одесос', u'Хотел'),
+        (u'Family Hotel Astra', u'район Одесос', u'хотел · без категоризация'),
+    ]),
+    (u'училище владислав варненчик', u'A3-location', 4,
+     u'S3 гейт 5: точно 4-те училища на квартала — показът е „кв. Владиславово“, '
+     u'а „ж.к. Владислав Варненчик“ е негов псевдоним (§3в)', [
+        (u'ОУ Стоян Михайловски', u'кв. Владиславово', u'училище'),
+        (u'ОУ Патриарх Евтимий', u'кв. Владиславово', u'училище'),
+        (u'СУ „Пейо Крачолов Яворов“', u'кв. Владиславово', u'училище'),
+        (u'І ОУ „Свети княз Борис I“', u'кв. Владиславово', u'училище'),
+    ]),
+    (u'детска градина владиславово', u'A3-location', 5,
+     u'S3 гейт 6: 4 по квартал + ДГ№40 по старата си зонова дума — мярката '
+     u'реши (Сол очакваше 4 или 5)', [
+        (u'ДГ 39 "Приказка"', u'кв. Владиславово', u'детска градина'),
+        (u'ОДЗ Маргаритка', u'кв. Владиславово', u'детска градина'),
+        (u'ДГ№41 „Първи юни“', u'кв. Владиславово', u'детска градина'),
+        (u'ДГ№37 „Пламъче“', u'кв. Владиславово', u'детска градина'),
+        (u'ДГ№40 „Детски свят“', u'район Владислав Варненчик', u'детска градина'),
+    ]),
+]
+
+LOT1V_V_CONTROLS = [
+    (u'училище район младост', u'A3-district', 12,
+     u'изричното „район X“ пита ЦЕЛИЯ район — 12, тоест 11-те горе минус '
+     u'ПГИ (тя е в квартала, но КАИС я държи в район Младост) плюс двете с '
+     u'квартал в друг район', [
+        (u'ОУ „Иван Вазов“', u'район Младост', u'училище'),
+        (u'Професионална гимназия по електротехника', u'район Младост', u'училище'),
+        (u'Професионална Техническа Гимназия', u'район Младост', u'училище'),
+    ]),
+    (u'училище морска градина', u'A3-location', 6,
+     u'старата зонова дума на местата: 6-те училища остават, както §3ж S2 иска', [
+        (u'8 СОУПЧЕ', u'район Одесос', u'училище'),
+        (u'ОУ "Св.св.Кирил и Методий"', u'район Одесос', u'училище'),
+        (u'ВТГ „Георги Стойков Раковски"', u'район Одесос', u'училище'),
+    ]),
+    (u'район младост', u'A3-district', 36,
+     u'изричното „район X“ работи и БЕЗ класова дума — 36-те записа на района, '
+     u'по близост; без ключ, значи стоим под адресната търсачка на сградите', [
+        (u'ОУ „Иван Вазов“', u'район Младост', u'училище'),
+        (u'Професионална гимназия по електротехника', u'район Младост', u'училище'),
+        (u'Професионална Техническа Гимназия', u'район Младост', u'училище'),
+    ]),
+    (u'бул. владислав варненчик 225', u'A3-street', 1,
+     u'булевардът е улица: разпознава се ПРЕДИ всяко местоположение и не '
+     u'докосва квартала със същото име', [
+        (u'ОУ „Свети Иван Рилски“', u'район Младост', u'училище'),
+    ]),
+]
+
+DISTRICT_CODES = (u"primorski", u"odesos", u"mladost", u"asparuhovo",
+                  u"vladislav_varnenchik")
+
+
+def check_lot1v_v_gate():
+    """The ЛОТ 1в-В gate: the typed schema, the guards and the nine queries.
+
+    Same fail-loud contract as the four gates above. The schema half is what
+    makes „100 % с извор“ measurable — a record without a district, a code
+    outside the closed lists or a compat label that does not follow from the
+    typed fields is red here, in the суite, without a browser."""
+    bad = []
+    if not LEGACY_SHA_OK:
+        bad.append(u"legacy_bundle_sha: речникът е строен срещу друг пакет — "
+                   u"старите зонови думи са изключени (fail-closed)")
+    for r in RECS:
+        if not r.district or r.district.get("code") not in DISTRICT_CODES:
+            bad.append(u"%s: район извън затворения списък (%s)"
+                       % (r.name, json.dumps(r.district, ensure_ascii=False)))
+            continue
+        want = (r.quarter or {}).get("name") or (u"район " + r.district["name"])
+        if r.zone != want:
+            bad.append(u"%s: `zone` = %s, а типовите полета дават %s"
+                       % (r.name, r.zone, want))
+        if r.quarter and r.quarter.get("code") not in LOCATIONS[u"quarter"]:
+            bad.append(u"%s: квартал извън речника (%s)" % (r.name, r.quarter.get("code")))
+        if r.locality and r.locality.get("code") not in LOCATIONS[u"locality"]:
+            bad.append(u"%s: допълнително място извън речника (%s)"
+                       % (r.name, r.locality.get("code")))
+        if r.zone in r.legacy:
+            bad.append(u"%s: старата зонова дума е и показваната зона (%s)"
+                       % (r.name, r.zone))
+    for label, spec in ((u"gain", LOT1V_V_GAINS), (u"control", LOT1V_V_CONTROLS)):
+        for q, branch, n, why, want in spec:
+            rows, br = search(q)
+            got = [(r.name.strip(), r.zone, r.kind) for r in rows]
+            if br != branch:
+                bad.append(u"%s `%s`: branch %s, expected %s" % (label, q, br, branch))
+            if len(rows) != n:
+                bad.append(u"%s `%s`: %d rows, expected %d" % (label, q, len(rows), n))
+            if got[:len(want)] != want:
+                bad.append(u"%s `%s`: rows differ from the measured expectation "
+                           u"(first %d): %s" % (label, q, len(want), got[:len(want)]))
+    if has_key_of(u"бул. владислав варненчик 225"):
+        bad.append(u"„бул. владислав варненчик 225“ носи класов ключ — адресната "
+                   u"търсачка на сградите вече не е отгоре")
+    return bad
+
+
 def check_p7_gate():
     """Runs the gate; returns the list of failures (empty list = green).
 
@@ -1957,15 +2370,284 @@ DIFF_G = [
 # main() refuses to write an artefact whose keys are not exactly this list.
 REF_BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a",
                "gate_lot1v_b")
+# ЛОТ 1в-В (план §3ж S2): the bucket the CANDIDATE carries and the frozen
+# artefact does not. It becomes the seventh member of REF_BUCKETS on all three
+# sides in the same commit that freezes the reference — after Petar signs the
+# manifest, never before. Until then it is allowed in the report-only candidate
+# and in nothing else.
+PENDING_BUCKET = "gate_lot1v_v"
 
 
-def bucket_drift(doc):
-    """The keys of an artefact against REF_BUCKETS; empty list = no drift."""
+def bucket_drift(doc, pending=()):
+    """The keys of an artefact against REF_BUCKETS; empty list = no drift.
+
+    `pending` is the report-only escape hatch and it is explicit at every call
+    site: a bucket named there is allowed in a CANDIDATE, never in the frozen
+    reference (main() passes nothing when it writes the tracked file)."""
     drift = [u"липсва " + b for b in REF_BUCKETS
              if not isinstance(doc.get(b), list)]
     drift += [u"нов " + b for b in doc
-              if b != "_meta" and b not in REF_BUCKETS]
+              if b != "_meta" and b not in REF_BUCKETS and b not in pending]
     return drift
+
+
+def base_adapter(doc):
+    """READ-ONLY view of the frozen artefact in the candidate's shape (S2).
+
+    The base was written before the typed fields existed: `hasKey` and the
+    three location fields are simply absent there, so the adapter fills them
+    with None and the comparator reads None as „the base cannot say“, never as
+    a difference. Returns (entries, duplicates); nothing is written back."""
+    entries, duplicates = {}, []
+    for bucket, rows in doc.items():
+        if bucket == "_meta" or not isinstance(rows, list):
+            continue
+        for entry in rows:
+            key = (bucket, entry.get("q"))
+            if key in entries:
+                duplicates.append(u"%s · %s" % key)
+                continue
+            entries[key] = {
+                "branch": entry.get("branch"),
+                "hasKey": entry.get("hasKey"),
+                "n": entry.get("n"),
+                "rows": [{"name": r.get("name"), "zone": r.get("zone"),
+                          "kind": r.get("kind"), "quarter": r.get("quarter"),
+                          "district": r.get("district"), "locality": r.get("locality")}
+                         for r in (entry.get("rows") or [])],
+            }
+    return entries, duplicates
+
+
+def compare_buckets(base, cand):
+    """(bucket, q) by (bucket, q): what moved, what did not, what must STOP.
+
+    The comparison is the one S2 named — branch, hasKey and the ORDERED rows —
+    and the row identity is (name, zone): the base knows no typed fields, so a
+    typed field can only ever be new, never „changed“. `pending` rows (a bucket
+    the base never had) are reported apart from the STOP-worthy `extra`."""
+    moved, unchanged, extra, missing = [], [], [], []
+    for key in sorted(cand, key=lambda k: (k[0], k[1] or u"")):
+        bucket, q = key
+        if key not in base:
+            # A row of the PENDING bucket is new by construction — it is the new
+            # bucket itself. A row that appears in a FROZEN bucket is an extra,
+            # and an extra is a STOP: the reference may only grow by signature.
+            if bucket in REF_BUCKETS:
+                extra.append({"bucket": bucket, "q": q,
+                              "why": u"нов ред в замразен bucket"})
+            continue
+        old, new = base[key], cand[key]
+        old_rows = [(r["name"], r["zone"]) for r in old["rows"]]
+        new_rows = [(r["name"], r["zone"]) for r in new["rows"]]
+        why = []
+        if old["branch"] != new["branch"]:
+            why.append(u"клон %s → %s" % (old["branch"], new["branch"]))
+        if old["hasKey"] is not None and old["hasKey"] != new["hasKey"]:
+            why.append(u"hasKey %s → %s" % (old["hasKey"], new["hasKey"]))
+        if len(old_rows) != len(new_rows):
+            why.append(u"редове %d → %d" % (len(old_rows), len(new_rows)))
+        elif [r[0] for r in old_rows] != [r[0] for r in new_rows]:
+            why.append(u"друга подредба или други записи")
+        elif old_rows != new_rows:
+            why.append(u"само етикетът на зоната")
+        record = {"bucket": bucket, "q": q,
+                  "old": {"branch": old["branch"], "hasKey": old["hasKey"],
+                          "rows": old["rows"]},
+                  "new": {"branch": new["branch"], "hasKey": new["hasKey"],
+                          "rows": new["rows"]},
+                  "why": why}
+        (moved if why else unchanged).append(record)
+    for key in sorted(base, key=lambda k: (k[0], k[1] or u"")):
+        if key not in cand:
+            missing.append({"bucket": key[0], "q": key[1],
+                            "why": u"редът го няма в кандидата"})
+    return moved, unchanged, extra, missing
+
+
+# Г7 (план §2) — the ten records Petar reads with his own eyes, one per root
+# cause. The keys are matched against the delivered names and each one must
+# resolve to EXACTLY one record; 0 or 2 is a failure of the manifest, not a
+# reason to guess.
+LOT1V_V_FIXTURE = (
+    (u"СУ „Гео Милев“", u"чертаната обвивка ЗПЗ падна — районът е честният отговор"),
+    (u"ОУ „Свети Иван Рилски“", u"обвивката „Възраждане“ падна; училището е в район Младост"),
+    (u"ДГ 32 \"Моряче\"", u"ЗПЗ не е квартал (типовият гейт)"),
+    (u"ДГ 36 \"Морска звездица\"", u"ЗПЗ слиза в „допълнително“, кварталът остава празен"),
+    (u"„Университетска многопрофилна болница за активно лечение „Света Марина““ ЕАД",
+     u"КАИС кварталът печели: к.к. Св. Св. Константин и Елена"),
+    (u"Дукеса", u"хотел от Морска градина → район Приморски"),
+    (u"АДАМО", u"хотел от ЗПЗ → район Младост; „зпз“ остава търсима дума на реда"),
+    (u"Вентура", u"кв. Аспарухово без извор → район Аспарухово"),
+    (u"ПРЕСЛАВ", u"подписаният курортен override (SIGNED_OVERRIDE)"),
+    (u"„Многопрофилна болница за активно лечение Варна“ ЕООД",
+     u"вече беше „район X“ — контролата, която НЕ мърда"),
+)
+
+
+def delivered_zones(commit=u"HEAD"):
+    """{(bundle, ordinal): (name, zone)} as a COMMIT delivers it — None if git cannot.
+
+    The manifest has to say how many RECORDS change their label, and the only
+    honest source for the old label is the committed blob, never a memory of
+    it. The key is the ORDINAL, not the name: „РОЯЛ“ is delivered twice (a hotel
+    and a place), and a name-keyed dictionary silently loses one of them — the
+    count came out 210 instead of 209 while the two files agree row for row."""
+    import subprocess
+    out = {}
+    for key, path in ((u"hotels", u"data/hotels.json"), (u"places", u"data/places.json")):
+        got = subprocess.run(["git", "-C", str(REPO_ROOT), "show",
+                              u"%s:%s" % (commit, path)],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if got.returncode != 0:
+            return None
+        try:
+            doc = json.loads(got.stdout.decode("utf-8"))
+        except ValueError:
+            return None
+        for n, rec in enumerate(doc.get(key) or []):
+            out[(key, n)] = (rec.get("name"), rec.get("zone"))
+    return out
+
+
+def write_manifest(rows_doc, candidate_path, candidate_text):
+    """The old → new manifest Petar signs BEFORE anything is frozen (S2).
+
+    Everything in it is measured here and now: the SHA of the base, of the
+    candidate and of the three inputs, every (bucket, q) that moves with the
+    reason it moved, the records whose label changes, the nine gate queries and
+    the four STOP conditions. Returns the path it wrote."""
+    base_doc = json.loads(pathlib.Path(REPO_ROWS_OUT).read_text(encoding="utf-8"))
+    base, duplicates = base_adapter(base_doc)
+    cand, cand_dup = base_adapter(rows_doc)
+    moved, unchanged, extra, missing = compare_buckets(base, cand)
+    # The manifest is read by a HUMAN: it carries the first eight rows of every
+    # side — what render() actually shows — and says how many stayed behind. The
+    # full ordered lists live in the candidate artefact, whose SHA is pinned above.
+    HEAD = TOP
+
+    def row_line(r):
+        line = u"%s · %s" % ((r.get("name") or u"").strip(), r.get("zone"))
+        loc = r.get("locality") or None
+        return line + (u" · доп.: " + loc["name"] if loc else u"")
+
+    def side(entry):
+        rows = entry["rows"]
+        head = [row_line(r) for r in rows[:HEAD]]
+        if len(rows) > HEAD:
+            head.append(u"…и още %d" % (len(rows) - HEAD))
+        return {"branch": entry["branch"], "hasKey": entry["hasKey"],
+                "n": len(rows), "rows": head}
+
+    for record in moved:
+        record["old"] = side({"branch": record["old"]["branch"],
+                              "hasKey": record["old"]["hasKey"],
+                              "rows": record["old"]["rows"]})
+        record["new"] = side({"branch": record["new"]["branch"],
+                              "hasKey": record["new"]["hasKey"],
+                              "rows": record["new"]["rows"]})
+
+    def sha_of(path):
+        raw = pathlib.Path(path).read_bytes()
+        return {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+
+    old_zones = delivered_zones()
+    changed_records, order_drift = None, []
+
+    def old_zone_of(rec):
+        """The label HEAD delivers for THIS row — by ordinal, checked by name."""
+        was = old_zones.get((rec.bundle, rec.ordinal))
+        if was is None:
+            order_drift.append(u"%s:%d липсва в HEAD" % (rec.bundle, rec.ordinal))
+            return None
+        if was[0] != rec.name:
+            order_drift.append(u"%s:%d е „%s“ в HEAD и „%s“ сега"
+                               % (rec.bundle, rec.ordinal, was[0], rec.name))
+        return was[1]
+
+    if old_zones is not None:
+        changed_records = [
+            {"name": r.name, "old": old_zone_of(r), "new": r.zone,
+             "src": ((r.quarter or {}).get("src") if r.quarter
+                     else (r.district or {}).get("src")),
+             "locality": (r.locality or {}).get("name")}
+            for r in RECS if old_zone_of(r) != r.zone]
+    fixture, fixture_bad = [], []
+    for key, why in LOT1V_V_FIXTURE:
+        hits = [r for r in RECS if r.name.strip() == key.strip()]
+        if len(hits) != 1:
+            fixture_bad.append(u"%s → %d записа" % (key, len(hits)))
+            continue
+        r = hits[0]
+        fixture.append({"name": r.name, "why": why,
+                        "old": None if old_zones is None else old_zone_of(r),
+                        "new": r.zone, "quarter": r.quarter, "district": r.district,
+                        "locality": r.locality, "legacy_terms": r.legacy})
+    gate = []
+    for label, spec in ((u"gain", LOT1V_V_GAINS), (u"control", LOT1V_V_CONTROLS)):
+        for q, branch, n, why, want in spec:
+            rows, br = search(q)
+            gate.append({"class": label, "q": q, "expect": why, "branch": br,
+                         "hasKey": has_key_of(q), "n": len(rows),
+                         "ok": br == branch and len(rows) == n
+                               and [(x.name.strip(), x.zone, x.kind) for x in rows][:len(want)] == list(want),
+                         "rows": side({"branch": br, "hasKey": has_key_of(q),
+                                       "rows": [row_out(x) for x in rows]})["rows"]})
+    manifest = {
+        "_meta": {
+            "what": u"ЛОТ 1в-В · манифест old → new на референцията (report-only)",
+            "plan": u"docs/plans/ПЛАН_ЛОТ1в-В_кварталите.md §3ж S2 / §3з",
+            "generator": u"scratch/places_search/recall_sweep.py --report-only",
+            "generated": None,
+            "frozen": False,
+            "signed_by_petar": None,
+            "pending_bucket": PENDING_BUCKET,
+            "note": (u"Референцията НЕ е замразена. Тестовете, които пинват старата, "
+                     u"са ЧЕРВЕНИ до подписа — това е гейтът, не дефект."),
+            "base": dict(sha_of(REPO_ROWS_OUT),
+                         path=u"scratch/places_search/recall_sweep_rows.json",
+                         what=u"артефактът след лот Б (HEAD)"),
+            "candidate": {"path": candidate_path,
+                          "sha256": hashlib.sha256(candidate_text.encode("utf-8")).hexdigest(),
+                          "bytes": len(candidate_text.encode("utf-8"))},
+            "inputs": {u"data/places.json": sha_of(PLACES2),
+                       u"data/hotels.json": sha_of(HOTELS),
+                       u"data/place_categories.json": sha_of(CATS)},
+        },
+        "totals": {
+            "records": len(RECS),
+            "quarter": sum(1 for r in RECS if r.quarter),
+            "locality": sum(1 for r in RECS if r.locality),
+            "district": sum(1 for r in RECS if r.district),
+            "records_changing_zone": None if changed_records is None else len(changed_records),
+            "reference_rows_base": sum(len(v["rows"]) for v in base.values()),
+            "reference_rows_candidate": sum(len(v["rows"]) for v in cand.values()),
+            "queries_base": len(base),
+            "queries_candidate": len(cand),
+            "queries_moved": len(moved),
+            "queries_unchanged": len(unchanged),
+            "queries_in_pending_bucket": sum(1 for b, _q in cand if b == PENDING_BUCKET),
+        },
+        "stop_conditions": {
+            "duplicate": duplicates + cand_dup,
+            "missing": missing,
+            "extra": extra,
+            "fixture_unresolved": fixture_bad,
+            "delivery_order_drift": sorted(set(order_drift)),
+            "unsigned": (u"да — манифестът чака подписа на Петър; докато го няма, "
+                         u"нищо не се замразява"),
+        },
+        "gate_queries": gate,
+        "fixture_10": fixture,
+        "records_changing_zone": changed_records,
+        "moved": moved,
+        "unchanged": [{"bucket": x["bucket"], "q": x["q"]} for x in unchanged],
+    }
+    manifest["_meta"]["generated"] = GENERATED_AT
+    out = OUTDIR + "lot1v_v_reference_manifest.json"
+    open(out, "w", encoding="utf-8").write(
+        json.dumps(manifest, ensure_ascii=False, indent=1, sort_keys=False) + chr(10))
+    return out
 
 
 def main():
@@ -2263,6 +2945,11 @@ def main():
         # 122 + 12 rows moved when the addresses and the street branch landed, so
         # nothing is re-frozen; Сол's six queries arrive as a bucket of their own.
         "gate_lot1v_b": [],
+        # ЛОТ 1в-В (план §3ж S2/S3): the PENDING bucket. It rides the report-only
+        # candidate and the manifest; it becomes the seventh member of REF_BUCKETS
+        # on all three sides in the same commit that freezes the reference — after
+        # Petar signs, never before.
+        "gate_lot1v_v": [],
     }
     for _q, _br, _n, _why, _want in P7_GAINS + P7_CONTROLS:
         _r, _b = search(_q)
@@ -2270,10 +2957,11 @@ def main():
             "q": _q,
             "expect": _why,
             "branch": _b,
+            "hasKey": has_key_of(_q),
             "n": len(_r),
             "ok": (_b == _br and len(_r) == _n
                    and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+            "rows": [row_out(x) for x in _r],
         })
     for _q, _br, _n, _why, _want in LOT1_GAINS + LOT1_CONTROLS:
         _r, _b = search(_q)
@@ -2281,10 +2969,11 @@ def main():
             "q": _q,
             "expect": _why,
             "branch": _b,
+            "hasKey": has_key_of(_q),
             "n": len(_r),
             "ok": (_b == _br and len(_r) == _n
                    and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+            "rows": [row_out(x) for x in _r],
         })
     # ЛОТ 1в-А: the same shape as the two gates above — `kind` rides in the
     # `ok` flag (the expectation triples of LOT1V_A_GAINS/LOT1V_A_CONTROLS carry
@@ -2295,10 +2984,11 @@ def main():
             "q": _q,
             "expect": _why,
             "branch": _b,
+            "hasKey": has_key_of(_q),
             "n": len(_r),
             "ok": (_b == _br and len(_r) == _n
                    and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+            "rows": [row_out(x) for x in _r],
         })
     for _q, _br, _n, _why, _want in LOT1V_B_GAINS + LOT1V_B_CONTROLS:
         _r, _b = search(_q)
@@ -2306,10 +2996,23 @@ def main():
             "q": _q,
             "expect": _why,
             "branch": _b,
+            "hasKey": has_key_of(_q),
             "n": len(_r),
             "ok": (_b == _br and len(_r) == _n
                    and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+            "rows": [row_out(x) for x in _r],
+        })
+    for _q, _br, _n, _why, _want in LOT1V_V_GAINS + LOT1V_V_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1v_v"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "hasKey": has_key_of(_q),
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [row_out(x) for x in _r],
         })
     for _bucket, _spec in [("gate_m5_a8", M5SPEC), ("extra", EXTRASPEC)]:
         for _q, _exp, _fn in _spec:
@@ -2318,22 +3021,33 @@ def main():
                 "q": _q,
                 "expect": _exp,
                 "branch": _b,
+                "hasKey": has_key_of(_q),
                 "n": len(_r),
                 "ok": bool(_fn(_r)),
-                "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+                "rows": [row_out(x) for x in _r],
             })
     # ADR 008 D7: an artefact whose buckets are not exactly REF_BUCKETS is a
     # DIFFERENT reference — it is never written, however green the rows are.
-    _drift = bucket_drift(ROWS)
+    # ЛОТ 1в-В: the pending bucket is allowed in the report-only CANDIDATE and
+    # nowhere else, so `--freeze` still refuses it until all three sides name it.
+    _drift = bucket_drift(ROWS, pending=() if FREEZE else (PENDING_BUCKET,))
     if _drift:
         raise SystemExit(u"REF_BUCKETS (ADR 008 D7): " + u", ".join(_drift))
     pathlib.Path(OUTDIR).mkdir(parents=True, exist_ok=True)
-    ROWS_OUT = OUTDIR + "recall_sweep_v22_rows.json"
+    ROWS_OUT = OUTDIR + ("recall_sweep_v22_rows.json" if FREEZE
+                         else "lot1v_v_candidate_rows.json")
     _rows_text = json.dumps(ROWS, ensure_ascii=False, indent=1, sort_keys=False) + chr(10)
     open(ROWS_OUT, "w", encoding="utf-8").write(_rows_text)
-    # The reference the JS is gated against lives next to the probe that replays it
-    # (scratch/places_search/recall_sweep_rows.json) - one file, one generator.
-    open(REPO_ROWS_OUT, "w", encoding="utf-8").write(_rows_text)
+    if FREEZE:
+        # The reference the JS is gated against lives next to the probe that replays
+        # it (scratch/places_search/recall_sweep_rows.json) - one file, one generator.
+        open(REPO_ROWS_OUT, "w", encoding="utf-8").write(_rows_text)
+        print(u"FREEZE: замразена референция -> %s" % REPO_ROWS_OUT)
+    else:
+        _manifest_out = write_manifest(ROWS, ROWS_OUT, _rows_text)
+        print(u"REPORT-ONLY (ЛОТ 1в-В): кандидат -> %s" % ROWS_OUT)
+        print(u"REPORT-ONLY: манифест old → new -> %s" % _manifest_out)
+        print(u"REPORT-ONLY: замразената референция НЕ е пипана (%s)" % REPO_ROWS_OUT)
 
     # С6′ — the parity corpus: every KEPT alias of the 28 zones and the name of
     # every one of the 361 records, with this tokeniser's answer. The probe runs
@@ -2365,6 +3079,23 @@ def main():
         for _s in (_r.address["street_phrase"], _r.address["house_key"]):
             if _s not in _corpus:
                 _corpus.append(_s)
+    _n_addr = len(_corpus) - _n_aliases - _n_names - _n_old
+    # ЛОТ 1в-В (С6′ по трите полета): the canonical name and every alias of every
+    # quarter, district and locality, plus the old zone words that live on the rows.
+    # All of them are searchable STRINGS now — three separate token sets and a
+    # per-row legacy index — so the two tokenisers have to agree on them as well.
+    for _cls in LOC_CLASSES:
+        for _code in sorted(LOCATIONS[_cls]):
+            _e = LOCATIONS[_cls][_code]
+            for _s in [_e["name"]] + list(_e["aliases"]):
+                if _s not in _corpus:
+                    _corpus.append(_s)
+    _n_loc = len(_corpus) - _n_aliases - _n_names - _n_old - _n_addr
+    for _r in RECS:
+        for _s in _r.legacy:
+            if _s not in _corpus:
+                _corpus.append(_s)
+    _n_legacy = len(_corpus) - _n_aliases - _n_names - _n_old - _n_addr - _n_loc
     _parity = {
         "_meta": {
             "source": "scratch/places_search/recall_sweep.py (place_tokens)",
@@ -2374,7 +3105,9 @@ def main():
             "records": len(RECS),
             "names": _n_names,
             "old_names": _n_old,
-            "addresses": len(_corpus) - _n_aliases - _n_names - _n_old,
+            "addresses": _n_addr,
+            "locations": _n_loc,
+            "legacy_terms": _n_legacy,
             "strings": len(_corpus),
         },
         "strings": [{"s": _x,
@@ -2441,7 +3174,18 @@ def main():
     for line in lot1v_b_bad:
         print(u"  ЧЕРВЕНО: %s" % line)
 
-    return 1 if (bad or badx or p7_bad or lot1_bad or lot1v_bad or lot1v_b_bad) else 0
+    # ЛОТ 1в-В (типовите полета + деветте заявки): the fifth gate that can FAIL.
+    lot1v_v_bad = check_lot1v_v_gate()
+    print(u"ЛОТ 1в-В: гейт %d/%d ; квартал %d · допълнително %d · район %d/%d"
+          % (len(LOT1V_V_GAINS) + len(LOT1V_V_CONTROLS) - len(lot1v_v_bad),
+             len(LOT1V_V_GAINS) + len(LOT1V_V_CONTROLS),
+             sum(1 for r in RECS if r.quarter), sum(1 for r in RECS if r.locality),
+             sum(1 for r in RECS if r.district), len(RECS)))
+    for line in lot1v_v_bad:
+        print(u"  ЧЕРВЕНО: %s" % line)
+
+    return 1 if (bad or badx or p7_bad or lot1_bad or lot1v_bad or lot1v_b_bad
+                 or lot1v_v_bad) else 0
 
 
 if __name__ == "__main__":

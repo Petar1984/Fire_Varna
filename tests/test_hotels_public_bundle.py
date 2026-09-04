@@ -54,9 +54,9 @@ CATEGORIES = REPO / "data" / "place_categories.json"
 # decision 10 merged „Явор“ into „ГОЛДЪН ЛАЙН“ (one building, two records at 0,00 m;
 # the old name lives on as an alias) and the reason line moved into `_meta.excluded`.
 # The three numbers below are re-measured on that blob; nothing else in it moved.
-HOTELS_SHA256 = "434d15d5af70a94c5240198dbd852055a23d57944872cfebc0a8c24e4ef0e2c2"
-HOTELS_BYTES = 101191
-HOTELS_GZIP9 = 12097
+HOTELS_SHA256 = "c30f7333d1a9a845b90ca46db0e41496cb722aa2640b6c862ccb8b211bd30100"
+HOTELS_BYTES = 142543
+HOTELS_GZIP9 = 13004
 # C16 (§11 П7): the dictionary was re-delivered with a `zones` key — the quarter
 # aliases of the zones that carry a registry entry, schema still 1.
 # ЛОТ 1 (F1-д, varna_3d dee1f76 „P2-д“) then moved the dictionary itself: chips
@@ -66,9 +66,18 @@ HOTELS_GZIP9 = 12097
 # json.dumps({"chips": …, "forms": …}, ensure_ascii=False, sort_keys=True):
 # 30 570 B / 87f35e90ac206ab3… at 23af63f → 32 188 B / 27fe1ca178c7cf17… now.
 #   git -C ../varna_3d show HEAD:data/place_categories.json > data/place_categories.json
-CATEGORIES_SHA256 = "7fb4ddb6959144de831841aaec5236a7d0cd1e212f7244bff44352816497bc13"
-CATEGORIES_BYTES = 50941
-CATEGORIES_GZIP9 = 6944
+# ЛОТ 1в-В (ADR 008 D9): the dictionary answers with THREE (class, code) dictionaries
+# — `locations.quarter|district|locality` — and with `legacy_by_row`: the old zone
+# word of every row whose label changed, keyed by that row's ordinal in its bundle
+# and protected by the SHA of the bundle. chips 57, forms 276 → 283, zones 30 → 19.
+CATEGORIES_SHA256 = "2d3d6af6909222b0e3fbb1af088e021edbc9c9c2dd6af140ab7a973b75c81289"
+CATEGORIES_BYTES = 64424
+CATEGORIES_GZIP9 = 8663
+# The closed lists the dictionary and the two payloads have to AGREE on: a code in a
+# record that the dictionary of the same delivery does not name is a broken delivery.
+LOCATION_COUNTS = {"quarter": 19, "district": 5, "locality": 4}
+LEGACY_ROWS = 209
+BUNDLE_SIZES = {"places": 150, "hotels": 225}
 
 EXPECTED_COUNT = 225
 TOP_LEVEL_KEYS = {"_meta", "hotels"}
@@ -76,8 +85,26 @@ TOP_LEVEL_KEYS = {"_meta", "hotels"}
 # no more and no less. `old_names_src` is the thirteenth — a parallel array of the
 # same length and order, so every old name names its own source instead of
 # inheriting the record's register; `address` (ЛОТ 1в-Б, ADR 008 D5) is the fourteenth.
-RECORD_KEYS = {"address", "beds", "cat", "kind", "lat", "lon", "name", "no_uin",
-               "old_names", "old_names_src", "src", "status", "uins", "zone"}
+RECORD_KEYS = {"address", "beds", "cat", "district", "kind", "lat", "locality",
+               "lon", "name", "no_uin", "old_names", "old_names_src", "quarter",
+               "src", "status", "uins", "zone"}
+# ЛОТ 1в-В (ADR 008 D9, план §3г/§3ж S1/S4/S6) — the three TYPED location fields.
+# Each is `null` or EXACTLY {name, src, code}; the district is the one field that is
+# never null, because „район X“ is the honest answer when nothing else can be
+# sourced. The code lists are CLOSED: a public row may carry no location that the
+# dictionary of the same delivery does not name.
+LOCATION_KEYS = {"name", "src", "code"}
+QUARTER_SRC = {"REG", "KAIS", "SIGNED_OVERRIDE"}
+DISTRICT_SRC = {"KAIS", "SIGNED_OVERRIDE"}
+DISTRICT_CODES = {"primorski", "odesos", "mladost", "asparuhovo", "vladislav_varnenchik"}
+QUARTER_CODES = {"asparuhovo", "borovets_yug", "chaika_kk", "chaika_kv", "druzhba",
+                 "galata", "izgrev_kv", "kk_konstantin_elena", "manastirski_rid",
+                 "mladost2", "pobeda", "priboy", "troshevo", "vazrazhdane",
+                 "vazrazhdane1", "vazrazhdane2", "vinitsa", "vladislavovo",
+                 "zlatni_pyasatsi"}
+LOCALITY_CODES = {"sveti_nikola", "vilite", "zelenika", "zpz"}
+QUARTER_BY_SRC = {"KAIS": 84, "SIGNED_OVERRIDE": 12}
+LOCALITY_COUNT = 4
 # ЛОТ 1в-Б (ADR 008 D5) — `address` is `null` or EXACTLY these four keys, and its
 # source is its OWN closed list: a hotel named by the НТР can carry a КАИС address
 # (К7 (4): a hotel with no НТР address falls back on the body under the pin), so
@@ -237,6 +264,44 @@ class HotelsBundleTest(unittest.TestCase):
             self.assertIsInstance(zone, str, rec.get("name"))
             self.assertTrue(zone.strip(), rec.get("name"))
             self.assertLessEqual(len(zone), 60, rec.get("name"))
+
+    def test_every_typed_location_is_null_or_the_closed_three_key_object(self):
+        """ЛОТ 1в-В (S1): {name, src, code}, all three non-empty, from closed lists."""
+        for rec in self.records:
+            for field, srcs, codes in (("quarter", QUARTER_SRC, QUARTER_CODES),
+                                       ("locality", QUARTER_SRC, LOCALITY_CODES),
+                                       ("district", DISTRICT_SRC, DISTRICT_CODES)):
+                value = rec[field]
+                if value is None:
+                    self.assertNotEqual(field, "district", rec["name"])
+                    continue
+                self.assertIsInstance(value, dict, rec["name"])
+                self.assertEqual(set(value), LOCATION_KEYS, rec["name"])
+                for key in LOCATION_KEYS:
+                    self.assertIsInstance(value[key], str, rec["name"])
+                    self.assertTrue(value[key].strip(), rec["name"])
+                self.assertIn(value["src"], srcs, rec["name"])
+                self.assertIn(value["code"], codes, rec["name"])
+
+    def test_the_compat_label_follows_from_the_typed_fields(self):
+        """S1: `zone` === quarter?.name ?? „район “ + district.name — nothing else."""
+        for rec in self.records:
+            want = rec["quarter"]["name"] if rec["quarter"] else "район " + rec["district"]["name"]
+            self.assertEqual(rec["zone"], want, rec["name"])
+
+    def test_the_district_covers_every_record(self):
+        """S4: 100 % and the five city districts, measured — not assumed."""
+        self.assertEqual(sum(1 for r in self.records if r["district"]), len(self.records))
+        self.assertEqual({r["district"]["code"] for r in self.records} - DISTRICT_CODES, set())
+
+    def test_the_typed_coverage_is_the_measured_one(self):
+        """The numbers of the manifest Petar signs — a drift is a re-delivery."""
+        by_src = {}
+        for rec in self.records:
+            if rec["quarter"]:
+                by_src[rec["quarter"]["src"]] = by_src.get(rec["quarter"]["src"], 0) + 1
+        self.assertEqual(by_src, QUARTER_BY_SRC)
+        self.assertEqual(sum(1 for r in self.records if r["locality"]), LOCALITY_COUNT)
 
     def test_no_cadastral_identifier_reaches_the_public_payload(self):
         self.assertEqual(sorted(set(_CADASTRAL_RE.findall(self.text))), [])
@@ -416,6 +481,52 @@ class CategoryDictionaryTest(unittest.TestCase):
         for entry in self.doc["chips"]:
             self.assertTrue(entry.get("forms"), entry["chip"])
             self.assertIn(entry["chip"], referenced)
+
+    def test_the_three_location_dictionaries_are_closed_and_typed(self):
+        """ЛОТ 1в-В (S3): three (class, code) dictionaries, each entry {name, aliases}."""
+        locs = self.doc["locations"]
+        self.assertEqual({k: len(v) for k, v in locs.items()}, LOCATION_COUNTS)
+        for entries in locs.values():
+            for code, entry in entries.items():
+                self.assertEqual(set(entry), {"name", "aliases"}, code)
+                self.assertIsInstance(entry["name"], str, code)
+                self.assertTrue(entry["name"].strip(), code)
+                self.assertIsInstance(entry["aliases"], list, code)
+                for alias in entry["aliases"]:
+                    self.assertIsInstance(alias, str, code)
+                    self.assertTrue(alias.strip(), code)
+        self.assertEqual({e["name"] for e in locs["district"].values()},
+                         {"Приморски", "Одесос", "Младост", "Аспарухово",
+                          "Владислав Варненчик"})
+
+    def test_the_legacy_words_are_keyed_by_an_ordinal_inside_its_bundle(self):
+        """S2: `places:<n>` / `hotels:<n>` — indexed, never shown, never a district alias."""
+        legacy = self.doc["legacy_by_row"]
+        self.assertEqual(len(legacy), LEGACY_ROWS)
+        for key, words in legacy.items():
+            bundle, _, ordinal = key.partition(":")
+            self.assertIn(bundle, BUNDLE_SIZES, key)
+            self.assertTrue(ordinal.isdigit() and int(ordinal) < BUNDLE_SIZES[bundle], key)
+            self.assertIsInstance(words, list, key)
+            self.assertTrue(words, key)
+            for word in words:
+                self.assertIsInstance(word, str, key)
+                self.assertTrue(word.strip(), key)
+
+    def test_the_legacy_bundle_sha_is_the_content_of_the_two_payloads(self):
+        """S2: the ordinals are only as true as the bundle they were built against.
+
+        The exporter digests its own WORKING-TREE file and that checkout stores the
+        hotels export with CRLF, so one content has two digests (measured 04.09).
+        Both spellings of THIS content pass and nothing else does — a dictionary
+        built against another generation of the payloads is a broken delivery.
+        """
+        shas = self.doc["_meta"]["legacy_bundle_sha"]
+        for key, path in (("places", REPO / "data" / "places.json"), ("hotels", HOTELS)):
+            lf = pathlib.Path(path).read_bytes().replace(b"\r\n", b"\n")
+            self.assertIn(shas[key],
+                          {hashlib.sha256(lf).hexdigest(),
+                           hashlib.sha256(lf.replace(b"\n", b"\r\n")).hexdigest()}, key)
 
     def test_encoding_is_utf8_without_bom_and_free_of_mojibake(self):
         self.assertFalse(self.raw.startswith(b"\xef\xbb\xbf"))

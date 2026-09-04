@@ -1143,6 +1143,134 @@ class RefBucketsTest(unittest.TestCase):
         self.assertEqual(REF.bucket_drift(broken), [u"липсва extra"])
 
 
+class Lot1vVGateTest(unittest.TestCase):
+    """ЛОТ 1в-В (план §3г/§3ж, Gate 1-В) — the typed location fields.
+
+    The delivery stopped carrying one `zone` string: every record now has
+    `quarter` | `district` | `locality`, each `null` or {name, src, code}, and
+    the client, the mirror and the dictionary have to agree on all three. This
+    class is ADDITIVE — it neither reads nor re-freezes the reference of the
+    earlier lots, which is red until the manifest is signed (план §3з).
+
+    Every assertion below is measured on the P6 delivery of varna_3d — the one
+    the three payloads in `data/` are pinned to by sha256.
+    """
+
+    DISTRICT_CODES = {"primorski", "odesos", "mladost", "asparuhovo",
+                      "vladislav_varnenchik"}
+
+    @classmethod
+    def setUpClass(cls):
+        cls.places = json.loads((REPO / "data" / "places.json").read_text(encoding="utf-8"))
+        cls.hotels = json.loads((REPO / "data" / "hotels.json").read_text(encoding="utf-8"))
+        cls.cats = json.loads((REPO / "data" / "place_categories.json").read_text(encoding="utf-8"))
+        cls.index = INDEX.read_text(encoding="utf-8")
+
+    def js_list(self, name):
+        """The literal array `name` out of index.html, as a set of strings."""
+        match = re.search(r"const " + name + r" = \[([^\]]*)\]", self.index)
+        self.assertIsNotNone(match, name + " is not a literal in index.html")
+        return set(re.findall(r"'([^']+)'", match.group(1)))
+
+    def test_gate(self):
+        """The nine measured queries and the schema half — fail-loud, in the suite."""
+        self.assertEqual(REF.check_lot1v_v_gate(), [])
+
+    def test_the_client_keysets_are_the_delivered_ones(self):
+        """G2 of the client: EXPECT_KEYS / EXPECT2_KEYS against the real rows."""
+        for name, doc, key in (("EXPECT_KEYS", self.hotels, "hotels"),
+                               ("EXPECT2_KEYS", self.places, "places")):
+            match = re.search(r"const " + name + r" = \[(.*?)\];", self.index, re.S)
+            self.assertIsNotNone(match, name + " is not a literal in index.html")
+            listed = re.findall(r"'([^']+)'", match.group(1))
+            self.assertEqual(listed, sorted(listed), name + " is not sorted")
+            for rec in doc[key]:
+                self.assertEqual(sorted(rec.keys()), listed, rec.get("name"))
+
+    def test_the_client_closed_lists_are_the_delivered_codes(self):
+        """S1: allow-listed codes — the client refuses a location nobody named."""
+        codes = {"quarter": set(), "district": set(), "locality": set()}
+        for doc, key in ((self.hotels, "hotels"), (self.places, "places")):
+            for rec in doc[key]:
+                for field in codes:
+                    if rec[field]:
+                        codes[field].add(rec[field]["code"])
+        self.assertEqual(self.js_list("DISTRICT_CODES"), self.DISTRICT_CODES)
+        self.assertEqual(codes["district"], self.DISTRICT_CODES)
+        for field, name in (("quarter", "QUARTER_CODES"), ("locality", "LOCALITY_CODES")):
+            listed = self.js_list(name)
+            # the client's list is the DICTIONARY's list, and every delivered code
+            # is in it: a code the dictionary does not name could never be searched.
+            self.assertEqual(listed, set(self.cats["locations"][field]), name)
+            self.assertEqual(codes[field] - listed, set(), name)
+
+    def test_the_client_pins_the_dictionary_bundle_sha(self):
+        """S2: the ordinals of `legacy_by_row` are pinned on the client too."""
+        match = re.search(r"const LEGACY_BUNDLE_SHA = \{(.*?)\};", self.index, re.S)
+        self.assertIsNotNone(match, "LEGACY_BUNDLE_SHA is not a literal in index.html")
+        pinned = dict(re.findall(r"(\w+):\s*'([0-9a-f]{64})'", match.group(1)))
+        self.assertEqual(pinned, self.cats["_meta"]["legacy_bundle_sha"])
+
+    def test_the_district_fallback_is_load_bearing(self):
+        """Runs and fails: inverted in place, the two schools Petar named vanish.
+
+        `dph` empty = „the district answers for nobody“. „училище младост“ falls
+        back to the two schools that carry the quarter itself, and СУ „Гео Милев“
+        — the row that started this lot — is not among them.
+        """
+        rows, branch = REF.search(u"училище младост")
+        self.assertEqual((branch, len(rows)), ("A3-location", 11))
+        self.assertIn(u"СУ „Гео Милев“", {r.name.strip() for r in rows})
+        saved = [(r, r.dph) for r in REF.RECS]
+        try:
+            for rec, _ in saved:
+                rec.dph = set()
+            without, branch2 = REF.search(u"училище младост")
+        finally:
+            for rec, dph in saved:
+                rec.dph = dph
+        self.assertEqual(len(without), 2)
+        self.assertNotIn(u"СУ „Гео Милев“", {r.name.strip() for r in without})
+        self.assertEqual(len(REF.search(u"училище младост")[0]), 11)
+
+    def test_the_old_zone_words_are_load_bearing(self):
+        """Runs and fails: without them ОУ „Свети Иван Рилски“ loses its old word.
+
+        The card says „район Младост“ now — the repair Petar asked for — but the
+        row is still reachable by the word it used to carry. Empty `gph` and the
+        second row of „училище възраждане“ is gone.
+        """
+        rows, _ = REF.search(u"училище възраждане")
+        self.assertEqual([r.name.strip() for r in rows],
+                         [u"II ОУ „Никола Йонков Вапцаров“", u"ОУ „Свети Иван Рилски“"])
+        saved = [(r, r.gph) for r in REF.RECS]
+        try:
+            for rec, _ in saved:
+                rec.gph = set()
+            without, _ = REF.search(u"училище възраждане")
+        finally:
+            for rec, gph in saved:
+                rec.gph = gph
+        self.assertEqual([r.name.strip() for r in without], [u"II ОУ „Никола Йонков Вапцаров“"])
+        self.assertEqual(len(REF.search(u"училище възраждане")[0]), 2)
+
+    def test_the_reference_is_not_frozen_and_the_candidate_bucket_is_pending(self):
+        """§3з: the manifest is signed BEFORE anything is frozen.
+
+        The tracked artefact must still carry exactly the six buckets of лот Б —
+        a seventh here would mean the reference was re-frozen without a signature.
+        """
+        current = json.loads(ROWS.read_text(encoding="utf-8"))
+        self.assertEqual(set(current) - {"_meta"}, set(REF_BUCKETS))
+        self.assertNotIn(REF.PENDING_BUCKET, current)
+        self.assertNotIn(REF.PENDING_BUCKET, REF_BUCKETS)
+        # and the generator refuses to freeze it: `--freeze` passes no `pending`
+        gained = dict((b, []) for b in REF_BUCKETS)
+        gained[REF.PENDING_BUCKET] = []
+        self.assertEqual(REF.bucket_drift(gained), [u"нов " + REF.PENDING_BUCKET])
+        self.assertEqual(REF.bucket_drift(gained, pending=(REF.PENDING_BUCKET,)), [])
+
+
 class AnchorsReachableTest(unittest.TestCase):
     """Амандамент А5 (2): the anchors are ANCESTORS of HEAD, not reflog ghosts.
 

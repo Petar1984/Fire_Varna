@@ -765,35 +765,31 @@ const TOKEN_TABLE = [
   ["апарткомплекс", ["apart", "kompleks"]],
 ];
 
-// С8′/С7′ — the SAME dictionary with `zones` replaced by a string. validateCats
+// С8′/С7′ — the SAME dictionary with `locations` replaced by a string. validateCats
 // (schema 1, forms, chips) still accepts it, so the page takes the В7 structure
-// path and buildIndex must simply switch П7 off. Built from the tracked file, so
-// it can never drift from what the browser really fetches.
-const CATS_BAD_ZONES = (function () {
+// path and buildIndex must simply switch the location words off. ЛОТ 1в-В moved
+// the input: until this lot the fail-soft path hung on `zones`, and `zones` is not
+// read by the client any more — breaking it would have proved nothing. Built from
+// the tracked file, so it can never drift from what the browser really fetches.
+const CATS_BAD_LOCATIONS = (function () {
   const doc = JSON.parse(fs.readFileSync(path.join(REPO, "data", "place_categories.json"), "utf8"));
-  doc.zones = "not an object";
+  doc.locations = "not an object";
   return JSON.stringify(doc);
 })();
-// The eight П7 gains AS THEY ANSWERED BEFORE THE RULE (measured 03.09 through the
-// same reference with П7 off): rows, the `category` flag the export carries (true
-// = the А3 category list answered) and the first row. A dictionary whose `zones`
-// is unusable must land back on exactly these — that is what "fail-soft" has to
-// mean to be a gate rather than a hope.
-const P7_BEFORE = [
-  // Амандамент №10 (2): ЛОТ 1 премести три от тези осем — не правилото,
-  // а данните: ДГ№40 „Детски свят“ и ОДЗ Маргаритка са вече две градини в
-  // кв. Владиславово, третата е в ж.к. Владислав Варненчик, а „ДКЦ Чайка“ ЕООД
-  // води шест реда по fail-open. Мерени 04.09 с този сценарий, не преписани.
-  ["владиславово детска градина", 2, true, "ДГ№40 „Детски свят“"],
-  ["детска градина владислав варненчик", 3, true, 'ДГ 39 "Приказка"'],
-  // ЛОТ 1в-А (04.09), измерено с този сценарий: 4 → 5. С изключен П7 заявката
-  // пада на fail-open по имена, а амандамент А4 т. 1 остави КЛАСОВИТЕ думи на
-  // псевдонима в `aset` — затова ВВМУ „Н. Й. Вапцаров“ („Висше военноморско
-  // училище, Варна“, WD) влиза трети. Водещият ред и редът на другите четири
-  // не мърдат. Същото и за „училище жкизгрев“ по-долу.
-  ["владиславово училище", 5, false, "Спортно училище Георги Бенковски"],
-  ["хотел владиславово", 22, false, "Hotel Color"],
-  ["дкц владиславово", 6, false, "„ДКЦ Чайка“ ЕООД"],
+// ЛОТ 1в-В — the eight location queries AS THEY ANSWER WITH THE DICTIONARIES OFF
+// (measured 04.09 through the mirror with `locations` = "not an object"). What is
+// left in that state is the per-row legacy words, which do not need the
+// dictionaries: „владиславово детска градина“ still finds ДГ№40 by its own old
+// zone word, while „хотел зпз“ falls back to the fail-open list because „ЗПЗ“ is
+// an ALIAS and aliases live in the dictionary. That is what fail-soft has to mean
+// to be a gate rather than a hope: rows, the `category` flag the export carries
+// and the first row.
+const LOC_OFF = [
+  ["владиславово детска градина", 1, true, "ДГ№40 „Детски свят“"],
+  ["детска градина владислав варненчик", 3, true, "ДГ 39 \"Приказка\""],
+  ["владиславово училище", 4, true, "ОУ Стоян Михайловски"],
+  ["хотел владиславово", 2, true, "Хотел-ресторант „Комитово ханче“"],
+  ["дкц владиславово", 1, true, "„ДКЦ 3 – Варна“ ЕООД"],
   ["хотел зпз", 22, false, "Hotel Color"],
   ["горчива чешма хотел", 22, false, "Hotel Color"],
   ["училище жкизгрев", 5, false, "Спортно училище Георги Бенковски"],
@@ -803,7 +799,7 @@ const P7_BEFORE = [
 // WRITES into it (staleCache) and reads it back (warm). tests/test_places_search_gate.py
 // (PlacesCacheNameTest) compares this literal with index.html — a stale copy would turn
 // the В7 refusal scenario into a plain 404 in silence.
-const PLACES_CACHE = "fire-varna-hotels-v4-225";
+const PLACES_CACHE = "fire-varna-hotels-v5-225";
 const HOTELS_URL = BASE + "data/hotels.json";
 
 const PL_VISIBLE_JS = "document.getElementById('placesSearchResults').classList.contains('visible')";
@@ -941,9 +937,10 @@ async function armPlacesFetch(s) {
   s.placesArmed = true;
   s.hotelsMode = "pass";           // pass | hold | 404 | malformed
   s.places2Mode = "pass";          // pass | 404  (phase 2: the SECOND payload)
-  // С8′ (§11): the dictionary carries the quarter aliases now, so it gets the
-  // same treatment as the other two — pass | hold | badZones (a `zones` that is
-  // not an object, to drive the fail-soft of С7′ through the В7 structure path).
+  // С8′ (§11): the dictionary carries the three location dictionaries now, so it
+  // gets the same treatment as the other two — pass | hold | badLocations (a
+  // `locations` that is not an object, to drive the fail-soft of С7′ through the
+  // В7 structure path).
   s.catsMode = "pass";
   s.heldHotelsId = null;
   s.heldCatsId = null;
@@ -952,10 +949,10 @@ async function armPlacesFetch(s) {
     const url = p.request?.url || "";
     if (url.includes("place_categories.json")) {
       try {
-        if (s.catsMode === "badZones") {
+        if (s.catsMode === "badLocations") {
           await s.send("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: 200,
             responseHeaders: [{ name: "Content-Type", value: "application/json" }],
-            body: Buffer.from(CATS_BAD_ZONES, "utf8").toString("base64") });
+            body: Buffer.from(CATS_BAD_LOCATIONS, "utf8").toString("base64") });
           return;
         }
         if (s.catsMode === "hold" && s.heldCatsId === null) { s.heldCatsId = p.requestId; return; }
@@ -1104,6 +1101,11 @@ async function checkTokenParity(s) {
            // ЛОТ 1в-Б D6: a street phrase and a house number are searchable STRINGS
            // now (STREET keys the whole phrase), so the corpus grew by them too.
            addresses: PARITY._meta.addresses === undefined ? null : PARITY._meta.addresses,
+           // ЛОТ 1в-В: the canonical name and every alias of the three location
+           // classes, plus the old zone words of the rows, are searchable STRINGS
+           // now — the corpus grew by them and the parity covers all three fields.
+           locations: PARITY._meta.locations === undefined ? null : PARITY._meta.locations,
+           legacyTerms: PARITY._meta.legacy_terms === undefined ? null : PARITY._meta.legacy_terms,
            passed: strings.length - mismatches.length,
            compares: "s + orig + num (orig през копие на токенизатора от index.html)",
            copyInstalled: installed === true, copyNote: installed === true ? null : installed,
@@ -1111,13 +1113,13 @@ async function checkTokenParity(s) {
            mismatches: mismatches.slice(0, 20) };
 }
 
-// С8′ — the dictionary's own load: cold, warm (our cache namespace), held past
-// the 8 s timeout, and a `zones` that is not an object. The rule of the scenario
-// is the same in all four: the branch answers, nothing is thrown, the console
-// stays empty, and with an unusable `zones` the answers are the pre-П7 ones.
+// С8′ — the dictionary's own load: cold, warm (our cache namespace), held past the
+// 8 s timeout, and a `locations` that is not an object. The rule of the scenario is
+// the same in all four: the branch answers, nothing is thrown, the console stays
+// empty, and with unusable location dictionaries the answers are the LOC_OFF ones.
 async function catsAnswers(s) {
   const out = [];
-  for (const [q] of P7_BEFORE) {
+  for (const [q] of LOC_OFF) {
     const r = JSON.parse(await s.ev(
       `JSON.stringify((function (r) { return { category: r.category, n: r.rows.length, first: r.rows.length ? r.rows[0].name : null }; })(window.__places.search(${JSON.stringify(q)})))`));
     out.push({ q, n: r.n, category: r.category, first: r.first });
@@ -1150,27 +1152,27 @@ async function scenarioCats(s) {
   s.catsMode = "pass";
   out.held = { ready, answers: await catsAnswers(s) };
 
-  // badZones: the В7 structure path (no SubtleCrypto) lets a dictionary whose
+  // badLocations: the В7 structure path (no SubtleCrypto) lets a dictionary whose
   // `zones` is a string through validateCats — П7 must switch itself off.
   const killSubtle = await s.send("Page.addScriptToEvaluateOnNewDocument", {
     source: "try { Object.defineProperty(window.crypto, 'subtle', { value: undefined, configurable: true }); } catch (e) {}" });
-  s.catsMode = "badZones";
-  await navigateFresh(s, "cats-badZones");
-  out.badZones = { ready: await placesReady(s), answers: await catsAnswers(s) };
+  s.catsMode = "badLocations";
+  await navigateFresh(s, "cats-badLocations");
+  out.badLocations = { ready: await placesReady(s), answers: await catsAnswers(s) };
   s.catsMode = "pass";
   const killId = killSubtle && killSubtle.result && killSubtle.result.identifier;
   if (killId) await s.send("Page.removeScriptToEvaluateOnNewDocument", { identifier: killId });
 
-  for (let i = 0; i < P7_BEFORE.length; i++) {
-    const [q, n, cat, first] = P7_BEFORE[i];
-    const got = out.badZones.answers[i];
+  for (let i = 0; i < LOC_OFF.length; i++) {
+    const [q, n, cat, first] = LOC_OFF[i];
+    const got = out.badLocations.answers[i];
     if (got.n !== n || got.category !== cat || got.first !== first) {
       out.ok = false;
-      out.notes.push(`badZones \`${q}\`: ${got.n}/${got.category}/${got.first}, `
+      out.notes.push(`badLocations \`${q}\`: ${got.n}/${got.category}/${got.first}, `
                      + `чакаше ${n}/${cat}/${first}`);
     }
   }
-  for (const key of ["cold", "warm", "held", "badZones"])
+  for (const key of ["cold", "warm", "held", "badLocations"])
     if (!out[key].ready) { out.ok = false; out.notes.push(`${key}: клонът не се вдигна`); }
   out.consoleErrsDuringScenario = s.errs.length - errsBefore;
   if (out.consoleErrsDuringScenario) { out.ok = false; out.notes.push("конзолни грешки в сценария"); }
@@ -1374,6 +1376,63 @@ async function checkAddressCard(s) {
 
 // П7 (§12 В3) — their building panel arrives 3 s late, after we have already put
 // our place on the map. The panel must not land on top of our selection.
+// ЛОТ 1в-В (ADR 008 D9, план §3г т. 5) — the card line the human READS. „вид ·
+// кв. X · район Y · доп.: Z“, every part null-safe: a record with no quarter has
+// no quarter part and no empty separator, the district always carries its marker,
+// and the extra location stands behind „доп.:“ and never in the quarter's place.
+// The five rows below are the ones Petar named plus the two that prove the shape:
+// the ONE record with an extra location and one with a quarter of its own. Each
+// expectation is MEASURED on this delivery (04.09), never wished for.
+const LOC_CARD = [
+  ["училище гео милев", "СУ „Гео Милев“", "училище · район Младост",
+   { quarter: null, district: "Младост", locality: null }],
+  ["училище свети иван рилски", "ОУ „Свети Иван Рилски“", "училище · район Младост",
+   { quarter: null, district: "Младост", locality: null }],
+  ["детска градина ян бибиян", "ДГ№12 „Ян Бибиян“", "детска градина · район Приморски",
+   { quarter: null, district: "Приморски", locality: null }],
+  ["детска градина морска звездица", "ДГ 36 \"Морска звездица\"",
+   "детска градина · район Младост · доп.: Западна промишлена зона",
+   { quarter: null, district: "Младост", locality: "Западна промишлена зона" }],
+  ["хотел преслав", "ПРЕСЛАВ", "Хотел · ★3 · 308 легла · к.к. Златни пясъци · район Приморски",
+   { quarter: "к.к. Златни пясъци", district: "Приморски", locality: null }],
+];
+
+async function checkLocationCard(s) {
+  await navigateFresh(s, "D9 location card");
+  if (!(await placesReady(s))) return { ready: false, ok: false, rows: [] };
+  const rows = [];
+  for (const [q, name, sub, typed] of LOC_CARD) {
+    const list = await typePlaces(s, q);
+    const found = await s.ev(`JSON.stringify(window.__places.search(${JSON.stringify(q)}))`);
+    const parsed = found ? JSON.parse(found) : null;
+    const row = parsed && parsed.rows && parsed.rows[0];
+    await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+    await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+    await waitMapStill(s);
+    await waitSettled(s, 30000);
+    const surface = await s.ev(PLACE_SURFACE_JS);
+    await focusInput(s);
+    await pressKey(s, "Escape", 27);
+    await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length === 0", 15000);
+    await clearField(s);
+    const got = {
+      quarter: row && row.quarter ? row.quarter.name : null,
+      district: row && row.district ? row.district.name : null,
+      locality: row && row.locality ? row.locality.name : null,
+    };
+    rows.push({
+      q, rowsShown: list.rows.length, title: surface.title, sub: surface.sub,
+      export: got, wantSub: sub, wantName: name, wantTyped: typed,
+      // the card is what the human reads AND the export is what the search reads:
+      // a card that is right over a row that is wrong would pass on one of them.
+      ok: !!row && row.name === name && surface.title === name && surface.sub === sub
+          && got.quarter === typed.quarter && got.district === typed.district
+          && got.locality === typed.locality,
+    });
+  }
+  return { ready: true, rows, ok: rows.every((r) => r.ok) };
+}
+
 async function checkLateDetailSheet(s) {
   await navigateFresh(s, "П7 late /detail/");
   if (!(await placesReady(s))) return { ready: false };
@@ -1879,6 +1938,8 @@ async function runG4(s) {
               `(${out.parity.aliases} зонови псевдонима + ${out.parity.records} имена` +
               `${out.parity.oldNames === null ? "" : ` + ${out.parity.oldNames} стари имена`}` +
               `${out.parity.addresses === null ? "" : ` + ${out.parity.addresses} улици/номера`}` +
+              `${out.parity.locations === null ? "" : ` + ${out.parity.locations} местоположения`}` +
+              `${out.parity.legacyTerms === null ? "" : ` + ${out.parity.legacyTerms} стари зонови думи`}` +
               `, ${out.parity.compares})`);
   console.log(`     К2 orig: копие ${out.parity.copyInstalled ? "вдигнато" : "ПАДА"}, ` +
               `очаквани разлики ${out.parity.expectedOrigDifferences.length}` +
@@ -1897,6 +1958,9 @@ async function runG4(s) {
   out.addressCard = await checkAddressCard(s);
   console.log(`     D5 картонче: „${out.addressCard.title}“ · ${out.addressCard.addr} · `
               + `без адрес: ${out.addressCard.noneAddr === null ? "без ред" : "ПАДА"}`);
+  out.locationCard = await checkLocationCard(s);
+  console.log(`     D9 картонче: ${out.locationCard.rows.filter((r) => r.ok).length}/` +
+              `${out.locationCard.rows.length} · „${(out.locationCard.rows[0] || {}).sub}“`);
   out.lateSheet = await checkLateDetailSheet(s);
   out.refusals = await checkRefusals(s);
   out.races = await checkRaces(s);
@@ -1914,8 +1978,8 @@ async function runG4(s) {
   out.popupRule = await checkPopupRule(s);
   out.mobileKeyed = await checkMobileKeyed(s);
   out.cats = await scenarioCats(s);            // С8′ + С7′ fail-soft
-  console.log(`     С8′ речник: cold/warm/held/badZones ` +
-              `${["cold", "warm", "held", "badZones"].map((k) => (out.cats[k].ready ? "ok" : "ПАДА")).join("/")} ` +
+  console.log(`     С8′ речник: cold/warm/held/badLocations ` +
+              `${["cold", "warm", "held", "badLocations"].map((k) => (out.cats[k].ready ? "ok" : "ПАДА")).join("/")} ` +
               `· конзолни грешки ${out.cats.consoleErrsDuringScenario}`);
   out.consoleWarns = [...new Set(s.warns)];    // warnOnce() is where a caught throw lands
   if (out.consoleWarns.length) warn(`конзолни предупреждения: ${out.consoleWarns.length}`);
@@ -2174,6 +2238,8 @@ async function main() {
     if (g4.cats && !g4.cats.ok) hard.push("С8′ речник");
     if (g4.aliasCard && !g4.aliasCard.ok) hard.push("D3 картончето не изписва извора на псевдонима");
     if (g4.addressCard && !g4.addressCard.ok) hard.push("D5 картончето не изписва адреса и извора му");
+    if (g4.locationCard && !g4.locationCard.ok)
+      hard.push(`D9 картончето: ${(g4.locationCard.rows || []).filter((r) => !r.ok).map((r) => r.q).join(", ")}`);
     if (g4.editTransition && !g4.editTransition.ok)
       hard.push("К2 преход „хотел адмирал“ → „адмирал“ без изпразване");
     if (!digest.equal)
