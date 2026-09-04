@@ -1,0 +1,778 @@
+{
+ "_meta": {
+  "what": "М7 („голото място“, план §3й-б S4): всяка единична дума, която може да задейства клона.",
+  "rule": "Дума в `qtk` или `ltk` на поне един изнесен ред. `legtk` (старите зонови думи на реда) и `ktk` (видът) НЕ задействат — затова „зпз“ влиза САМО като днешната местност, не като наследена дума.",
+  "how_to_reproduce": "зареди scratch/places_search/recall_sweep.py като модул и извикай search(<дума>) — клонът е `M7-bare-location`.",
+  "measured": {
+   "tokens": 45,
+   "trigger_today": 41,
+   "rows_of_the_delivery": 375
+  },
+  "for_signature": [
+   "„зпз“: и алиас на местността Западна промишлена зона, и наследена дума на реда — по правилото по-горе задейства САМО като местност (1 ред).",
+   "Думите с `word_class` = „short“ (к, кв, м, о, с, т, жк, и, 1, 2) идват от ПРЕФИКСА на името („к.к.“, „кв.“, „м-т“, „с.о.“, „ж.к.“), не от мястото. Планът изброява само филтъра „без токен-число“, затова днес „кв“ отговаря с 36 реда, а „к“ — със 163. Останалата част от машинарията за места хвърля тези думи (значимият токен иска >2 знака и в двата изписа). ЧАКА решение: остава ли клонът буквален, или взима същия филтър за значимост.",
+   "„приморски“ и „приморският“ са алиаси на местността Морска градина — затова районна на вид дума отговаря през М7. Контролата на Сол (гейт 6) очакваше M3."
+  ]
+ },
+ "signed_by": "pending — Петър",
+ "date": "2026-09-05",
+ "tokens": [
+  {
+   "token": "1",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "vazrazhdane1": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": false,
+   "branch": "M3",
+   "rows_answered": 0,
+   "word_class": "short"
+  },
+  {
+   "token": "2",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "mladost2": 1,
+     "vazrazhdane2": 1
+    }
+   },
+   "rows_carrying_the_token": 2,
+   "triggers": false,
+   "branch": "M3",
+   "rows_answered": 0,
+   "word_class": "short"
+  },
+  {
+   "token": "asparuhovo",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "asparuhovo": 4
+    }
+   },
+   "rows_carrying_the_token": 4,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 16,
+   "word_class": "significant"
+  },
+  {
+   "token": "borovets",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "borovets_yug": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "significant"
+  },
+  {
+   "token": "briz",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "briz": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 2,
+   "word_class": "significant"
+  },
+  {
+   "token": "chaika",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "chaika_kk": 18,
+     "chaika_kv": 10
+    }
+   },
+   "rows_carrying_the_token": 28,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 29,
+   "word_class": "significant"
+  },
+  {
+   "token": "druzhba",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "druzhba": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 2,
+   "word_class": "significant"
+  },
+  {
+   "token": "elena",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "kk_konstantin_elena": 35
+    }
+   },
+   "rows_carrying_the_token": 35,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 36,
+   "word_class": "significant"
+  },
+  {
+   "token": "galata",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "galata": 4
+    }
+   },
+   "rows_carrying_the_token": 4,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 4,
+   "word_class": "significant"
+  },
+  {
+   "token": "gradina",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "morska_gradina": 3
+    }
+   },
+   "rows_carrying_the_token": 3,
+   "triggers": false,
+   "branch": "M1-category",
+   "rows_answered": 52,
+   "word_class": "significant"
+  },
+  {
+   "token": "i",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "kk_konstantin_elena": 35
+    }
+   },
+   "rows_carrying_the_token": 35,
+   "triggers": false,
+   "branch": "M3",
+   "rows_answered": 0,
+   "word_class": "short"
+  },
+  {
+   "token": "iug",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "borovets_yug": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "short"
+  },
+  {
+   "token": "izgrev",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "izgrev_kv": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "significant"
+  },
+  {
+   "token": "k",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "briz": 1,
+     "chaika_kk": 36,
+     "druzhba": 1,
+     "kk_konstantin_elena": 70,
+     "mladost": 5,
+     "mladost2": 1,
+     "pobeda": 1,
+     "vazrazhdane": 3,
+     "vazrazhdane1": 1,
+     "vazrazhdane2": 1,
+     "zlatni_pyasatsi": 192
+    }
+   },
+   "rows_carrying_the_token": 312,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 163,
+   "word_class": "short"
+  },
+  {
+   "token": "konstanin",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "kk_konstantin_elena": 35
+    }
+   },
+   "rows_carrying_the_token": 35,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 35,
+   "word_class": "alias"
+  },
+  {
+   "token": "konstantin",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "kk_konstantin_elena": 35
+    }
+   },
+   "rows_carrying_the_token": 35,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 37,
+   "word_class": "significant"
+  },
+  {
+   "token": "kv",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "asparuhovo": 4,
+     "chaika_kv": 10,
+     "galata": 4,
+     "izgrev_kv": 1,
+     "troshevo": 2,
+     "vinitsa": 3,
+     "vladislavovo": 12
+    }
+   },
+   "rows_carrying_the_token": 36,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 36,
+   "word_class": "short"
+  },
+  {
+   "token": "m",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "sveti_nikola": 2,
+     "vilite": 2,
+     "zelenika": 4
+    }
+   },
+   "rows_carrying_the_token": 8,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 10,
+   "word_class": "short"
+  },
+  {
+   "token": "mladost",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "mladost": 5,
+     "mladost2": 1
+    }
+   },
+   "rows_carrying_the_token": 6,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 28,
+   "word_class": "significant"
+  },
+  {
+   "token": "morska",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "morska_gradina": 3
+    }
+   },
+   "rows_carrying_the_token": 3,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 7,
+   "word_class": "significant"
+  },
+  {
+   "token": "nikola",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "sveti_nikola": 2
+    }
+   },
+   "rows_carrying_the_token": 2,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 4,
+   "word_class": "significant"
+  },
+  {
+   "token": "o",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "borovets_yug": 1,
+     "priboy": 1
+    }
+   },
+   "rows_carrying_the_token": 2,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 2,
+   "word_class": "short"
+  },
+  {
+   "token": "piasatsi",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "zlatni_pyasatsi": 96
+    }
+   },
+   "rows_carrying_the_token": 96,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 96,
+   "word_class": "significant"
+  },
+  {
+   "token": "pobeda",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "pobeda": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "significant"
+  },
+  {
+   "token": "priboi",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "priboy": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "significant"
+  },
+  {
+   "token": "primorski",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "morska_gradina": 3
+    }
+   },
+   "rows_carrying_the_token": 3,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 70,
+   "word_class": "alias"
+  },
+  {
+   "token": "primorskiat",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "morska_gradina": 3
+    }
+   },
+   "rows_carrying_the_token": 3,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 3,
+   "word_class": "alias"
+  },
+  {
+   "token": "promishlena",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "zpz": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "significant"
+  },
+  {
+   "token": "s",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "borovets_yug": 1,
+     "priboy": 1
+    }
+   },
+   "rows_carrying_the_token": 2,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 4,
+   "word_class": "short"
+  },
+  {
+   "token": "sveti",
+   "classes": [
+    "locality",
+    "quarter"
+   ],
+   "codes": {
+    "locality": {
+     "sveti_nikola": 2
+    },
+    "quarter": {
+     "kk_konstantin_elena": 70
+    }
+   },
+   "rows_carrying_the_token": 72,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 44,
+   "word_class": "significant"
+  },
+  {
+   "token": "t",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "sveti_nikola": 2,
+     "zelenika": 4
+    }
+   },
+   "rows_carrying_the_token": 6,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 6,
+   "word_class": "short"
+  },
+  {
+   "token": "troshevo",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "troshevo": 2
+    }
+   },
+   "rows_carrying_the_token": 2,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 2,
+   "word_class": "significant"
+  },
+  {
+   "token": "varnenchik",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "vladislavovo": 12
+    }
+   },
+   "rows_carrying_the_token": 12,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 13,
+   "word_class": "alias"
+  },
+  {
+   "token": "vazrazhdane",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "vazrazhdane": 3,
+     "vazrazhdane1": 1,
+     "vazrazhdane2": 1
+    }
+   },
+   "rows_carrying_the_token": 5,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 5,
+   "word_class": "significant"
+  },
+  {
+   "token": "vilite",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "vilite": 2
+    }
+   },
+   "rows_carrying_the_token": 2,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 2,
+   "word_class": "significant"
+  },
+  {
+   "token": "vinitsa",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "vinitsa": 3
+    }
+   },
+   "rows_carrying_the_token": 3,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 3,
+   "word_class": "significant"
+  },
+  {
+   "token": "vladislav",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "vladislavovo": 12
+    }
+   },
+   "rows_carrying_the_token": 12,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 12,
+   "word_class": "alias"
+  },
+  {
+   "token": "vladislavovo",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "vladislavovo": 12
+    }
+   },
+   "rows_carrying_the_token": 12,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 12,
+   "word_class": "significant"
+  },
+  {
+   "token": "zapadna",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "zpz": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "significant"
+  },
+  {
+   "token": "zelenika",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "zelenika": 4
+    }
+   },
+   "rows_carrying_the_token": 4,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 4,
+   "word_class": "significant"
+  },
+  {
+   "token": "zh",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "briz": 1,
+     "druzhba": 1,
+     "mladost": 5,
+     "mladost2": 1,
+     "pobeda": 1,
+     "vazrazhdane": 3,
+     "vazrazhdane1": 1,
+     "vazrazhdane2": 1
+    }
+   },
+   "rows_carrying_the_token": 14,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 14,
+   "word_class": "short"
+  },
+  {
+   "token": "zhkizgrev",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "izgrev_kv": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "alias"
+  },
+  {
+   "token": "zlatni",
+   "classes": [
+    "quarter"
+   ],
+   "codes": {
+    "quarter": {
+     "zlatni_pyasatsi": 96
+    }
+   },
+   "rows_carrying_the_token": 96,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 96,
+   "word_class": "significant"
+  },
+  {
+   "token": "zona",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "zpz": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "significant"
+  },
+  {
+   "token": "zpz",
+   "classes": [
+    "locality"
+   ],
+   "codes": {
+    "locality": {
+     "zpz": 1
+    }
+   },
+   "rows_carrying_the_token": 1,
+   "triggers": true,
+   "branch": "M7-bare-location",
+   "rows_answered": 1,
+   "word_class": "alias"
+  }
+ ]
+}

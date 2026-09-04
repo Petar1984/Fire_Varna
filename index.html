@@ -6774,6 +6774,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
         return { e: h, bundle: bundle, ordinal: ordinal,
                  ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, atk: atk,
                  kkey: ktk.join(' '),
+                 // М7 (план §3й-б S4): the three token sets STAY APART. `zkset`
+                 // below is their union plus the kind, and a union cannot say
+                 // whether „зпз“ arrived as today's locality or as a row's old
+                 // word — М7 needs exactly that difference, so it reads these.
+                 qtk: qtk, ltk: ltk, legtk: legtk,
                  // The token set the matcher reads as „zone/kind“: kind + quarter +
                  // locality + this row's own old words. The DISTRICT is deliberately
                  // out of it — „младост“ must not filter every school of a district
@@ -7024,6 +7029,28 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const rows = orderCategory(cls, c), exact = EXACT_NAME.get(qt.map((t) => t.s).join(' '));
         return { category: true, hasKey: hasKey,
                  rows: exact ? stableUnique(orderCategory(exact, c).concat(rows)) : rows };
+      }
+      // М7 (план §3й-б S4) — a BARE location word, without a class key. It stands
+      // BEFORE the М3/Б2 generosity gate on purpose: „златни пясъци“ is a place the
+      // human named in full, and the size of the class it falls in may not decide
+      // whether we answer. Only `qtk` and `ltk` trigger it: `legtk` is a row's
+      // history and not its address (Кими К5-г), so „зпз“ fires as the locality it
+      // is TODAY and never as the old zone word; the kind is the class list, not a
+      // place; and the district enters only through rows with no quarter of their
+      // own, exactly as the district branch says. `hasKey` stays false, so our
+      // section still renders UNDER the untouched building address search.
+      if (!hasKey && R.length && !R.some((t) => t.orig === DISTRICT_MARK)
+          && !R.some((t) => STREET_MARK.indexOf(t.orig) >= 0) && !R.some((t) => t.num)) {
+        const qHit = cls.filter((r) => R.every((t) => r.qtk.indexOf(t.s) >= 0));
+        const lHit = cls.filter((r) => R.every((t) => r.ltk.indexOf(t.s) >= 0));
+        if (qHit.length || lHit.length) {
+          const bphrase = R.map((t) => t.s).join(' ');
+          const dHit = cls.filter((r) => !r.e.quarter && r.dph.has(bphrase));
+          const bare = stableUnique(orderCategory(cls.filter((r) => nameHasPhrase(r, R)), c)
+                                    .concat(orderCategory(qHit, c), orderCategory(lHit, c),
+                                            orderCategory(dHit, c)));
+          if (bare.length) return { category: true, hasKey: false, rows: bare };
+        }
       }
       if (!hasKey) {                             // М3/Б2 generosity gate, PER CLASS (С3)
         cls = cls.filter(genOk);

@@ -799,7 +799,7 @@ const LOC_OFF = [
 // WRITES into it (staleCache) and reads it back (warm). tests/test_places_search_gate.py
 // (PlacesCacheNameTest) compares this literal with index.html — a stale copy would turn
 // the В7 refusal scenario into a plain 404 in silence.
-const PLACES_CACHE = "fire-varna-hotels-v5-225";
+const PLACES_CACHE = "fire-varna-hotels-v6-225";
 const HOTELS_URL = BASE + "data/hotels.json";
 
 const PL_VISIBLE_JS = "document.getElementById('placesSearchResults').classList.contains('visible')";

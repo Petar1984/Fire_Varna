@@ -1106,6 +1106,57 @@ def location_rows(R, cls):
     return order_category(q_rows), order_category(l_rows), order_category(d_rows)
 
 
+def bare_location_rows(R, cls):
+    """М7 (план §3й-б S4): a BARE location word, without a class key.
+
+    Sol’s S4 overturned the literal М7: `location_rows` compares the WHOLE
+    phrase, so „златни“ alone could never reach „к.к. Златни пясъци“, and the
+    only token set the client kept (`zkset`) mixes quarter, locality, legacy and
+    kind together — a branch built on it would answer a locality query with the
+    rows of a KIND. So the trigger reads `qtk` and `ltk` and nothing else:
+
+      * `legtk` (the OLD zone words of a row) never triggers and never enters
+        (Кими К5-г): those words are a row’s history, not its address, and
+        „зпз“ — which is both a locality alias and a legacy word — therefore
+        fires ONLY as the locality it is today;
+      * `ktk` (the kind) never triggers: „училище“ is the class list, not a place;
+      * the district never triggers by name — bare „младост“ is the quarter
+        first, exactly as `district_rows` says, and the district enters only
+        through the rows that have no quarter of their own.
+
+    Returns [] when the words are nobody’s quarter or locality.
+    """
+    if not R:
+        return []
+    tokens = [t.s for t in R]
+    quarter_hit = [r for r in cls if all(t in r.qtk for t in tokens)]
+    locality_hit = [r for r in cls if all(t in r.ltk for t in tokens)]
+    if not (quarter_hit or locality_hit):
+        return []
+    phrase = u" ".join(tokens)
+    # The exact-name head of ЛОТ 1 decision 1 keeps a record whose own NAME is
+    # the phrase above the location rows it happens to share the word with.
+    head = order_category([r for r in cls if name_has_phrase(r, R)])
+    district_hit = [r for r in cls if r.quarter is None and phrase in r.dph]
+    return stable_unique(head + order_category(quarter_hit)
+                         + order_category(locality_hit) + order_category(district_hit))
+
+
+def bare_location_query(R):
+    """The shape of a query М7 may answer: a bare place, nothing else.
+
+    A district marker („район X“) has its own branch, a street marker („ул. X“)
+    is a street before it is a quarter, and a number is an address — none of
+    the three is a bare location word."""
+    if not R:
+        return False
+    if any(t.orig == DISTRICT_MARK for t in R):
+        return False
+    if any(t.orig in STREET_MARK for t in R):
+        return False
+    return not any(t.num for t in R)
+
+
 def has_key_of(q):
     """The `hasKey` the CLIENT returns for this query — 1:1 with index.html.
 
@@ -1162,6 +1213,15 @@ def search(q):
         if exact:
             rows = stable_unique(order_category(exact) + rows)
         return rows, "M1-category"
+    if not has_key and bare_location_query(R):
+        # М7 (план §3й-б S4) stands BEFORE the M3/B2 generosity gate on purpose:
+        # „златни пясъци“ is a place the human named in full, and the size of the
+        # class it happens to fall in may not decide whether we answer it. It
+        # keeps `hasKey` False, so the client still renders our section UNDER the
+        # untouched building address search.
+        bare = bare_location_rows(R, cls)
+        if bare:
+            return bare, "M7-bare-location"
     if not has_key:                                        # M3/B2 gate, PER CLASS
         cls = [r for r in cls if gen_ok(r)]
         if not cls:
