@@ -58,7 +58,7 @@ Everything older shifts the same way (C35 `f40d296` → `4c4af94`, F2-к `23af63
 | commits on `main` | 279 | `git rev-list --count main` |
 | last pushed commit | a58010e 2026-09-04 | `git log -1 --format='%h %cs' origin/main` |
 | commits on `origin/main` not on `main` (the duplicate patch was dropped by the 04.09 rebase) | 0 | `git rev-list --count main..origin/main` |
-| commits ahead of `origin/main` (48 before the 04.09 push — the places-search cycle + ЛОТ 1; now the ЛОТ 1в plan, ADR 008, ЛОТ 1в-А, the ЛОТ 1в-В quarters plan with its amendments and truth board, ЛОТ 1в-Б and ЛОТ 1в-В) | 17 | `git rev-list --count origin/main..main` |
+| commits ahead of `origin/main` (48 before the 04.09 push — the places-search cycle + ЛОТ 1; now the ЛОТ 1в plan, ADR 008, ЛОТ 1в-А, the ЛОТ 1в-В quarters plan with its amendments and truth board, ЛОТ 1в-Б and ЛОТ 1в-В) | 16 | `git rev-list --count origin/main..main` |
 | commits on `lot1-client` not on `main` (0 before the 04.09 rebase; the branch is now the pre-rebase trace of the client half — its patches live on `main` under new hashes) | 39 | `git rev-list --count main..lot1-client` |
 | last data commit (moderation cycle) | 2026-09-03 data: cycle #32 — 12 reports, and the same form gap for the second cycle running | `git log -1 --format='%cs %s' -- data/hydrants.json docs/moderation_log.md` |
 | `index.html` bytes (on `main`; 544967 after ЛОТ 1в-Б, 538992 after ЛОТ 1в-А, 532231 after the ЛОТ 1 data, 530484 after the ЛОТ 1 client half, 526153 before ЛОТ 1; ЛОТ 1в-В carries the typed location fields, F11-х the two re-pinned SHA constants) | 557270 | `wc -c < index.html` |
