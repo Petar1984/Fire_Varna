@@ -18,8 +18,10 @@ Five checks, one table, one exit code:
 The gate never imports `unittest` and never reads `tests/`: a check that shares
 code with the suite it guards cannot fail independently of it.
 
-Exit code: 0 when every check is green (warnings allowed), 1 as soon as any
-check is red. One number for the pre-push hook to read.
+Every check runs, always: the table is written for the human, not stopped at
+the first mark. Exit code: 0 only when every check is green; 1 when any check
+is red OR yellow — "pending — Петър" is not a signature (Амандамент №1, т. 8).
+One number for the pre-push hook to read.
 """
 
 from __future__ import annotations
@@ -238,18 +240,40 @@ def check_coverage(base_override: str | None, allow_override: str | None) -> Che
         check.fail("coverage: %s" % exc)
         return check
 
+    allow_meta = result.get("allow") or {}
+    if allow_meta:
+        check.say(
+            "allow подпис: signed_by=%r date=%r → %s"
+            % (allow_meta.get("signed_by"), allow_meta.get("date"), allow_meta.get("signature"))
+        )
     for file_key in coverage.FILES:
         block = result["files"].get(file_key)
         if not block:
             continue
+        # The row counts are part of the verdict: a delivery that lost a hundred
+        # rows can otherwise show a clean field table (одит 05.09, дефект 2).
+        check.say(
+            "%s: rows_base=%d rows_candidate=%d сдвоени=%d липсващи=%d нови=%d пренаредени=%d"
+            % (
+                file_key,
+                block["rows_base"],
+                block["rows_candidate"],
+                block["compared"],
+                len(block["missing_rows"]),
+                len(block["added_rows"]),
+                len(block["reordered_rows"]),
+            )
+        )
         for field in coverage.FIELDS:
             c = block["fields"][field]["counts"]
-            if c["lost"] or c["changed"] or c["reordered"]:
+            if c["lost"] or c["changed"] or c["reordered"] or c["after"] < c["before"]:
                 check.say(
                     "%s %s: before=%d after=%d lost=%d changed=%d gained=%d reordered=%d"
                     % (file_key, field, c["before"], c["after"], c["lost"], c["changed"], c["gained"], c["reordered"])
                 )
-    if result["exit_code"] != coverage.EXIT_OK:
+    if result["exit_code"] == coverage.EXIT_ALLOW_UNSIGNED:
+        check.warn("coverage изход %d — %s (жълто блокира пуша)" % (result["exit_code"], result["verdict"]))
+    elif result["exit_code"] != coverage.EXIT_OK:
         check.fail("coverage изход %d — %s (виж gates/out/coverage.md)" % (result["exit_code"], result["verdict"]))
     else:
         check.say("нула непокрити загубени/сменени реда")
@@ -360,6 +384,10 @@ def check_signed_facts() -> Check:
 
 
 def main(argv: list[str]) -> int:
+    # Without this the table dies with UnicodeEncodeError on a cp1252 console
+    # before the first row — a crash that reads like a pass (одит 05.09, дефект 4).
+    coverage.use_utf8_console()
+
     ap = argparse.ArgumentParser(description="Fire_Varna gates — one exit code")
     ap.add_argument("--base", help="git:<rev> — вместо подписания baseline")
     ap.add_argument("--allow", help="gates/allow/<ГГГГ-ММ-ДД>_<тема>.json")
@@ -386,8 +414,10 @@ def main(argv: list[str]) -> int:
         out.write("⛔ ЧЕРВЕНО: %s\n" % "; ".join(c.name for c in red))
         return 1
     if yellow:
-        out.write("⚠ ЖЪЛТО (минава, но не е зелено): %s\n" % "; ".join(c.name for c in yellow))
-        return 0
+        # Yellow blocks exactly like red: an unsigned baseline or allow-file is
+        # not a lighter signature, it is no signature (Амандамент №1, т. 8).
+        out.write("⚠ ЖЪЛТО — блокира пуша като червено: %s\n" % "; ".join(c.name for c in yellow))
+        return 1
     out.write("✓ всички гейтове зелени\n")
     return 0
 
