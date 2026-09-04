@@ -58,9 +58,13 @@ HOTELS_SHA256 = "b9ec6b6d62c25fc465d7db80e47241021ee03e4da62977a268199041ccc04d1
 HOTELS_BYTES = 79691
 HOTELS_GZIP9 = 9301
 # C16 (§11 П7): the dictionary was re-delivered with a `zones` key — the quarter
-# aliases of the 28 zones that carry a registry entry, schema still 1. `chips` and
-# `forms` are byte-identical to the previous blob (35 600 bytes, sha256
-# 715b96ed6d63f0b7…), so only the three numbers below moved.
+# aliases of the zones that carry a registry entry, schema still 1.
+# ЛОТ 1 (F1-д, varna_3d dee1f76 „P2-д“) then moved the dictionary itself: chips
+# 55 → 57, forms 264 → 276, zones 28 → 30, so the „`chips` and `forms` are
+# byte-identical to the previous blob“ of C16 stopped being true. Re-measured
+# with the sha256 of this file, over the UTF-8 bytes of
+# json.dumps({"chips": …, "forms": …}, ensure_ascii=False, sort_keys=True):
+# 30 570 B / 87f35e90ac206ab3… at 23af63f → 32 188 B / 27fe1ca178c7cf17… now.
 #   git -C ../varna_3d show HEAD:data/place_categories.json > data/place_categories.json
 CATEGORIES_SHA256 = "7cf4140b84b29bf3bc68c80197dd10fcd5534e18fa66326650d3157c94e4f926"
 CATEGORIES_BYTES = 48382

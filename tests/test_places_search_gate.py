@@ -31,7 +31,13 @@ Until C16 nothing here could go red without a human reading a report:
      никола“, „хотел зеленика“) are gone. 23af63f INHERITS them: that commit is
      the artefact frozen against both of them and green on both, so the chain
      7a6ea1d → 378a844 → 23af63f is unbroken, and one anchor now covers all
-     four buckets and all 122 rows instead of two anchors over 103.
+     four buckets and all 122 rows instead of two anchors over 103;
+  7. Амандамент №8 П2 („детско заведение“): the form table `EXTRA_FORMS` is
+     kept by hand on BOTH sides — the places IIFE of index.html and the
+     reference — and the ЛОТ 1 audit proved that deleting „детска ясла“ from
+     the client copy left this suite green while only the browser probe went
+     red. `Lot1FormTableTest` reads the client literal out of index.html and
+     compares the two tables, then measures the answer itself.
 
 Read-only: it runs `git show` through subprocess and touches nothing on disk.
 """
@@ -40,11 +46,13 @@ import importlib.util
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import unittest
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
+INDEX = REPO / "index.html"
 REFERENCE = REPO / "scratch" / "places_search" / "recall_sweep.py"
 ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
@@ -426,6 +434,77 @@ class Lot1GateTest(unittest.TestCase):
             if token in REF.EXACT_NAME:
                 self.assertTrue(any(rec.ntk == [token] for rec in REF.EXACT_NAME[token]),
                                 token)
+
+
+# --- Амандамент №8 П2: the client's own copy of the form table -----------------
+# The places IIFE of index.html and the reference each hold a hand-kept
+# `EXTRA_FORMS`; both comments already call a drift between them a failed gate,
+# but until now only the browser probe could see one.
+PLACES_IIFE_START = "(function initPlacesSearch() {"
+PLACES_IIFE_END = "\n  })();"
+
+
+def js_extra_forms(text):
+    """The EXTRA_FORMS literal of index.html, read out of the places IIFE.
+
+    Built like the other index.html pins in the suite (ShaPinTest in
+    tests/test_places_search_primitives.py): find the marker, take the literal,
+    and account for every byte of it — an entry this parser cannot read is a
+    loud failure, never a silently dropped key.
+    """
+    start = text.find(PLACES_IIFE_START)
+    if start == -1:
+        raise AssertionError(PLACES_IIFE_START + " is gone from index.html")
+    end = text.find(PLACES_IIFE_END, start)
+    if end == -1:
+        raise AssertionError("the places IIFE does not close")
+    match = re.search(r"const EXTRA_FORMS = \{(.*?)\n\s*\};", text[start:end], re.S)
+    if match is None:
+        raise AssertionError("EXTRA_FORMS is not a literal inside initPlacesSearch")
+    rest, table = match.group(1), {}
+    for entry in re.finditer(r"'([^']+)'\s*:\s*\[([^\]]*)\]\s*,?", match.group(1)):
+        table[entry.group(1)] = re.findall(r"'([^']*)'", entry.group(2))
+        rest = rest.replace(entry.group(0), "", 1)
+    if rest.strip():
+        raise AssertionError("unread bytes in the EXTRA_FORMS literal: %r" % rest.strip())
+    return table
+
+
+class Lot1FormTableTest(unittest.TestCase):
+    """Амандамент №8 П2 („детско заведение“) — gated WITHOUT a browser.
+
+    The ЛОТ 1 audit deleted „детска ясла“ from the client table and the whole
+    suite stayed green while the probe went red (М5 121/122): the signed form
+    was carried by the browser gate alone. These two tests carry it here —
+    (a) the two tables are the same table, (b) the word really answers with
+    both kinds, and the two single-kind words are NOT widened with it.
+    """
+
+    def test_the_client_table_equals_the_reference_table(self):
+        table = js_extra_forms(INDEX.read_text(encoding="utf-8"))
+        self.assertEqual(table, REF.EXTRA_FORMS)
+        self.assertEqual(table, {
+            u"детско заведение": [u"детска градина", u"детска ясла"],
+            u"детски заведения": [u"детска градина", u"детска ясла"],
+        })
+
+    def test_the_form_answers_with_both_kinds_and_widens_nothing_else(self):
+        """Measured on the ЛОТ 1 delivery: 61 = 51 kindergartens + 10 nurseries,
+        M1-category, for both spellings — and П6/§Г, „детска градина“ still
+        answers with 51 kindergartens and no nursery at all."""
+        for query in (u"детско заведение", u"детски заведения"):
+            rows, branch = REF.search(query)
+            counts = {}
+            for row in rows:
+                counts[row.kind] = counts.get(row.kind, 0) + 1
+            self.assertEqual((branch, len(rows)), ("M1-category", 61), query)
+            self.assertEqual(counts, {u"детска градина": 51, u"детска ясла": 10}, query)
+        rows, branch = REF.search(u"детска градина")
+        self.assertEqual((branch, len(rows)), ("M1-category", 51))
+        self.assertEqual(set(row.kind for row in rows), set([u"детска градина"]))
+        rows, branch = REF.search(u"детска ясла")
+        self.assertEqual((branch, len(rows)), ("M1-category", 10))
+        self.assertEqual(set(row.kind for row in rows), set([u"детска ясла"]))
 
 
 if __name__ == "__main__":
