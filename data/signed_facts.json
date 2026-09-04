@@ -1,0 +1,449 @@
+{
+  "_meta": {
+    "what": "Малкият съдещ файл: какво Петър е ПОДПИСАЛ за конкретен ред и какво още чака подписа му. `facts` се съди от gates/run_gates (проверка 5); `candidates` са предложения без подпис и никога не червенят гейта.",
+    "rule": "the gate only compares; it never writes",
+    "licence": "Котвите са УИН от Националния туристически регистър — отделни факти (чл. 4 ЗАПСП), същите, които вече стоят в `data/hotels.json`. Имената са както в доставката. Никакви кадастрални идентификатори.",
+    "schema": "anchor {src: NTR|REG|WEAK, id} · file hotels|places · name (както в доставката) · expect {поле: {is: code} | {not: [code]}} · witness [канали] · signed {by, date, how, evidence_src}. Пропуснато поле = без твърдение; `null` не се ползва; кодовете са от затворените списъци в index.html.",
+    "sources": [
+      "docs/plans/ИДЕЯ_златен_списък.md §S3 (12-те SIGNED_OVERRIDE)",
+      "scratch/places_search/lot1v_v_m6_fix_sample.md (8-те сблъсъка)"
+    ]
+  },
+  "facts": [
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ШГ-15Т-Б1"
+      },
+      "file": "hotels",
+      "name": "ЕЛЕНА",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ЧХ-13Я-Б1"
+      },
+      "file": "hotels",
+      "name": "НИМФА",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ШБ-15Р-Б1"
+      },
+      "file": "hotels",
+      "name": "ВИВА КЛУБ",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-ЕХЖ-13Т-В1"
+      },
+      "file": "hotels",
+      "name": "ПЛИСКА",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-И6Ж-15Щ-В1"
+      },
+      "file": "hotels",
+      "name": "ПРЕСЛАВ",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-И5Ф-5ЦВ-Б1"
+      },
+      "file": "hotels",
+      "name": "ХОЛИДЕЙ ПАРК",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-ИИТ-0К6-1А"
+      },
+      "file": "hotels",
+      "name": "Империя",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ЦФ-14Д-В1"
+      },
+      "file": "hotels",
+      "name": "ГРАДИНА",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ЧЛ-152-Б1"
+      },
+      "file": "hotels",
+      "name": "ДОЛЧЕ ВИТА",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-ИРБ-15Р-Б1"
+      },
+      "file": "hotels",
+      "name": "ЛОТОС/LOTOS",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ЦД-13Я-В1"
+      },
+      "file": "hotels",
+      "name": "ОАЗИС/OAZIS",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-03",
+        "how": "решение 6 (б), 03.09",
+        "evidence_src": "решение 6 (б): ивицата 43,2733–43,2780 е к.к. Златни пясъци"
+      }
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ШЯ-15Ж-А1"
+      },
+      "file": "hotels",
+      "name": "АДМИРАЛ",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "REG-TOCity",
+        "KAIS-addr"
+      ],
+      "signed": {
+        "by": "Петър",
+        "date": "2026-09-04",
+        "how": "думата на Петър 04.09 + НТР TOCity + КАИС addr",
+        "evidence_src": "НТР TOCity „Златни пясъци“ + КАИС адресно поле на котвеното тяло"
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "anchor": {
+        "src": "WEAK"
+      },
+      "file": "hotels",
+      "name": "Вихрен",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "SIGNED"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "WEAK"
+      },
+      "file": "places",
+      "name": "СУ „Гео Милев“",
+      "expect": {
+        "quarter": {
+          "is": "mladost"
+        }
+      },
+      "witness": [
+        "REG-manifest"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "WEAK"
+      },
+      "file": "places",
+      "name": "ОУ „Свети Иван Рилски“",
+      "expect": {
+        "quarter": {
+          "not": [
+            "vazrazhdane",
+            "vazrazhdane1",
+            "vazrazhdane2"
+          ]
+        }
+      },
+      "witness": [
+        "REG-manifest"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-ДМ3-80О-В1"
+      },
+      "file": "hotels",
+      "name": "МАГНОЛИЯ 1 И 2",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "REG-TOCity"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-ИН9-1ФС-В1"
+      },
+      "file": "hotels",
+      "name": "РУСАЛКА",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "REG-TOCity"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ЦК-144-В1"
+      },
+      "file": "hotels",
+      "name": "СТРАНДЖА",
+      "expect": {
+        "quarter": {
+          "is": "zlatni_pyasatsi"
+        }
+      },
+      "witness": [
+        "REG-TOCity",
+        "REG-TOAddress"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-7Н2-04Г-Д1"
+      },
+      "file": "hotels",
+      "name": "Маяк",
+      "expect": {
+        "quarter": {
+          "is": "kk_konstantin_elena"
+        }
+      },
+      "witness": [
+        "REG-TOCity"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-7Н1-04Г-Д1"
+      },
+      "file": "hotels",
+      "name": "Фрегата",
+      "expect": {
+        "quarter": {
+          "is": "kk_konstantin_elena"
+        }
+      },
+      "witness": [
+        "REG-TOCity",
+        "REG-TOAddress"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ЦЖ-141-В1"
+      },
+      "file": "hotels",
+      "name": "ДАЛИЯ ГАРДЪН",
+      "witness": [
+        "REG-TOCity",
+        "KAIS-quar"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-1ЦН-147-В1"
+      },
+      "file": "hotels",
+      "name": "НЕПТУН",
+      "witness": [
+        "REG-TOCity",
+        "REG-TOAddress",
+        "KAIS-quar"
+      ]
+    },
+    {
+      "anchor": {
+        "src": "NTR",
+        "id": "В1-7ЖФ-5ИИ-1В"
+      },
+      "file": "hotels",
+      "name": "Романтика",
+      "witness": [
+        "REG-TOAddress",
+        "KAIS-quar"
+      ]
+    }
+  ]
+}
