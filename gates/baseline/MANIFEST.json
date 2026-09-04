@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "what": "Подписаният baseline, срещу който gates/coverage.py мери всяка следваща доставка.",
+    "rule": "Гейтът само сравнява — никога не пише в доставката.",
+    "note": "Подписан по думите на Петър 05.09: етикетите на курортите преди лот В са верни за хотелите; 18-те „Морска градина“ са известна грешка на обвивката и влизат в allow-файла на P7.",
+    "how_to_verify": "git show <rev>:<path> | sha256sum — байтовете на tracked blob-а (LF), не на работното дърво"
+  },
+  "signed_by": "pending — Петър",
+  "date": "2026-09-05",
+  "rev": "f06ac06dec521638e43f7c7f10eabd67fe86a611",
+  "rev_short": "f06ac06",
+  "files": {
+    "data/hotels.json": "434d15d5af70a94c5240198dbd852055a23d57944872cfebc0a8c24e4ef0e2c2",
+    "data/places.json": "c31a866e3ca9567a94ebb93713309bd68b6ff8ea61af6e008ffbe2ff93913a7d",
+    "data/place_categories.json": "7fb4ddb6959144de831841aaec5236a7d0cd1e212f7244bff44352816497bc13"
+  }
+}

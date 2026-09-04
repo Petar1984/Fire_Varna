@@ -1,0 +1,396 @@
+#!/usr/bin/env python3
+"""The single executable the push waits on.
+
+    python -m gates.run_gates [--base git:<rev>] [--allow <path>]
+
+Five checks, one table, one exit code:
+
+  1. sha pins        the three SHA256 constants in `index.html` against the
+                     LF-normalised bytes of the three delivered blobs — exactly
+                     the bytes `fetchValidatedJson` digests in the browser
+  2. key sets        every row carries exactly EXPECT_KEYS / EXPECT2_KEYS
+                     (hotels 17, places 13) — the count and the names
+  3. qa_no_cad_ids   no cadastral identifier ever rides a public blob
+  4. coverage        gates/coverage.py against the last signed baseline
+                     (gates/baseline/MANIFEST.json); no baseline = STOP
+  5. signed_facts    data/signed_facts.json — the small judging file
+
+The gate never imports `unittest` and never reads `tests/`: a check that shares
+code with the suite it guards cannot fail independently of it.
+
+Exit code: 0 when every check is green (warnings allowed), 1 as soon as any
+check is red. One number for the pre-push hook to read.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+
+from gates import coverage
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+INDEX_HTML = "index.html"
+BASELINE_PATH = "gates/baseline/MANIFEST.json"
+ALLOW_DIR = "gates/allow"
+SIGNED_FACTS_PATH = "data/signed_facts.json"
+
+# (constant in index.html, delivered blob)
+SHA_PINS = (
+    ("HOTELS_SHA256", "data/hotels.json"),
+    ("PLACES2_SHA256", "data/places.json"),
+    ("CATS_SHA256", "data/place_categories.json"),
+)
+
+ROW_FILES = (
+    ("hotels", "data/hotels.json", "hotels", "EXPECT_KEYS", 17),
+    ("places", "data/places.json", "places", "EXPECT2_KEYS", 13),
+)
+
+# A cadastral id never rides a public bundle (ADR 008 Д2) — the same regex the
+# client applies to the fetched text, applied here to the tracked bytes.
+CADASTRAL_RE = re.compile(r"\b\d{4,5}\.\d+\.\d+")
+PUBLIC_BLOBS = (
+    "data/hotels.json",
+    "data/places.json",
+    "data/place_categories.json",
+    SIGNED_FACTS_PATH,
+)
+
+OK, WARN, BAD = "✓", "⚠", "✗"
+
+
+class Check:
+    """One row of the table: a mark, a name, and the words behind it."""
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.mark = OK
+        self.lines: list[str] = []
+
+    def say(self, text: str) -> None:
+        self.lines.append(text)
+
+    def fail(self, text: str) -> None:
+        self.mark = BAD
+        self.lines.append(text)
+
+    def warn(self, text: str) -> None:
+        if self.mark == OK:
+            self.mark = WARN
+        self.lines.append(text)
+
+
+def read_text(rel: str) -> str:
+    return (REPO_ROOT / rel).read_text(encoding="utf-8")
+
+
+def lf_bytes(rel: str) -> bytes:
+    """The bytes the browser sees: the tracked LF blob, whatever the checkout wrote."""
+    return (REPO_ROOT / rel).read_bytes().replace(b"\r\n", b"\n")
+
+
+def js_const_string(html: str, name: str) -> str | None:
+    m = re.search(r"const\s+%s\s*=\s*'([0-9a-f]{64})'" % re.escape(name), html)
+    return m.group(1) if m else None
+
+
+def js_const_array(html: str, name: str) -> list[str] | None:
+    """Read a JS array of single-quoted strings out of index.html.
+
+    The closed lists live in the app shell and nowhere else; duplicating them
+    here would create a second truth that drifts.
+    """
+    m = re.search(r"const\s+%s\s*=\s*\[(.*?)\]\s*;" % re.escape(name), html, re.S)
+    if not m:
+        return None
+    return re.findall(r"'([^']*)'", m.group(1))
+
+
+def check_sha_pins() -> Check:
+    check = Check("1 · sha пинове (index.html ↔ LF байтовете)")
+    html = read_text(INDEX_HTML)
+    for const_name, rel in SHA_PINS:
+        pinned = js_const_string(html, const_name)
+        if not pinned:
+            check.fail("%s: константата липсва в %s" % (const_name, INDEX_HTML))
+            continue
+        actual = hashlib.sha256(lf_bytes(rel)).hexdigest()
+        if actual == pinned:
+            check.say("%s = %s ✓ %s" % (const_name, pinned[:12], rel))
+        else:
+            check.fail("%s: пин %s ≠ %s (%s)" % (const_name, pinned[:12], actual[:12], rel))
+    return check
+
+
+def check_key_sets() -> Check:
+    check = Check("2 · ключовите набори на редовете")
+    html = read_text(INDEX_HTML)
+    for label, rel, array_key, const_name, expected_len in ROW_FILES:
+        keys = js_const_array(html, const_name)
+        if keys is None:
+            check.fail("%s: липсва в %s" % (const_name, INDEX_HTML))
+            continue
+        if len(keys) != expected_len:
+            check.fail("%s: %d ключа, планът казва %d" % (const_name, len(keys), expected_len))
+            continue
+        expected = set(keys)
+        rows = json.loads(read_text(rel))[array_key]
+        bad = 0
+        for i, row in enumerate(rows):
+            if len(row) != expected_len or set(row) != expected:
+                bad += 1
+                if bad <= 3:
+                    check.fail(
+                        "%s ред %d (%s): %d ключа, разлика %s"
+                        % (label, i, row.get("name"), len(row), sorted(set(row) ^ expected))
+                    )
+        if bad:
+            check.fail("%s: %d реда с грешен набор" % (label, bad))
+        else:
+            check.say("%s: %d реда × %d ключа ✓" % (label, len(rows), expected_len))
+    return check
+
+
+def check_no_cad_ids() -> Check:
+    check = Check("3 · qa_no_cad_ids върху публичните blob-ове")
+    for rel in PUBLIC_BLOBS:
+        path = REPO_ROOT / rel
+        if not path.exists():
+            check.say("%s: липсва (не се проверява)" % rel)
+            continue
+        hits = sorted(set(CADASTRAL_RE.findall(path.read_text(encoding="utf-8"))))
+        if hits:
+            check.fail("%s: %d кадастрални идентификатора, напр. %s" % (rel, len(hits), hits[:3]))
+        else:
+            check.say("%s ✓" % rel)
+    return check
+
+
+def pick_allow_file(explicit: str | None, check: Check) -> str | None:
+    """One allow-file, named explicitly or the only one in gates/allow/.
+
+    Never merge several signed lists silently: two signatures for one delivery
+    is exactly the ambiguity the gate exists to remove.
+    """
+    if explicit:
+        return explicit
+    allow_dir = REPO_ROOT / ALLOW_DIR
+    found = sorted(p for p in allow_dir.glob("*.json")) if allow_dir.exists() else []
+    if not found:
+        return None
+    if len(found) > 1:
+        check.fail(
+            "повече от един allow-файл в %s (%s) — подай --allow изрично"
+            % (ALLOW_DIR, ", ".join(p.name for p in found))
+        )
+        return None
+    return str(found[0].relative_to(REPO_ROOT))
+
+
+def check_coverage(base_override: str | None, allow_override: str | None) -> Check:
+    check = Check("4 · покритие спрямо подписания baseline")
+    manifest_path = REPO_ROOT / BASELINE_PATH
+    if base_override:
+        rev = base_override[len("git:"):] if base_override.startswith("git:") else base_override
+        check.say("base по команден ред: %s" % rev)
+    else:
+        if not manifest_path.exists():
+            check.fail("няма подписан baseline (%s липсва)" % BASELINE_PATH)
+            return check
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        rev = manifest.get("rev")
+        if not rev:
+            check.fail("няма подписан baseline (%s без `rev`)" % BASELINE_PATH)
+            return check
+        signed_by = manifest.get("signed_by") or ""
+        if not signed_by.startswith("Петър"):
+            check.warn("baseline `signed_by` = %r — още НЕ е подпис на Петър" % signed_by)
+        # The baseline names the bytes it was signed on; if the rev no longer
+        # carries them, the signature is on something else.
+        for rel, want in (manifest.get("files") or {}).items():
+            try:
+                blob = coverage.read_source("git:%s:%s" % (rev, rel)).encode("utf-8")
+            except ValueError as exc:
+                check.fail(str(exc))
+                continue
+            got = hashlib.sha256(blob).hexdigest()
+            if got != want:
+                check.fail("%s@%s: %s ≠ подписаното %s" % (rel, rev[:7], got[:12], want[:12]))
+
+    allow_path = pick_allow_file(allow_override, check)
+    check.say("allow-файл: %s" % (allow_path or "няма"))
+    try:
+        result = coverage.run(
+            places_base="git:%s:data/places.json" % rev,
+            places_candidate="data/places.json",
+            hotels_base="git:%s:data/hotels.json" % rev,
+            hotels_candidate="data/hotels.json",
+            allow_path=str(REPO_ROOT / allow_path) if allow_path else None,
+            out_dir=str(REPO_ROOT / "gates" / "out"),
+        )
+    except (ValueError, OSError, json.JSONDecodeError) as exc:
+        check.fail("coverage: %s" % exc)
+        return check
+
+    for file_key in coverage.FILES:
+        block = result["files"].get(file_key)
+        if not block:
+            continue
+        for field in coverage.FIELDS:
+            c = block["fields"][field]["counts"]
+            if c["lost"] or c["changed"] or c["reordered"]:
+                check.say(
+                    "%s %s: before=%d after=%d lost=%d changed=%d gained=%d reordered=%d"
+                    % (file_key, field, c["before"], c["after"], c["lost"], c["changed"], c["gained"], c["reordered"])
+                )
+    if result["exit_code"] != coverage.EXIT_OK:
+        check.fail("coverage изход %d — %s (виж gates/out/coverage.md)" % (result["exit_code"], result["verdict"]))
+    else:
+        check.say("нула непокрити загубени/сменени реда")
+    return check
+
+
+def normalise_uin(value: str) -> str:
+    """Registry numbers are compared without their separators and in upper case."""
+    return re.sub(r"[^0-9A-ZА-Я]", "", (value or "").upper())
+
+
+def check_signed_facts() -> Check:
+    check = Check("5 · signed_facts (малкият съдещ файл)")
+    path = REPO_ROOT / SIGNED_FACTS_PATH
+    if not path.exists():
+        check.fail("липсва %s" % SIGNED_FACTS_PATH)
+        return check
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        check.fail("%s: невалиден JSON — %s" % (SIGNED_FACTS_PATH, exc))
+        return check
+
+    html = read_text(INDEX_HTML)
+    code_lists = {
+        "quarter": js_const_array(html, "QUARTER_CODES") or [],
+        "locality": js_const_array(html, "LOCALITY_CODES") or [],
+        "district": js_const_array(html, "DISTRICT_CODES") or [],
+    }
+    rows = {
+        "hotels": json.loads(read_text("data/hotels.json"))["hotels"],
+        "places": json.loads(read_text("data/places.json"))["places"],
+    }
+
+    facts = doc.get("facts")
+    if not isinstance(facts, list):
+        check.fail("%s: няма масив `facts`" % SIGNED_FACTS_PATH)
+        return check
+
+    green = 0
+    for n, fact in enumerate(facts, 1):
+        label = "факт %d (%s)" % (n, fact.get("name"))
+        file_key = fact.get("file")
+        if file_key not in rows:
+            check.fail("%s: непознат файл %r" % (label, file_key))
+            continue
+        anchor = fact.get("anchor") or {}
+        src, ident = anchor.get("src"), anchor.get("id")
+        if src == "NTR":
+            key = normalise_uin(ident)
+            hits = [r for r in rows[file_key] if any(normalise_uin(u) == key for u in r.get("uins", []))]
+        elif src == "REG":
+            hits = [r for r in rows[file_key] if r.get("name") == fact.get("name")]
+            check.warn("%s: слаба котва (REG по (файл, име), не по УИН)" % label)
+        else:
+            check.fail("%s: непозната котва %r" % (label, src))
+            continue
+        if len(hits) != 1:
+            check.fail("%s: котвата резолвира %d реда, а трябва точно 1" % (label, len(hits)))
+            continue
+        row = hits[0]
+        if row.get("name") != fact.get("name"):
+            check.warn("%s: котвата сочи ред с име %r" % (label, row.get("name")))
+        for field, claim in (fact.get("expect") or {}).items():
+            if field not in code_lists:
+                check.fail("%s: непознато поле %r" % (label, field))
+                continue
+            value = row.get(field)
+            actual = value.get("code") if isinstance(value, dict) else None
+            if "is" in claim:
+                want = claim["is"]
+                if want not in code_lists[field]:
+                    check.fail("%s: код %r извън затворения списък %s" % (label, want, field))
+                    continue
+                if actual == want:
+                    green += 1
+                else:
+                    check.fail("%s: %s = %r, подписано е %r" % (label, field, actual, want))
+            elif "not" in claim:
+                forbidden = claim["not"]
+                bad = [c for c in forbidden if c not in code_lists[field]]
+                if bad:
+                    check.fail("%s: кодове извън затворения списък %s: %s" % (label, field, bad))
+                    continue
+                if actual in forbidden:
+                    check.fail("%s: %s = %r, подписано е „не е %s“" % (label, field, actual, forbidden))
+                else:
+                    green += 1
+            else:
+                check.fail("%s: твърдение без `is`/`not`" % label)
+
+    check.say("%d факта, %d потвърдени твърдения" % (len(facts), green))
+
+    candidates = doc.get("candidates") or []
+    for n, cand in enumerate(candidates, 1):
+        # Candidates carry no signature: they are never red, but a code the app
+        # does not know must be visible, not silent (СУ „Гео Милев“ → mladost).
+        for field, claim in (cand.get("expect") or {}).items():
+            wanted = [claim["is"]] if "is" in claim else list(claim.get("not") or [])
+            unknown = [c for c in wanted if c not in code_lists.get(field, [])]
+            if unknown:
+                check.warn(
+                    "кандидат %d (%s): код %s извън затворения списък %s — чака подпис И код"
+                    % (n, cand.get("name"), unknown, field)
+                )
+    check.say("%d кандидата без подпис" % len(candidates))
+    return check
+
+
+def main(argv: list[str]) -> int:
+    ap = argparse.ArgumentParser(description="Fire_Varna gates — one exit code")
+    ap.add_argument("--base", help="git:<rev> — вместо подписания baseline")
+    ap.add_argument("--allow", help="gates/allow/<ГГГГ-ММ-ДД>_<тема>.json")
+    args = ap.parse_args(argv)
+
+    checks = [
+        check_sha_pins(),
+        check_key_sets(),
+        check_no_cad_ids(),
+        check_coverage(args.base, args.allow),
+        check_signed_facts(),
+    ]
+
+    out = sys.stdout
+    out.write("\n")
+    for check in checks:
+        out.write("%s %s\n" % (check.mark, check.name))
+        for line in check.lines:
+            out.write("      %s\n" % line)
+    red = [c for c in checks if c.mark == BAD]
+    yellow = [c for c in checks if c.mark == WARN]
+    out.write("\n")
+    if red:
+        out.write("⛔ ЧЕРВЕНО: %s\n" % "; ".join(c.name for c in red))
+        return 1
+    if yellow:
+        out.write("⚠ ЖЪЛТО (минава, но не е зелено): %s\n" % "; ".join(c.name for c in yellow))
+        return 0
+    out.write("✓ всички гейтове зелени\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
