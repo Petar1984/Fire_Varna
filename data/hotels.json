@@ -1,9 +1,10 @@
 {
  "_meta": {
-  "generated": "2026-09-04 07:26:53 · python src/export_fire_varna_hotels.py",
+  "generated": "2026-09-04 13:30:45 · python src/export_fire_varna_hotels.py",
   "count": 225,
   "licence": "Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).",
   "licence_osm": "Разгърнати имена (псевдоними за търсене) от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0, снапшот 2026-08-10. Днес е един такъв псевдоним (way 199237000); изворът на всеки псевдоним стои в `old_names_src`.",
+  "licence_address": "Адресите: КАИС адресното поле на тялото под пина (© АГКК — отворените данни, върху които стоят и координатите; условията на ФАЗА_0_лицензи.md); регистровите адреси (Община Варна, МОН/НЕИСПУО, ИАМН) и Националният туристически регистър: отделни факти от регистрите (чл. 4 ЗАПСП), не копие на регистър; адресите от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0. Изворът на всеки адрес стои в `address.src`; токени за собственост не влизат в адреса.",
   "excluded": [
    {
     "name": "Конен пикник",
@@ -64,7 +65,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЕЛЕНА",
@@ -85,7 +87,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АМБАСАДОР",
@@ -106,7 +109,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "БОНИТА/BONITA",
@@ -127,7 +131,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ХОЛИДЕЙ ПАРК",
@@ -148,7 +153,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АРЕНА МАР",
@@ -169,7 +175,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ХОТЕЛ  ХЕЛИОС СПА",
@@ -190,7 +197,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Варшава",
@@ -211,7 +219,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "КАМЧИЯ",
@@ -232,7 +241,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ГЛАДИОЛА СТАР",
@@ -253,7 +263,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ГЛАДИОЛА",
@@ -278,7 +289,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "БЕРЛИН ГРИЙН ПАРК",
@@ -299,7 +311,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПЕРУНИКА",
@@ -320,7 +333,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "НОА",
@@ -345,7 +359,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЛУНА",
@@ -366,7 +381,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Хоризонт",
@@ -387,7 +403,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПАЛМ БИЙЧ",
@@ -408,7 +425,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ВИСТАМАР",
@@ -433,7 +451,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АСТОРИЯ",
@@ -454,7 +473,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Златен рог",
@@ -475,7 +495,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Диана",
@@ -496,7 +517,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ДАНА ПАЛАС",
@@ -523,7 +545,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МЕЛИА ГРАНД ЕРМИТАЖ",
@@ -544,7 +567,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЗДРАВЕЦ",
@@ -565,7 +589,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ХАВАНА",
@@ -586,7 +611,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ИНТЕРНАЦИОНАЛ",
@@ -607,7 +633,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АТЛАС",
@@ -628,7 +655,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АЛЕГРА",
@@ -649,7 +677,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "КРИСТАЛ",
@@ -670,7 +699,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПАРК ХОТЕЛ БРИЗ",
@@ -691,7 +721,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПЕРЛА",
@@ -714,7 +745,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МАРЕА",
@@ -735,7 +767,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ШИПКА",
@@ -758,7 +791,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ГРАДИНА",
@@ -781,7 +815,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ВИВА КЛУБ",
@@ -806,7 +841,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПАРК ХОТЕЛ ГОЛДЪН БИЙЧ",
@@ -827,7 +863,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПРЕСТИЖ ГРАНД ХОТЕЛ И АКВАПАРК",
@@ -854,7 +891,8 @@
     "NTR"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПЛИСКА",
@@ -875,7 +913,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МАРИНА ГРАНД БИЙЧ",
@@ -896,7 +935,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "БЕРЛИН ГОЛДЪН БИЙЧ",
@@ -921,7 +961,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЛЮЛЯК",
@@ -942,7 +983,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПАРК-ХОТЕЛ ТИНТЯВА",
@@ -963,7 +1005,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "СЛАВЕЙ",
@@ -984,7 +1027,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЛИЛИЯ",
@@ -1005,7 +1049,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МЕТРОПОЛ",
@@ -1026,7 +1071,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ГОЛДЪН ЛАЙН",
@@ -1051,7 +1097,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Дукеса",
@@ -1072,7 +1119,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АДАМО",
@@ -1093,7 +1141,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ДЕВНЯ 106",
+    "src": "KAIS",
+    "street_phrase": "девня",
+    "house_key": "106"
+   }
   },
   {
    "name": "Романтика",
@@ -1114,7 +1168,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Албиция",
@@ -1135,7 +1190,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Людо",
@@ -1156,7 +1212,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ. \"I-ВА\" № 21",
+    "src": "NTR",
+    "street_phrase": "i ва",
+    "house_key": "21"
+   }
   },
   {
    "name": "Зеленика",
@@ -1177,7 +1239,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Ванила",
@@ -1198,7 +1261,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Бел Епок",
@@ -1219,7 +1283,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. ПРИМОРСКИ 43",
+    "src": "KAIS",
+    "street_phrase": "приморски",
+    "house_key": "43"
+   }
   },
   {
    "name": "ПАНОРАМА",
@@ -1240,7 +1310,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. ПРИМОРСКИ 31",
+    "src": "KAIS",
+    "street_phrase": "приморски",
+    "house_key": "31"
+   }
   },
   {
    "name": "РЕВЕРАНС",
@@ -1262,7 +1338,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. ОСМИ ПРИМОРСКИ ПОЛК 58",
+    "src": "KAIS",
+    "street_phrase": "осми приморски полк",
+    "house_key": "58"
+   }
   },
   {
    "name": "Орбита",
@@ -1283,7 +1365,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. цар ОСВОБОДИТЕЛ 25",
+    "src": "KAIS",
+    "street_phrase": "цар освободител",
+    "house_key": "25"
+   }
   },
   {
    "name": "ГАЛЕРИЯ ГРАФИТ",
@@ -1304,7 +1392,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. КНЯЗ БОРИС I 65",
+    "src": "KAIS",
+    "street_phrase": "княз борис i",
+    "house_key": "65"
+   }
   },
   {
    "name": "КАПИТОЛ",
@@ -1325,7 +1419,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Петко Каравелов № 40",
+    "src": "NTR",
+    "street_phrase": "петко каравелов",
+    "house_key": "40"
+   }
   },
   {
    "name": "„Виктория“",
@@ -1346,7 +1446,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ХАН МАЛАМИР 6",
+    "src": "KAIS",
+    "street_phrase": "хан маламир",
+    "house_key": "6"
+   }
   },
   {
    "name": "Дивеста",
@@ -1369,7 +1475,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ХРИСТО САМСАРОВ 1",
+    "src": "KAIS",
+    "street_phrase": "христо самсаров",
+    "house_key": "1"
+   }
   },
   {
    "name": "АСЛАН ГОЛД",
@@ -1390,7 +1502,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. СЪБОРНИ 42",
+    "src": "KAIS",
+    "street_phrase": "съборни",
+    "house_key": "42"
+   }
   },
   {
    "name": "Дионис",
@@ -1411,7 +1529,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Бузлуджа 13",
+    "src": "KAIS",
+    "street_phrase": "бузлуджа",
+    "house_key": "13"
+   }
   },
   {
    "name": "РОЯЛ",
@@ -1432,7 +1556,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"Хан Омуртаг\" 11",
+    "src": "KAIS",
+    "street_phrase": "хан омуртаг",
+    "house_key": "11"
+   }
   },
   {
    "name": "ГОЛДЪН ТЮЛИП ВАРНА",
@@ -1453,7 +1583,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"Христо Ботев\" 3",
+    "src": "KAIS",
+    "street_phrase": "христо ботев",
+    "house_key": "3"
+   }
   },
   {
    "name": "Трите делфина",
@@ -1474,7 +1610,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ГАБРОВО 27",
+    "src": "KAIS",
+    "street_phrase": "габрово",
+    "house_key": "27"
+   }
   },
   {
    "name": "ЕФБЕТ",
@@ -1495,7 +1637,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"Преслав\" 44",
+    "src": "KAIS",
+    "street_phrase": "преслав",
+    "house_key": "44"
+   }
   },
   {
    "name": "Модус",
@@ -1516,7 +1664,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Стефан Стамболов 46",
+    "src": "KAIS",
+    "street_phrase": "стефан стамболов",
+    "house_key": "46"
+   }
   },
   {
    "name": "ГРАНД ХОТЕЛ ЛОНДОН",
@@ -1537,7 +1691,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. МУСАЛА 3",
+    "src": "KAIS",
+    "street_phrase": "мусала",
+    "house_key": "3"
+   }
   },
   {
    "name": "Зора",
@@ -1558,7 +1718,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Траката",
@@ -1579,7 +1740,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул.1-ва 7",
+    "src": "KAIS",
+    "street_phrase": "1 ва",
+    "house_key": "7"
+   }
   },
   {
    "name": "РОСЛИН ДИМЯТ ХОТЕЛ ВАРНА",
@@ -1600,7 +1767,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. КНЯЗ БОРИС I 111",
+    "src": "KAIS",
+    "street_phrase": "княз борис i",
+    "house_key": "111"
+   }
   },
   {
    "name": "АМИРАЛ",
@@ -1621,7 +1794,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Амфора",
@@ -1642,7 +1816,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ. \"1-ВА\" № 126",
+    "src": "NTR",
+    "street_phrase": "1 ва",
+    "house_key": "126"
+   }
   },
   {
    "name": "РОМАНС И ФЕМИЛИ СУИТС",
@@ -1663,7 +1843,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "КРИСТЕЛ",
@@ -1684,7 +1865,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. 68 № 3",
+    "src": "NTR",
+    "street_phrase": "68",
+    "house_key": "3"
+   }
   },
   {
    "name": "СИРИУС БИЙЧ",
@@ -1705,7 +1892,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АСТОР ГАРДЪН",
@@ -1726,7 +1914,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЕСТРЕЯ ПАЛАС",
@@ -1747,7 +1936,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "КОРАЛ",
@@ -1768,7 +1958,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПРИМОРСКИ",
@@ -1789,7 +1980,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ГЛОРИЯ",
@@ -1810,7 +2002,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Русалка",
@@ -1831,7 +2024,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "бивш",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МДУ ФРЕДЕРИК ЖОЛИО-КЮРИ",
@@ -1856,7 +2050,8 @@
     "OSM"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АЗАЛИЯ МЕДИКЪЛ СПА",
@@ -1877,7 +2072,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПАЛАС",
@@ -1898,7 +2094,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МАРИНА",
@@ -1920,7 +2117,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Флагман",
@@ -1941,7 +2139,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Адмирал",
@@ -1962,7 +2161,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "РУСАЛКА",
@@ -1983,7 +2183,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Танго",
@@ -2004,7 +2205,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ. \"ДИМИТЪР ХАДЖИЯНЕВ\" № 20",
+    "src": "NTR",
+    "street_phrase": "димитър хаджиянев",
+    "house_key": "20"
+   }
   },
   {
    "name": "Пиер",
@@ -2025,7 +2232,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Боян Бъчваров 157",
+    "src": "KAIS",
+    "street_phrase": "боян бъчваров",
+    "house_key": "157"
+   }
   },
   {
    "name": "СТРАНДЖА",
@@ -2048,7 +2261,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ВЕЖЕН",
@@ -2069,7 +2283,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЕКЗОТИКА",
@@ -2090,7 +2305,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ДЕТЕЛИНА",
@@ -2111,7 +2327,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ДАЛИЯ ГАРДЪН",
@@ -2132,7 +2349,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ПЕТЪР ПОПОВ 102",
+    "src": "KAIS",
+    "street_phrase": "петър попов",
+    "house_key": "102"
+   }
   },
   {
    "name": "КИНИ ПАРК",
@@ -2154,7 +2377,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ФИЕСТА",
@@ -2175,7 +2399,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ПЕТЪР ПОПОВ 108",
+    "src": "KAIS",
+    "street_phrase": "петър попов",
+    "house_key": "108"
+   }
   },
   {
    "name": "СИЛВЕР",
@@ -2196,7 +2426,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Д-р Любен Лазаров № 115",
+    "src": "NTR",
+    "street_phrase": "д р любен лазаров",
+    "house_key": "115"
+   }
   },
   {
    "name": "ОАЗИС/OAZIS",
@@ -2219,7 +2455,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "НИМФА",
@@ -2241,7 +2478,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Империя",
@@ -2262,7 +2500,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ. \"ОХРИД\" № 10",
+    "src": "NTR",
+    "street_phrase": "охрид",
+    "house_key": "10"
+   }
   },
   {
    "name": "ЛОТОС/LOTOS",
@@ -2283,7 +2527,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "РИВИЕРА БИЙЧ",
@@ -2305,7 +2550,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Ниагара",
@@ -2326,7 +2572,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"ЦАР БОРИС-III\" 60",
+    "src": "KAIS",
+    "street_phrase": "цар борис iii",
+    "house_key": "60"
+   }
   },
   {
    "name": "НЕПТУН",
@@ -2347,7 +2599,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Веселина Цанкова № 4",
+    "src": "NTR",
+    "street_phrase": "веселина цанкова",
+    "house_key": "4"
+   }
   },
   {
    "name": "Фрегата",
@@ -2368,7 +2626,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Маяк",
@@ -2389,7 +2648,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Перла",
@@ -2410,7 +2670,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ.\"ЯНКО СЛАВЧЕВ\" № 115А",
+    "src": "NTR",
+    "street_phrase": "янко славчев",
+    "house_key": "115а"
+   }
   },
   {
    "name": "Гран Иван",
@@ -2431,7 +2697,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ОВЧО ПОЛЕ 28",
+    "src": "KAIS",
+    "street_phrase": "овчо поле",
+    "house_key": "28"
+   }
   },
   {
    "name": "Палитра",
@@ -2452,7 +2724,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"К.Доганов\" 11",
+    "src": "KAIS",
+    "street_phrase": "к доганов",
+    "house_key": "11"
+   }
   },
   {
    "name": "ДОЛЧЕ МАРЕ",
@@ -2473,7 +2751,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ДОЛЧЕ ВИТА",
@@ -2494,7 +2773,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "СЪНРАЙЗ",
@@ -2515,7 +2795,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "КЛУБ ХОТЕЛ БОЛЕРО",
@@ -2536,7 +2817,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЕНКАНТО БИЙЧ",
@@ -2557,7 +2839,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "РИВА",
@@ -2578,7 +2861,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ВАКАНЦИОНЕН КЛУБ АФРОДИТА",
@@ -2599,7 +2883,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПОСЕЙДОН/ POSEIDON",
@@ -2621,7 +2906,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "СЕРДИКА",
@@ -2642,7 +2928,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПАРК ХОТЕЛ БЕЛВЮ",
@@ -2663,7 +2950,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ДЖОЯ ПАРК",
@@ -2684,7 +2972,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Извора",
@@ -2705,7 +2994,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АТЛАНТ",
@@ -2726,7 +3016,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Йо",
@@ -2750,7 +3041,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Адия Блу",
@@ -2771,7 +3063,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Вега",
@@ -2792,7 +3085,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. 49-та 3",
+    "src": "KAIS",
+    "street_phrase": "49 та",
+    "house_key": "3"
+   }
   },
   {
    "name": "Парадайс",
@@ -2813,7 +3112,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул.\"49-та\" № 13",
+    "src": "NTR",
+    "street_phrase": "49 та",
+    "house_key": "13"
+   }
   },
   {
    "name": "Мотиви",
@@ -2834,7 +3139,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МАГНОЛИЯ 1 И 2",
@@ -2855,7 +3161,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АКВА АЗУР",
@@ -2876,7 +3183,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АКВАВЮ",
@@ -2898,7 +3206,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "УМАНИ",
@@ -2919,7 +3228,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Кабакум",
@@ -2940,7 +3250,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ.“РОБЪРТ СКОТ“ № 1",
+    "src": "NTR",
+    "street_phrase": "робърт скот",
+    "house_key": "1"
+   }
   },
   {
    "name": "Дива",
@@ -2962,7 +3278,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ. \"ЯНКО СЛАВЧЕВ\" № 82",
+    "src": "NTR",
+    "street_phrase": "янко славчев",
+    "house_key": "82"
+   }
   },
   {
    "name": "Ной",
@@ -2985,7 +3307,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "КАМПУС 90",
@@ -3007,7 +3330,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. Цар Освободител 90",
+    "src": "KAIS",
+    "street_phrase": "цар освободител",
+    "house_key": "90"
+   }
   },
   {
    "name": "Сорбона",
@@ -3028,7 +3357,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ДУБРОВНИК 23",
+    "src": "KAIS",
+    "street_phrase": "дубровник",
+    "house_key": "23"
+   }
   },
   {
    "name": "БУТИК СПЛЕНДИД/BOUTIQUE SPLENDID",
@@ -3049,7 +3384,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. братя шкорпил 30",
+    "src": "KAIS",
+    "street_phrase": "братя шкорпил",
+    "house_key": "30"
+   }
   },
   {
    "name": "Военноморски клуб",
@@ -3070,7 +3411,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. ВЛАДИСЛАВ ВАРНЕНЧИК 2",
+    "src": "KAIS",
+    "street_phrase": "владислав варненчик",
+    "house_key": "2"
+   }
   },
   {
    "name": "Казабланка Грийн",
@@ -3091,7 +3438,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ.\"СИРМА ВОЙВОДА\" № 108",
+    "src": "NTR",
+    "street_phrase": "сирма войвода",
+    "house_key": "108"
+   }
   },
   {
    "name": "Еллинис",
@@ -3112,7 +3465,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Алекта",
@@ -3133,7 +3487,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Елица",
@@ -3154,7 +3509,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ГЕОРГИ БЕНКОВСКИ 90",
+    "src": "KAIS",
+    "street_phrase": "георги бенковски",
+    "house_key": "90"
+   }
   },
   {
    "name": "Камелия",
@@ -3175,7 +3536,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. КНЯЗ БОРИС I 117",
+    "src": "KAIS",
+    "street_phrase": "княз борис i",
+    "house_key": "117"
+   }
   },
   {
    "name": "Перфект",
@@ -3196,7 +3563,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. П. КАРАВЕЛОВ 8",
+    "src": "KAIS",
+    "street_phrase": "п каравелов",
+    "house_key": "8"
+   }
   },
   {
    "name": "Хай",
@@ -3217,7 +3590,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Хан Аспарух 11",
+    "src": "KAIS",
+    "street_phrase": "хан аспарух",
+    "house_key": "11"
+   }
   },
   {
    "name": "Вентура",
@@ -3238,7 +3617,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Мара Тасева 16",
+    "src": "KAIS",
+    "street_phrase": "мара тасева",
+    "house_key": "16"
+   }
   },
   {
    "name": "Опера",
@@ -3259,7 +3644,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ. \"ФР. ШОПЕН\" № 2",
+    "src": "NTR",
+    "street_phrase": "фр шопен",
+    "house_key": "2"
+   }
   },
   {
    "name": "Маргарита",
@@ -3280,7 +3671,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ.\"ПОСЕВ\" № 29",
+    "src": "NTR",
+    "street_phrase": "посев",
+    "house_key": "29"
+   }
   },
   {
    "name": "Класик",
@@ -3301,7 +3698,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Еника",
@@ -3322,7 +3720,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. СТЕФАН КАРАДЖА 28",
+    "src": "KAIS",
+    "street_phrase": "стефан караджа",
+    "house_key": "28"
+   }
   },
   {
    "name": "Варна",
@@ -3343,7 +3747,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. СОЛУН 2",
+    "src": "KAIS",
+    "street_phrase": "солун",
+    "house_key": "2"
+   }
   },
   {
    "name": "ЕНСАНА АКВАХУС ХЕЛТ СПА ХОТЕЛ",
@@ -3364,7 +3774,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АСТЕРА",
@@ -3385,7 +3796,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МАДАРА",
@@ -3406,7 +3818,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЧЕРНО МОРЕ",
@@ -3427,7 +3840,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. СЛИВНИЦА 33",
+    "src": "KAIS",
+    "street_phrase": "сливница",
+    "house_key": "33"
+   }
   },
   {
    "name": "ПРЕСТИЖ ХОТЕЛ И АКВАПАРК",
@@ -3448,7 +3867,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АВРОРА",
@@ -3469,7 +3889,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. 45-та № 16",
+    "src": "NTR",
+    "street_phrase": "45 та",
+    "house_key": "16"
+   }
   },
   {
    "name": "ЕСТРЕЯ  РЕЗИДЕНС",
@@ -3490,7 +3916,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПАРАДАЙЗ ГРИЙН ПАРК",
@@ -3511,7 +3938,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Морски бряг",
@@ -3532,7 +3960,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. СТАНКО ВЪЛЧАНОВ 7",
+    "src": "KAIS",
+    "street_phrase": "станко вълчанов",
+    "house_key": "7"
+   }
   },
   {
    "name": "Плаза",
@@ -3553,7 +3987,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. СЛИВНИЦА 10",
+    "src": "KAIS",
+    "street_phrase": "сливница",
+    "house_key": "10"
+   }
   },
   {
    "name": "Санта Марина",
@@ -3574,7 +4014,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. БАБА РАДА 28",
+    "src": "KAIS",
+    "street_phrase": "баба рада",
+    "house_key": "28"
+   }
   },
   {
    "name": "Вила Аврора",
@@ -3595,7 +4041,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"45\" № 16",
+    "src": "NTR",
+    "street_phrase": "45",
+    "house_key": "16"
+   }
   },
   {
    "name": "Джоя",
@@ -3616,7 +4068,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Арт",
@@ -3637,7 +4090,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"Преслав\" 59",
+    "src": "KAIS",
+    "street_phrase": "преслав",
+    "house_key": "59"
+   }
   },
   {
    "name": "Акрополис",
@@ -3658,7 +4117,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. \"ЦАР ИВАН ШИШМАН\" 13",
+    "src": "KAIS",
+    "street_phrase": "цар иван шишман",
+    "house_key": "13"
+   }
   },
   {
    "name": "АПОЛО РИЗОРТ",
@@ -3679,7 +4144,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Marina Varna Apartments",
@@ -3694,7 +4160,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. \"Южен залив\" 6",
+    "src": "KAIS",
+    "street_phrase": "южен залив",
+    "house_key": "6"
+   }
   },
   {
    "name": "„Рубин“ (в реконструкция)",
@@ -3709,7 +4181,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Апарткомплекс „Ялта“",
@@ -3724,7 +4197,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Oasis Villas / Вили Оазис",
@@ -3739,7 +4213,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Trigor City / Guest Apartments",
@@ -3754,7 +4229,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. инж. ЦАНЮ ЦАНЕВ 1",
+    "src": "KAIS",
+    "street_phrase": "инж цаню цанев",
+    "house_key": "1"
+   }
   },
   {
    "name": "Royal Beach",
@@ -3769,7 +4250,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Аква",
@@ -3790,7 +4272,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ДЕВНЯ 12",
+    "src": "KAIS",
+    "street_phrase": "девня",
+    "house_key": "12"
+   }
   },
   {
    "name": "M Hostel Musala",
@@ -3805,7 +4293,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. МУСАЛА 1",
+    "src": "KAIS",
+    "street_phrase": "мусала",
+    "house_key": "1"
+   }
   },
   {
    "name": "Family Hotel Astra",
@@ -3820,7 +4314,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. ОПЪЛЧЕНСКА 9",
+    "src": "KAIS",
+    "street_phrase": "опълченска",
+    "house_key": "9"
+   }
   },
   {
    "name": "Villa Chinka",
@@ -3835,7 +4335,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Апарт комплекс Ritsa / „Рица“",
@@ -3850,7 +4351,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Albatros Suites / „Албатрос“",
@@ -3865,7 +4367,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. \"50-та\" 24",
+    "src": "KAIS",
+    "street_phrase": "50 та",
+    "house_key": "24"
+   }
   },
   {
    "name": "Nikea / Nikeya Park",
@@ -3880,7 +4388,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Sirena Sea View Apartments",
@@ -3895,7 +4404,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Kabakum Sea View",
@@ -3910,7 +4420,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. \"Боян Бъчваров\" 82",
+    "src": "KAIS",
+    "street_phrase": "боян бъчваров",
+    "house_key": "82"
+   }
   },
   {
    "name": "Cabacum Beach Residence",
@@ -3925,7 +4441,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Hugo Hotel",
@@ -3940,7 +4457,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. ЦАР САМУИЛ 7",
+    "src": "KAIS",
+    "street_phrase": "цар самуил",
+    "house_key": "7"
+   }
   },
   {
    "name": "Хотел „Журналист“ / МДЖ",
@@ -3955,7 +4478,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Мотел „Иванчов хан“",
@@ -3970,7 +4494,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Хотел-ресторант „Комитово ханче“",
@@ -3985,7 +4510,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "Art Green Boutique Hotel",
@@ -4000,7 +4526,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. ГАБРОВО 11",
+    "src": "KAIS",
+    "street_phrase": "габрово",
+    "house_key": "11"
+   }
   },
   {
    "name": "Hotel Color",
@@ -4015,7 +4547,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": {
+    "text": "ул. Рали Мавридов 23",
+    "src": "KAIS",
+    "street_phrase": "рали мавридов",
+    "house_key": "23"
+   }
   },
   {
    "name": "Hotel Bona Vita",
@@ -4030,7 +4568,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "Sol/OSM идентификация"
+   "src": "Sol/OSM идентификация",
+   "address": null
   },
   {
    "name": "СВЕТА ЕЛЕНА",
@@ -4051,7 +4590,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "бул. Княз Борис I № 354",
+    "src": "NTR",
+    "street_phrase": "княз борис i",
+    "house_key": "354"
+   }
   },
   {
    "name": "БИЗАР ХОТЕЛ",
@@ -4072,7 +4617,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. Д-Р ЛЮДВИГ ЗАМЕНХОФ 38",
+    "src": "KAIS",
+    "street_phrase": "д р людвиг заменхоф",
+    "house_key": "38"
+   }
   },
   {
    "name": "Вемара сити",
@@ -4094,7 +4645,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "УЛ. \"АРХ.МАНОЛ ЙОРДАНОВ\" № 20",
+    "src": "NTR",
+    "street_phrase": "арх манол йорданов",
+    "house_key": "20"
+   }
   },
   {
    "name": "Каприз",
@@ -4115,7 +4672,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. ПАРИЖКА КОМУНА 2",
+    "src": "KAIS",
+    "street_phrase": "парижка комуна",
+    "house_key": "2"
+   }
   },
   {
    "name": "Станкино ханче",
@@ -4136,7 +4699,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "БУЛ. \"ЯНОШ ХУНЯДИ\" № 1",
+    "src": "NTR",
+    "street_phrase": "янош хуняди",
+    "house_key": "1"
+   }
   },
   {
    "name": "Калифорния",
@@ -4157,7 +4726,13 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": {
+    "text": "ул. 13-ТА 3",
+    "src": "KAIS",
+    "street_phrase": "13 та",
+    "house_key": "3"
+   }
   },
   {
    "name": "АРАБЕЛА",
@@ -4180,7 +4755,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АРГИЩ ПАРТЕЗ",
@@ -4199,7 +4775,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "СОФИЯ",
@@ -4218,7 +4795,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "АДМИРАЛ",
@@ -4237,7 +4815,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Иглика-2",
@@ -4252,7 +4831,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "Царевец",
@@ -4267,7 +4847,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "Амфора Палас",
@@ -4282,7 +4863,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "ГРИЙН ПАРК",
@@ -4307,7 +4889,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ПРЕСТИЖ ДЕЛУКС АКВАПАРК КЛУБ",
@@ -4332,7 +4915,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "КАРНИВАЛ",
@@ -4357,7 +4941,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "МИРАБЕЛ",
@@ -4382,7 +4967,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Вихрен",
@@ -4397,7 +4983,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "РОЯЛ",
@@ -4420,7 +5007,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЕЛПИДА БИЙЧ",
@@ -4446,7 +5034,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "ЕКСЕЛСИОР",
@@ -4465,7 +5054,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Меркурий",
@@ -4480,7 +5070,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "Зл.котва",
@@ -4495,7 +5086,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "Иглика",
@@ -4510,7 +5102,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "Синигер",
@@ -4525,7 +5118,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "РУМЪР",
@@ -4550,7 +5144,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Гданск",
@@ -4565,7 +5160,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "ПАРК ХОТЕЛ ОДЕСОС",
@@ -4584,7 +5180,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Бендита",
@@ -4599,7 +5196,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "ПАЛМА",
@@ -4618,7 +5216,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   },
   {
    "name": "Сентрал",
@@ -4633,7 +5232,8 @@
    "old_names": [],
    "old_names_src": [],
    "status": "",
-   "src": "КАИС адресно поле"
+   "src": "КАИС адресно поле",
+   "address": null
   },
   {
    "name": "КОНТИНЕНТАЛ",
@@ -4658,7 +5258,8 @@
     "KAIS"
    ],
    "status": "",
-   "src": "НТР УИН"
+   "src": "НТР УИН",
+   "address": null
   }
  ]
 }

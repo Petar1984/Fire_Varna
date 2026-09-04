@@ -469,6 +469,14 @@ class Rec(object):
                 if t.s in ALIAS_GENERIC:
                     continue
                 self.aset.add(t.s)
+        # ЛОТ 1в-Б (ADR 008 D6, план §2г S4): the ORDERED street phrase and the
+        # house number as the DELIVERY wrote them. 1:1 with the client, and OUTSIDE
+        # nset/aset/zkset — the name path and П7 neither see them nor are moved
+        # by them. The client does not parse `text` either; both read these fields.
+        _addr = h.get("address") or None
+        self.address = _addr
+        self.spk = key_of(_addr["street_phrase"]) if _addr else u""
+        self.hkey = key_of(_addr["house_key"]) if _addr else u""
         dy = (self.lat - CENTER[0]) * 110574.0
         dx = (self.lon - CENTER[1]) * 81152.0
         self.dist = math.hypot(dx, dy)
@@ -500,6 +508,52 @@ for _rec in RECS:
         _bucket = EXACT_ALIAS.setdefault(_k, [])
         if not any(_r is _rec for _r, _j in _bucket):
             _bucket.append((_rec, _i))
+
+
+# ЛОТ 1в-Б, ADR 008 D6 — the WHOLE street phrase maps to the records on it. A
+# partial phrase is not a street: „<улица> <номер>“ and „<клас> <улица>“ both ask
+# for the street the delivery named, and a number behind a phrase that is nobody's
+# whole street never takes part (план §2г S4). 1:1 with index.html `STREET`.
+STREET = {}
+for _rec in RECS:
+    if _rec.spk:
+        STREET.setdefault(_rec.spk, []).append(_rec)
+
+# The prefix the SOURCE wrote, never one we add. „№“ is dropped with them.
+STREET_MARK = (u"ул", u"бул", u"пл")
+
+
+def street_rows(R, cls):
+    """ЛОТ 1в-Б (ADR 008 D6) — the A3-street branch; None = not a street query.
+
+    Reads `spk`/`hkey` and NOTHING else: no nset, no aset, no zkset, no
+    significant(), no A5. When the phrase is ALSO an exact name or zone/kind token
+    of the searched set, the street is chosen only if the human said „ул./бул./пл.“
+    or named a house number — otherwise the name path keeps the query untouched.
+    """
+    if not STREET:
+        return None
+    marked = any(t.orig in STREET_MARK for t in R)
+    rest = [t for t in R if t.orig not in STREET_MARK and t.orig != u"№"]
+    if not rest:
+        return None
+    num = rest[-1] if rest[-1].num else None
+    phrase = rest[:-1] if num else rest
+    if not phrase or any(t.num for t in phrase):
+        return None
+    hits = STREET.get(u" ".join(t.s for t in phrase))
+    if not hits:
+        return None                              # not a whole street -> not a street
+    if not marked and not num:
+        for t in phrase:
+            for rec in cls:
+                if t.s in rec.nset or t.s in rec.zkset:
+                    return None
+    keep = set(id(r) for r in cls)
+    rows = [r for r in hits if id(r) in keep]
+    if num:
+        rows = [r for r in rows if r.hkey == num.s]
+    return order_category(rows) if rows else None
 
 
 def alias_significant(qt):
@@ -877,6 +931,13 @@ def search(q):
             flt = [r for r in cls if all(t.s in r.zkset for t in R)]
             if flt:
                 return order_category(flt), "A3-category+zone/kind"
+    # ADR 008 D6: exact name/alias -> zone (П7) -> STREET -> fuzzy/fail-open. With
+    # a key the answer is the class on that street; without one it is the address
+    # the human typed and `has_key` stays False, so the client renders our section
+    # UNDER the untouched building address search (план §2г S4).
+    street = street_rows(R, cls)
+    if street:
+        return street, "A3-street"
     rows = run_scored(cls, R, has_key, dead)
     if rows:
         return rows, ("M2" if has_key else "M3")
@@ -1598,6 +1659,116 @@ def check_lot1v_a_gate():
     return bad
 
 
+
+
+# --- ЛОТ 1в-Б (04.09) — the address gate: Сол S4's SIX queries, measured here
+# with the delivery of P5 (25a6d79). Three of them are the gains of the new
+# A3-street branch, three are controls that must NOT move: the number without a
+# street, the zone phrase and the name phrase both keep their branch.
+LOT1V_B_GAINS = [
+    (u'детска градина дойран', u'A3-street', 1,
+     u'S4 гейт 1: „<клас> <улица>“ — класът на улицата, само ДГ№12 '
+     u'(ул. ДОЙРАН 9, КАИС); преди лота заявката даваше 12 реда по fail-open', [
+        (u'ДГ№12 „Ян Бибиян“', u'м-т Шашкъна', u'детска градина'),
+    ]),
+    (u'дойран 9', u'A3-street', 1,
+     u'S4 гейт 2: „<улица> <номер>“ — само ДГ№12 в местата, без ключ '
+     u'(`hasKey=false`), тоест адресната търсачка на сградите остава отгоре '
+     u'с Enter, а местата стоят в своята секция; преди лота 0 реда', [
+        (u'ДГ№12 „Ян Бибиян“', u'м-т Шашкъна', u'детска градина'),
+    ]),
+    # S4 предвиди ДВА записа на ул. Дойран (мярката му беше върху 236-те
+    # join-нати реда); доставката на P5 носи ТРИ — ЦПЛР „Михаил Колони“ на
+    # ул. ДОЙРАН 17 също получи адрес. Редът е този, който Сол поиска (ДГ№12,
+    # после очната болница), а третият ред е измерен факт, не отклонение от
+    # правилото: подредбата е по близост до центъра (210 / 298 / 349 m).
+    (u'ул. дойран', u'A3-street', 3,
+     u'S4 гейт 3: „ул. <улица>“ — ДГ№12, после очната болница, после '
+     u'общежитието на ул. ДОЙРАН 17 (трети измерен ред, S4 знаеше за два)', [
+        (u'ДГ№12 „Ян Бибиян“', u'м-т Шашкъна', u'детска градина'),
+        (u'„Университетска специализирана болница по очни болести за активно лечение – Варна“ ЕООД',
+         u'м-т Шашкъна', u'болница'),
+        (u'ЦПЛР – Средношколско общежитие „Михаил Колони“', u'м-т Шашкъна', u'общежитие'),
+    ]),
+]
+
+LOT1V_B_CONTROLS = [
+    (u'детска градина 12', u'M2', 1,
+     u'S4 гейт 4: число без съвпаднала ПЪЛНА улица не участва — заявката '
+     u'остава M2 по името „12“, не става адрес', [
+        (u'ДГ№12 „Ян Бибиян“', u'м-т Шашкъна', u'детска градина'),
+    ]),
+    (u'училище владислав варненчик', u'A3-category+zone/kind', 4,
+     u'S4 гейт 5: зоната стои ПРЕД улицата — същите 4 зонови училища, макар '
+     u'„владислав варненчик“ да е и улична фраза на 4 други записа', [
+        (u'ОУ Стоян Михайловски', u'ж.к. Владислав Варненчик', u'училище'),
+        (u'ОУ Патриарх Евтимий', u'ж.к. Владислав Варненчик', u'училище'),
+        (u'СУ „Пейо Крачолов Яворов“', u'ж.к. Владислав Варненчик', u'училище'),
+        (u'І ОУ „Свети княз Борис I“', u'ж.к. Владислав Варненчик', u'училище'),
+    ]),
+    (u'хотел приморски', u'A3-record+zone-phrase', 5,
+     u'S4 гейт 6: колизия улица↔име — без „ул./бул./пл.“ и без номер улицата '
+     u'НЕ се избира, така че ПАНОРАМА (бул. ПРИМОРСКИ 31) не влиза', [
+        (u'ПРИМОРСКИ', u'к.к. Св. Св. Константин и Елена', u'Хотел'),
+        (u'Маргарита', u'район Приморски', u'Семеен хотел'),
+        (u'Вемара сити', u'район Приморски', u'Семеен хотел'),
+        (u'Траката', u'район Приморски', u'Семеен хотел'),
+        (u'Еллинис', u'район Приморски', u'Семеен хотел'),
+    ]),
+]
+
+
+def check_lot1v_b_gate():
+    """The ЛОТ 1в-Б gate; returns the list of failures (empty list = green).
+
+    Same fail-loud contract as the three gates above. Two claims cannot be put
+    into a (branch, n, prefix) triple, so they are checked by name: „дойран 9“
+    must carry NO class key (the client renders our section under the untouched
+    address search only while `hasKey` is false), and an exact alias must still
+    beat its own street when the query carries neither „ул./бул./пл.“ nor a
+    number — „алеко константинов“ is І ОУ „Свети княз Борис I“, and only
+    „ул. алеко константинов“ is the street.
+    """
+    bad = []
+    for label, spec in ((u"gain", LOT1V_B_GAINS), (u"control", LOT1V_B_CONTROLS)):
+        for q, branch, n, why, want in spec:
+            rows, br = search(q)
+            got = [(r.name.strip(), r.zone, r.kind) for r in rows]
+            if br != branch:
+                bad.append(u"%s `%s`: branch %s, expected %s" % (label, q, br, branch))
+            if len(rows) != n:
+                bad.append(u"%s `%s`: %d rows, expected %d" % (label, q, len(rows), n))
+            if got[:len(want)] != want:
+                bad.append(u"%s `%s`: rows differ from the measured expectation "
+                           u"(first %d): %s" % (label, q, len(want), got[:len(want)]))
+    keys, _slots, _dead = split_keys(place_tokens(u"дойран 9"))
+    if keys:
+        bad.append(u"„дойран 9“ носи класов ключ %s — адресните резултати на "
+                   u"сградите вече не са отгоре" % u", ".join(keys))
+    rows, br = search(u"алеко константинов")
+    if br != "A0-exact-alias" or [r.name for r in rows] != [u"І ОУ „Свети княз Борис I“"]:
+        bad.append(u"колизия улица↔псевдоним: „алеко константинов“ дава %s/%d (%s) — "
+                   u"псевдонимът трябва да е пръв без „ул./бул./пл.“"
+                   % (br, len(rows), u", ".join(r.name for r in rows[:3])))
+    rows, br = search(u"ул. алеко константинов")
+    if br != "A3-street":
+        bad.append(u"„ул. алеко константинов“ дава %s — с префикс улицата печели" % br)
+    # Гейт 6 на Сол е защитен от РЕДА на клоновете (A3-record+zone-phrase стои
+    # преди улицата), не от правилото за колизия — измерено 04.09. Затова
+    # правилото си има собствени редове: три голи улични фрази, които се
+    # пресичат с име или зона и НЕ бива да стават адрес без „ул./бул./пл.“.
+    for q, want_branch, want_first in ((u"приморски", "M3", u"ПРИМОРСКИ"),
+                                       (u"роза", "M3", u"ДЯ №7 „Роза“"),
+                                       (u"владислав варненчик", "M3", u"КАРНИВАЛ")):
+        rows, br = search(q)
+        first = rows[0].name if rows else u"—"
+        if br != want_branch or first != want_first:
+            bad.append(u"колизия улица↔име/зона: „%s“ дава %s/%s, очаквано %s/%s — "
+                       u"без „ул./бул./пл.“ и без номер улицата не се избира"
+                       % (q, br, first, want_branch, want_first))
+    return bad
+
+
 def check_p7_gate():
     """Runs the gate; returns the list of failures (empty list = green).
 
@@ -1784,7 +1955,8 @@ DIFF_G = [
 # (tests/test_places_search_gate.py, `REF_BUCKETS`), which compares all three.
 # A bucket added on one side alone would grow or shrink the reference in silence.
 # main() refuses to write an artefact whose keys are not exactly this list.
-REF_BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a")
+REF_BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a",
+               "gate_lot1v_b")
 
 
 def bucket_drift(doc):
@@ -2086,6 +2258,11 @@ def main():
         # landed (measured against a58010e), so nothing is re-frozen; the twelve
         # measured rows of the new lot arrive as a bucket of their own.
         "gate_lot1v_a": [],
+        # ЛОТ 1в-Б (ADR 008 D6/D7, план §2г S4/S6): АДИТИВНО again. Measured
+        # against a58010e and against the committed `gate_lot1v_a`, not one of the
+        # 122 + 12 rows moved when the addresses and the street branch landed, so
+        # nothing is re-frozen; Сол's six queries arrive as a bucket of their own.
+        "gate_lot1v_b": [],
     }
     for _q, _br, _n, _why, _want in P7_GAINS + P7_CONTROLS:
         _r, _b = search(_q)
@@ -2115,6 +2292,17 @@ def main():
     for _q, _br, _n, _why, _want in LOT1V_A_GAINS + LOT1V_A_CONTROLS:
         _r, _b = search(_q)
         ROWS["gate_lot1v_a"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+        })
+    for _q, _br, _n, _why, _want in LOT1V_B_GAINS + LOT1V_B_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1v_b"].append({
             "q": _q,
             "expect": _why,
             "branch": _b,
@@ -2167,6 +2355,16 @@ def main():
         for _o in _r.old_names:
             if _o not in _corpus:
                 _corpus.append(_o)
+    _n_old = len(_corpus) - _n_aliases - _n_names
+    # ЛОТ 1в-Б D6: `street_phrase` and `house_key` are searchable STRINGS now —
+    # both tokenisers have to agree on them too, or the A3-street branch would
+    # index one thing in Python and another in the page.
+    for _r in RECS:
+        if not _r.address:
+            continue
+        for _s in (_r.address["street_phrase"], _r.address["house_key"]):
+            if _s not in _corpus:
+                _corpus.append(_s)
     _parity = {
         "_meta": {
             "source": "scratch/places_search/recall_sweep.py (place_tokens)",
@@ -2175,7 +2373,8 @@ def main():
             "zones_with_aliases": len(cats.get("zones") or {}),
             "records": len(RECS),
             "names": _n_names,
-            "old_names": len(_corpus) - _n_aliases - _n_names,
+            "old_names": _n_old,
+            "addresses": len(_corpus) - _n_aliases - _n_names - _n_old,
             "strings": len(_corpus),
         },
         "strings": [{"s": _x,
@@ -2234,7 +2433,15 @@ def main():
     for line in lot1v_bad:
         print(u"  ЧЕРВЕНО: %s" % line)
 
-    return 1 if (bad or badx or p7_bad or lot1_bad or lot1v_bad) else 0
+    # ЛОТ 1в-Б (адресите + клонът A3-street): the fourth gate that can FAIL.
+    lot1v_b_bad = check_lot1v_b_gate()
+    print(u"ЛОТ 1в-Б: гейт %d/%d"
+          % (len(LOT1V_B_GAINS) + len(LOT1V_B_CONTROLS) - len(lot1v_b_bad),
+             len(LOT1V_B_GAINS) + len(LOT1V_B_CONTROLS)))
+    for line in lot1v_b_bad:
+        print(u"  ЧЕРВЕНО: %s" % line)
+
+    return 1 if (bad or badx or p7_bad or lot1_bad or lot1v_bad or lot1v_b_bad) else 0
 
 
 if __name__ == "__main__":

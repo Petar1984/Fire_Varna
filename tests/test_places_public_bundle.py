@@ -47,16 +47,26 @@ PLACES = pathlib.Path(os.environ.get("FIRE_VARNA_PLACES_PATH") or (REPO / "data"
 
 # The tracked LF blob, measured at C11 (varna_3d HEAD ba78a25, branch rezhimi):
 #   git -C ../varna_3d show HEAD:data/fire_varna_places.json > data/places.json
-PLACES_SHA256 = "ef98624f2933d5191f927aaab303b248317ea92707be5c60fca5ccff0afa296a"
-PLACES_BYTES = 76110
-PLACES_GZIP9 = 9642
+PLACES_SHA256 = "c31a866e3ca9567a94ebb93713309bd68b6ff8ea61af6e008ffbe2ff93913a7d"
+PLACES_BYTES = 96314
+PLACES_GZIP9 = 12881
 
 EXPECTED_COUNT = 150
 TOP_LEVEL_KEYS = {"_meta", "places"}
-# Phase-2 plan §2 Д1 + ЛОТ 1в (ADR 008 D1/S2): exactly these NINE keys on every
-# record — no `i`, no notes, no cadastral identifier. `old_names_src` is the ninth.
-RECORD_KEYS = {"kind", "lat", "lon", "name", "old_names", "old_names_src",
+# Phase-2 plan §2 Д1 + ЛОТ 1в (ADR 008 D1/S2): exactly these TEN keys on every
+# record — no `i`, no notes, no cadastral identifier. `old_names_src` is the ninth,
+# `address` (ЛОТ 1в-Б, ADR 008 D5) the tenth.
+RECORD_KEYS = {"address", "kind", "lat", "lon", "name", "old_names", "old_names_src",
                "src", "status", "zone"}
+# ЛОТ 1в-Б (ADR 008 D5) — `address` is `null` or EXACTLY these four keys, and its
+# source is its OWN closed list: a school named by the МОН registry can carry a
+# КАИС address, so the card names the source of THAT string, not of the record.
+ADDRESS_KEYS = {"text", "src", "street_phrase", "house_key"}
+ADDRESS_SRC = {"KAIS", "REG", "NTR", "OSM"}
+# The measured coverage of the signed list (план §2в/§2ж, `lot1v_addresses_for_signature.md`
+# re-measured on the P5 delivery): 115 of the 150 places carry an address.
+ADDRESS_COUNT = 115
+ADDRESS_BY_SRC = {"KAIS": 96, "REG": 18, "OSM": 1}
 # ЛОТ 1в (ADR 008 D1, амандамент А3) — the CLOSED list of alias sources. A place
 # name that travels as an alias carries its own letter; `old_names_src` is a
 # parallel array of the same length and order. Until this lot the card printed the
@@ -75,10 +85,23 @@ BBOX = (43.13, 43.35, 27.65, 28.10)  # min_lat, max_lat, min_lon, max_lon
 # Copied byte-for-byte out of data/places.json with python — never retyped by hand.
 LICENCE_OSM = 'Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).'
 LICENCE_WIKIDATA = 'Разгърнати имена (псевдоними за търсене) на 3 места: Wikidata Q7035695, Q12291800, Q12299161, CC0 1.0 Universal, достъп 03.09.2026. Низовете са зафиксирани с датата на достъп (снапшотът), не се теглят живо; изворът на всеки псевдоним стои в `old_names_src`.'
+LICENCE_ADDRESS = 'Адресите: КАИС адресното поле на тялото под пина (© АГКК — отворените данни, върху които стоят и координатите; условията на ФАЗА_0_лицензи.md); регистровите адреси (Община Варна, МОН/НЕИСПУО, ИАМН) и Националният туристически регистър: отделни факти от регистрите (чл. 4 ЗАПСП), не копие на регистър; адресите от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0. Изворът на всеки адрес стои в `address.src`; токени за собственост не влизат в адреса.'
 LICENCE_REGISTRY = 'Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).'
 
 # A КАИС cadastral identifier is the one thing that must never reach a public payload.
 _CADASTRAL_RE = re.compile(r"\b\d{4,5}\.\d+\.\d+")
+# ЛОТ 1в-Б (ADR 008 D5, план §2в + К5(г)): the PROPERTY tokens. The raw НТР
+# addresses carry "ПИ № …", "УПИ …", "кв. 20", "поземлен имот 583"; the masking
+# lives in the exporter and THIS is the publish gate — over the whole blob, not
+# over the address values, so a token that slips into a licence line, a zone or a
+# name is as red as one inside an address. Every token is matched as a WORD:
+# measured 04.09 on this delivery, a naive substring "ПИ" fires on "КАПИТАН
+# РАЙЧО" and a case-blind one on "Пирот" — both false alarms are real.
+_LETTER = "А-Яа-яA-Za-z"
+_PROPERTY_RE = re.compile(
+    "(?<![%s])(?:У?ПИ(?![%s])|(?:парцел|имот)(?![%s]))"
+    "|кадастр|кад[.][ ]*ид|кв[.]?[ ]*[0-9]"
+    % (_LETTER, _LETTER, _LETTER), re.IGNORECASE)
 # UTF-8 read back as cp1252 leaves these two-byte signatures (AGENTS.md § encoding).
 _MOJIBAKE_RE = re.compile("[\u00d0\u00d1\u00c2][\u0080-\u00ff]")
 # Personal data in the free text. The five patterns below are the hotel gate's, verbatim
@@ -115,6 +138,16 @@ _PII_PATTERNS = {
 # legitimate names red („ПГТ „Проф. д-р Асен Златаров"“ — „ПГТ“ is caught only by the
 # „ПГ*“ prefix of §6 К7), so the repair needs its own measure and Petar's word.
 _DOCTOR_RE = re.compile(r"(?:^|[^а-яА-Яa-zA-Z])(?:д-?р|доктор|dr)\b\.?\s+\S", re.I)
+# ЛОТ 1в-Б (план §2г S5): the address text is scanned like every other free
+# string, and the doctor rule fires on a STREET named after a doctor — measured
+# 04.09 on the delivery: „ул. „Д-р Василаки Пападопулу“ 54“, „ул. Д-Р БАСАНОВИЧ
+# 29“, „ул. Д-р Любен Лазаров № 115“, „ул. Д-Р ЛЮДВИГ ЗАМЕНХОФ 38“ (five rows in
+# the two files). The excuse is as narrow as institutional(): the title must stand
+# IMMEDIATELY after the prefix the SOURCE wrote, at the very START of the address
+# (an optional quote between them). A second title anywhere else in the same
+# string, or a title without a street prefix, is still a red row.
+_DOCTOR_STREET_RE = re.compile(
+    "^(?:ул|бул|пл)[.]?[ ]*[\"„]?[ ]*(?:д-?р|доктор|dr)[ .]", re.I)
 # §6 К7 ∪ plan §2 Д1 — the institutional words, matched as a PREFIX of a word. Copied from
 # the exporter gate; not one word more, because every added word loosens the check.
 INSTITUTIONAL = (
@@ -179,7 +212,7 @@ class PlacesBundleTest(unittest.TestCase):
         self.assertEqual(self.doc["_meta"]["count"], EXPECTED_COUNT)
         self.assertEqual(len(self.records), EXPECTED_COUNT)
 
-    def test_every_record_carries_exactly_the_nine_keys(self):
+    def test_every_record_carries_exactly_the_ten_keys(self):
         for rec in self.records:
             self.assertEqual(set(rec.keys()), RECORD_KEYS, rec.get("name"))
 
@@ -227,6 +260,64 @@ class PlacesBundleTest(unittest.TestCase):
         self.assertEqual(sorted(set(_CADASTRAL_RE.findall(self.text))), [])
         self.assertNotIn("10135", self.text)
 
+    def test_no_property_token_reaches_the_public_payload(self):
+        # К5 (г) + план §2в: the publish gate over the WHOLE blob, by word.
+        self.assertEqual([m.group(0) for m in _PROPERTY_RE.finditer(self.text)], [])
+
+    def test_every_address_is_null_or_the_closed_four_key_object(self):
+        # ADR 008 D5 / план §2г S5. `null` is an answer, not a gap: 35 of the 150
+        # places have no address that meets the strict criterion, and the card then
+        # shows the zone alone — honestly, without inventing a street.
+        for rec in self.records:
+            addr = rec["address"]
+            if addr is None:
+                continue
+            self.assertIsInstance(addr, dict, rec["name"])
+            self.assertEqual(set(addr.keys()), ADDRESS_KEYS, rec["name"])
+            for key in ADDRESS_KEYS:
+                self.assertIsInstance(addr[key], str, (rec["name"], key))
+                self.assertTrue(addr[key].strip(), (rec["name"], key))
+            self.assertIn(addr["src"], ADDRESS_SRC, rec["name"])
+
+    def test_the_address_coverage_is_the_measured_one(self):
+        # The numbers Gate 1-Б was signed on, re-measured against the P5 delivery.
+        with_address = [rec for rec in self.records if rec["address"]]
+        self.assertEqual(len(with_address), ADDRESS_COUNT)
+        by_src = {}
+        for rec in with_address:
+            code = rec["address"]["src"]
+            by_src[code] = by_src.get(code, 0) + 1
+        self.assertEqual(by_src, ADDRESS_BY_SRC)
+
+    def test_the_street_phrase_and_the_house_key_are_read_back_out_of_the_text(self):
+        # К7 (1): the canonicalisation is an INDEPENDENT transcript. The exporter
+        # emits `text`, `street_phrase` and `house_key` TOGETHER and its own QA
+        # checks them; this reads them back the other way round, here, with a
+        # normaliser written for this test alone — the phrase must stand in the text
+        # as a whole run of words, and the house number must follow it. The client
+        # never parses `text` either (ADR 008 D6), so a drift between the three
+        # would be invisible in the browser and loud only here.
+        for rec in self.records:
+            addr = rec["address"]
+            if not addr:
+                continue
+            flat = " ".join("".join(c if c.isalnum() else " "
+                                    for c in addr["text"].lower()).split())
+            phrase = addr["street_phrase"]
+            self.assertIn(" %s " % phrase, " %s " % flat, rec["name"])
+            tail = "".join(flat[flat.index(phrase) + len(phrase):].split())
+            self.assertTrue(tail.startswith(addr["house_key"]),
+                            (rec["name"], addr["text"], addr["house_key"]))
+
+    def test_the_address_licence_line_is_verbatim(self):
+        # ADR 008 D5: the sources of an ADDRESS get their own sentence — КАИС/АГКК
+        # for the body under the pin, the registries as separate facts, OSM under
+        # ODbL. Not one of them is new to this delivery (план §2 т. 5), so the README
+        # licence table is untouched and the line itself is pinned right here.
+        self.assertEqual(self.doc["_meta"]["licence_address"], LICENCE_ADDRESS)
+        self.assertIn("ODbL 1.0", LICENCE_ADDRESS)
+        self.assertIn("`address.src`", LICENCE_ADDRESS)
+
     def test_the_cadastral_word_appears_nowhere(self):
         # Unlike the hotels licence, neither licence line here names cadastral address
         # fields, so the word has no legitimate place in this payload at all.
@@ -261,7 +352,11 @@ class PlacesBundleTest(unittest.TestCase):
     def test_free_text_carries_no_personal_data(self):
         hits = []
         for rec in self.records:
-            for value in [rec["name"], rec["zone"]] + list(rec["old_names"]):
+            # ЛОТ 1в-Б (план §2г S5): an address text is free text too.
+            values = [rec["name"], rec["zone"]] + list(rec["old_names"])
+            if rec["address"]:
+                values.append(rec["address"]["text"])
+            for value in values:
                 for label, pattern in _PII_PATTERNS.items():
                     if pattern.search(value):
                         hits.append((label, value))
@@ -273,6 +368,16 @@ class PlacesBundleTest(unittest.TestCase):
         hits = [value for rec in self.records
                 for value in [rec["name"], rec["zone"]] + list(rec["old_names"])
                 if _DOCTOR_RE.search(value) and not institutional(value)]
+        self.assertEqual(hits, [])
+
+    def test_a_doctor_title_inside_an_address_is_a_street_name(self):
+        hits = []
+        for rec in self.records:
+            addr = rec["address"]
+            if not addr:
+                continue
+            if _DOCTOR_RE.search(_DOCTOR_STREET_RE.sub("ул. ", addr["text"])):
+                hits.append((rec["name"], addr["text"]))
         self.assertEqual(hits, [])
 
     def test_name_skeleton_and_zone_pairs_are_unique(self):

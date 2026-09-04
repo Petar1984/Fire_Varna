@@ -59,13 +59,13 @@ FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
 # The four buckets the 23af63f anchor holds — the ЛОТ 1 reference, 122 rows.
 BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
 # ADR 008 D7 — fail-closed, and the WHOLE list: F6-а added `gate_lot1v_a`
-# ADDITIVELY (план §2г S3/S6), so the four above keep their anchor and the new
-# lot answers in a bucket of its own. `REF_BUCKETS` is hand-kept on three sides —
+# ADDITIVELY (план §2г S3/S6) and F8 added `gate_lot1v_b` the same way, so the
+# four above keep their anchor and each new lot answers in a bucket of its own. `REF_BUCKETS` is hand-kept on three sides —
 # here, in scratch/places_search/probe_places_fv.mjs (the probe that replays the
 # rows) and in scratch/places_search/recall_sweep.py (the reference, which refuses
 # to WRITE an artefact with other keys). RefBucketsTest compares all three against
 # the artefact, so a bucket added on one side alone is red without a browser.
-REF_BUCKETS = BUCKETS + ("gate_lot1v_a",)
+REF_BUCKETS = BUCKETS + ("gate_lot1v_a", "gate_lot1v_b")
 PROBE = REPO / "scratch" / "places_search" / "probe_places_fv.mjs"
 # The ONE anchor (Амандамент №11): the artefact as it stood before the ЛОТ 1
 # DATA landed — 113 rows over the four buckets, itself frozen against 7a6ea1d
@@ -682,12 +682,17 @@ class Lot1vAdditiveFreezeTest(unittest.TestCase):
         self.assertEqual(len(now), 375)
 
     def test_the_candidate_only_grew(self):
+        # F8 (ЛОТ 1в-Б) states the contract the artefact reaches in F9: the two
+        # gained buckets and 134 + 6 = 140 rows. Until the re-freeze this is one of
+        # the NAMED red rows of the lot — the reference is the thing that moves,
+        # never the anchor.
         gained = [b for b in self.current if b != "_meta" and b not in self.anchor]
-        self.assertEqual(gained, ["gate_lot1v_a"])
-        self.assertEqual(sum(len(self.current[b]) for b in REF_BUCKETS), 134)
+        self.assertEqual(gained, ["gate_lot1v_a", "gate_lot1v_b"])
+        self.assertEqual(sum(len(self.current[b]) for b in REF_BUCKETS), 140)
         self.assertEqual(sum(len(e["rows"]) for b in BUCKETS
                              for e in self.current[b]), 1998)
         self.assertEqual(sum(len(e["rows"]) for e in self.current["gate_lot1v_a"]), 108)
+        self.assertEqual(sum(len(e["rows"]) for e in self.current["gate_lot1v_b"]), 15)
 
 
 class Lot1vABucketTest(unittest.TestCase):
@@ -753,6 +758,214 @@ class Lot1vABucketTest(unittest.TestCase):
                              list(want), entry["q"])
 
 
+def lot1v_b_bucket_failures(doc):
+    """The `gate_lot1v_b` bucket of an artefact against REF's measured spec.
+
+    Sibling of lot1v_a_bucket_failures() and pure over the document it is given
+    for the same reason: a test can delete a row or change a value in a COPY and
+    watch the answer turn red.
+    """
+    spec = list(REF.LOT1V_B_GAINS) + list(REF.LOT1V_B_CONTROLS)
+    bucket = doc.get("gate_lot1v_b")
+    if not isinstance(bucket, list):
+        return [u"gate_lot1v_b липсва от артефакта"]
+    bad = []
+    if len(bucket) != len(spec):
+        bad.append(u"gate_lot1v_b: %d реда, очаквани %d" % (len(bucket), len(spec)))
+    by_q = {}
+    for entry in bucket:
+        by_q.setdefault(entry["q"], []).append(entry)
+    for q, branch, n, why, want in spec:
+        entries = by_q.pop(q, [])
+        if len(entries) != 1:
+            bad.append(u"`%s`: %d реда в артефакта, очакван 1" % (q, len(entries)))
+            continue
+        entry = entries[0]
+        if entry["branch"] != branch:
+            bad.append(u"`%s`: клон %s, очакван %s" % (q, entry["branch"], branch))
+        if entry["n"] != n or len(entry["rows"]) != n:
+            bad.append(u"`%s`: %d реда (n=%s), очаквани %d"
+                       % (q, len(entry["rows"]), entry["n"], n))
+        if entry["expect"] != why:
+            bad.append(u"`%s`: причината не е тази на референцията" % q)
+        got = [(r["name"].strip(), r["zone"]) for r in entry["rows"]][:len(want)]
+        if got != [(w[0], w[1]) for w in want]:
+            bad.append(u"`%s`: първите %d реда са %s" % (q, len(want), got))
+        if not entry["ok"]:
+            bad.append(u"`%s`: редът не е зелен в артефакта" % q)
+    for q in by_q:
+        bad.append(u"`%s`: ред в артефакта, който референцията не мери" % q)
+    return bad
+
+
+class Lot1vBGateTest(unittest.TestCase):
+    """ЛОТ 1в-Б — адресите и клонът A3-street (04.09), ADR 008 D5/D6.
+
+    Сол's six queries (план §2г S4) are the acceptance gate: three gains of the
+    new branch („детска градина дойран“, „дойран 9“, „ул. дойран“) and three
+    controls that must NOT move — the number without a street, the zone phrase
+    ahead of the street, and the name/street collision that keeps ПАНОРАМА out of
+    „хотел приморски“.
+    """
+
+    def test_gate(self):
+        failures = REF.check_lot1v_b_gate()
+        self.assertEqual(failures, [], "\n".join(failures))
+
+    def test_the_measured_rows_are_six(self):
+        self.assertEqual(len(REF.LOT1V_B_GAINS), 3)
+        self.assertEqual(len(REF.LOT1V_B_CONTROLS), 3)
+
+    def test_the_street_index_is_the_delivery_and_nothing_else(self):
+        """D6: `spk`/`hkey` come from `address`, never from `text`.
+
+        Measured on the P5 delivery: 190 of the 375 records carry an address over
+        133 distinct street phrases, and the tokeniser collapses those to 131 KEYS
+        — „8 ми приморски полк“ = „осми приморски полк“ and „45 та“ = „45“ are the
+        same street written twice by two sources, and the ordinal rewriting is what
+        unites them. Two spellings, one street: that is the point of the key.
+        """
+        with_address = [rec for rec in REF.RECS if rec.address]
+        self.assertEqual(len(with_address), 190)
+        self.assertEqual(len(set(rec.address["street_phrase"] for rec in with_address)), 133)
+        self.assertEqual(len(REF.STREET), 131)
+        self.assertEqual(sum(len(v) for v in REF.STREET.values()), 190)
+        collapsed = {}
+        for rec in with_address:
+            collapsed.setdefault(rec.spk, set()).add(rec.address["street_phrase"])
+        self.assertEqual(sorted(tuple(sorted(v)) for v in collapsed.values() if len(v) > 1),
+                         [(u"45", u"45 та"),
+                          (u"8 ми приморски полк", u"осми приморски полк")])
+        for rec in with_address:
+            self.assertEqual(rec.spk, REF.key_of(rec.address["street_phrase"]),
+                             rec.name)
+            self.assertEqual(rec.hkey, REF.key_of(rec.address["house_key"]), rec.name)
+            self.assertIn(rec, REF.STREET[rec.spk])
+        for rec in REF.RECS:
+            if not rec.address:
+                self.assertEqual((rec.spk, rec.hkey), ("", ""), rec.name)
+
+    def test_the_street_tokens_stay_out_of_the_name_and_zone_sets(self):
+        """S4's own condition: the branch must not be able to move A4, A5 or П7.
+        The proof is structural — `nset` is still exactly the name tokens and
+        `zkset` still exactly the zone and kind tokens, so not one street phrase
+        and not one house number entered the sets the matcher scores on."""
+        for rec in REF.RECS:
+            self.assertEqual(rec.nset, set(rec.ntk), rec.name)
+            self.assertEqual(rec.zkset, set(rec.ztk) | set(rec.ktk), rec.name)
+
+    def test_a_number_without_a_whole_street_never_takes_part(self):
+        """S4 gate 4, inverted: „12“ is the house number of nobody's matched
+        street here, so „детска градина 12“ stays a NAME query — and the branch
+        answers None for a bare number as well."""
+        self.assertIsNone(REF.street_rows(REF.place_tokens(u"12"), REF.RECS))
+        self.assertIsNone(REF.street_rows(REF.place_tokens(u"9"), REF.RECS))
+        rows, branch = REF.search(u"детска градина 12")
+        self.assertEqual((branch, len(rows)), ("M2", 1))
+
+    def test_the_collision_rule_is_load_bearing(self):
+        """G2 — a gate that cannot go red is not a gate.
+
+        Measured 04.09: Сол's sixth query is protected by the ORDER of the branches
+        (A3-record+zone-phrase answers „хотел приморски“ before the street is even
+        asked), NOT by the collision rule — so the rule has three named rows of its
+        own. Here the rule is disabled in place, by handing street_rows() a query
+        that always carries „ул.“, and check_lot1v_b_gate() must go red on all
+        three: „приморски“, „роза“, „владислав варненчик“.
+        """
+        original = REF.street_rows
+        try:
+            REF.street_rows = (lambda R, cls:
+                               original(list(R) + REF.place_tokens(u"ул"), cls))
+            rows, branch = REF.search(u"приморски")
+            self.assertEqual((branch, rows[0].name), ("A3-street", u"Бел Епок"))
+            failures = REF.check_lot1v_b_gate()
+            self.assertEqual(len(failures), 3, failures)
+            for query in (u"приморски", u"роза", u"владислав варненчик"):
+                self.assertTrue(any(query in f for f in failures), query)
+        finally:
+            REF.street_rows = original
+        self.assertEqual(REF.check_lot1v_b_gate(), [])
+        rows, branch = REF.search(u"приморски")
+        self.assertEqual((branch, rows[0].name), ("M3", u"ПРИМОРСКИ"))
+
+    def test_the_branch_stands_after_the_zone_and_before_the_fuzzy_path(self):
+        """ADR 008 D6, the ORDER — measured on the queries that prove each step:
+        the exact alias wins over its own street, the zone phrase wins over the
+        street it shares a name with, and the street wins over the fuzzy scoring
+        that used to answer „болница дойран“ with eleven unrelated rows."""
+        self.assertEqual(REF.search(u"алеко константинов")[1], "A0-exact-alias")
+        self.assertEqual(REF.search(u"училище владислав варненчик")[1],
+                         "A3-category+zone/kind")
+        rows, branch = REF.search(u"болница дойран")
+        self.assertEqual((branch, len(rows)), ("A3-street", 1))
+        self.assertEqual(rows[0].name,
+                         u"„Университетска специализирана болница по очни болести "
+                         u"за активно лечение – Варна“ ЕООД")
+
+
+class Lot1vBBucketTest(unittest.TestCase):
+    """The new bucket, and the proof that its gate runs and falls.
+
+    Red until F9 by design: F8 does not re-freeze the reference (план §2г S6 —
+    with 0 movements there is nothing to re-freeze, only to ADD), so the
+    committed artefact does not carry `gate_lot1v_b` yet.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
+
+    def test_the_bucket_is_the_six_measured_rows(self):
+        self.assertEqual(lot1v_b_bucket_failures(self.current), [])
+        self.assertEqual(len(self.current["gate_lot1v_b"]), 6)
+        self.assertEqual(len(REF.LOT1V_B_GAINS) + len(REF.LOT1V_B_CONTROLS), 6)
+
+    def test_removing_any_row_turns_the_bucket_red(self):
+        for entry in self.current.get("gate_lot1v_b", []):
+            doc = dict(self.current)
+            doc["gate_lot1v_b"] = [e for e in self.current["gate_lot1v_b"]
+                                   if e["q"] != entry["q"]]
+            failures = lot1v_b_bucket_failures(doc)
+            self.assertNotEqual(failures, [], entry["q"])
+            self.assertTrue(any(entry["q"] in f for f in failures), entry["q"])
+
+    def test_changing_any_value_turns_the_bucket_red(self):
+        for index in range(len(self.current.get("gate_lot1v_b", []))):
+            original = self.current["gate_lot1v_b"][index]
+            mutations = [
+                ("branch", lambda e: dict(e, branch=e["branch"] + "-x")),
+                ("n", lambda e: dict(e, n=e["n"] + 1)),
+                ("rows", lambda e: dict(e, rows=e["rows"][1:], n=e["n"] - 1)),
+                ("name", lambda e: dict(e, rows=[dict(e["rows"][0], name=u"друго име")]
+                                        + e["rows"][1:])),
+                ("zone", lambda e: dict(e, rows=[dict(e["rows"][0], zone=u"друга зона")]
+                                        + e["rows"][1:])),
+                ("expect", lambda e: dict(e, expect=u"друга причина")),
+                ("ok", lambda e: dict(e, ok=False)),
+            ]
+            for label, mutate in mutations:
+                bucket = list(self.current["gate_lot1v_b"])
+                bucket[index] = mutate(original)
+                doc = dict(self.current)
+                doc["gate_lot1v_b"] = bucket
+                self.assertNotEqual(lot1v_b_bucket_failures(doc), [],
+                                    u"%s / %s остана зелено" % (original["q"], label))
+
+    def test_the_live_engine_replays_the_new_bucket(self):
+        spec = dict((q, (branch, n, want)) for q, branch, n, why, want
+                    in list(REF.LOT1V_B_GAINS) + list(REF.LOT1V_B_CONTROLS))
+        for entry in self.current.get("gate_lot1v_b", []):
+            rows, branch = REF.search(entry["q"])
+            self.assertEqual(branch, entry["branch"], entry["q"])
+            self.assertEqual([(r.name, r.zone) for r in rows],
+                             [(r["name"], r["zone"]) for r in entry["rows"]], entry["q"])
+            want_branch, want_n, want = spec[entry["q"]]
+            self.assertEqual((branch, len(rows)), (want_branch, want_n), entry["q"])
+            self.assertEqual([(r.name.strip(), r.zone, r.kind) for r in rows][:len(want)],
+                             list(want), entry["q"])
+
+
 class RefBucketsTest(unittest.TestCase):
     """ADR 008 D7: the bucket list is fail-closed on all three sides."""
 
@@ -786,8 +999,8 @@ class RefBucketsTest(unittest.TestCase):
         del lost["gate_lot1v_a"]
         self.assertEqual(REF.bucket_drift(lost), [u"липсва gate_lot1v_a"])
         gained = dict(good)
-        gained["gate_lot1v_b"] = []
-        self.assertEqual(REF.bucket_drift(gained), [u"нов gate_lot1v_b"])
+        gained["gate_lot1v_v"] = []
+        self.assertEqual(REF.bucket_drift(gained), [u"нов gate_lot1v_v"])
         broken = dict(good)
         broken["extra"] = {"not": "a list"}
         self.assertEqual(REF.bucket_drift(broken), [u"липсва extra"])

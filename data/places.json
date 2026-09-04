@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "generated": "2026-09-04 08:03:35 · python src/export_fire_varna_places.py",
+  "generated": "2026-09-04 13:30:45 · python src/export_fire_varna_places.py",
   "count": 150,
   "by_kind": {
    "училище": 57,
@@ -23,6 +23,7 @@
   "licence_osm": "Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).",
   "licence_registry": "Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).",
   "licence_wikidata": "Разгърнати имена (псевдоними за търсене) на 3 места: Wikidata Q7035695, Q12291800, Q12299161, CC0 1.0 Universal, достъп 03.09.2026. Низовете са зафиксирани с датата на достъп (снапшотът), не се теглят живо; изворът на всеки псевдоним стои в `old_names_src`.",
+  "licence_address": "Адресите: КАИС адресното поле на тялото под пина (© АГКК — отворените данни, върху които стоят и координатите; условията на ФАЗА_0_лицензи.md); регистровите адреси (Община Варна, МОН/НЕИСПУО, ИАМН) и Националният туристически регистър: отделни факти от регистрите (чл. 4 ЗАПСП), не копие на регистър; адресите от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0. Изворът на всеки адрес стои в `address.src`; токени за собственост не влизат в адреса.",
   "excluded": [
    {
     "name": "V ДКЦ \"Св. Екатерина\"",
@@ -516,7 +517,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"РОЗА\" 42",
+    "src": "KAIS",
+    "street_phrase": "роза",
+    "house_key": "42"
+   }
   },
   {
    "name": "8 СОУПЧЕ",
@@ -527,7 +534,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. Сливница 68",
+    "src": "KAIS",
+    "street_phrase": "сливница",
+    "house_key": "68"
+   }
   },
   {
    "name": "бивше ОУ „Д-р Никола Димитров“",
@@ -538,7 +551,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": "бивш"
+   "status": "бивш",
+   "address": {
+    "text": "ул. 28-ма 28",
+    "src": "KAIS",
+    "street_phrase": "28 ма",
+    "house_key": "28"
+   }
   },
   {
    "name": "ЧОУ \"Феникс 2020\"",
@@ -549,7 +568,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СТУДЕНТСКА- 1",
+    "src": "KAIS",
+    "street_phrase": "студентска",
+    "house_key": "1"
+   }
   },
   {
    "name": "ЧПГ „Антоан дьо Сент-Екзюпери“",
@@ -564,7 +589,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ВАСИЛ ДРУМЕВ 73",
+    "src": "KAIS",
+    "street_phrase": "васил друмев",
+    "house_key": "73"
+   }
   },
   {
    "name": "ЧСУ „Монтесори Варна“",
@@ -579,7 +610,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Глог\" №50",
+    "src": "REG",
+    "street_phrase": "глог",
+    "house_key": "50"
+   }
   },
   {
    "name": "I ЕГ",
@@ -594,7 +631,13 @@
    "old_names_src": [
     "WD"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Подвис\" 29",
+    "src": "KAIS",
+    "street_phrase": "подвис",
+    "house_key": "29"
+   }
   },
   {
    "name": "II ОУ „Никола Йонков Вапцаров“",
@@ -609,7 +652,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "III ПМГ „Акад. Методий Попов“",
@@ -624,7 +668,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. „Владислав Варненчик\" №80",
+    "src": "REG",
+    "street_phrase": "владислав варненчик",
+    "house_key": "80"
+   }
   },
   {
    "name": "IV ЕГ Жолио Кюри",
@@ -641,7 +691,13 @@
     "WD",
     "REG"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Д-р Василаки Пападопулу\" 54",
+    "src": "KAIS",
+    "street_phrase": "д р василаки пападопулу",
+    "house_key": "54"
+   }
   },
   {
    "name": "Математическа гимназия „Доктор Петър Берон“",
@@ -652,7 +708,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "Международното Френско училище във Варна",
@@ -663,7 +720,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "Морска гимназия \"Св. Николай Чудотворец\"",
@@ -674,7 +732,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. НАРОДНИ БУДИТЕЛИ 4",
+    "src": "KAIS",
+    "street_phrase": "народни будители",
+    "house_key": "4"
+   }
   },
   {
    "name": "Национално училище по изкуствата \"Добри Христов\"",
@@ -685,7 +749,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СТЕФАН КАРАДЖА 34",
+    "src": "KAIS",
+    "street_phrase": "стефан караджа",
+    "house_key": "34"
+   }
   },
   {
    "name": "НУ Васил Левски",
@@ -696,7 +766,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. НАЙЧО ЦАНОВ 14",
+    "src": "KAIS",
+    "street_phrase": "найчо цанов",
+    "house_key": "14"
+   }
   },
   {
    "name": "ОУ Черноризец Храбър",
@@ -707,7 +783,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СТУДЕНТСКА- 5",
+    "src": "KAIS",
+    "street_phrase": "студентска",
+    "house_key": "5"
+   }
   },
   {
    "name": "ОУ Добри Чинтулов",
@@ -718,7 +800,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"МИЛОСЪРДИЕ\" 12",
+    "src": "KAIS",
+    "street_phrase": "милосърдие",
+    "house_key": "12"
+   }
   },
   {
    "name": "ОУ \"Г.С.Раковски\"",
@@ -729,7 +817,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ОУ Христо Ботев",
@@ -740,7 +829,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. св.св. Кирил и Методи 8",
+    "src": "KAIS",
+    "street_phrase": "св св кирил и методи",
+    "house_key": "8"
+   }
   },
   {
    "name": "ОУ Йордан Йовков",
@@ -751,7 +846,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ЕКАТЕРИНА СИМИТЧИЕВА 8",
+    "src": "KAIS",
+    "street_phrase": "екатерина симитчиева",
+    "house_key": "8"
+   }
   },
   {
    "name": "ОУ „Иван Вазов“",
@@ -762,7 +863,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Върба\" №24",
+    "src": "REG",
+    "street_phrase": "върба",
+    "house_key": "24"
+   }
   },
   {
    "name": "ОУ Капитан Петко Войвода",
@@ -773,7 +880,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"КАП.I РАНГ ГЕОРГИ КУПОВ\" 37",
+    "src": "KAIS",
+    "street_phrase": "кап i ранг георги купов",
+    "house_key": "37"
+   }
   },
   {
    "name": "ОУ \"Константин Арабаджиев\"",
@@ -784,7 +897,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Ангел Кънчев\" №1",
+    "src": "REG",
+    "street_phrase": "ангел кънчев",
+    "house_key": "1"
+   }
   },
   {
    "name": "ОУ Отец Паисий",
@@ -795,7 +914,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Козница 1",
+    "src": "KAIS",
+    "street_phrase": "козница",
+    "house_key": "1"
+   }
   },
   {
    "name": "ОУ \"П. Р. Славейков\"",
@@ -806,7 +931,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. Владислав Варненчик 80",
+    "src": "OSM",
+    "street_phrase": "владислав варненчик",
+    "house_key": "80"
+   }
   },
   {
    "name": "ОУ ,,Панайот Волов\"",
@@ -817,7 +948,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Св. Димитър Солунски 4",
+    "src": "KAIS",
+    "street_phrase": "св димитър солунски",
+    "house_key": "4"
+   }
   },
   {
    "name": "ОУ Патриарх Евтимий",
@@ -828,7 +965,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Д. Дончев-Доктора\" №10",
+    "src": "REG",
+    "street_phrase": "д дончев доктора",
+    "house_key": "10"
+   }
   },
   {
    "name": "ОУ \"Стефан Караджа\"",
@@ -839,7 +982,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. БРАТЯ БЪКСТОН 11",
+    "src": "KAIS",
+    "street_phrase": "братя бъкстон",
+    "house_key": "11"
+   }
   },
   {
    "name": "ОУ Стоян Михайловски",
@@ -850,7 +999,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ОУ „Св. Климент Охридски“",
@@ -865,7 +1015,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. МИХАИЛ КОЛОНИ 10",
+    "src": "KAIS",
+    "street_phrase": "михаил колони",
+    "house_key": "10"
+   }
   },
   {
    "name": "ОУ \"Св.св.Кирил и Методий\"",
@@ -876,7 +1032,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Братя Миладинови\" 19",
+    "src": "KAIS",
+    "street_phrase": "братя миладинови",
+    "house_key": "19"
+   }
   },
   {
    "name": "ОУ „Свети Иван Рилски“",
@@ -891,7 +1053,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. ВЛАДИСЛАВ ВАРНЕНЧИК 225",
+    "src": "KAIS",
+    "street_phrase": "владислав варненчик",
+    "house_key": "225"
+   }
   },
   {
    "name": "ОУ \"Цар Симеон I\"",
@@ -902,7 +1070,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. НЕОФИТ БОЗВЕЛИ 33",
+    "src": "KAIS",
+    "street_phrase": "неофит бозвели",
+    "house_key": "33"
+   }
   },
   {
    "name": "ОУ \"Васил Априлов\"",
@@ -913,7 +1087,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ОБОРИЩЕ 130",
+    "src": "KAIS",
+    "street_phrase": "оборище",
+    "house_key": "130"
+   }
   },
   {
    "name": "ОУ Васил Друмев",
@@ -924,7 +1104,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. НАЙДЕН ГЕРОВ 31",
+    "src": "KAIS",
+    "street_phrase": "найден геров",
+    "house_key": "31"
+   }
   },
   {
    "name": "ОУ \"Захари Стоянов\"",
@@ -935,7 +1121,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "Първа частна търговска гимназия",
@@ -946,7 +1133,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ПРЕСПА 1",
+    "src": "KAIS",
+    "street_phrase": "преспа",
+    "house_key": "1"
+   }
   },
   {
    "name": "ПГ по Компютърно Моделиране и Компютърни Системи \"Акад. Благовест Сендов\"",
@@ -961,7 +1154,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СТУДЕНТСКА- 1",
+    "src": "KAIS",
+    "street_phrase": "студентска",
+    "house_key": "1"
+   }
   },
   {
    "name": "ПГ по строителство, архитектура и геодезия \"Васил Левски\"",
@@ -976,7 +1175,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. СЛИВНИЦА 189",
+    "src": "KAIS",
+    "street_phrase": "сливница",
+    "house_key": "189"
+   }
   },
   {
    "name": "ПГИ „Д-р Иван Богоров“",
@@ -991,7 +1196,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ПГГСД „Николай Хайтов“",
@@ -1006,7 +1212,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ОРЕХ 11",
+    "src": "KAIS",
+    "street_phrase": "орех",
+    "house_key": "11"
+   }
   },
   {
    "name": "ПГТ „Проф. д-р Асен Златаров\"",
@@ -1021,7 +1233,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. НАЙДЕН ГЕРОВ 1",
+    "src": "KAIS",
+    "street_phrase": "найден геров",
+    "house_key": "1"
+   }
   },
   {
    "name": "Професионална гимназия по електротехника",
@@ -1032,7 +1250,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Върба\" №24",
+    "src": "REG",
+    "street_phrase": "върба",
+    "house_key": "24"
+   }
   },
   {
    "name": "Професионална гимназия по химични и хранително-вкусови технологии \"Д. И. Менделеев\"",
@@ -1043,7 +1267,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Д-р Василаки Пападопулу\" 52",
+    "src": "KAIS",
+    "street_phrase": "д р василаки пападопулу",
+    "house_key": "52"
+   }
   },
   {
    "name": "Професионална Гимназия по Текстил и Моден Дизайн",
@@ -1058,7 +1288,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул.8-ми Приморски полк 113",
+    "src": "KAIS",
+    "street_phrase": "8 ми приморски полк",
+    "house_key": "113"
+   }
   },
   {
    "name": "Професионална Техническа Гимназия",
@@ -1073,7 +1309,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. СЛИВНИЦА 158",
+    "src": "KAIS",
+    "street_phrase": "сливница",
+    "house_key": "158"
+   }
   },
   {
    "name": "Спортно училище Георги Бенковски",
@@ -1084,7 +1326,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "СУ \"Елин Пелин\"",
@@ -1095,7 +1338,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Т.ВЛАЙКОВ 18",
+    "src": "KAIS",
+    "street_phrase": "т влайков",
+    "house_key": "18"
+   }
   },
   {
    "name": "СУ „Гео Милев“",
@@ -1106,7 +1355,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. \"Република\" 124",
+    "src": "KAIS",
+    "street_phrase": "република",
+    "house_key": "124"
+   }
   },
   {
    "name": "СУ „Любен Каравелов“",
@@ -1121,7 +1376,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Народни будители\" №17а",
+    "src": "REG",
+    "street_phrase": "народни будители",
+    "house_key": "17а"
+   }
   },
   {
    "name": "СУ „Неофит Бозвели“",
@@ -1136,7 +1397,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Любчо Патронов\" №3",
+    "src": "REG",
+    "street_phrase": "любчо патронов",
+    "house_key": "3"
+   }
   },
   {
    "name": "СУ „Пейо Крачолов Яворов“",
@@ -1151,7 +1418,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "СУХНИ „Константин Преславски“",
@@ -1166,7 +1434,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. АТАНАС ГЕОРГИЕВ 20",
+    "src": "KAIS",
+    "street_phrase": "атанас георгиев",
+    "house_key": "20"
+   }
   },
   {
    "name": "СУУНЗ Проф. д-р Иван Шишманов",
@@ -1177,7 +1451,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ВИЛИТЕ 1",
+    "src": "KAIS",
+    "street_phrase": "вилите",
+    "house_key": "1"
+   }
   },
   {
    "name": "VII СУ „Найден Геров“",
@@ -1192,7 +1472,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. \"ЦАРЕВЕЦ\" 1",
+    "src": "KAIS",
+    "street_phrase": "царевец",
+    "house_key": "1"
+   }
   },
   {
    "name": "ВТГ „Георги Стойков Раковски\"",
@@ -1207,7 +1493,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. КНЯЗ БОРИС I 55",
+    "src": "KAIS",
+    "street_phrase": "княз борис i",
+    "house_key": "55"
+   }
   },
   {
    "name": "І ОУ „Свети княз Борис I“",
@@ -1222,7 +1514,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "Икономически университет - Варна",
@@ -1239,7 +1532,13 @@
     "CUR",
     "CUR"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. КНЯЗ БОРИС I 77",
+    "src": "KAIS",
+    "street_phrase": "княз борис i",
+    "house_key": "77"
+   }
   },
   {
    "name": "Икономически университет - Варна, 2-ри корпус",
@@ -1250,7 +1549,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ЕВЛОГИ ГЕОРГИЕВ 24",
+    "src": "KAIS",
+    "street_phrase": "евлоги георгиев",
+    "house_key": "24"
+   }
   },
   {
    "name": "Медицински университет „Проф. д-р Параскев Стоянов“",
@@ -1267,7 +1572,13 @@
     "CUR",
     "CUR"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Марин Дринов\" 55",
+    "src": "KAIS",
+    "street_phrase": "марин дринов",
+    "house_key": "55"
+   }
   },
   {
    "name": "Технически университет – Варна",
@@ -1282,7 +1593,13 @@
    "old_names_src": [
     "CUR"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СТУДЕНТСКА- 1",
+    "src": "KAIS",
+    "street_phrase": "студентска",
+    "house_key": "1"
+   }
   },
   {
    "name": "Варненски Свободен Университет „Черноризец Храбър“",
@@ -1297,7 +1614,13 @@
    "old_names_src": [
     "CUR"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"ЯНКО СЛАВЧЕВ\" 84",
+    "src": "KAIS",
+    "street_phrase": "янко славчев",
+    "house_key": "84"
+   }
   },
   {
    "name": "Варненски Университет по Мениджмънт",
@@ -1314,7 +1637,13 @@
     "OSM",
     "CUR"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ОБОРИЩЕ 13",
+    "src": "KAIS",
+    "street_phrase": "оборище",
+    "house_key": "13"
+   }
   },
   {
    "name": "ВВМУ „Н. Й. Вапцаров“",
@@ -1329,7 +1658,13 @@
    "old_names_src": [
     "WD"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ВАСИЛ ДРУМЕВ 73",
+    "src": "KAIS",
+    "street_phrase": "васил друмев",
+    "house_key": "73"
+   }
   },
   {
    "name": "Eurohospital",
@@ -1340,7 +1675,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "„Многопрофилна болница за активно лечение Света Анна – Варна“ АД",
@@ -1355,7 +1691,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. цар ОСВОБОДИТЕЛ 100",
+    "src": "KAIS",
+    "street_phrase": "цар освободител",
+    "house_key": "100"
+   }
   },
   {
    "name": "„Многопрофилна болница за активно лечение Варна“ ЕООД",
@@ -1370,7 +1712,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "пл. „Славейков“ №1",
+    "src": "REG",
+    "street_phrase": "славейков",
+    "house_key": "1"
+   }
   },
   {
    "name": "Онкологична болница-Марко Антонов",
@@ -1381,7 +1729,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ВИЛИТЕ 1",
+    "src": "KAIS",
+    "street_phrase": "вилите",
+    "house_key": "1"
+   }
   },
   {
    "name": "„Специализирана болница по акушерство и гинекология за активно лечение „Проф. д-р Димитър Стаматов“ – Варна“ ЕООД",
@@ -1396,7 +1750,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. цар ОСВОБОДИТЕЛ 150",
+    "src": "KAIS",
+    "street_phrase": "цар освободител",
+    "house_key": "150"
+   }
   },
   {
    "name": "„Специализирана болница за активно лечение по детски болести – доктор Лисичкова“ ЕООД",
@@ -1407,7 +1767,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. „Република“ №91, ет. 4–5, тяло „Г“",
+    "src": "REG",
+    "street_phrase": "република",
+    "house_key": "91"
+   }
   },
   {
    "name": "„Специализирана болница за активно лечение по кардиология Варна“ ЕАД",
@@ -1418,7 +1784,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. цар ОСВОБОДИТЕЛ 100",
+    "src": "KAIS",
+    "street_phrase": "цар освободител",
+    "house_key": "100"
+   }
   },
   {
    "name": "„Специализирана хирургична болница за активно лечение – проф. Темелков“ ООД",
@@ -1433,7 +1805,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. АЛЕКО КОНСТАНТИНОВ 7",
+    "src": "KAIS",
+    "street_phrase": "алеко константинов",
+    "house_key": "7"
+   }
   },
   {
    "name": "„Университетска многопрофилна болница за активно лечение „Света Марина““ ЕАД",
@@ -1450,7 +1828,13 @@
     "OSM",
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. \"ХРИСТО СМИРНЕНСКИ\" 1",
+    "src": "KAIS",
+    "street_phrase": "христо смирненски",
+    "house_key": "1"
+   }
   },
   {
    "name": "„Университетска специализирана болница по очни болести за активно лечение – Варна“ ЕООД",
@@ -1465,7 +1849,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ДОЙРАН 15",
+    "src": "KAIS",
+    "street_phrase": "дойран",
+    "house_key": "15"
+   }
   },
   {
    "name": "Военно-морска болница",
@@ -1476,7 +1866,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. \"ХРИСТО СМИРНЕНСКИ\" 3",
+    "src": "KAIS",
+    "street_phrase": "христо смирненски",
+    "house_key": "3"
+   }
   },
   {
    "name": "Диспансер за белодробни заболявания",
@@ -1487,7 +1883,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ВЕЛЧОВА ЗАВЕРА 12",
+    "src": "KAIS",
+    "street_phrase": "велчова завера",
+    "house_key": "12"
+   }
   },
   {
    "name": "„ДКЦ 3 – Варна“ ЕООД",
@@ -1502,7 +1904,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "„ДКЦ 4 – Варна“ ЕООД",
@@ -1513,7 +1916,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. цар ОСВОБОДИТЕЛ 100",
+    "src": "KAIS",
+    "street_phrase": "цар освободител",
+    "house_key": "100"
+   }
   },
   {
    "name": "„ДКЦ 5 Варна Света Екатерина“ ЕООД",
@@ -1528,7 +1937,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Сава\" 2",
+    "src": "KAIS",
+    "street_phrase": "сава",
+    "house_key": "2"
+   }
   },
   {
    "name": "„ДКЦ Чайка“ ЕООД",
@@ -1543,7 +1958,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"НИКОЛА ВАПЦАРОВ\" 2",
+    "src": "KAIS",
+    "street_phrase": "никола вапцаров",
+    "house_key": "2"
+   }
   },
   {
    "name": "„ДКЦ Младост-М Варна“ ООД",
@@ -1554,7 +1975,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. „Република“ №15, МК „Младост“",
+    "src": "REG",
+    "street_phrase": "република",
+    "house_key": "15"
+   }
   },
   {
    "name": "II ДКЦ Св. Иван Рилски",
@@ -1565,7 +1992,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. НАРОДНИ БУДИТЕЛИ 5",
+    "src": "KAIS",
+    "street_phrase": "народни будители",
+    "house_key": "5"
+   }
   },
   {
    "name": "„Хоспис Филаретова“ ЕООД",
@@ -1576,7 +2009,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Зеленика-1-ва\" 7",
+    "src": "KAIS",
+    "street_phrase": "зеленика 1 ва",
+    "house_key": "7"
+   }
   },
   {
    "name": "„Хоспис Медицинска грижа“ ООД",
@@ -1587,7 +2026,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. „Република“ №15, МК „Младост“, тяло В, ет. 6",
+    "src": "REG",
+    "street_phrase": "република",
+    "house_key": "15"
+   }
   },
   {
    "name": "„Хоспис Мишел Паре“ ООД",
@@ -1598,7 +2043,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. 16-та 40",
+    "src": "KAIS",
+    "street_phrase": "16 та",
+    "house_key": "40"
+   }
   },
   {
    "name": "„Хоспис Надежда“ ЕООД",
@@ -1609,7 +2060,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. „Република“ №15, МЦ „Младост“, тяло Д, ет. 4",
+    "src": "REG",
+    "street_phrase": "република",
+    "house_key": "15"
+   }
   },
   {
    "name": "„Хоспис Света Мария Магдалена“ ЕООД",
@@ -1620,7 +2077,13 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "бул. „Република“ №15, МК „Младост“, блок Г, ет. 5",
+    "src": "REG",
+    "street_phrase": "република",
+    "house_key": "15"
+   }
   },
   {
    "name": "„Хоспис Царица Елеонора – Варна“ ЕООД",
@@ -1631,7 +2094,8 @@
    "src": "Регистър на лечебните заведения (ИАМН)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "1 ЦДГ",
@@ -1642,7 +2106,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ПАРИЖКА КОМУНА 25",
+    "src": "KAIS",
+    "street_phrase": "парижка комуна",
+    "house_key": "25"
+   }
   },
   {
    "name": "20 Логопедична ЦДГ",
@@ -1653,7 +2123,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "27 ДГ Успех",
@@ -1664,7 +2135,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ПЕТКО СТАЙНОВ 10A",
+    "src": "KAIS",
+    "street_phrase": "петко стайнов",
+    "house_key": "10a"
+   }
   },
   {
    "name": "3 ЦДГ Ян Бибиян",
@@ -1675,7 +2152,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ДОБРУДЖА 3",
+    "src": "KAIS",
+    "street_phrase": "добруджа",
+    "house_key": "3"
+   }
   },
   {
    "name": "35 ОДЗ Детска радост",
@@ -1686,7 +2169,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"ХРИСТО СМИРНЕНСКИ\" 30",
+    "src": "KAIS",
+    "street_phrase": "христо смирненски",
+    "house_key": "30"
+   }
   },
   {
    "name": "4 ОДЗ Чайка",
@@ -1697,7 +2186,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "46 ДГ Горска приказка",
@@ -1708,7 +2198,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ЧДГ „Приятели\"",
@@ -1719,7 +2210,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. „Пирот\" №11",
+    "src": "REG",
+    "street_phrase": "пирот",
+    "house_key": "11"
+   }
   },
   {
    "name": "Детска градина \"Жирафче\"",
@@ -1730,7 +2227,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Д-Р БАСАНОВИЧ 29",
+    "src": "KAIS",
+    "street_phrase": "д р басанович",
+    "house_key": "29"
+   }
   },
   {
    "name": "ДГ№10 „Карамфилче“",
@@ -1745,7 +2248,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"КАРАМФИЛ\" 13",
+    "src": "KAIS",
+    "street_phrase": "карамфил",
+    "house_key": "13"
+   }
   },
   {
    "name": "ДГ№11 „Незабравка“",
@@ -1760,7 +2269,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№12 „Ян Бибиян“",
@@ -1775,7 +2285,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ДОЙРАН 9",
+    "src": "KAIS",
+    "street_phrase": "дойран",
+    "house_key": "9"
+   }
   },
   {
    "name": "ДГ№16 „Слънчева Дъга“",
@@ -1790,7 +2306,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул.\"Уйлям Гладстон\" №5",
+    "src": "REG",
+    "street_phrase": "уйлям гладстон",
+    "house_key": "5"
+   }
   },
   {
    "name": "ДГ№17 „Петър Берон\"",
@@ -1807,7 +2329,13 @@
     "OSM",
     "REG"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Генерал Колев 92",
+    "src": "KAIS",
+    "street_phrase": "генерал колев",
+    "house_key": "92"
+   }
   },
   {
    "name": "ДГ№19 „Славейче“",
@@ -1818,7 +2346,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СТУДЕНТСКА- 7",
+    "src": "KAIS",
+    "street_phrase": "студентска",
+    "house_key": "7"
+   }
   },
   {
    "name": "ДГ№21 „Калина Малина“",
@@ -1833,7 +2367,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№22 „Мечо Пух“",
@@ -1844,7 +2379,8 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№23 „Иглика\"",
@@ -1859,7 +2395,13 @@
    "old_names_src": [
     "REG"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ЛАЗУР 2",
+    "src": "KAIS",
+    "street_phrase": "лазур",
+    "house_key": "2"
+   }
   },
   {
    "name": "ДГ 24 \"Детско градче\"",
@@ -1870,7 +2412,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Никола Симов\" 6",
+    "src": "KAIS",
+    "street_phrase": "никола симов",
+    "house_key": "6"
+   }
   },
   {
    "name": "ДГ№25 „Златното зрънце“",
@@ -1885,7 +2433,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№26 „Изворче\"",
@@ -1900,7 +2449,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Хан Кубрат\" 40",
+    "src": "KAIS",
+    "street_phrase": "хан кубрат",
+    "house_key": "40"
+   }
   },
   {
    "name": "ДГ 28 \"Пролет\"",
@@ -1911,7 +2466,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. МИЛОСЪРДИЕ 10",
+    "src": "KAIS",
+    "street_phrase": "милосърдие",
+    "house_key": "10"
+   }
   },
   {
    "name": "ДГ 29 \"Звънче\"",
@@ -1922,7 +2483,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№3 „Звездичка“",
@@ -1937,7 +2499,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Проф.Фр.Жолио Кюри 14",
+    "src": "KAIS",
+    "street_phrase": "проф фр жолио кюри",
+    "house_key": "14"
+   }
   },
   {
    "name": "ДГ 30 \"Синчец\"",
@@ -1948,7 +2516,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ 31 \"Крилатко\"",
@@ -1959,7 +2528,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ 32 \"Моряче\"",
@@ -1970,7 +2540,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"ХАН СЕВАР\" 4",
+    "src": "KAIS",
+    "street_phrase": "хан севар",
+    "house_key": "4"
+   }
   },
   {
    "name": "ДГ 33 „Делфинче“",
@@ -1981,7 +2557,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№34 „Лястовичка“",
@@ -1992,7 +2569,8 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ 36 \"Морска звездица\"",
@@ -2003,7 +2581,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№37 „Пламъче“",
@@ -2014,7 +2593,8 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ 39 \"Приказка\"",
@@ -2025,7 +2605,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ-4 \"Теменужка\" Филиал 1",
@@ -2036,7 +2617,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Цар Симеон I\" 14",
+    "src": "KAIS",
+    "street_phrase": "цар симеон i",
+    "house_key": "14"
+   }
   },
   {
    "name": "ДГ№40 „Детски свят“",
@@ -2047,7 +2634,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Шести септември 6",
+    "src": "KAIS",
+    "street_phrase": "шести септември",
+    "house_key": "6"
+   }
   },
   {
    "name": "ДГ№41 „Първи юни“",
@@ -2058,7 +2651,8 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДГ№44 „Валентина Терешкова\"",
@@ -2073,7 +2667,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. КИРИЛ ПЕЙЧИНОВИЧ 19",
+    "src": "KAIS",
+    "street_phrase": "кирил пейчинович",
+    "house_key": "19"
+   }
   },
   {
    "name": "ДГ №45 Морски свят",
@@ -2084,7 +2684,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул.\"Народни будители\" №8",
+    "src": "REG",
+    "street_phrase": "народни будители",
+    "house_key": "8"
+   }
   },
   {
    "name": "ДГ 5 \"Слънчо\"",
@@ -2095,7 +2701,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Юрий Венелин\" 5",
+    "src": "KAIS",
+    "street_phrase": "юрий венелин",
+    "house_key": "5"
+   }
   },
   {
    "name": "ДГ№52 „Бялата лястовица\"",
@@ -2106,7 +2718,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул.“Велчова завера“ № 12",
+    "src": "REG",
+    "street_phrase": "велчова завера",
+    "house_key": "12"
+   }
   },
   {
    "name": "ДГ№53 „Слънчево зайче“",
@@ -2117,7 +2735,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. КАПИТАН РАЙЧО 103 А",
+    "src": "KAIS",
+    "street_phrase": "капитан райчо",
+    "house_key": "103а"
+   }
   },
   {
    "name": "ДГ№6 „Палечко“",
@@ -2128,7 +2752,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"ТОДОР ВЛАЙКОВ\" 71",
+    "src": "KAIS",
+    "street_phrase": "тодор влайков",
+    "house_key": "71"
+   }
   },
   {
    "name": "ДГ 7 \"Ал.С. Пушкин\"",
@@ -2139,7 +2769,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. А.С.ПУШКИН 24",
+    "src": "KAIS",
+    "street_phrase": "а с пушкин",
+    "house_key": "24"
+   }
   },
   {
    "name": "ДГ Мир №13",
@@ -2150,7 +2786,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"НИКОЛА МИХАЙЛОВСКИ\" 6",
+    "src": "KAIS",
+    "street_phrase": "никола михайловски",
+    "house_key": "6"
+   }
   },
   {
    "name": "ОДГ №14 \"Дружба\"",
@@ -2161,7 +2803,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ДУБРОВНИК 56",
+    "src": "KAIS",
+    "street_phrase": "дубровник",
+    "house_key": "56"
+   }
   },
   {
    "name": "ОДЗ Люляче",
@@ -2172,7 +2820,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"Адмирал Грейг\" 21",
+    "src": "KAIS",
+    "street_phrase": "адмирал грейг",
+    "house_key": "21"
+   }
   },
   {
    "name": "ОДЗ Маргаритка",
@@ -2183,7 +2837,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "Оздравителна Детска Градина №9 \"Ален Мак\"",
@@ -2194,7 +2849,8 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ЦДГ 15 \"Гълъбче\"",
@@ -2205,7 +2861,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. В.ПЕТЛЕШКОВ/А.МАЙМУНКОВА/ 33",
+    "src": "KAIS",
+    "street_phrase": "в петлешков а маймункова",
+    "house_key": "33"
+   }
   },
   {
    "name": "ЦДГ 43 \"Пинокио\"",
@@ -2216,7 +2878,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. КИРИЛ И МЕТОДИЙ 12",
+    "src": "KAIS",
+    "street_phrase": "кирил и методий",
+    "house_key": "12"
+   }
   },
   {
    "name": "ЦДГ 8 - Христо Ботев",
@@ -2227,7 +2895,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СРЕДНА ГОРА 45",
+    "src": "KAIS",
+    "street_phrase": "средна гора",
+    "house_key": "45"
+   }
   },
   {
    "name": "ЦДГ Пушкин (филиал)",
@@ -2238,7 +2912,13 @@
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"княз Дондуков\" 31",
+    "src": "KAIS",
+    "street_phrase": "княз дондуков",
+    "house_key": "31"
+   }
   },
   {
    "name": "ДЯ №11 „Иглика“",
@@ -2255,7 +2935,8 @@
     "OSM",
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДЯ №13 „Русалка“",
@@ -2270,7 +2951,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ЛЮБЧО ПАТРОНОВ 1",
+    "src": "KAIS",
+    "street_phrase": "любчо патронов",
+    "house_key": "1"
+   }
   },
   {
    "name": "ДЯ №14 „Звънче“",
@@ -2285,7 +2972,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДЯ №2 „Моряче“",
@@ -2300,7 +2988,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДЯ №3 „Зайо Байо“",
@@ -2315,7 +3004,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. Никола Кънев 28",
+    "src": "KAIS",
+    "street_phrase": "никола кънев",
+    "house_key": "28"
+   }
   },
   {
    "name": "ДЯ №4 „Приказен свят“",
@@ -2330,7 +3025,8 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": null
   },
   {
    "name": "ДЯ №5 „Чуден свят“",
@@ -2345,7 +3041,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ДИМИТЪР ПОЛЯНОВ 5",
+    "src": "KAIS",
+    "street_phrase": "димитър полянов",
+    "house_key": "5"
+   }
   },
   {
    "name": "ДЯ №6 „Мечо Пух“",
@@ -2356,7 +3058,13 @@
    "src": "Регистър на училищата и детските заведения (Община Варна)",
    "old_names": [],
    "old_names_src": [],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. НИШ 29",
+    "src": "KAIS",
+    "street_phrase": "ниш",
+    "house_key": "29"
+   }
   },
   {
    "name": "ДЯ №7 „Роза“",
@@ -2371,7 +3079,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. \"РОЗА\" 34",
+    "src": "KAIS",
+    "street_phrase": "роза",
+    "house_key": "34"
+   }
   },
   {
    "name": "ДЯ №9 „Детелина“",
@@ -2386,7 +3100,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. СРЕДЕЦ 12",
+    "src": "KAIS",
+    "street_phrase": "средец",
+    "house_key": "12"
+   }
   },
   {
    "name": "ЦПЛР – Средношколско общежитие „Михаил Колони“",
@@ -2401,7 +3121,13 @@
    "old_names_src": [
     "OSM"
    ],
-   "status": ""
+   "status": "",
+   "address": {
+    "text": "ул. ДОЙРАН 17",
+    "src": "KAIS",
+    "street_phrase": "дойран",
+    "house_key": "17"
+   }
   }
  ]
 }

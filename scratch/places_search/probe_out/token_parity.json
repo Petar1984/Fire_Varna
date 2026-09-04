@@ -7,7 +7,8 @@
   "records": 375,
   "names": 373,
   "old_names": 82,
-  "strings": 525
+  "addresses": 210,
+  "strings": 735
  },
  "strings": [
   {
@@ -9967,6 +9968,2696 @@
      "s": "koloni",
      "orig": "колони",
      "num": false
+    }
+   ]
+  },
+  {
+   "s": "девня",
+   "tokens": [
+    {
+     "s": "devnia",
+     "orig": "девня",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "106",
+   "tokens": [
+    {
+     "s": "106",
+     "orig": "106",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "i ва",
+   "tokens": [
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    },
+    {
+     "s": "va",
+     "orig": "ва",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "21",
+   "tokens": [
+    {
+     "s": "21",
+     "orig": "21",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "приморски",
+   "tokens": [
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "43",
+   "tokens": [
+    {
+     "s": "43",
+     "orig": "43",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "31",
+   "tokens": [
+    {
+     "s": "31",
+     "orig": "31",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "осми приморски полк",
+   "tokens": [
+    {
+     "s": "8",
+     "orig": "осми",
+     "num": true
+    },
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "polk",
+     "orig": "полк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "58",
+   "tokens": [
+    {
+     "s": "58",
+     "orig": "58",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "цар освободител",
+   "tokens": [
+    {
+     "s": "tsar",
+     "orig": "цар",
+     "num": false
+    },
+    {
+     "s": "osvoboditel",
+     "orig": "освободител",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "25",
+   "tokens": [
+    {
+     "s": "25",
+     "orig": "25",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "княз борис i",
+   "tokens": [
+    {
+     "s": "kniaz",
+     "orig": "княз",
+     "num": false
+    },
+    {
+     "s": "boris",
+     "orig": "борис",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "65",
+   "tokens": [
+    {
+     "s": "65",
+     "orig": "65",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "петко каравелов",
+   "tokens": [
+    {
+     "s": "petko",
+     "orig": "петко",
+     "num": false
+    },
+    {
+     "s": "karavelov",
+     "orig": "каравелов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "40",
+   "tokens": [
+    {
+     "s": "40",
+     "orig": "40",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "хан маламир",
+   "tokens": [
+    {
+     "s": "han",
+     "orig": "хан",
+     "num": false
+    },
+    {
+     "s": "malamir",
+     "orig": "маламир",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "6",
+   "tokens": [
+    {
+     "s": "6",
+     "orig": "6",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "христо самсаров",
+   "tokens": [
+    {
+     "s": "hristo",
+     "orig": "христо",
+     "num": false
+    },
+    {
+     "s": "samsarov",
+     "orig": "самсаров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "1",
+   "tokens": [
+    {
+     "s": "1",
+     "orig": "1",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "съборни",
+   "tokens": [
+    {
+     "s": "saborni",
+     "orig": "съборни",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "42",
+   "tokens": [
+    {
+     "s": "42",
+     "orig": "42",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "бузлуджа",
+   "tokens": [
+    {
+     "s": "buzludzha",
+     "orig": "бузлуджа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "13",
+   "tokens": [
+    {
+     "s": "13",
+     "orig": "13",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "хан омуртаг",
+   "tokens": [
+    {
+     "s": "han",
+     "orig": "хан",
+     "num": false
+    },
+    {
+     "s": "omurtag",
+     "orig": "омуртаг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "11",
+   "tokens": [
+    {
+     "s": "11",
+     "orig": "11",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "христо ботев",
+   "tokens": [
+    {
+     "s": "hristo",
+     "orig": "христо",
+     "num": false
+    },
+    {
+     "s": "botev",
+     "orig": "ботев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "3",
+   "tokens": [
+    {
+     "s": "3",
+     "orig": "3",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "габрово",
+   "tokens": [
+    {
+     "s": "gabrovo",
+     "orig": "габрово",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "27",
+   "tokens": [
+    {
+     "s": "27",
+     "orig": "27",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "преслав",
+   "tokens": [
+    {
+     "s": "preslav",
+     "orig": "преслав",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "44",
+   "tokens": [
+    {
+     "s": "44",
+     "orig": "44",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "стефан стамболов",
+   "tokens": [
+    {
+     "s": "stefan",
+     "orig": "стефан",
+     "num": false
+    },
+    {
+     "s": "stambolov",
+     "orig": "стамболов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "46",
+   "tokens": [
+    {
+     "s": "46",
+     "orig": "46",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "мусала",
+   "tokens": [
+    {
+     "s": "musala",
+     "orig": "мусала",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "1 ва",
+   "tokens": [
+    {
+     "s": "1",
+     "orig": "1",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "7",
+   "tokens": [
+    {
+     "s": "7",
+     "orig": "7",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "111",
+   "tokens": [
+    {
+     "s": "111",
+     "orig": "111",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "126",
+   "tokens": [
+    {
+     "s": "126",
+     "orig": "126",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "68",
+   "tokens": [
+    {
+     "s": "68",
+     "orig": "68",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "димитър хаджиянев",
+   "tokens": [
+    {
+     "s": "dimitar",
+     "orig": "димитър",
+     "num": false
+    },
+    {
+     "s": "hadzhianev",
+     "orig": "хаджиянев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "20",
+   "tokens": [
+    {
+     "s": "20",
+     "orig": "20",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "боян бъчваров",
+   "tokens": [
+    {
+     "s": "boian",
+     "orig": "боян",
+     "num": false
+    },
+    {
+     "s": "bachvarov",
+     "orig": "бъчваров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "157",
+   "tokens": [
+    {
+     "s": "157",
+     "orig": "157",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "петър попов",
+   "tokens": [
+    {
+     "s": "petar",
+     "orig": "петър",
+     "num": false
+    },
+    {
+     "s": "popov",
+     "orig": "попов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "102",
+   "tokens": [
+    {
+     "s": "102",
+     "orig": "102",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "108",
+   "tokens": [
+    {
+     "s": "108",
+     "orig": "108",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "д р любен лазаров",
+   "tokens": [
+    {
+     "s": "d",
+     "orig": "д",
+     "num": false
+    },
+    {
+     "s": "r",
+     "orig": "р",
+     "num": false
+    },
+    {
+     "s": "liuben",
+     "orig": "любен",
+     "num": false
+    },
+    {
+     "s": "lazarov",
+     "orig": "лазаров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "115",
+   "tokens": [
+    {
+     "s": "115",
+     "orig": "115",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "охрид",
+   "tokens": [
+    {
+     "s": "ohrid",
+     "orig": "охрид",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "10",
+   "tokens": [
+    {
+     "s": "10",
+     "orig": "10",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "цар борис iii",
+   "tokens": [
+    {
+     "s": "tsar",
+     "orig": "цар",
+     "num": false
+    },
+    {
+     "s": "boris",
+     "orig": "борис",
+     "num": false
+    },
+    {
+     "s": "3",
+     "orig": "iii",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "60",
+   "tokens": [
+    {
+     "s": "60",
+     "orig": "60",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "веселина цанкова",
+   "tokens": [
+    {
+     "s": "veselina",
+     "orig": "веселина",
+     "num": false
+    },
+    {
+     "s": "tsankova",
+     "orig": "цанкова",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "4",
+   "tokens": [
+    {
+     "s": "4",
+     "orig": "4",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "янко славчев",
+   "tokens": [
+    {
+     "s": "ianko",
+     "orig": "янко",
+     "num": false
+    },
+    {
+     "s": "slavchev",
+     "orig": "славчев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "115а",
+   "tokens": [
+    {
+     "s": "115a",
+     "orig": "115а",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "овчо поле",
+   "tokens": [
+    {
+     "s": "ovcho",
+     "orig": "овчо",
+     "num": false
+    },
+    {
+     "s": "pole",
+     "orig": "поле",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "28",
+   "tokens": [
+    {
+     "s": "28",
+     "orig": "28",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "к доганов",
+   "tokens": [
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "doganov",
+     "orig": "доганов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "49 та",
+   "tokens": [
+    {
+     "s": "49",
+     "orig": "49",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "робърт скот",
+   "tokens": [
+    {
+     "s": "robart",
+     "orig": "робърт",
+     "num": false
+    },
+    {
+     "s": "skot",
+     "orig": "скот",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "82",
+   "tokens": [
+    {
+     "s": "82",
+     "orig": "82",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "90",
+   "tokens": [
+    {
+     "s": "90",
+     "orig": "90",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "дубровник",
+   "tokens": [
+    {
+     "s": "dubrovnik",
+     "orig": "дубровник",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "23",
+   "tokens": [
+    {
+     "s": "23",
+     "orig": "23",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "братя шкорпил",
+   "tokens": [
+    {
+     "s": "bratia",
+     "orig": "братя",
+     "num": false
+    },
+    {
+     "s": "shkorpil",
+     "orig": "шкорпил",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "30",
+   "tokens": [
+    {
+     "s": "30",
+     "orig": "30",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "владислав варненчик",
+   "tokens": [
+    {
+     "s": "vladislav",
+     "orig": "владислав",
+     "num": false
+    },
+    {
+     "s": "varnenchik",
+     "orig": "варненчик",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "2",
+   "tokens": [
+    {
+     "s": "2",
+     "orig": "2",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "сирма войвода",
+   "tokens": [
+    {
+     "s": "sirma",
+     "orig": "сирма",
+     "num": false
+    },
+    {
+     "s": "voivoda",
+     "orig": "войвода",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "георги бенковски",
+   "tokens": [
+    {
+     "s": "georgi",
+     "orig": "георги",
+     "num": false
+    },
+    {
+     "s": "benkovski",
+     "orig": "бенковски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "117",
+   "tokens": [
+    {
+     "s": "117",
+     "orig": "117",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "п каравелов",
+   "tokens": [
+    {
+     "s": "p",
+     "orig": "п",
+     "num": false
+    },
+    {
+     "s": "karavelov",
+     "orig": "каравелов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "8",
+   "tokens": [
+    {
+     "s": "8",
+     "orig": "8",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "хан аспарух",
+   "tokens": [
+    {
+     "s": "han",
+     "orig": "хан",
+     "num": false
+    },
+    {
+     "s": "asparuh",
+     "orig": "аспарух",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "мара тасева",
+   "tokens": [
+    {
+     "s": "mara",
+     "orig": "мара",
+     "num": false
+    },
+    {
+     "s": "taseva",
+     "orig": "тасева",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "16",
+   "tokens": [
+    {
+     "s": "16",
+     "orig": "16",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "фр шопен",
+   "tokens": [
+    {
+     "s": "fr",
+     "orig": "фр",
+     "num": false
+    },
+    {
+     "s": "shopen",
+     "orig": "шопен",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "посев",
+   "tokens": [
+    {
+     "s": "posev",
+     "orig": "посев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "29",
+   "tokens": [
+    {
+     "s": "29",
+     "orig": "29",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "стефан караджа",
+   "tokens": [
+    {
+     "s": "stefan",
+     "orig": "стефан",
+     "num": false
+    },
+    {
+     "s": "karadzha",
+     "orig": "караджа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "солун",
+   "tokens": [
+    {
+     "s": "solun",
+     "orig": "солун",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "сливница",
+   "tokens": [
+    {
+     "s": "slivnitsa",
+     "orig": "сливница",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "33",
+   "tokens": [
+    {
+     "s": "33",
+     "orig": "33",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "45 та",
+   "tokens": [
+    {
+     "s": "45",
+     "orig": "45",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "станко вълчанов",
+   "tokens": [
+    {
+     "s": "stanko",
+     "orig": "станко",
+     "num": false
+    },
+    {
+     "s": "valchanov",
+     "orig": "вълчанов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "баба рада",
+   "tokens": [
+    {
+     "s": "baba",
+     "orig": "баба",
+     "num": false
+    },
+    {
+     "s": "rada",
+     "orig": "рада",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "45",
+   "tokens": [
+    {
+     "s": "45",
+     "orig": "45",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "59",
+   "tokens": [
+    {
+     "s": "59",
+     "orig": "59",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "цар иван шишман",
+   "tokens": [
+    {
+     "s": "tsar",
+     "orig": "цар",
+     "num": false
+    },
+    {
+     "s": "ivan",
+     "orig": "иван",
+     "num": false
+    },
+    {
+     "s": "shishman",
+     "orig": "шишман",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "южен залив",
+   "tokens": [
+    {
+     "s": "iuzhen",
+     "orig": "южен",
+     "num": false
+    },
+    {
+     "s": "zaliv",
+     "orig": "залив",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "инж цаню цанев",
+   "tokens": [
+    {
+     "s": "inzh",
+     "orig": "инж",
+     "num": false
+    },
+    {
+     "s": "tsaniu",
+     "orig": "цаню",
+     "num": false
+    },
+    {
+     "s": "tsanev",
+     "orig": "цанев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "12",
+   "tokens": [
+    {
+     "s": "12",
+     "orig": "12",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "опълченска",
+   "tokens": [
+    {
+     "s": "opalchenska",
+     "orig": "опълченска",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "9",
+   "tokens": [
+    {
+     "s": "9",
+     "orig": "9",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "50 та",
+   "tokens": [
+    {
+     "s": "50",
+     "orig": "50",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "24",
+   "tokens": [
+    {
+     "s": "24",
+     "orig": "24",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "цар самуил",
+   "tokens": [
+    {
+     "s": "tsar",
+     "orig": "цар",
+     "num": false
+    },
+    {
+     "s": "samuil",
+     "orig": "самуил",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "рали мавридов",
+   "tokens": [
+    {
+     "s": "rali",
+     "orig": "рали",
+     "num": false
+    },
+    {
+     "s": "mavridov",
+     "orig": "мавридов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "354",
+   "tokens": [
+    {
+     "s": "354",
+     "orig": "354",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "д р людвиг заменхоф",
+   "tokens": [
+    {
+     "s": "d",
+     "orig": "д",
+     "num": false
+    },
+    {
+     "s": "r",
+     "orig": "р",
+     "num": false
+    },
+    {
+     "s": "liudvig",
+     "orig": "людвиг",
+     "num": false
+    },
+    {
+     "s": "zamenhof",
+     "orig": "заменхоф",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "38",
+   "tokens": [
+    {
+     "s": "38",
+     "orig": "38",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "арх манол йорданов",
+   "tokens": [
+    {
+     "s": "arh",
+     "orig": "арх",
+     "num": false
+    },
+    {
+     "s": "manol",
+     "orig": "манол",
+     "num": false
+    },
+    {
+     "s": "iordanov",
+     "orig": "йорданов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "парижка комуна",
+   "tokens": [
+    {
+     "s": "parizhka",
+     "orig": "парижка",
+     "num": false
+    },
+    {
+     "s": "komuna",
+     "orig": "комуна",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "янош хуняди",
+   "tokens": [
+    {
+     "s": "ianosh",
+     "orig": "янош",
+     "num": false
+    },
+    {
+     "s": "huniadi",
+     "orig": "хуняди",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "13 та",
+   "tokens": [
+    {
+     "s": "13",
+     "orig": "13",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "роза",
+   "tokens": [
+    {
+     "s": "roza",
+     "orig": "роза",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "28 ма",
+   "tokens": [
+    {
+     "s": "28",
+     "orig": "28",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "студентска",
+   "tokens": [
+    {
+     "s": "studentska",
+     "orig": "студентска",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "васил друмев",
+   "tokens": [
+    {
+     "s": "vasil",
+     "orig": "васил",
+     "num": false
+    },
+    {
+     "s": "drumev",
+     "orig": "друмев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "73",
+   "tokens": [
+    {
+     "s": "73",
+     "orig": "73",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "глог",
+   "tokens": [
+    {
+     "s": "glog",
+     "orig": "глог",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "50",
+   "tokens": [
+    {
+     "s": "50",
+     "orig": "50",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "подвис",
+   "tokens": [
+    {
+     "s": "podvis",
+     "orig": "подвис",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "80",
+   "tokens": [
+    {
+     "s": "80",
+     "orig": "80",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "д р василаки пападопулу",
+   "tokens": [
+    {
+     "s": "d",
+     "orig": "д",
+     "num": false
+    },
+    {
+     "s": "r",
+     "orig": "р",
+     "num": false
+    },
+    {
+     "s": "vasilaki",
+     "orig": "василаки",
+     "num": false
+    },
+    {
+     "s": "papadopulu",
+     "orig": "пападопулу",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "54",
+   "tokens": [
+    {
+     "s": "54",
+     "orig": "54",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "народни будители",
+   "tokens": [
+    {
+     "s": "narodni",
+     "orig": "народни",
+     "num": false
+    },
+    {
+     "s": "buditeli",
+     "orig": "будители",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "34",
+   "tokens": [
+    {
+     "s": "34",
+     "orig": "34",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "найчо цанов",
+   "tokens": [
+    {
+     "s": "naicho",
+     "orig": "найчо",
+     "num": false
+    },
+    {
+     "s": "tsanov",
+     "orig": "цанов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "14",
+   "tokens": [
+    {
+     "s": "14",
+     "orig": "14",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "5",
+   "tokens": [
+    {
+     "s": "5",
+     "orig": "5",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "милосърдие",
+   "tokens": [
+    {
+     "s": "milosardie",
+     "orig": "милосърдие",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "св св кирил и методи",
+   "tokens": [
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "kiril",
+     "orig": "кирил",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "metodi",
+     "orig": "методи",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "екатерина симитчиева",
+   "tokens": [
+    {
+     "s": "ekaterina",
+     "orig": "екатерина",
+     "num": false
+    },
+    {
+     "s": "simitchieva",
+     "orig": "симитчиева",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "върба",
+   "tokens": [
+    {
+     "s": "varba",
+     "orig": "върба",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кап i ранг георги купов",
+   "tokens": [
+    {
+     "s": "kap",
+     "orig": "кап",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    },
+    {
+     "s": "rang",
+     "orig": "ранг",
+     "num": false
+    },
+    {
+     "s": "georgi",
+     "orig": "георги",
+     "num": false
+    },
+    {
+     "s": "kupov",
+     "orig": "купов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "37",
+   "tokens": [
+    {
+     "s": "37",
+     "orig": "37",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "ангел кънчев",
+   "tokens": [
+    {
+     "s": "angel",
+     "orig": "ангел",
+     "num": false
+    },
+    {
+     "s": "kanchev",
+     "orig": "кънчев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "козница",
+   "tokens": [
+    {
+     "s": "koznitsa",
+     "orig": "козница",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "св димитър солунски",
+   "tokens": [
+    {
+     "s": "sveti",
+     "orig": "свети",
+     "num": false
+    },
+    {
+     "s": "dimitar",
+     "orig": "димитър",
+     "num": false
+    },
+    {
+     "s": "solunski",
+     "orig": "солунски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "д дончев доктора",
+   "tokens": [
+    {
+     "s": "d",
+     "orig": "д",
+     "num": false
+    },
+    {
+     "s": "donchev",
+     "orig": "дончев",
+     "num": false
+    },
+    {
+     "s": "doktora",
+     "orig": "доктора",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "братя бъкстон",
+   "tokens": [
+    {
+     "s": "bratia",
+     "orig": "братя",
+     "num": false
+    },
+    {
+     "s": "bakston",
+     "orig": "бъкстон",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "михаил колони",
+   "tokens": [
+    {
+     "s": "mihail",
+     "orig": "михаил",
+     "num": false
+    },
+    {
+     "s": "koloni",
+     "orig": "колони",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "братя миладинови",
+   "tokens": [
+    {
+     "s": "bratia",
+     "orig": "братя",
+     "num": false
+    },
+    {
+     "s": "miladinovi",
+     "orig": "миладинови",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "19",
+   "tokens": [
+    {
+     "s": "19",
+     "orig": "19",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "225",
+   "tokens": [
+    {
+     "s": "225",
+     "orig": "225",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "неофит бозвели",
+   "tokens": [
+    {
+     "s": "neofit",
+     "orig": "неофит",
+     "num": false
+    },
+    {
+     "s": "bozveli",
+     "orig": "бозвели",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "оборище",
+   "tokens": [
+    {
+     "s": "oborishte",
+     "orig": "оборище",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "130",
+   "tokens": [
+    {
+     "s": "130",
+     "orig": "130",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "найден геров",
+   "tokens": [
+    {
+     "s": "naiden",
+     "orig": "найден",
+     "num": false
+    },
+    {
+     "s": "gerov",
+     "orig": "геров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "преспа",
+   "tokens": [
+    {
+     "s": "prespa",
+     "orig": "преспа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "189",
+   "tokens": [
+    {
+     "s": "189",
+     "orig": "189",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "орех",
+   "tokens": [
+    {
+     "s": "oreh",
+     "orig": "орех",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "52",
+   "tokens": [
+    {
+     "s": "52",
+     "orig": "52",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "8 ми приморски полк",
+   "tokens": [
+    {
+     "s": "8",
+     "orig": "8",
+     "num": true
+    },
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "polk",
+     "orig": "полк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "113",
+   "tokens": [
+    {
+     "s": "113",
+     "orig": "113",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "158",
+   "tokens": [
+    {
+     "s": "158",
+     "orig": "158",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "т влайков",
+   "tokens": [
+    {
+     "s": "t",
+     "orig": "т",
+     "num": false
+    },
+    {
+     "s": "vlaikov",
+     "orig": "влайков",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "18",
+   "tokens": [
+    {
+     "s": "18",
+     "orig": "18",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "република",
+   "tokens": [
+    {
+     "s": "republika",
+     "orig": "република",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "124",
+   "tokens": [
+    {
+     "s": "124",
+     "orig": "124",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "17а",
+   "tokens": [
+    {
+     "s": "17a",
+     "orig": "17а",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "любчо патронов",
+   "tokens": [
+    {
+     "s": "liubcho",
+     "orig": "любчо",
+     "num": false
+    },
+    {
+     "s": "patronov",
+     "orig": "патронов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "атанас георгиев",
+   "tokens": [
+    {
+     "s": "atanas",
+     "orig": "атанас",
+     "num": false
+    },
+    {
+     "s": "georgiev",
+     "orig": "георгиев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "вилите",
+   "tokens": [
+    {
+     "s": "vilite",
+     "orig": "вилите",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "царевец",
+   "tokens": [
+    {
+     "s": "tsarevets",
+     "orig": "царевец",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "55",
+   "tokens": [
+    {
+     "s": "55",
+     "orig": "55",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "77",
+   "tokens": [
+    {
+     "s": "77",
+     "orig": "77",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "евлоги георгиев",
+   "tokens": [
+    {
+     "s": "evlogi",
+     "orig": "евлоги",
+     "num": false
+    },
+    {
+     "s": "georgiev",
+     "orig": "георгиев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "марин дринов",
+   "tokens": [
+    {
+     "s": "marin",
+     "orig": "марин",
+     "num": false
+    },
+    {
+     "s": "drinov",
+     "orig": "дринов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "84",
+   "tokens": [
+    {
+     "s": "84",
+     "orig": "84",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "100",
+   "tokens": [
+    {
+     "s": "100",
+     "orig": "100",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "славейков",
+   "tokens": [
+    {
+     "s": "slaveikov",
+     "orig": "славейков",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "150",
+   "tokens": [
+    {
+     "s": "150",
+     "orig": "150",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "91",
+   "tokens": [
+    {
+     "s": "91",
+     "orig": "91",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "алеко константинов",
+   "tokens": [
+    {
+     "s": "aleko",
+     "orig": "алеко",
+     "num": false
+    },
+    {
+     "s": "konstantinov",
+     "orig": "константинов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "христо смирненски",
+   "tokens": [
+    {
+     "s": "hristo",
+     "orig": "христо",
+     "num": false
+    },
+    {
+     "s": "smirnenski",
+     "orig": "смирненски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "дойран",
+   "tokens": [
+    {
+     "s": "doiran",
+     "orig": "дойран",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "15",
+   "tokens": [
+    {
+     "s": "15",
+     "orig": "15",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "велчова завера",
+   "tokens": [
+    {
+     "s": "velchova",
+     "orig": "велчова",
+     "num": false
+    },
+    {
+     "s": "zavera",
+     "orig": "завера",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "сава",
+   "tokens": [
+    {
+     "s": "sava",
+     "orig": "сава",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "никола вапцаров",
+   "tokens": [
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    },
+    {
+     "s": "vaptsarov",
+     "orig": "вапцаров",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "зеленика 1 ва",
+   "tokens": [
+    {
+     "s": "zelenika",
+     "orig": "зеленика",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "1",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "16 та",
+   "tokens": [
+    {
+     "s": "16",
+     "orig": "16",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "петко стайнов",
+   "tokens": [
+    {
+     "s": "petko",
+     "orig": "петко",
+     "num": false
+    },
+    {
+     "s": "stainov",
+     "orig": "стайнов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "10a",
+   "tokens": [
+    {
+     "s": "10a",
+     "orig": "10a",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "добруджа",
+   "tokens": [
+    {
+     "s": "dobrudzha",
+     "orig": "добруджа",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "пирот",
+   "tokens": [
+    {
+     "s": "pirot",
+     "orig": "пирот",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "д р басанович",
+   "tokens": [
+    {
+     "s": "d",
+     "orig": "д",
+     "num": false
+    },
+    {
+     "s": "r",
+     "orig": "р",
+     "num": false
+    },
+    {
+     "s": "basanovich",
+     "orig": "басанович",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "карамфил",
+   "tokens": [
+    {
+     "s": "karamfil",
+     "orig": "карамфил",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "уйлям гладстон",
+   "tokens": [
+    {
+     "s": "uiliam",
+     "orig": "уйлям",
+     "num": false
+    },
+    {
+     "s": "gladston",
+     "orig": "гладстон",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "генерал колев",
+   "tokens": [
+    {
+     "s": "general",
+     "orig": "генерал",
+     "num": false
+    },
+    {
+     "s": "kolev",
+     "orig": "колев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "92",
+   "tokens": [
+    {
+     "s": "92",
+     "orig": "92",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "лазур",
+   "tokens": [
+    {
+     "s": "lazur",
+     "orig": "лазур",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "никола симов",
+   "tokens": [
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    },
+    {
+     "s": "simov",
+     "orig": "симов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "хан кубрат",
+   "tokens": [
+    {
+     "s": "han",
+     "orig": "хан",
+     "num": false
+    },
+    {
+     "s": "kubrat",
+     "orig": "кубрат",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "проф фр жолио кюри",
+   "tokens": [
+    {
+     "s": "prof",
+     "orig": "проф",
+     "num": false
+    },
+    {
+     "s": "fr",
+     "orig": "фр",
+     "num": false
+    },
+    {
+     "s": "zholio",
+     "orig": "жолио",
+     "num": false
+    },
+    {
+     "s": "kiuri",
+     "orig": "кюри",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "хан севар",
+   "tokens": [
+    {
+     "s": "han",
+     "orig": "хан",
+     "num": false
+    },
+    {
+     "s": "sevar",
+     "orig": "севар",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "цар симеон i",
+   "tokens": [
+    {
+     "s": "tsar",
+     "orig": "цар",
+     "num": false
+    },
+    {
+     "s": "simeon",
+     "orig": "симеон",
+     "num": false
+    },
+    {
+     "s": "1",
+     "orig": "i",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "шести септември",
+   "tokens": [
+    {
+     "s": "6",
+     "orig": "шести",
+     "num": true
+    },
+    {
+     "s": "septemvri",
+     "orig": "септември",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кирил пейчинович",
+   "tokens": [
+    {
+     "s": "kiril",
+     "orig": "кирил",
+     "num": false
+    },
+    {
+     "s": "peichinovich",
+     "orig": "пейчинович",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "юрий венелин",
+   "tokens": [
+    {
+     "s": "iuri",
+     "orig": "юрий",
+     "num": false
+    },
+    {
+     "s": "venelin",
+     "orig": "венелин",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "капитан райчо",
+   "tokens": [
+    {
+     "s": "kapitan",
+     "orig": "капитан",
+     "num": false
+    },
+    {
+     "s": "raicho",
+     "orig": "райчо",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "103а",
+   "tokens": [
+    {
+     "s": "103a",
+     "orig": "103а",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "тодор влайков",
+   "tokens": [
+    {
+     "s": "todor",
+     "orig": "тодор",
+     "num": false
+    },
+    {
+     "s": "vlaikov",
+     "orig": "влайков",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "71",
+   "tokens": [
+    {
+     "s": "71",
+     "orig": "71",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "а с пушкин",
+   "tokens": [
+    {
+     "s": "a",
+     "orig": "а",
+     "num": false
+    },
+    {
+     "s": "s",
+     "orig": "с",
+     "num": false
+    },
+    {
+     "s": "pushkin",
+     "orig": "пушкин",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "никола михайловски",
+   "tokens": [
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    },
+    {
+     "s": "mihailovski",
+     "orig": "михайловски",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "56",
+   "tokens": [
+    {
+     "s": "56",
+     "orig": "56",
+     "num": true
+    }
+   ]
+  },
+  {
+   "s": "адмирал грейг",
+   "tokens": [
+    {
+     "s": "admiral",
+     "orig": "адмирал",
+     "num": false
+    },
+    {
+     "s": "greig",
+     "orig": "грейг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "в петлешков а маймункова",
+   "tokens": [
+    {
+     "s": "v",
+     "orig": "в",
+     "num": false
+    },
+    {
+     "s": "petleshkov",
+     "orig": "петлешков",
+     "num": false
+    },
+    {
+     "s": "a",
+     "orig": "а",
+     "num": false
+    },
+    {
+     "s": "maimunkova",
+     "orig": "маймункова",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кирил и методий",
+   "tokens": [
+    {
+     "s": "kiril",
+     "orig": "кирил",
+     "num": false
+    },
+    {
+     "s": "i",
+     "orig": "и",
+     "num": false
+    },
+    {
+     "s": "metodi",
+     "orig": "методий",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "средна гора",
+   "tokens": [
+    {
+     "s": "sredna",
+     "orig": "средна",
+     "num": false
+    },
+    {
+     "s": "gora",
+     "orig": "гора",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "княз дондуков",
+   "tokens": [
+    {
+     "s": "kniaz",
+     "orig": "княз",
+     "num": false
+    },
+    {
+     "s": "dondukov",
+     "orig": "дондуков",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "никола кънев",
+   "tokens": [
+    {
+     "s": "nikola",
+     "orig": "никола",
+     "num": false
+    },
+    {
+     "s": "kanev",
+     "orig": "кънев",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "димитър полянов",
+   "tokens": [
+    {
+     "s": "dimitar",
+     "orig": "димитър",
+     "num": false
+    },
+    {
+     "s": "polianov",
+     "orig": "полянов",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ниш",
+   "tokens": [
+    {
+     "s": "nish",
+     "orig": "ниш",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "средец",
+   "tokens": [
+    {
+     "s": "sredets",
+     "orig": "средец",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "17",
+   "tokens": [
+    {
+     "s": "17",
+     "orig": "17",
+     "num": true
     }
    ]
   }

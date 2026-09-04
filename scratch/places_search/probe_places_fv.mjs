@@ -716,8 +716,11 @@ const REF_ROWS = JSON.parse(fs.readFileSync(REF_PATH, "utf8"));
 // (recall_sweep.py REF_BUCKETS, which refuses to WRITE an artefact with other
 // keys); the suite compares all three. F6-а added `gate_lot1v_a` additively:
 // the 122 rows of the four buckets above did not move (measured against
-// a58010e), so they are replayed exactly as they were frozen.
-const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a"];
+// a58010e), so they are replayed exactly as they were frozen. F8 added
+// `gate_lot1v_b` the same way — the addresses and the A3-street branch moved
+// none of the 122 + 12 rows either, so nothing was re-frozen, only added.
+const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a",
+                     "gate_lot1v_b"];
 const REF_BUCKETS_IN_FILE = Object.keys(REF_ROWS).filter((k) => k !== "_meta");
 const REF_BUCKETS_DRIFT = REF_BUCKETS
   .filter((b) => !Array.isArray(REF_ROWS[b])).map((b) => "липсва " + b)
@@ -800,7 +803,7 @@ const P7_BEFORE = [
 // WRITES into it (staleCache) and reads it back (warm). tests/test_places_search_gate.py
 // (PlacesCacheNameTest) compares this literal with index.html — a stale copy would turn
 // the В7 refusal scenario into a plain 404 in silence.
-const PLACES_CACHE = "fire-varna-hotels-v3-225";
+const PLACES_CACHE = "fire-varna-hotels-v4-225";
 const HOTELS_URL = BASE + "data/hotels.json";
 
 const PL_VISIBLE_JS = "document.getElementById('placesSearchResults').classList.contains('visible')";
@@ -890,6 +893,7 @@ const PLACE_SURFACE_JS = `(function () {
     sub: pop ? (pop.querySelector('.pp-sub') || {}).textContent || null : null,
     old: pop ? ((pop.querySelector('.pp-old') || {}).textContent || null) : null,
     oldSrc: pop ? ((pop.querySelector('.pp-old-src') || {}).textContent || null) : null,
+    addr: pop ? ((pop.querySelector('.pp-addr') || {}).textContent || null) : null,
     src: pop ? (pop.querySelector('.pp-src') || {}).textContent || null : null,
     navHrefs: hrefs,
     theirPins: document.querySelectorAll('.search-pin-wrapper').length,
@@ -1097,6 +1101,9 @@ async function checkTokenParity(s) {
            // phrase), so the corpus grew by one entry per delivered old name.
            names: PARITY._meta.names === undefined ? null : PARITY._meta.names,
            oldNames: PARITY._meta.old_names === undefined ? null : PARITY._meta.old_names,
+           // ЛОТ 1в-Б D6: a street phrase and a house number are searchable STRINGS
+           // now (STREET keys the whole phrase), so the corpus grew by them too.
+           addresses: PARITY._meta.addresses === undefined ? null : PARITY._meta.addresses,
            passed: strings.length - mismatches.length,
            compares: "s + orig + num (orig през копие на токенизатора от index.html)",
            copyInstalled: installed === true, copyNote: installed === true ? null : installed,
@@ -1303,6 +1310,65 @@ async function checkAliasCard(s) {
   out.ok = out.rowsShown === 1 && !!parsed && parsed.name === "ВВМУ „Н. Й. Вапцаров“"
            && parsed.matched_alias_i === 0 && parsed.old_names_src[0] === "WD"
            && out.oldSrc === ALIAS_CARD_EXPECT && out.namedOldSrc === null;
+  return out;
+}
+
+// ЛОТ 1в-Б (ADR 008 D5) — the card carries the address of the record and the
+// source of THAT string, right under „вид · зона“. Measured, not claimed: ДГ№12
+// „Ян Бибиян“ is reached through the new street branch („дойран 9“) and its card
+// has to read „адрес: ул. ДОЙРАН 9 · КАИС“; a record with `address: null` must
+// carry no such line at all. Both halves are a hard gate, exactly like D3 above.
+const ADDR_CARD_Q = "дойран 9";
+const ADDR_CARD_EXPECT = "адрес: ул. ДОЙРАН 9 · КАИС";
+// Measured: 185 of the 375 records have no address that meets the strict criterion,
+// and „хотел адмирал“ puts one of them (Адмирал) first — the same path D3 already
+// walks for its own second half, so no new scenario is invented for this one.
+const ADDR_CARD_NONE_Q = "хотел адмирал";
+
+async function checkAddressCard(s) {
+  await navigateFresh(s, "D5 address card");
+  if (!(await placesReady(s))) return { ready: false, ok: false };
+  const list = await typePlaces(s, ADDR_CARD_Q);
+  const found = await s.ev(
+    `JSON.stringify(window.__places.search(${JSON.stringify(ADDR_CARD_Q)}))`);
+  const parsed = found ? JSON.parse(found) : null;
+  const clicked = await s.ev(
+    "(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]');"
+    + " if (!e) return false; e.click(); return true; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const surface = await s.ev(PLACE_SURFACE_JS);
+  await focusInput(s);
+  await pressKey(s, "Escape", 27);
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length === 0", 15000);
+  await clearField(s);
+  // The other half: a record without an address says nothing about one.
+  const none = await typePlaces(s, ADDR_CARD_NONE_Q);
+  await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const noneSurface = await s.ev(PLACE_SURFACE_JS);
+  await focusInput(s);
+  await pressKey(s, "Escape", 27);
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length === 0", 15000);
+  await clearField(s);
+  const row = parsed && parsed.rows && parsed.rows[0];
+  const out = {
+    ready: true, query: ADDR_CARD_Q, clicked: !!clicked,
+    rowsShown: list.rows.length, hasKey: parsed ? parsed.hasKey : null,
+    exportRow: row && { name: row.name, address: row.address },
+    title: surface.title, addr: surface.addr, src: surface.src,
+    theirVisible: surface.theirVisible,
+    noneQuery: ADDR_CARD_NONE_Q, noneTitle: noneSurface.title,
+    noneAddr: noneSurface.addr, noneRows: none.rows.length,
+  };
+  // S4: the keyless street query keeps `hasKey` false, so the building address
+  // search and its Enter stay on top and our section renders under it.
+  out.ok = out.rowsShown === 1 && !!row && row.name === "ДГ№12 „Ян Бибиян“"
+           && parsed.hasKey === false && !!row.address && row.address.src === "KAIS"
+           && out.addr === ADDR_CARD_EXPECT && out.noneAddr === null;
   return out;
 }
 
@@ -1812,6 +1878,7 @@ async function runG4(s) {
   console.log(`     С6′ токенизатори: ${out.parity.passed}/${out.parity.total} ` +
               `(${out.parity.aliases} зонови псевдонима + ${out.parity.records} имена` +
               `${out.parity.oldNames === null ? "" : ` + ${out.parity.oldNames} стари имена`}` +
+              `${out.parity.addresses === null ? "" : ` + ${out.parity.addresses} улици/номера`}` +
               `, ${out.parity.compares})`);
   console.log(`     К2 orig: копие ${out.parity.copyInstalled ? "вдигнато" : "ПАДА"}, ` +
               `очаквани разлики ${out.parity.expectedOrigDifferences.length}` +
@@ -1827,6 +1894,9 @@ async function runG4(s) {
   out.aliasCard = await checkAliasCard(s);
   console.log(`     D3 картонче: „${out.aliasCard.title}“ · ${out.aliasCard.oldSrc} · `
               + `по име: ${out.aliasCard.namedOldSrc === null ? "без ред" : "ПАДА"}`);
+  out.addressCard = await checkAddressCard(s);
+  console.log(`     D5 картонче: „${out.addressCard.title}“ · ${out.addressCard.addr} · `
+              + `без адрес: ${out.addressCard.noneAddr === null ? "без ред" : "ПАДА"}`);
   out.lateSheet = await checkLateDetailSheet(s);
   out.refusals = await checkRefusals(s);
   out.races = await checkRaces(s);
@@ -2103,6 +2173,7 @@ async function main() {
     if (g4.m5 && g4.m5.some((r) => !r.ok)) hard.push(`М5 ${g4.m5.filter((r) => r.ok).length}/${g4.m5.length}`);
     if (g4.cats && !g4.cats.ok) hard.push("С8′ речник");
     if (g4.aliasCard && !g4.aliasCard.ok) hard.push("D3 картончето не изписва извора на псевдонима");
+    if (g4.addressCard && !g4.addressCard.ok) hard.push("D5 картончето не изписва адреса и извора му");
     if (g4.editTransition && !g4.editTransition.ok)
       hard.push("К2 преход „хотел адмирал“ → „адмирал“ без изпразване");
     if (!digest.equal)

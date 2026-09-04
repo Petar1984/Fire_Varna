@@ -1146,10 +1146,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .place-popup { font-size: 13px; line-height: 1.45; min-width: 180px; max-width: 260px; }
   .place-popup .pp-title { font-weight: 700; margin-bottom: 4px; color: #1f2d3d; }
-  .place-popup .pp-sub, .place-popup .pp-old, .place-popup .pp-old-src, .place-popup .pp-src { font-size: 11.5px; color: #6b7785; }
+  .place-popup .pp-sub, .place-popup .pp-addr, .place-popup .pp-old, .place-popup .pp-old-src, .place-popup .pp-src { font-size: 11.5px; color: #6b7785; }
   /* The rows are <span>s (the JS contract): inline by default they ran into one line.
-     ЛОТ 1в (ADR 008 D3) added a fifth — the source of the MATCHED old name. */
-  .place-popup .pp-title, .place-popup .pp-sub, .place-popup .pp-old,
+     ЛОТ 1в (ADR 008 D3) added a fifth — the source of the MATCHED old name;
+     ЛОТ 1в-Б (ADR 008 D5) a sixth — the address, right under „вид · зона“. */
+  .place-popup .pp-title, .place-popup .pp-sub, .place-popup .pp-addr, .place-popup .pp-old,
   .place-popup .pp-old-src, .place-popup .pp-src { display: block; }
   .place-popup .nav-actions { margin-top: 6px; }
   /* Approximate-address result (ADR 001) — a distinct amber ≈ marker + chip, so it
@@ -6255,29 +6256,31 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const PLACES_URL = 'data/hotels.json', CATS_URL = 'data/place_categories.json';
     const PLACES2_URL = 'data/places.json';            // фаза 2: училища/университети/болници/градини
     // ADR 008 D8: the NAME is not a contract, the VERSION is — it changes with every
-    // change of the blobs. ЛОТ 1в-А rewrote all three, so v2 → v3 (the count stays 225).
-    const PLACES_CACHE = 'fire-varna-hotels-v3-225';   // our own namespace (Д3)
+    // change of the blobs. ЛОТ 1в-А rewrote all three (v2 → v3); ЛОТ 1в-Б added the
+    // `address` key to two of them, so v3 → v4 (the count stays 225).
+    const PLACES_CACHE = 'fire-varna-hotels-v4-225';   // our own namespace (Д3)
     const TOP = 8, MIN_Q = 2, DEBOUNCE_MS = 120, FETCH_TIMEOUT_MS = 8000;
     const TOP_TOTAL = 16, GEN_CAP = 300;               // фаза 2 С3: per group / per class
     const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 225, EXPECT2_COUNT = 150;
     const MX = 81152, MY = 110574;               // metres per degree of lon/lat in Varna (М1)
     const LAT_MIN = 43.13, LAT_MAX = 43.35, LON_MIN = 27.65, LON_MAX = 28.10;  // delivery box (Д2)
     // ЛОТ 1в (ADR 008 D1/S2): `old_names_src` is a parallel array of the SAME length
-    // and order — the hotels' 13th key, the places' 9th.
-    const EXPECT_KEYS = ['beds', 'cat', 'kind', 'lat', 'lon', 'name', 'no_uin', 'old_names',
-                         'old_names_src', 'src', 'status', 'uins', 'zone'];
+    // and order — the hotels' 13th key, the places' 9th. ЛОТ 1в-Б (D5) adds `address`
+    // as the hotels' 14th and the places' 10th: `null` or the closed four-key object.
+    const EXPECT_KEYS = ['address', 'beds', 'cat', 'kind', 'lat', 'lon', 'name', 'no_uin',
+                         'old_names', 'old_names_src', 'src', 'status', 'uins', 'zone'];
     const KINDS = ['Хотел', 'Семеен хотел', 'хотел · без категоризация', 'апарт-хотел'];
     // Фаза 2 (places_phase2_plan.md Д1/Д3): the second delivery - 8 keys, its own
     // kind enum. Same box, same status enum, same cadastral refusal as the hotels.
-    const EXPECT2_KEYS = ['kind', 'lat', 'lon', 'name', 'old_names', 'old_names_src',
-                          'src', 'status', 'zone'];
+    const EXPECT2_KEYS = ['address', 'kind', 'lat', 'lon', 'name', 'old_names',
+                          'old_names_src', 'src', 'status', 'zone'];
     const KINDS2 = ['училище', 'университет', 'болница', 'ДКЦ', 'хоспис', 'детска градина',
                      'детска ясла', 'общежитие'];
     const STATUSES = ['', 'бивш'];
     const CADASTRAL = /\b\d{4,5}\.\d+\.\d+/;     // a cadastral id never rides a public bundle (Д2)
     // §12 В7 + §14 — the exact bytes the browser may trust (the tracked LF blobs).
-    const HOTELS_SHA256 = '728e8ceb86cd6860baf008485fc99ac2c41ef177b78d9a045d221665dbaa360c';
-    const PLACES2_SHA256 = 'ef98624f2933d5191f927aaab303b248317ea92707be5c60fca5ccff0afa296a';
+    const HOTELS_SHA256 = '434d15d5af70a94c5240198dbd852055a23d57944872cfebc0a8c24e4ef0e2c2';
+    const PLACES2_SHA256 = 'c31a866e3ca9567a94ebb93713309bd68b6ff8ea61af6e008ffbe2ff93913a7d';
     const CATS_SHA256 = '7fb4ddb6959144de831841aaec5236a7d0cd1e212f7244bff44352816497bc13';
     // ЛОТ 1в (ADR 008 D1, амандамент А3) — the CLOSED list of alias sources and the
     // word the card says for each. An old name used to inherit the source line of its
@@ -6291,6 +6294,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
       'WEB': 'официален сайт',
       'KAIS': 'КАИС адресно поле (АГКК)',
       'CUR': 'съкращение (речник)'
+    };
+    // ЛОТ 1в-Б (ADR 008 D5, план §2 т. 2) — the CLOSED list of ADDRESS sources and
+    // the word the card says after the address itself. The register of an address is
+    // NOT the register of the name: a place named by the school registry can carry a
+    // КАИС address, so the line names the source of THAT string. „· КАИС“ is the
+    // wording of the signed plan; the OSM one keeps the ODbL attribution whole.
+    const ADDR_SRC_LINE = {
+      'KAIS': 'КАИС',
+      'REG': 'регистър',
+      'NTR': 'Национален туристически регистър',
+      'OSM': '© OpenStreetMap contributors (ODbL)'
     };
     // Д7 — the source line of a record, worded from the delivery's own licence.
     const SRC_LINE = {
@@ -6434,6 +6448,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     let RECS = [], FORMS = null, CLASS_OF = null, placesPromise = null, GROUP_SIZE = null;
     let EXACT_NAME = null;                       // ЛОТ 1 решение 2: joined name tokens -> records
     let EXACT_ALIAS = null;                      // ЛОТ 1в D2: joined alias tokens -> {rec, i}
+    let STREET = null;                           // ЛОТ 1в-Б D6: joined street phrase -> records
     const groupOf = (rec) => KIND_GROUP[rec.e.kind] || rec.e.kind;
     const colourOf = (kind) => GROUP_COLOUR[KIND_GROUP[kind]] || 'hotel';   // К1
     // С3 - the bug Sol found: the <=300 generosity of М3/Б2 was read off the WHOLE
@@ -6448,6 +6463,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (typeof code !== 'string' || !ALIAS_SRC_LINE[code]) return false;
       return true;
     }
+    // ЛОТ 1в-Б (ADR 008 D5, план §2г S5): `address` is `null` or EXACTLY the four
+    // keys, all four non-empty strings, the source from the closed list. The client
+    // never parses `text`: `street_phrase` and `house_key` leave the exporter WITH
+    // it, so a drift between them is a STOP over there, never a guess here.
+    const ADDR_KEYS = ['text', 'src', 'street_phrase', 'house_key'];
+    function validAddress(r) {
+      const a = r.address;
+      if (a === null) return true;
+      if (!a || typeof a !== 'object' || Array.isArray(a)) return false;
+      if (Object.keys(a).length !== ADDR_KEYS.length) return false;
+      for (const k of ADDR_KEYS) if (typeof a[k] !== 'string' || !a[k]) return false;
+      return !!ADDR_SRC_LINE[a.src];
+    }
     function validateHotels(d, text) {
       if (!d || !d._meta || !Array.isArray(d.hotels)) return false;
       if (d.hotels.length !== EXPECT_COUNT || d._meta.count !== EXPECT_COUNT) return false;
@@ -6456,7 +6484,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (Object.keys(h).length !== EXPECT_KEYS.length) return false;
         for (const k of EXPECT_KEYS) if (!(k in h)) return false;
         for (const k of ['old_names', 'old_names_src', 'cat', 'beds', 'uins']) if (!Array.isArray(h[k])) return false;
-        if (!validAliasSrc(h)) return false;
+        if (!validAliasSrc(h) || !validAddress(h)) return false;
         if (typeof h.name !== 'string' || !h.name || typeof h.zone !== 'string' || !h.zone) return false;
         if (typeof h.no_uin !== 'boolean') return false;
         if (KINDS.indexOf(h.kind) < 0 || STATUSES.indexOf(h.status) < 0 || !SRC_LINE[h.src]) return false;
@@ -6475,7 +6503,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         if (Object.keys(p).length !== EXPECT2_KEYS.length) return false;
         for (const k of EXPECT2_KEYS) if (!(k in p)) return false;
         if (!Array.isArray(p.old_names) || !Array.isArray(p.old_names_src)) return false;
-        if (!validAliasSrc(p)) return false;
+        if (!validAliasSrc(p) || !validAddress(p)) return false;
         if (typeof p.name !== 'string' || !p.name || typeof p.zone !== 'string' || !p.zone) return false;
         if (KINDS2.indexOf(p.kind) < 0 || STATUSES.indexOf(p.status) < 0 || !SRC_LINE[p.src]) return false;
         if (!isFinite(p.lat) || !isFinite(p.lon)) return false;
@@ -6621,9 +6649,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
                 && !ALIAS_GENERIC.has(t.s)) { aset.add(t.s); one.add(t.s); }
           atk.push(one);
         }
+        // ЛОТ 1в-Б (ADR 008 D6, план §2г S4): the ORDERED street phrase and the
+        // house number as the DELIVERY wrote them — never parsed out of `text`
+        // here. They stand OUTSIDE nset/aset/zkset/significant/A5, so A4's token
+        // priorities and П7's zone path cannot see them and cannot be moved by them.
+        const addr = h.address || null;
         return { e: h, ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, atk: atk,
                  kkey: ktk.join(' '), zkset: new Set(ztk.concat(ktk)),
-                 zph: zonePhrase.get(h.zone) || new Set() };
+                 zph: zonePhrase.get(h.zone) || new Set(),
+                 spk: addr ? keyOf(addr.street_phrase) : '',
+                 hkey: addr ? keyOf(addr.house_key) : '' };
       });
       // ЛОТ 1 решение 2: the exact-CURRENT-name index. old_names stay out of it on
       // purpose — measured, 0 old-name keys coincide with a populated category key,
@@ -6649,6 +6684,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
           if (!list) EXACT_ALIAS.set(key, [{ rec: rec, i: i }]);
           else if (!list.some((x) => x.rec === rec)) list.push({ rec: rec, i: i });
         }
+      // ЛОТ 1в-Б (ADR 008 D6): the WHOLE street phrase -> the records on it. A
+      // partial phrase is not a street: „<улица> <номер>“ and „<клас> <улица>“ both
+      // ask for the street the delivery named, and a number without a matched whole
+      // street never takes part (план §2г S4).
+      STREET = new Map();
+      for (const rec of RECS) {
+        if (!rec.spk) continue;
+        const list = STREET.get(rec.spk);
+        if (list) list.push(rec); else STREET.set(rec.spk, [rec]);
+      }
       GROUP_SIZE = new Map();                    // С3: the size of every class
       for (const rec of RECS) GROUP_SIZE.set(groupOf(rec), (GROUP_SIZE.get(groupOf(rec)) || 0) + 1);
       FORMS = new Map();
@@ -6805,6 +6850,34 @@ window._hydrantDataReady = (async function loadHydrantData() {
       }
       return orderNamed(out);
     }
+    // ЛОТ 1в-Б (ADR 008 D6, план §2г S4) — the street branch. It reads `spk`/`hkey`
+    // and NOTHING else: no nset, no aset, no zkset, no significant(), no A5. The
+    // shape it answers is „<улица>“, „<улица> <номер>“ or „<клас> <улица>“, where
+    // <улица> is the WHOLE phrase the delivery wrote — a number behind a phrase that
+    // is nobody's whole street does not take part. When the phrase also happens to be
+    // an exact name or zone/kind token of the searched set, the street is chosen ONLY
+    // when the human said „ул./бул./пл.“ or named a house number; otherwise this
+    // returns null and the name path below keeps the query, untouched.
+    const STREET_MARK = ['ул', 'бул', 'пл'];     // the prefix comes from the SOURCE
+    function streetRows(R, cls, c) {
+      if (!STREET || !STREET.size) return null;
+      const marked = R.some((t) => STREET_MARK.indexOf(t.orig) >= 0);
+      const rest = R.filter((t) => STREET_MARK.indexOf(t.orig) < 0 && t.orig !== '№');
+      if (!rest.length) return null;
+      const last = rest[rest.length - 1];
+      const num = last.num ? last : null;
+      const phrase = num ? rest.slice(0, -1) : rest;
+      if (!phrase.length || phrase.some((t) => t.num)) return null;
+      const hits = STREET.get(phrase.map((t) => t.s).join(' '));
+      if (!hits) return null;                    // not a whole street -> not a street
+      if (!marked && !num)
+        for (const t of phrase)
+          for (const rec of cls)
+            if (rec.nset.has(t.s) || rec.zkset.has(t.s)) return null;
+      let rows = hits.filter((r) => cls.indexOf(r) >= 0);
+      if (num) rows = rows.filter((r) => r.hkey === num.s);
+      return rows.length ? orderCategory(rows, c) : null;
+    }
     function search(q) {
       if (!RECS.length) return { category: false, hasKey: false, rows: [] };
       const qt = placeTokens(q);
@@ -6849,6 +6922,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
           if (flt.length) return { category: true, hasKey: hasKey, rows: orderCategory(flt, c) };
         }
       }
+      // ADR 008 D6: exact name/alias -> zone (П7) -> STREET -> fuzzy/fail-open. With a
+      // key the answer is the class on that street; without one it is the address the
+      // human typed, and `hasKey` stays false — so our section renders UNDER the
+      // building address search, whose rows and whose Enter stay exactly as they were.
+      const street = streetRows(R, cls, c);
+      if (street) return { category: true, hasKey: hasKey, rows: street };
       let rows = runScored(cls, R, hasKey, sk.dead, c);
       if (!rows.length && hasKey)                // А1 fail-open: the keys become plain names
         rows = runScored(RECS, sk.slots.map((x) => x.t), false, sk.dead, c);
@@ -6974,6 +7053,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (h.beds && h.beds.length) bits.push(h.beds.join('+') + ' легла');
       bits.push(h.zone);
       wrap.appendChild(span('pp-sub', bits.join(' · ')));
+      // ЛОТ 1в-Б (ADR 008 D5, план §2 т. 2): the address stands under „вид · зона“ and
+      // names the source of THAT string, not the record's. 185 of the 375 have none —
+      // then there is no line at all and the zone above stays the honest answer.
+      if (h.address && ADDR_SRC_LINE[h.address.src])
+        wrap.appendChild(span('pp-addr', 'адрес: ' + h.address.text + ' · ' + ADDR_SRC_LINE[h.address.src]));
       if (h.old_names.length) wrap.appendChild(span('pp-old', 'старо име: ' + h.old_names.join(', ')));
       // ADR 008 D3: when the row was found through an OLD name, the source line of
       // that STRING is the one that is true — until ЛОТ 1в the card printed the
@@ -7158,6 +7242,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const rowOut = (rec, qt) => ({ name: rec.e.name, zone: rec.e.zone, kind: rec.e.kind,
                                status: rec.e.status, old_names: rec.e.old_names.slice(),
                                old_names_src: rec.e.old_names_src.slice(),
+                               // ЛОТ 1в-Б (ADR 008 D5): the probe reads the address
+                               // off the export, not off the card's own text.
+                               address: rec.e.address ? Object.assign({}, rec.e.address) : null,
                                matched_alias_i: qt ? matchedAliasIndex(rec, qt) : -1 });
     window.__places = {
       tokens: (q) => placeTokens(q).map((t) => t.s),
