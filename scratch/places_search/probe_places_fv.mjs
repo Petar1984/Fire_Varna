@@ -711,9 +711,13 @@ const REF_ROWS = JSON.parse(fs.readFileSync(REF_PATH, "utf8"));
 // ADR 008 D7 — FAIL-CLOSED. The `.filter(...)` that used to stand on this line
 // dropped a bucket the file no longer has WITHOUT a word, and never even looked
 // at a bucket the file gained: both are a changed reference, and a changed
-// reference is a red run. The list is hand-kept here and in
-// tests/test_places_search_gate.py (BUCKETS), which compares the two.
-const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7", "gate_lot1"];
+// reference is a red run. The list is hand-kept on three sides — here, in
+// tests/test_places_search_gate.py (REF_BUCKETS) and in the reference itself
+// (recall_sweep.py REF_BUCKETS, which refuses to WRITE an artefact with other
+// keys); the suite compares all three. F6-а added `gate_lot1v_a` additively:
+// the 122 rows of the four buckets above did not move (measured against
+// a58010e), so they are replayed exactly as they were frozen.
+const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a"];
 const REF_BUCKETS_IN_FILE = Object.keys(REF_ROWS).filter((k) => k !== "_meta");
 const REF_BUCKETS_DRIFT = REF_BUCKETS
   .filter((b) => !Array.isArray(REF_ROWS[b])).map((b) => "липсва " + b)

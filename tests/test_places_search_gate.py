@@ -56,16 +56,26 @@ INDEX = REPO / "index.html"
 REFERENCE = REPO / "scratch" / "places_search" / "recall_sweep.py"
 ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
+# The four buckets the 23af63f anchor holds — the ЛОТ 1 reference, 122 rows.
 BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
-# ADR 008 D7 — fail-closed. `REF_BUCKETS` in scratch/places_search/probe_places_fv.mjs
-# is the probe's hand-kept copy of the very same list; RefBucketsTest below compares
-# the two and the artefact against both, so a bucket added on one side alone is red
-# without a browser.
+# ADR 008 D7 — fail-closed, and the WHOLE list: F6-а added `gate_lot1v_a`
+# ADDITIVELY (план §2г S3/S6), so the four above keep their anchor and the new
+# lot answers in a bucket of its own. `REF_BUCKETS` is hand-kept on three sides —
+# here, in scratch/places_search/probe_places_fv.mjs (the probe that replays the
+# rows) and in scratch/places_search/recall_sweep.py (the reference, which refuses
+# to WRITE an artefact with other keys). RefBucketsTest compares all three against
+# the artefact, so a bucket added on one side alone is red without a browser.
+REF_BUCKETS = BUCKETS + ("gate_lot1v_a",)
 PROBE = REPO / "scratch" / "places_search" / "probe_places_fv.mjs"
 # The ONE anchor (Амандамент №11): the artefact as it stood before the ЛОТ 1
 # DATA landed — 113 rows over the four buckets, itself frozen against 7a6ea1d
 # and 378a844 (docstring 6).
 LOT1_DATA_ANCHOR = "23af63f"       # C30 — the last artefact before the ЛОТ 1 data
+# F6-а (план §2г S6): the SECOND anchor, and the one with no exception list
+# at all. a58010e is ЛОТ 1 as it was pushed; the aliases and the curated class
+# words of F5-а were measured against it and moved NOTHING, so every one of the
+# 122 rows must still equal it. A movement here is a STOP, never a re-freeze.
+LOT1V_A_ANCHOR = "a58010e"         # C37 — main == origin/main, the ЛОТ 1 anchor
 # The signed change list: Petar's П1 „да“ of Амандамент №8 over
 # scratch/places_search/lot1_reference_preview_v2.md — §А (18 rows where only the
 # spelling of a label moved: the renamed zone „к.к. Св. Константин“ →
@@ -546,20 +556,241 @@ class Lot1vAGateTest(unittest.TestCase):
                 self.assertIn(code, allowed, rec.name)
 
 
+# --- F6-а: the additive freeze -----------------------------------------------
+# ADR 008 D4/D7 and план §2г S3/S6. Two claims, one file: the 122 rows of ЛОТ 1
+# did NOT move when the aliases and the curated class words landed, and the
+# twelve measured rows of ЛОТ 1в-А arrived as a bucket of their own. The first
+# is checked against a COMMITTED blob (a58010e), the second against the
+# reference's own spec — and both are checked in a way that can go red.
+
+
+def lot1v_a_bucket_failures(doc):
+    """The `gate_lot1v_a` bucket of an artefact against REF's measured spec.
+
+    Pure over the document it is given, so a test can delete a row or change a
+    value in a COPY and watch the answer turn red. A gate that cannot go red is
+    not a gate (docs/audits — „гейтовете лъжат по-често от кода“).
+    """
+    spec = list(REF.LOT1V_A_GAINS) + list(REF.LOT1V_A_CONTROLS)
+    bucket = doc.get("gate_lot1v_a")
+    if not isinstance(bucket, list):
+        return [u"gate_lot1v_a липсва от артефакта"]
+    bad = []
+    if len(bucket) != len(spec):
+        bad.append(u"gate_lot1v_a: %d реда, очаквани %d" % (len(bucket), len(spec)))
+    by_q = {}
+    for entry in bucket:
+        by_q.setdefault(entry["q"], []).append(entry)
+    for q, branch, n, why, want in spec:
+        entries = by_q.pop(q, [])
+        if len(entries) != 1:
+            bad.append(u"`%s`: %d реда в артефакта, очакван 1" % (q, len(entries)))
+            continue
+        entry = entries[0]
+        if entry["branch"] != branch:
+            bad.append(u"`%s`: клон %s, очакван %s" % (q, entry["branch"], branch))
+        if entry["n"] != n or len(entry["rows"]) != n:
+            bad.append(u"`%s`: %d реда (n=%s), очаквани %d"
+                       % (q, len(entry["rows"]), entry["n"], n))
+        if entry["expect"] != why:
+            bad.append(u"`%s`: причината не е тази на референцията" % q)
+        got = [(r["name"].strip(), r["zone"]) for r in entry["rows"]][:len(want)]
+        if got != [(w[0], w[1]) for w in want]:
+            bad.append(u"`%s`: първите %d реда са %s" % (q, len(want), got))
+        if not entry["ok"]:
+            bad.append(u"`%s`: редът не е зелен в артефакта" % q)
+    for q in by_q:
+        bad.append(u"`%s`: ред в артефакта, който референцията не мери" % q)
+    return bad
+
+
+def delivery_kinds(commit=None):
+    """(name, zone) -> kind over the two delivered blobs; `None` = working tree.
+
+    The artefact holds (name, zone) per row and never held `kind`, on either
+    side of the anchor — so the third member of the S6 triple is measured here,
+    on the delivery itself, instead of being claimed.
+    """
+    out = {}
+    for name in ("data/places.json", "data/hotels.json"):
+        if commit is None:
+            doc = json.loads((REPO / name).read_text(encoding="utf-8"))
+        else:
+            got = subprocess.run(["git", "-C", str(REPO), "show", commit + ":" + name],
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if got.returncode != 0:
+                raise AssertionError("git show %s:%s failed" % (commit, name))
+            doc = json.loads(got.stdout.decode("utf-8"))
+        for row in (doc["places"] if "places" in doc else doc["hotels"]):
+            out[(row["name"], row["zone"])] = row["kind"]
+    return out
+
+
+class Lot1vAdditiveFreezeTest(unittest.TestCase):
+    """The freeze of F6-а: additive, and nothing else.
+
+    S6 compares the candidate with the committed anchor by (bucket, q, branch,
+    ordered rows). Zero movements means no re-freeze — so this test carries no
+    exception list at all: the day one of the 122 rows moves, it is a STOP with
+    a named list, not a new signature buried in a constant.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.anchor = frozen_rows(LOT1V_A_ANCHOR)
+        cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
+
+    def test_the_anchor_is_the_four_buckets_and_122_rows(self):
+        self.assertEqual(set(self.anchor.keys()) - {"_meta"}, set(BUCKETS))
+        self.assertEqual(sum(len(self.anchor[b]) for b in BUCKETS), 122)
+        self.assertNotIn("gate_lot1v_a", self.anchor)
+
+    def test_not_one_of_the_122_rows_moved(self):
+        compared, moved = 0, []
+        for bucket in BUCKETS:
+            anchor = dict((e["q"], e) for e in self.anchor[bucket])
+            current = dict((e["q"], e) for e in self.current[bucket])
+            self.assertEqual(set(anchor), set(current), bucket)
+            for q, was in anchor.items():
+                now = current[q]
+                compared += 1
+                if ((was["branch"], [(r["name"], r["zone"]) for r in was["rows"]])
+                        != (now["branch"], [(r["name"], r["zone"]) for r in now["rows"]])):
+                    moved.append(bucket + "/" + q)
+        self.assertEqual(moved, [], u"движение срещу %s: %s"
+                         % (LOT1V_A_ANCHOR, u", ".join(moved)))
+        self.assertEqual(compared, 122)
+
+    def test_the_kind_of_every_frozen_record_is_unchanged(self):
+        """The third member of the S6 triple. The rows name a record by
+        (name, zone); `kind` lives in the delivery, so that is where it is
+        compared — for every record any of the 122 rows stands on."""
+        was, now = delivery_kinds(LOT1V_A_ANCHOR), delivery_kinds()
+        keys, changed, missing = set(), [], []
+        for bucket in BUCKETS:
+            for entry in self.current[bucket]:
+                for row in entry["rows"]:
+                    keys.add((row["name"], row["zone"]))
+        for key in sorted(keys):
+            if key not in was or key not in now:
+                missing.append(key[0])
+            elif was[key] != now[key]:
+                changed.append(u"%s: %s → %s" % (key[0], was[key], now[key]))
+        self.assertEqual(missing, [])
+        self.assertEqual(changed, [])
+        self.assertEqual(len(was), 375)
+        self.assertEqual(len(now), 375)
+
+    def test_the_candidate_only_grew(self):
+        gained = [b for b in self.current if b != "_meta" and b not in self.anchor]
+        self.assertEqual(gained, ["gate_lot1v_a"])
+        self.assertEqual(sum(len(self.current[b]) for b in REF_BUCKETS), 134)
+        self.assertEqual(sum(len(e["rows"]) for b in BUCKETS
+                             for e in self.current[b]), 1998)
+        self.assertEqual(sum(len(e["rows"]) for e in self.current["gate_lot1v_a"]), 108)
+
+
+class Lot1vABucketTest(unittest.TestCase):
+    """The new bucket, and the proof that its gate runs and falls."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
+
+    def test_the_bucket_is_the_twelve_measured_rows(self):
+        self.assertEqual(lot1v_a_bucket_failures(self.current), [])
+        self.assertEqual(len(self.current["gate_lot1v_a"]), 12)
+        self.assertEqual(len(REF.LOT1V_A_GAINS) + len(REF.LOT1V_A_CONTROLS), 12)
+
+    def test_removing_any_row_turns_the_bucket_red(self):
+        """Remove a row and the bucket goes red — for each of the twelve."""
+        for entry in self.current["gate_lot1v_a"]:
+            doc = dict(self.current)
+            doc["gate_lot1v_a"] = [e for e in self.current["gate_lot1v_a"]
+                                   if e["q"] != entry["q"]]
+            failures = lot1v_a_bucket_failures(doc)
+            self.assertNotEqual(failures, [], entry["q"])
+            self.assertTrue(any(entry["q"] in f for f in failures), entry["q"])
+
+    def test_changing_any_value_turns_the_bucket_red(self):
+        """Change a value and the bucket goes red: the branch, the count, the
+        rows, the name, the zone, the reason, the green flag — one at a time,
+        on a copy, for every one of the twelve rows."""
+        for index in range(len(self.current["gate_lot1v_a"])):
+            original = self.current["gate_lot1v_a"][index]
+            mutations = [
+                ("branch", lambda e: dict(e, branch=e["branch"] + "-x")),
+                ("n", lambda e: dict(e, n=e["n"] + 1)),
+                ("rows", lambda e: dict(e, rows=e["rows"][1:], n=e["n"] - 1)),
+                ("name", lambda e: dict(e, rows=[dict(e["rows"][0], name=u"друго име")]
+                                        + e["rows"][1:])),
+                ("zone", lambda e: dict(e, rows=[dict(e["rows"][0], zone=u"друга зона")]
+                                        + e["rows"][1:])),
+                ("expect", lambda e: dict(e, expect=u"друга причина")),
+                ("ok", lambda e: dict(e, ok=False)),
+            ]
+            for label, mutate in mutations:
+                bucket = list(self.current["gate_lot1v_a"])
+                bucket[index] = mutate(original)
+                doc = dict(self.current)
+                doc["gate_lot1v_a"] = bucket
+                self.assertNotEqual(lot1v_a_bucket_failures(doc), [],
+                                    u"%s / %s остана зелено" % (original["q"], label))
+
+    def test_the_live_engine_replays_the_new_bucket(self):
+        """And the engine says what the bucket says — branch, ordered rows and
+        the `kind` the artefact schema does not carry."""
+        spec = dict((q, (branch, n, want)) for q, branch, n, why, want
+                    in list(REF.LOT1V_A_GAINS) + list(REF.LOT1V_A_CONTROLS))
+        for entry in self.current["gate_lot1v_a"]:
+            rows, branch = REF.search(entry["q"])
+            self.assertEqual(branch, entry["branch"], entry["q"])
+            self.assertEqual([(r.name, r.zone) for r in rows],
+                             [(r["name"], r["zone"]) for r in entry["rows"]], entry["q"])
+            want_branch, want_n, want = spec[entry["q"]]
+            self.assertEqual((branch, len(rows)), (want_branch, want_n), entry["q"])
+            self.assertEqual([(r.name.strip(), r.zone, r.kind) for r in rows][:len(want)],
+                             list(want), entry["q"])
+
+
 class RefBucketsTest(unittest.TestCase):
     """ADR 008 D7: the bucket list is fail-closed on all three sides."""
 
     def test_the_artefact_carries_exactly_the_named_buckets(self):
         current = json.loads(ROWS.read_text(encoding="utf-8"))
-        self.assertEqual(set(current.keys()) - {"_meta"}, set(BUCKETS))
+        self.assertEqual(set(current.keys()) - {"_meta"}, set(REF_BUCKETS))
 
     def test_the_probe_names_the_same_buckets_in_the_same_order(self):
         probe = PROBE.read_text(encoding="utf-8")
         match = re.search(r"const REF_BUCKETS = \[([^\]]*)\];", probe)
         self.assertIsNotNone(match, "REF_BUCKETS is not a literal in the probe")
-        self.assertEqual(tuple(re.findall(r'"([^"]+)"', match.group(1))), BUCKETS)
-        self.assertNotIn("REF_BUCKETS = [\"gate_m5_a8\", \"extra\", \"gate_p7\", "
-                         "\"gate_lot1\"]\n  .filter(", probe)
+        self.assertEqual(tuple(re.findall(r'"([^"]+)"', match.group(1))), REF_BUCKETS)
+        # The fail-open form this replaced filtered the list by what the FILE
+        # happens to hold, so a bucket the file had lost was simply skipped.
+        # A `.filter(` hung on the literal itself brings that back.
+        self.assertIsNone(
+            re.search(r"const REF_BUCKETS = \[[^\]]*\]\s*\.filter\(", probe),
+            "REF_BUCKETS is filtered by the file again (fail-open)")
+
+    def test_the_reference_names_the_same_buckets_in_the_same_order(self):
+        """The third side: the generator. A bucket that lives in the artefact
+        alone would be a hand edit nobody can regenerate."""
+        self.assertEqual(tuple(REF.REF_BUCKETS), REF_BUCKETS)
+
+    def test_the_reference_refuses_an_artefact_with_other_buckets(self):
+        """Runs and fails: `bucket_drift()` is what stops main() from writing."""
+        good = dict((b, []) for b in REF_BUCKETS)
+        good["_meta"] = {}
+        self.assertEqual(REF.bucket_drift(good), [])
+        lost = dict(good)
+        del lost["gate_lot1v_a"]
+        self.assertEqual(REF.bucket_drift(lost), [u"липсва gate_lot1v_a"])
+        gained = dict(good)
+        gained["gate_lot1v_b"] = []
+        self.assertEqual(REF.bucket_drift(gained), [u"нов gate_lot1v_b"])
+        broken = dict(good)
+        broken["extra"] = {"not": "a list"}
+        self.assertEqual(REF.bucket_drift(broken), [u"липсва extra"])
 
 
 class PlacesCacheNameTest(unittest.TestCase):

@@ -1778,6 +1778,23 @@ DIFF_G = [
     u"А8 го приема така.",
 ]
 
+# ADR 008 D7 — the bucket list of the artefact, fail-closed and hand-kept on
+# THREE sides: here, in the probe that replays the rows
+# (scratch/places_search/probe_places_fv.mjs, `REF_BUCKETS`) and in the suite
+# (tests/test_places_search_gate.py, `REF_BUCKETS`), which compares all three.
+# A bucket added on one side alone would grow or shrink the reference in silence.
+# main() refuses to write an artefact whose keys are not exactly this list.
+REF_BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a")
+
+
+def bucket_drift(doc):
+    """The keys of an artefact against REF_BUCKETS; empty list = no drift."""
+    drift = [u"липсва " + b for b in REF_BUCKETS
+             if not isinstance(doc.get(b), list)]
+    drift += [u"нов " + b for b in doc
+              if b != "_meta" and b not in REF_BUCKETS]
+    return drift
+
 
 def main():
     """§11 Р9 / C14 finding 3 — everything that RUNS lives here.
@@ -2064,6 +2081,11 @@ def main():
         # ЛОТ 1: the two client rules, in their own bucket — the 103 rows above
         # keep their identity, so the signed change list stays readable.
         "gate_lot1": [],
+        # ЛОТ 1в-А (ADR 008 D4/D7, план §2г S3/S6): АДИТИВНО. The 122 rows above
+        # did not move one label when the aliases and the curated class words
+        # landed (measured against a58010e), so nothing is re-frozen; the twelve
+        # measured rows of the new lot arrive as a bucket of their own.
+        "gate_lot1v_a": [],
     }
     for _q, _br, _n, _why, _want in P7_GAINS + P7_CONTROLS:
         _r, _b = search(_q)
@@ -2087,6 +2109,20 @@ def main():
                    and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
             "rows": [{"name": x.name, "zone": x.zone} for x in _r],
         })
+    # ЛОТ 1в-А: the same shape as the two gates above — `kind` rides in the
+    # `ok` flag (the expectation triples of LOT1V_A_GAINS/LOT1V_A_CONTROLS carry
+    # it), while the rows keep the (name, zone) schema the artefact has always had.
+    for _q, _br, _n, _why, _want in LOT1V_A_GAINS + LOT1V_A_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1v_a"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [{"name": x.name, "zone": x.zone} for x in _r],
+        })
     for _bucket, _spec in [("gate_m5_a8", M5SPEC), ("extra", EXTRASPEC)]:
         for _q, _exp, _fn in _spec:
             _r, _b = search(_q)
@@ -2098,6 +2134,11 @@ def main():
                 "ok": bool(_fn(_r)),
                 "rows": [{"name": x.name, "zone": x.zone} for x in _r],
             })
+    # ADR 008 D7: an artefact whose buckets are not exactly REF_BUCKETS is a
+    # DIFFERENT reference — it is never written, however green the rows are.
+    _drift = bucket_drift(ROWS)
+    if _drift:
+        raise SystemExit(u"REF_BUCKETS (ADR 008 D7): " + u", ".join(_drift))
     pathlib.Path(OUTDIR).mkdir(parents=True, exist_ok=True)
     ROWS_OUT = OUTDIR + "recall_sweep_v22_rows.json"
     _rows_text = json.dumps(ROWS, ensure_ascii=False, indent=1, sort_keys=False) + chr(10)
