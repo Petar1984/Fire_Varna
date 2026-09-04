@@ -20,7 +20,11 @@ code with the suite it guards cannot fail independently of it.
 
 Every check runs, always: the table is written for the human, not stopped at
 the first mark. Exit code: 0 only when every check is green; 1 when any check
-is red OR yellow — "pending — Петър" is not a signature (Амандамент №1, т. 8).
+is red OR yellow — "pending — Петър" is not a signature (Амандамент №1, т. 8),
+and neither is "Петърчо Иванов": the signature is compared exactly, by
+`coverage.is_signed_by_petar`, for the baseline manifest and the allow-file
+alike. `--base` replaces the signed baseline with an ad-hoc revision and is
+therefore ⚠ by construction: it measures, it does not absolve.
 One number for the pre-push hook to read.
 """
 
@@ -200,7 +204,13 @@ def check_coverage(base_override: str | None, allow_override: str | None) -> Che
     manifest_path = REPO_ROOT / BASELINE_PATH
     if base_override:
         rev = base_override[len("git:"):] if base_override.startswith("git:") else base_override
-        check.say("base по команден ред: %s" % rev)
+        # An ad-hoc base is a measurement, never a verdict: the run says
+        # nothing about the bytes Petar signed, and a green table here would
+        # read as if it did (одит ЛОТ 0-fix, бележка „е“).
+        check.warn(
+            "подписаният baseline НЕ е проверен — base по команден ред: %s (%s не е четен)"
+            % (rev, BASELINE_PATH)
+        )
     else:
         if not manifest_path.exists():
             check.fail("няма подписан baseline (%s липсва)" % BASELINE_PATH)
@@ -210,8 +220,9 @@ def check_coverage(base_override: str | None, allow_override: str | None) -> Che
         if not rev:
             check.fail("няма подписан baseline (%s без `rev`)" % BASELINE_PATH)
             return check
-        signed_by = manifest.get("signed_by") or ""
-        if not signed_by.startswith("Петър"):
+        signed_by = manifest.get("signed_by")
+        # The same exact comparison the allow-file gets — one rule, one place.
+        if not coverage.is_signed_by_petar(signed_by):
             check.warn("baseline `signed_by` = %r — още НЕ е подпис на Петър" % signed_by)
         # The baseline names the bytes it was signed on; if the rev no longer
         # carries them, the signature is on something else.
@@ -261,22 +272,22 @@ def check_coverage(base_override: str | None, allow_override: str | None) -> Che
                 block["compared"],
                 len(block["missing_rows"]),
                 len(block["added_rows"]),
-                len(block["reordered_rows"]),
+                block["file_reordered"],
             )
         )
         for field in coverage.FIELDS:
             c = block["fields"][field]["counts"]
-            if c["lost"] or c["changed"] or c["reordered"] or c["after"] < c["before"]:
+            if c["lost"] or c["changed"] or c["after"] < c["before"]:
                 check.say(
-                    "%s %s: before=%d after=%d lost=%d changed=%d gained=%d reordered=%d"
-                    % (file_key, field, c["before"], c["after"], c["lost"], c["changed"], c["gained"], c["reordered"])
+                    "%s %s: before=%d after=%d lost=%d changed=%d gained=%d"
+                    % (file_key, field, c["before"], c["after"], c["lost"], c["changed"], c["gained"])
                 )
     if result["exit_code"] == coverage.EXIT_ALLOW_UNSIGNED:
         check.warn("coverage изход %d — %s (жълто блокира пуша)" % (result["exit_code"], result["verdict"]))
     elif result["exit_code"] != coverage.EXIT_OK:
         check.fail("coverage изход %d — %s (виж gates/out/coverage.md)" % (result["exit_code"], result["verdict"]))
     else:
-        check.say("нула непокрити загубени/сменени реда")
+        check.say("coverage изход 0 — %s" % result["verdict"])
     return check
 
 
@@ -369,17 +380,24 @@ def check_signed_facts() -> Check:
 
     candidates = doc.get("candidates") or []
     for n, cand in enumerate(candidates, 1):
-        # Candidates carry no signature: they are never red, but a code the app
-        # does not know must be visible, not silent (СУ „Гео Милев“ → mladost).
+        # Candidates never touch the exit code (Амандамент №2, A.8): they carry
+        # no signature, so their weak anchors and unknown codes are notes for
+        # the human, not marks that hold the push. ⚠ stays for `facts`.
+        anchor_src = (cand.get("anchor") or {}).get("src")
+        if anchor_src != "NTR":
+            check.say(
+                "кандидат %d (%s): слаба котва (%s) — бележка, не ⚠"
+                % (n, cand.get("name"), anchor_src)
+            )
         for field, claim in (cand.get("expect") or {}).items():
             wanted = [claim["is"]] if "is" in claim else list(claim.get("not") or [])
             unknown = [c for c in wanted if c not in code_lists.get(field, [])]
             if unknown:
-                check.warn(
+                check.say(
                     "кандидат %d (%s): код %s извън затворения списък %s — чака подпис И код"
                     % (n, cand.get("name"), unknown, field)
                 )
-    check.say("%d кандидата без подпис" % len(candidates))
+    check.say("%d кандидата без подпис (никога не влияят на изхода)" % len(candidates))
     return check
 
 

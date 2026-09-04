@@ -19,7 +19,6 @@ Classes per (file, field), over the joined pairs:
   changed    a named value became a *different* named value
   gained     a null in the base became a named value
   unchanged  the same named value on both sides
-  reordered  the pair exists but the candidate carries it at another ordinal
 `before` and `after` are counted over ALL rows of each side, not over the
 pairs: they are the coverage of the delivery itself, and they see a deletion
 that a join could hide.
@@ -27,6 +26,10 @@ that a join could hide.
 Structural classes per file, from the join itself:
   row_missing  a name the base carried and the candidate no longer carries
   row_added    a name the candidate carries and the base did not
+  reordered    the pair exists but the candidate carries it at another ordinal
+Reordering is a property of the file, not of a field: the second round printed
+the same number in every field row, which reads like four findings instead of
+one (одит ЛОТ 0-fix, бележка „г“).
 
 The allow-file is the only way any of this becomes green:
 
@@ -34,17 +37,30 @@ The allow-file is the only way any of this becomes green:
      "rows": [{"file","name","field","from","to","why"}]}
 
 A structural row is listed with `field` = "row_missing" | "row_added" |
-"reordered" and without `from`/`to`. `signed_by`/`date` are read and judged: a
-missing key is red, a signature that is not Petar's ("pending — Петър") is
-yellow, and yellow blocks the push exactly like red (Амандамент №1, т. 8).
+"reordered" and without `from`/`to`. The signature is compared EXACTLY
+(`signed_by.strip() == "Петър"`): "Петърчо Иванов" and "Петър — pending, НЕ
+подписвам" both start with Petar's name and neither is his signature (одит
+ЛОТ 0-fix, major „а“). A missing `signed_by`/`date` key is red, a signature
+that is not exactly Petar's is yellow, and yellow blocks the push exactly like
+red (Амандамент №1, т. 8).
+
+One allow row covers exactly ONE moved row: the duplicated name (РОЯЛ ×2)
+needs two listed rows, not one (одит ЛОТ 0-fix, бележка „д“).
+
+A net drop of coverage (`after` < `before`) is covered when every lost,
+changed, missing, added and reordered row of that file is listed in an
+allow-file signed by Petar (Амандамент №2, A.7) — otherwise a signed loss
+could never go green and P7-д would be blocked forever. Without that signature
+the net drop stays red.
 
 Exit codes:
   0  green: nothing lost/changed/missing/added/reordered, or every such row is
      covered by an allow-file signed by Petar
-  2  red: an uncovered row, a (file, field) whose `after` is below `before`,
-     or an allow-file without `signed_by`/`date`
+  2  red: an uncovered row, an uncovered net drop of coverage, or an
+     allow-file without `signed_by`/`date`
   3  the allow-file lists a row that did not move ("listed but unchanged")
-  4  usage / input error
+  4  usage / input error, including an allow-file that does not match the
+     schema (a list instead of an object, a row that is not an object, …)
   5  yellow: an allow-file that is not signed by Petar — blocks like red
 """
 
@@ -64,6 +80,9 @@ DISTRICT_MARK = "район "
 
 FIELDS = ("zone_named", "quarter", "locality", "district")
 
+# Row-level (not field-level) findings; an allow-file may list them too.
+STRUCTURAL_FIELDS = ("row_missing", "row_added", "reordered")
+
 # The only signature that grants anything.
 SIGNER = "Петър"
 
@@ -72,6 +91,17 @@ EXIT_UNCOVERED = 2
 EXIT_ALLOW_STALE = 3
 EXIT_USAGE = 4
 EXIT_ALLOW_UNSIGNED = 5
+
+
+def is_signed_by_petar(signed_by) -> bool:
+    """The one place that decides whether a signature is Petar's.
+
+    Exact, not a prefix: `startswith("Петър")` accepted "Петърчо Иванов" and
+    even "Петър — pending, НЕ подписвам" — a refusal that read as a signature
+    (одит ЛОТ 0-fix, major „а“). `run_gates` imports this function so the
+    baseline manifest and the allow-file are judged by the same rule.
+    """
+    return isinstance(signed_by, str) and signed_by.strip() == SIGNER
 
 
 def read_source(spec: str) -> str:
@@ -210,7 +240,6 @@ def compare(base_rows: list, cand_rows: list, file_key: str) -> dict:
             "changed": 0,
             "gained": 0,
             "unchanged": 0,
-            "reordered": len(reordered_rows),
         }
         lost_rows, changed_rows = [], []
         for base_ordinal, cand_ordinal in pairs:
@@ -252,6 +281,8 @@ def compare(base_rows: list, cand_rows: list, file_key: str) -> dict:
         "rows_base": len(base_rows),
         "rows_candidate": len(cand_rows),
         "compared": len(pairs),
+        # One number for the file, not one per field (одит ЛОТ 0-fix, „г“).
+        "file_reordered": len(reordered_rows),
         "reordered_rows": reordered_rows,
         "missing_rows": missing_rows,
         "added_rows": added_rows,
@@ -259,14 +290,43 @@ def compare(base_rows: list, cand_rows: list, file_key: str) -> dict:
     }
 
 
+def validate_allow_rows(path: str, rows: list) -> None:
+    """Refuse a malformed allow-file with a sentence, never with a traceback.
+
+    A hand-written list of exceptions is exactly the file that arrives broken;
+    the gate that answers it with an AttributeError stack tells the human
+    nothing and exits 1, which the hook cannot tell from an ordinary red
+    (одит ЛОТ 0-fix, бележка „в“).
+    """
+    known_fields = FIELDS + STRUCTURAL_FIELDS
+    for n, row in enumerate(rows, 1):
+        if not isinstance(row, dict):
+            raise ValueError("%s: row %d is %s, must be an object" % (path, n, type(row).__name__))
+        for key in ("file", "name", "field"):
+            if not isinstance(row.get(key), str) or not row[key]:
+                raise ValueError("%s: row %d has no `%s` string" % (path, n, key))
+        if row["file"] not in FILES:
+            raise ValueError("%s: row %d names file %r, not one of %s" % (path, n, row["file"], list(FILES)))
+        if row["field"] not in known_fields:
+            raise ValueError(
+                "%s: row %d names field %r, not one of %s" % (path, n, row["field"], list(known_fields))
+            )
+        for key in ("from", "to"):
+            if row.get(key) is not None and not isinstance(row.get(key), str):
+                raise ValueError("%s: row %d has a non-string `%s`" % (path, n, key))
+
+
 def load_allow(path: str | None) -> tuple:
     """Read the allow-file and judge its signature. Absent path = no allowance."""
     if not path:
         return [], {}
     data = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("%s: the allow-file must be a JSON object, got %s" % (path, type(data).__name__))
     rows = data.get("rows")
     if not isinstance(rows, list):
         raise ValueError("%s: no `rows` array" % path)
+    validate_allow_rows(path, rows)
     signed_by = data.get("signed_by")
     date = data.get("date")
     missing_keys = [key for key, value in (("signed_by", signed_by), ("date", date)) if value is None]
@@ -274,7 +334,7 @@ def load_allow(path: str | None) -> tuple:
         # An allow-file without a signature does not carry a weaker signature —
         # it carries none, and it can never make a lost row green.
         signature = "missing"
-    elif isinstance(signed_by, str) and signed_by.strip().startswith(SIGNER):
+    elif is_signed_by_petar(signed_by):
         signature = "signed"
     else:
         signature = "unsigned"
@@ -295,9 +355,18 @@ def allow_key(row: dict) -> tuple:
 
 SIGNATURE_WORD = {
     "signed": "приет",
-    "unsigned": "ЖЪЛТО — не е Петър",
+    "unsigned": "ЖЪЛТО — не е точно „Петър“",
     "missing": "ЧЕРВЕНО — липсва ключ",
 }
+
+
+def net_loss_word(item: dict, result: dict) -> str:
+    """Why a net drop is green, yellow or red — listing and signing are separate."""
+    if not item.get("allowed"):
+        return "ЧЕРВЕНО (ред извън allow-файла)"
+    if (result.get("allow") or {}).get("signature") == "signed":
+        return "ПОКРИТ от подписания allow-файл"
+    return "ЖЪЛТО (всеки ред е изброен, подписът не е на Петър)"
 
 
 def render_md(result: dict) -> str:
@@ -340,8 +409,8 @@ def render_md(result: dict) -> str:
             )
         )
     out.append("")
-    out.append("| файл | поле | before | after | lost | changed | gained | unchanged | reordered |")
-    out.append("|---|---|---:|---:|---:|---:|---:|---:|---:|")
+    out.append("| файл | поле | before | after | lost | changed | gained | unchanged |")
+    out.append("|---|---|---:|---:|---:|---:|---:|---:|")
     for file_key in FILES:
         block = result["files"].get(file_key)
         if not block:
@@ -349,7 +418,7 @@ def render_md(result: dict) -> str:
         for field in FIELDS:
             c = block["fields"][field]["counts"]
             out.append(
-                "| %s | %s | %d | %d | %d | %d | %d | %d | %d |"
+                "| %s | %s | %d | %d | %d | %d | %d | %d |"
                 % (
                     file_key,
                     field,
@@ -359,17 +428,27 @@ def render_md(result: dict) -> str:
                     c["changed"],
                     c["gained"],
                     c["unchanged"],
-                    c["reordered"],
                 )
             )
+    out.append("")
+    out.append(
+        "`reordered` е файлово число (колоната „пренаредени“ в първата таблица), не поле по поле."
+    )
     if result["net_loss"]:
         out.append("")
-        out.append("## Нетен спад на покритието (after < before) — ЧЕРВЕНО")
+        out.append("## Нетен спад на покритието (after < before)")
         out.append("")
         for item in result["net_loss"]:
             out.append(
-                "- %s · %s: %d → %d (−%d)"
-                % (item["file"], item["field"], item["before"], item["after"], item["before"] - item["after"])
+                "- %s · %s: %d → %d (−%d) — %s"
+                % (
+                    item["file"],
+                    item["field"],
+                    item["before"],
+                    item["after"],
+                    item["before"] - item["after"],
+                    net_loss_word(item, result),
+                )
             )
     for file_key in FILES:
         block = result["files"].get(file_key)
@@ -383,7 +462,7 @@ def render_md(result: dict) -> str:
                 out.append("")
                 out.append("## %s · %s · %s (%d)" % (kind, file_key, field, len(rows)))
                 out.append("")
-                out.append("| # | име | преди | след | src | покрит от allow |")
+                out.append("| # | име | преди | след | src | изброен в allow |")
                 out.append("|---:|---|---|---|---|---|")
                 for n, r in enumerate(rows, 1):
                     out.append(
@@ -408,7 +487,7 @@ def render_md(result: dict) -> str:
             out.append("")
             out.append("## %s · %s (%d)" % (kind, file_key, len(rows)))
             out.append("")
-            out.append("| # | име | ordinal | покрит от allow |")
+            out.append("| # | име | ordinal | изброен в allow |")
             out.append("|---:|---|---|---|")
             for n, r in enumerate(rows, 1):
                 position = (
@@ -454,17 +533,21 @@ def run(
 
     allow_rows, allow_meta = load_allow(allow_path)
     signature = allow_meta.get("signature")
-    # A signature that is not Petar's grants nothing: the rows stay uncovered
-    # and the verdict says why.
-    grants = signature == "signed"
-    allowed_keys = {}
-    if grants:
-        for r in allow_rows:
-            allowed_keys.setdefault(allow_key(r), []).append(r)
-    used_keys = set()
+    # Listing and signing are two different questions, and the gate answers
+    # them separately (Амандамент №2, A.7): a row nobody listed is RED even
+    # under a perfect signature; a file where every moved row is listed but the
+    # signature is not Petar's is YELLOW — it waits for him, it is not a lie.
+    # Each listed row is a budget of ONE: the duplicated name (РОЯЛ ×2) needs
+    # two listed rows, otherwise one line would absolve two losses
+    # (одит ЛОТ 0-fix, бележка „д“).
+    allow_budget: dict = {}
+    for r in allow_rows:
+        allow_budget.setdefault(allow_key(r), []).append(r)
+    used_count: dict = {}
 
     uncovered = 0
     uncovered_structural = 0
+    uncovered_by_file = {file_key: 0 for file_key in files}
     for file_key, block in files.items():
         field_groups = [
             block["fields"][field][key] for field in FIELDS for key in ("lost_rows", "changed_rows")
@@ -473,33 +556,49 @@ def run(
         for rows, is_structural in [(g, False) for g in field_groups] + [(g, True) for g in structural_groups]:
             for row in rows:
                 key = allow_key(row)
-                if key in allowed_keys:
+                if used_count.get(key, 0) < len(allow_budget.get(key, ())):
                     row["allowed"] = True
-                    used_keys.add(key)
+                    used_count[key] = used_count.get(key, 0) + 1
                 else:
                     row["allowed"] = False
+                    uncovered_by_file[file_key] += 1
                     if is_structural:
                         uncovered_structural += 1
                     else:
                         uncovered += 1
 
     # Сол S6: a row listed in the allow-file that did not actually move is a
-    # stale signature — it must be removed, not carried forward silently.
-    allow_stale = [r for k, rs in allowed_keys.items() if k not in used_keys for r in rs]
+    # stale signature — it must be removed, not carried forward silently. With
+    # per-key budgets that also catches "listed three times, moved twice".
+    allow_stale = [
+        r
+        for key, rows in allow_budget.items()
+        for r in rows[used_count.get(key, 0):]
+    ]
 
     # The backstop that does not depend on the join at all: the delivery may
-    # never carry less of a field than the base did.
+    # never carry less of a field than the base did — unless Petar signed for
+    # every row that moved in that file (Амандамент №2, A.7). A signed loss
+    # that can never go green would make the allow-file pointless.
     net_loss = []
     for file_key in FILES:
         block = files.get(file_key)
         if not block:
             continue
+        file_fully_allowed = uncovered_by_file.get(file_key, 0) == 0
         for field in FIELDS:
             c = block["fields"][field]["counts"]
             if c["after"] < c["before"]:
                 net_loss.append(
-                    {"file": file_key, "field": field, "before": c["before"], "after": c["after"]}
+                    {
+                        "file": file_key,
+                        "field": field,
+                        "before": c["before"],
+                        "after": c["after"],
+                        "allowed": file_fully_allowed,
+                    }
                 )
+    uncovered_net_loss = [i for i in net_loss if not i["allowed"]]
 
     reasons = []
     if signature == "missing":
@@ -508,8 +607,10 @@ def run(
         reasons.append("%d непокрити загубени/сменени реда" % uncovered)
     if uncovered_structural:
         reasons.append("%d непокрити липсващи/нови/пренаредени реда" % uncovered_structural)
-    if net_loss:
-        reasons.append("нетен спад по %s" % ", ".join("%s.%s" % (i["file"], i["field"]) for i in net_loss))
+    if uncovered_net_loss:
+        reasons.append(
+            "нетен спад по %s" % ", ".join("%s.%s" % (i["file"], i["field"]) for i in uncovered_net_loss)
+        )
 
     if reasons:
         exit_code, verdict = EXIT_UNCOVERED, "; ".join(reasons)
@@ -518,7 +619,14 @@ def run(
     elif signature == "unsigned":
         exit_code, verdict = (
             EXIT_ALLOW_UNSIGNED,
-            "жълто: allow-файлът е подписан от %r, не от %s" % (allow_meta.get("signed_by"), SIGNER),
+            "жълто: всеки преместен ред е изброен, но allow-файлът е подписан от %r, не точно от %r"
+            % (allow_meta.get("signed_by"), SIGNER),
+        )
+    elif net_loss:
+        exit_code, verdict = (
+            EXIT_OK,
+            "нула непокрити редове; нетният спад по %s е покрит от подписания allow-файл"
+            % ", ".join("%s.%s" % (i["file"], i["field"]) for i in net_loss),
         )
     else:
         exit_code, verdict = EXIT_OK, "нула непокрити загубени/сменени реда"
@@ -532,6 +640,7 @@ def run(
         "uncovered": uncovered,
         "uncovered_structural": uncovered_structural,
         "net_loss": net_loss,
+        "net_loss_uncovered": uncovered_net_loss,
         "exit_code": exit_code,
         "verdict": verdict,
     }
@@ -607,8 +716,8 @@ def main(argv: list[str]) -> int:
             for field in FIELDS:
                 c = block["fields"][field]["counts"]
                 sys.stdout.write(
-                    "%-7s %-10s before=%-4d after=%-4d lost=%-4d changed=%-4d gained=%-4d reordered=%d\n"
-                    % (file_key, field, c["before"], c["after"], c["lost"], c["changed"], c["gained"], c["reordered"])
+                    "%-7s %-10s before=%-4d after=%-4d lost=%-4d changed=%-4d gained=%-4d unchanged=%d\n"
+                    % (file_key, field, c["before"], c["after"], c["lost"], c["changed"], c["gained"], c["unchanged"])
                 )
         allow = result["allow"]
         if allow:

@@ -25,7 +25,10 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
 }
 cd "$ROOT" || exit 1
 
-PYTHONIOENCODING=utf-8 python -m gates.run_gates
+# No PYTHONIOENCODING prop: the gate reconfigures its own stdout/stderr to
+# utf-8 (gates/coverage.py `use_utf8_console`). A hook that props the gate up
+# hides the day the gate stops standing on its own (Амандамент №2, A.10).
+python -m gates.run_gates
 STATUS=$?
 
 if [ "$STATUS" -eq 0 ]; then
