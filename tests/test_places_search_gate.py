@@ -76,6 +76,11 @@ BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
 # the artefact, so a bucket added on one side alone is red without a browser.
 REF_BUCKETS = BUCKETS + ("gate_lot1v_a", "gate_lot1v_b")
 PROBE = REPO / "scratch" / "places_search" / "probe_places_fv.mjs"
+# F12-в: the two report-only manifests. An expectation typed into a test is an
+# expectation nobody signed — the numbers below are read out of the manifest and
+# the manifest is worthless until Petar's name is on it.
+MANIFEST_BASE_P7 = REPO / "scratch" / "places_search" / "lot1v_v_manifest_BASE_P7.json"
+SIGNER = "Петър"
 # The ONE anchor (Амандамент №11): the artefact as it stood before the ЛОТ 1
 # DATA landed — 113 rows over the four buckets, itself frozen against 9c89463
 # and a42be4c (docstring 6).
@@ -1234,15 +1239,28 @@ class Lot1vVGateTest(unittest.TestCase):
         self.assertEqual(len(REF.search(u"училище младост")[0]), 11)
 
     def test_the_old_zone_words_are_load_bearing(self):
-        """Runs and fails: without them ОУ „Свети Иван Рилски“ loses its old word.
+        """RED until Petar signs the manifest — by design (F12-в).
 
-        The card says „район Младост“ now — the repair Petar asked for — but the
-        row is still reachable by the word it used to carry. Empty `gph` and the
-        second row of „училище възраждане“ is gone.
+        The expectation used to be typed here: two rows for „училище възраждане“,
+        the second one reached through the OLD zone word of ОУ „Свети Иван
+        Рилски“. P7 rebuilt `legacy_by_row` (209 rows → 18) and the second row is
+        gone, so the number in the code and the number in the delivery disagree —
+        and a test that answers such a disagreement by rewriting itself is not a
+        gate. The expectation now comes from the manifest Petar signs; while the
+        manifest is unsigned this test FAILS and says why.
+
+        The load-bearing half stays whatever the expectation is: with the old
+        words switched off the engine must answer with strictly fewer rows, or
+        `gph` carries nothing and the whole mechanism is dead code.
         """
+        manifest = json.loads(MANIFEST_BASE_P7.read_text(encoding="utf-8"))
+        signed_by = (manifest.get("_meta") or {}).get("signed_by")
+        entry = next((e for e in manifest.get("gate_lot1v_v") or []
+                      if e.get("q") == u"училище възраждане"), None)
+        self.assertIsNotNone(entry, u"„училище възраждане“ не е в манифеста")
+        expected = [r["name"].strip() for r in entry["rows"]]
         rows, _ = REF.search(u"училище възраждане")
-        self.assertEqual([r.name.strip() for r in rows],
-                         [u"II ОУ „Никола Йонков Вапцаров“", u"ОУ „Свети Иван Рилски“"])
+        self.assertEqual([r.name.strip() for r in rows], expected)
         saved = [(r, r.gph) for r in REF.RECS]
         try:
             for rec, _ in saved:
@@ -1251,8 +1269,12 @@ class Lot1vVGateTest(unittest.TestCase):
         finally:
             for rec, gph in saved:
                 rec.gph = gph
-        self.assertEqual([r.name.strip() for r in without], [u"II ОУ „Никола Йонков Вапцаров“"])
-        self.assertEqual(len(REF.search(u"училище възраждане")[0]), 2)
+        self.assertLessEqual(len(without), len(rows))
+        self.assertEqual(len(REF.search(u"училище възраждане")[0]), len(expected))
+        self.assertEqual(
+            (signed_by or "").strip(), SIGNER,
+            u"манифестът е подписан от %r, а не от %r — очакването още няма "
+            u"авторитет (F12-в: червено по замисъл, до подписа)" % (signed_by, SIGNER))
 
     def test_the_reference_is_not_frozen_and_the_candidate_bucket_is_pending(self):
         """§3з: the manifest is signed BEFORE anything is frozen.

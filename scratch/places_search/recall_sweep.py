@@ -89,6 +89,12 @@ OUTDIR = (pathlib.Path(tempfile.gettempdir()) / "fv_measures").as_posix() + "/"
 # REPORT-ONLY and writes the candidate + the old → new manifest into OUTDIR.
 FREEZE = "--freeze" in sys.argv
 REPORT_ONLY = not FREEZE
+# F12-в: the two diffs Petar signs before anything is frozen. REPORT-ONLY by
+# construction — it never touches the tracked reference, only writes the two
+# manifests next to it, and `--freeze` and `--manifest` are refused together.
+MANIFEST = "--manifest" in sys.argv
+if MANIFEST and FREEZE:
+    raise SystemExit(u"--manifest е report-only: не се съчетава с --freeze")
 # Date only, so two runs of the same day are byte-equal (the determinism gate
 # replays this script twice and compares).
 GENERATED_AT = datetime.date.today().isoformat()
@@ -839,8 +845,14 @@ CAPMODE = "plan"                                           # "plan" | "poi"
 
 
 def set_capmode(argv):
+    """The cap mode is the first POSITIONAL word; `--freeze`/`--manifest` are not it.
+
+    Read positionally, `recall_sweep.py --manifest` died with „CAPMODE must be
+    one of plan, poi“ — a flag the script itself defines, refused by the script
+    itself, is the kind of gate that teaches a human to stop reading errors."""
     global CAPMODE
-    mode = argv[1] if len(argv) > 1 else "plan"
+    positional = [a for a in argv[1:] if not a.startswith("--")]
+    mode = positional[0] if positional else "plan"
     if mode not in CAPMODES:
         raise SystemExit("recall_sweep: CAPMODE must be one of %s, got %r"
                          % (", ".join(CAPMODES), mode))
@@ -1106,6 +1118,13 @@ def location_rows(R, cls):
     return order_category(q_rows), order_category(l_rows), order_category(d_rows)
 
 
+# The one switch of the engine, and it exists for ONE reader: the P7 → F12
+# manifest has to show what М7 moved, and „what it moved“ can only be measured
+# by running the same data with the branch off. The client has no such flag —
+# it is never asked to measure itself — and nothing but `--manifest` flips it.
+M7_ENABLED = True
+
+
 def bare_location_rows(R, cls):
     """М7 (план §3й-б S4): a BARE location word, without a class key.
 
@@ -1148,7 +1167,7 @@ def bare_location_query(R):
     A district marker („район X“) has its own branch, a street marker („ул. X“)
     is a street before it is a quarter, and a number is an address — none of
     the three is a bare location word."""
-    if not R:
+    if not M7_ENABLED or not R:
         return False
     if any(t.orig == DISTRICT_MARK for t in R):
         return False
@@ -2057,6 +2076,15 @@ LOT1V_B_CONTROLS = [
 ]
 
 
+# ЛОТ 1в-Б, гейт 6 на Сол: three BARE phrases that intersect a street with a
+# name or a zone and must not become an address without „ул./бул./пл.“. They
+# live outside the buckets, so the manifest reads them from here — a second copy
+# inside the manifest writer would be a second truth.
+COLLISION_CONTROLS = ((u"приморски", "M3", u"ПРИМОРСКИ"),
+                      (u"роза", "M3", u"ДЯ №7 „Роза“"),
+                      (u"владислав варненчик", "M3", u"КАРНИВАЛ"))
+
+
 def check_lot1v_b_gate():
     """The ЛОТ 1в-Б gate; returns the list of failures (empty list = green).
 
@@ -2096,9 +2124,7 @@ def check_lot1v_b_gate():
     # преди улицата), не от правилото за колизия — измерено 04.09. Затова
     # правилото си има собствени редове: три голи улични фрази, които се
     # пресичат с име или зона и НЕ бива да стават адрес без „ул./бул./пл.“.
-    for q, want_branch, want_first in ((u"приморски", "M3", u"ПРИМОРСКИ"),
-                                       (u"роза", "M3", u"ДЯ №7 „Роза“"),
-                                       (u"владислав варненчик", "M3", u"КАРНИВАЛ")):
+    for q, want_branch, want_first in COLLISION_CONTROLS:
         rows, br = search(q)
         first = rows[0].name if rows else u"—"
         if br != want_branch or first != want_first:
@@ -2436,6 +2462,33 @@ REF_BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1", "gate_lot1v_a",
 # manifest, never before. Until then it is allowed in the report-only candidate
 # and in nothing else.
 PENDING_BUCKET = "gate_lot1v_v"
+# F12-б/в: the М7 bucket. Same rule as the one above — it rides the report-only
+# candidate and the P7 → F12 manifest, and it joins REF_BUCKETS on all three
+# sides only in the commit that freezes the reference, after Petar signs.
+M7_BUCKET = "gate_m7_bare"
+
+
+def m7_queries():
+    """Every query the М7 bucket carries — measured, never hand-listed.
+
+    Two shapes, both of them „a bare place and nothing else“: the FULL phrase of
+    every quarter and locality the delivery carries (that is what a human types
+    when he knows the name — „златни пясъци“), and every SINGLE word that can
+    reach the branch (that is what he types when he does not — „златни“). The
+    list is derived from the delivered rows, so it moves with the delivery and
+    the signed `m7_trigger_tokens.json` describes exactly the second half."""
+    out = set()
+    for rec in RECS:
+        for cls, field in ((u"quarter", rec.quarter), (u"locality", rec.locality)):
+            if not field:
+                continue
+            for phrase in LOC_PHRASES[cls].get(field.get("code")) or ():
+                out.add(phrase)
+        if rec.quarter:
+            out.update(rec.qtk)
+        if rec.locality:
+            out.update(rec.ltk)
+    return sorted(out)
 
 
 def bucket_drift(doc, pending=()):
@@ -2722,6 +2775,371 @@ def write_manifest(rows_doc, candidate_path, candidate_text):
     return out
 
 
+def reference_rows():
+    """The seven buckets of the reference, measured here and now.
+
+    It was inline in main() until F12-в: the two manifests have to build the
+    same buckets a second time (with the М7 branch switched off) and a copy
+    of the loops would be a second truth about what the reference IS."""
+    ROWS = {
+        "_meta": {
+            "source": "measures/recall_sweep_v22.py",
+            "rules": "plan sec.3 (T1/T2/K2/M1-M5) + sec.10 A1-A8 + P2+P3+P4 (no P1)",
+            "data": ["Fire_Varna/data/hotels.json",
+                     "Fire_Varna/data/places.json",
+                     "Fire_Varna/data/place_categories.json"],
+            "records": len(RECS),
+            "center": [CENTER[0], CENTER[1]],
+            "top_cut_is_in_render": TOP,
+            "note": ("full ordered lists; the TOP-8 cut belongs to render(), not to "
+                     "the search. No cadastral identifiers are read or written."),
+            # П7 (§11 v2.1): what the quarter aliases actually added, and why
+            # every other candidate fell. The C16 gate reads p7_added and goes
+            # red on any drift from the seven tokens in six zones (Амандамент №10).
+            "p7_added": P7_ADDED,
+            "p7_dropped": P7_DROPPED,
+            "p7_zones_with_aliases": len(P7_ADDED),
+            "p7_tokens": sum(len(v) for v in P7_ADDED.values()),
+            "p7_records_touched": sum(1 for r in RECS if r.p7),
+            "p7_alias_strings": sum(len(v.get("aliases") or [])
+                                    for v in (cats.get("zones") or {}).values()),
+        },
+        "gate_m5_a8": [],
+        "extra": [],
+        # С2′: one query per added token plus the controls of §11 Р3 — the probe
+        # replays this bucket too, so the JS↔Python parity covers П7 itself.
+        "gate_p7": [],
+        # ЛОТ 1: the two client rules, in their own bucket — the 103 rows above
+        # keep their identity, so the signed change list stays readable.
+        "gate_lot1": [],
+        # ЛОТ 1в-А (ADR 008 D4/D7, план §2г S3/S6): АДИТИВНО. The 122 rows above
+        # did not move one label when the aliases and the curated class words
+        # landed (measured against a58010e), so nothing is re-frozen; the twelve
+        # measured rows of the new lot arrive as a bucket of their own.
+        "gate_lot1v_a": [],
+        # ЛОТ 1в-Б (ADR 008 D6/D7, план §2г S4/S6): АДИТИВНО again. Measured
+        # against a58010e and against the committed `gate_lot1v_a`, not one of the
+        # 122 + 12 rows moved when the addresses and the street branch landed, so
+        # nothing is re-frozen; Сол's six queries arrive as a bucket of their own.
+        "gate_lot1v_b": [],
+        # ЛОТ 1в-В (план §3ж S2/S3): the PENDING bucket. It rides the report-only
+        # candidate and the manifest; it becomes the seventh member of REF_BUCKETS
+        # on all three sides in the same commit that freezes the reference — after
+        # Petar signs, never before.
+        "gate_lot1v_v": [],
+        # F12-б/в: М7 („голото място“). Every query here is a bare quarter or
+        # locality word — the bucket exists so the P7 → F12 manifest can show
+        # what the new branch answers, row by row, before anything is frozen.
+        "gate_m7_bare": [],
+    }
+    for _q, _br, _n, _why, _want in P7_GAINS + P7_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_p7"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "hasKey": has_key_of(_q),
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [row_out(x) for x in _r],
+        })
+    for _q, _br, _n, _why, _want in LOT1_GAINS + LOT1_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "hasKey": has_key_of(_q),
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [row_out(x) for x in _r],
+        })
+    # ЛОТ 1в-А: the same shape as the two gates above — `kind` rides in the
+    # `ok` flag (the expectation triples of LOT1V_A_GAINS/LOT1V_A_CONTROLS carry
+    # it), while the rows keep the (name, zone) schema the artefact has always had.
+    for _q, _br, _n, _why, _want in LOT1V_A_GAINS + LOT1V_A_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1v_a"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "hasKey": has_key_of(_q),
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [row_out(x) for x in _r],
+        })
+    for _q, _br, _n, _why, _want in LOT1V_B_GAINS + LOT1V_B_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1v_b"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "hasKey": has_key_of(_q),
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [row_out(x) for x in _r],
+        })
+    for _q, _br, _n, _why, _want in LOT1V_V_GAINS + LOT1V_V_CONTROLS:
+        _r, _b = search(_q)
+        ROWS["gate_lot1v_v"].append({
+            "q": _q,
+            "expect": _why,
+            "branch": _b,
+            "hasKey": has_key_of(_q),
+            "n": len(_r),
+            "ok": (_b == _br and len(_r) == _n
+                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
+            "rows": [row_out(x) for x in _r],
+        })
+    for _q in m7_queries():
+        _r, _b = search(_q)
+        ROWS[M7_BUCKET].append({
+            "q": _q,
+            "expect": u"М7: голо име на квартал/местност",
+            "branch": _b,
+            "hasKey": has_key_of(_q),
+            "n": len(_r),
+            "ok": _b == "M7-bare-location",
+            "rows": [row_out(x) for x in _r],
+        })
+    for _bucket, _spec in [("gate_m5_a8", M5SPEC), ("extra", EXTRASPEC)]:
+        for _q, _exp, _fn in _spec:
+            _r, _b = search(_q)
+            ROWS[_bucket].append({
+                "q": _q,
+                "expect": _exp,
+                "branch": _b,
+                "hasKey": has_key_of(_q),
+                "n": len(_r),
+                "ok": bool(_fn(_r)),
+                "rows": [row_out(x) for x in _r],
+            })
+    return ROWS
+
+
+def full_side(entry):
+    """A whole side of a moved query — ALL rows, not the first eight (Сол S5).
+
+    The eight-row head of the лот-В manifest is what `render()` shows; a
+    signature over a head is a signature over a summary, and the rows that were
+    cut are exactly the ones nobody checked."""
+    return {"branch": entry["branch"], "hasKey": entry["hasKey"],
+            "n": len(entry["rows"]),
+            "rows": [{"name": (r.get("name") or u"").strip(), "zone": r.get("zone"),
+                      "kind": r.get("kind"),
+                      # The WITNESS: which channel named the location of this row.
+                      # „район X“ carries the district's own source, never a
+                      # quarter's — that is the honest answer, and it says so.
+                      "witness": ((r.get("quarter") or {}).get("src") if r.get("quarter")
+                                  else (r.get("district") or {}).get("src")),
+                      "quarter": r.get("quarter"), "district": r.get("district"),
+                      "locality": r.get("locality")}
+                     for r in entry["rows"]]}
+
+
+def manifest_diff(base_entries, cand_entries, frozen_only):
+    """moved / unchanged / extra / missing between two shapes of the reference."""
+    moved, unchanged, extra, missing = compare_buckets(base_entries, cand_entries)
+    if frozen_only:
+        moved = [m for m in moved if m["bucket"] in REF_BUCKETS]
+        unchanged = [u for u in unchanged if u["bucket"] in REF_BUCKETS]
+    for record in moved:
+        record["old"] = full_side(record["old"])
+        record["new"] = full_side(record["new"])
+    return moved, unchanged, extra, missing
+
+
+def sha_and_bytes(path):
+    raw = pathlib.Path(path).read_bytes()
+    return {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+
+
+def manifest_meta(what, base, candidate):
+    return {
+        "what": what,
+        "plan": u"docs/plans/ПЛАН_ЛОТ0_гейтове_P7_F12.md §F12-в",
+        "generator": u"scratch/places_search/recall_sweep.py --manifest (report-only)",
+        "generated": GENERATED_AT,
+        "frozen": False,
+        "signed_by": u"pending — Петър",
+        "note": (u"Референцията НЕ е замразена и този прогон не я пипа. Тестовете, "
+                 u"които пинват старите числа, остават ЧЕРВЕНИ до подписа — това е "
+                 u"гейтът, не дефект."),
+        "base": base,
+        "candidate": candidate,
+        "inputs": {u"data/places.json": sha_and_bytes(PLACES2),
+                   u"data/hotels.json": sha_and_bytes(HOTELS),
+                   u"data/place_categories.json": sha_and_bytes(CATS)},
+    }
+
+
+def write_two_manifests(rows_with_m7):
+    """The two diffs of F12-в, both report-only, both showing EVERY row.
+
+    BASE → P7 is the DATA: the frozen artefact of лот Б against today's engine
+    with М7 switched OFF, so every difference in it comes from М2+М3+М6 and from
+    nothing else. P7 → F12 is the BRANCH: the same engine with М7 off against the
+    same engine with М7 on, so every difference in it comes from М7 alone. Two
+    causes, two documents — one manifest carrying both would ask Petar to sign a
+    sum he cannot take apart."""
+    global M7_ENABLED
+    base_doc = json.loads(pathlib.Path(REPO_ROWS_OUT).read_text(encoding="utf-8"))
+    frozen, frozen_dup = base_adapter(base_doc)
+    with_m7, with_dup = base_adapter(rows_with_m7)
+
+    M7_ENABLED = False
+    try:
+        rows_p7 = reference_rows()
+    finally:
+        M7_ENABLED = True
+    without_m7, without_dup = base_adapter(rows_p7)
+
+    def dump(doc):
+        return json.dumps(doc, ensure_ascii=False, indent=1, sort_keys=False) + chr(10)
+
+    p7_text = dump(rows_p7)
+    f12_text = dump(rows_with_m7)
+
+    # ---------------------------------------------------------- BASE → P7 (data)
+    moved, unchanged, extra, missing = manifest_diff(frozen, without_m7, True)
+    old_zones = delivered_zones()
+    order_drift = []
+
+    def old_zone_of(rec):
+        was = old_zones.get((rec.bundle, rec.ordinal)) if old_zones is not None else None
+        if was is None:
+            order_drift.append(u"%s:%d липсва в %s" % (rec.bundle, rec.ordinal, BASE_COMMIT))
+            return None
+        if was[0] != rec.name:
+            order_drift.append(u"%s:%d е „%s“ в %s и „%s“ сега"
+                               % (rec.bundle, rec.ordinal, was[0], BASE_COMMIT, rec.name))
+        return was[1]
+
+    changed_records = None
+    if old_zones is not None:
+        changed_records = [
+            {"name": r.name.strip(), "bundle": u"%s:%d" % (r.bundle, r.ordinal),
+             "old": old_zone_of(r), "new": r.zone,
+             "witness": ((r.quarter or {}).get("src") if r.quarter
+                         else (r.district or {}).get("src")),
+             "quarter": r.quarter, "district": r.district, "locality": r.locality,
+             "legacy_terms": r.legacy}
+            for r in RECS if old_zone_of(r) != r.zone]
+    base_p7 = {
+        "_meta": manifest_meta(
+            u"F12-в · манифест BASE → P7 (данните: М2+М3+М6). М7 е ИЗКЛЮЧЕН тук — "
+            u"клонът има свой манифест.",
+            dict(sha_and_bytes(REPO_ROWS_OUT),
+                 path=u"scratch/places_search/recall_sweep_rows.json",
+                 commit=BASE_COMMIT, what=u"замразената референция след лот Б"),
+            {"what": u"днешният двигател с М7 = OFF",
+             "sha256": hashlib.sha256(p7_text.encode("utf-8")).hexdigest(),
+             "bytes": len(p7_text.encode("utf-8"))}),
+        "totals": {
+            "records": len(RECS),
+            "quarter": sum(1 for r in RECS if r.quarter),
+            "locality": sum(1 for r in RECS if r.locality),
+            "district": sum(1 for r in RECS if r.district),
+            "records_changing_zone": None if changed_records is None else len(changed_records),
+            "queries_base": len(frozen),
+            "queries_candidate": sum(1 for b, _q in without_m7 if b in REF_BUCKETS),
+            "queries_moved": len(moved),
+            "queries_unchanged": len(unchanged),
+            "rows_shown": sum(len(m["old"]["rows"]) + len(m["new"]["rows"]) for m in moved),
+        },
+        "stop_conditions": {
+            "duplicate": frozen_dup + without_dup,
+            "missing": missing,
+            "extra": extra,
+            "delivery_order_drift": sorted(set(order_drift)),
+            "unsigned": (u"да — манифестът чака подписа на Петър; докато го няма, "
+                         u"нищо не се замразява"),
+        },
+        "records_changing_zone": changed_records,
+        # The лот-В bucket is PENDING: the base never carried it, so it can only
+        # be „new“ to the comparator above and would fall out of the document
+        # entirely. It is exactly where the expectation of the В-gate queries
+        # lives, so it is written out in full — that is what the suite reads
+        # instead of a number typed into a test (F12-в).
+        "gate_lot1v_v": [{"q": e["q"], "expect": e["expect"], "branch": e["branch"],
+                          "hasKey": e["hasKey"], "n": e["n"], "ok": e["ok"],
+                          "rows": full_side({"branch": e["branch"], "hasKey": e["hasKey"],
+                                             "rows": e["rows"]})["rows"]}
+                         for e in rows_p7[PENDING_BUCKET]],
+        "moved": moved,
+        "unchanged": [{"bucket": x["bucket"], "q": x["q"]} for x in unchanged],
+    }
+
+    # ----------------------------------------------------------- P7 → F12 (М7)
+    m7_moved, m7_unchanged, m7_extra, m7_missing = manifest_diff(without_m7, with_m7, False)
+    touched = [{"bucket": m["bucket"], "q": m["q"], "why": m["why"]}
+               for m in m7_moved if m["bucket"] != M7_BUCKET]
+    controls = []
+    for q, want_branch, want_first in COLLISION_CONTROLS:
+        M7_ENABLED = False
+        try:
+            off_rows, off_branch = search(q)
+            off = (off_branch, [r.name.strip() for r in off_rows])
+        finally:
+            M7_ENABLED = True
+        on_rows, on_branch = search(q)
+        if (on_branch, [r.name.strip() for r in on_rows]) != off:
+            controls.append({
+                "q": q, "expected_branch": want_branch, "expected_first": want_first,
+                "without_m7": {"branch": off[0], "n": len(off[1]), "first": off[1][0] if off[1] else None},
+                "with_m7": {"branch": on_branch, "n": len(on_rows),
+                            "first": on_rows[0].name.strip() if on_rows else None},
+                "why": u"контрола ИЗВЪН кофите (гейт 6 на Сол) — М7 я мести; иска думата на Петър",
+            })
+    p7_f12 = {
+        "_meta": manifest_meta(
+            u"F12-в · манифест P7 → F12 (само М7). Един и същ двигател, едни и същи "
+            u"данни, с изключен и с включен клон.",
+            {"what": u"днешният двигател с М7 = OFF",
+             "sha256": hashlib.sha256(p7_text.encode("utf-8")).hexdigest(),
+             "bytes": len(p7_text.encode("utf-8"))},
+            {"what": u"днешният двигател с М7 = ON",
+             "sha256": hashlib.sha256(f12_text.encode("utf-8")).hexdigest(),
+             "bytes": len(f12_text.encode("utf-8"))}),
+        "totals": {
+            "m7_bucket": M7_BUCKET,
+            "m7_queries": len(m7_queries()),
+            "m7_queries_answered_by_the_branch": sum(
+                1 for e in rows_with_m7[M7_BUCKET] if e["branch"] == "M7-bare-location"),
+            "m7_rows": sum(len(e["rows"]) for e in rows_with_m7[M7_BUCKET]),
+            "old_queries_touched": len(touched),
+            "controls_outside_the_buckets_touched": len(controls),
+        },
+        "stop_conditions": {
+            "old_queries_touched": touched,
+            "missing": m7_missing,
+            "extra": [e for e in m7_extra if e["bucket"] != M7_BUCKET],
+            "unsigned": (u"да — списъкът на задействащите думи е "
+                         u"scratch/places_search/m7_trigger_tokens.json и също чака подпис"),
+        },
+        "controls_outside_the_buckets": controls,
+        "gate_m7_bare": [{"q": e["q"], "branch": e["branch"], "hasKey": e["hasKey"],
+                          "n": e["n"],
+                          "rows": full_side({"branch": e["branch"], "hasKey": e["hasKey"],
+                                             "rows": e["rows"]})["rows"]}
+                         for e in rows_with_m7[M7_BUCKET]],
+        "moved": m7_moved,
+    }
+
+    out_dir = pathlib.Path(REPO_ROOT) / "scratch" / "places_search"
+    written = []
+    for name, doc in ((u"lot1v_v_manifest_BASE_P7.json", base_p7),
+                      (u"lot1v_v_manifest_P7_F12.json", p7_f12)):
+        path = out_dir / name
+        path.write_text(dump(doc), encoding="utf-8", newline="\n")
+        written.append(str(path))
+    return written
+
+
 def main():
     """§11 Р9 / C14 finding 3 — everything that RUNS lives here.
 
@@ -2976,133 +3394,12 @@ def main():
 
     # ------------------------------------------------- the row-by-row JS baseline
     set_fix(BASE)
-    ROWS = {
-        "_meta": {
-            "source": "measures/recall_sweep_v22.py",
-            "rules": "plan sec.3 (T1/T2/K2/M1-M5) + sec.10 A1-A8 + P2+P3+P4 (no P1)",
-            "data": ["Fire_Varna/data/hotels.json",
-                     "Fire_Varna/data/places.json",
-                     "Fire_Varna/data/place_categories.json"],
-            "records": len(RECS),
-            "center": [CENTER[0], CENTER[1]],
-            "top_cut_is_in_render": TOP,
-            "note": ("full ordered lists; the TOP-8 cut belongs to render(), not to "
-                     "the search. No cadastral identifiers are read or written."),
-            # П7 (§11 v2.1): what the quarter aliases actually added, and why
-            # every other candidate fell. The C16 gate reads p7_added and goes
-            # red on any drift from the seven tokens in six zones (Амандамент №10).
-            "p7_added": P7_ADDED,
-            "p7_dropped": P7_DROPPED,
-            "p7_zones_with_aliases": len(P7_ADDED),
-            "p7_tokens": sum(len(v) for v in P7_ADDED.values()),
-            "p7_records_touched": sum(1 for r in RECS if r.p7),
-            "p7_alias_strings": sum(len(v.get("aliases") or [])
-                                    for v in (cats.get("zones") or {}).values()),
-        },
-        "gate_m5_a8": [],
-        "extra": [],
-        # С2′: one query per added token plus the controls of §11 Р3 — the probe
-        # replays this bucket too, so the JS↔Python parity covers П7 itself.
-        "gate_p7": [],
-        # ЛОТ 1: the two client rules, in their own bucket — the 103 rows above
-        # keep their identity, so the signed change list stays readable.
-        "gate_lot1": [],
-        # ЛОТ 1в-А (ADR 008 D4/D7, план §2г S3/S6): АДИТИВНО. The 122 rows above
-        # did not move one label when the aliases and the curated class words
-        # landed (measured against a58010e), so nothing is re-frozen; the twelve
-        # measured rows of the new lot arrive as a bucket of their own.
-        "gate_lot1v_a": [],
-        # ЛОТ 1в-Б (ADR 008 D6/D7, план §2г S4/S6): АДИТИВНО again. Measured
-        # against a58010e and against the committed `gate_lot1v_a`, not one of the
-        # 122 + 12 rows moved when the addresses and the street branch landed, so
-        # nothing is re-frozen; Сол's six queries arrive as a bucket of their own.
-        "gate_lot1v_b": [],
-        # ЛОТ 1в-В (план §3ж S2/S3): the PENDING bucket. It rides the report-only
-        # candidate and the manifest; it becomes the seventh member of REF_BUCKETS
-        # on all three sides in the same commit that freezes the reference — after
-        # Petar signs, never before.
-        "gate_lot1v_v": [],
-    }
-    for _q, _br, _n, _why, _want in P7_GAINS + P7_CONTROLS:
-        _r, _b = search(_q)
-        ROWS["gate_p7"].append({
-            "q": _q,
-            "expect": _why,
-            "branch": _b,
-            "hasKey": has_key_of(_q),
-            "n": len(_r),
-            "ok": (_b == _br and len(_r) == _n
-                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [row_out(x) for x in _r],
-        })
-    for _q, _br, _n, _why, _want in LOT1_GAINS + LOT1_CONTROLS:
-        _r, _b = search(_q)
-        ROWS["gate_lot1"].append({
-            "q": _q,
-            "expect": _why,
-            "branch": _b,
-            "hasKey": has_key_of(_q),
-            "n": len(_r),
-            "ok": (_b == _br and len(_r) == _n
-                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [row_out(x) for x in _r],
-        })
-    # ЛОТ 1в-А: the same shape as the two gates above — `kind` rides in the
-    # `ok` flag (the expectation triples of LOT1V_A_GAINS/LOT1V_A_CONTROLS carry
-    # it), while the rows keep the (name, zone) schema the artefact has always had.
-    for _q, _br, _n, _why, _want in LOT1V_A_GAINS + LOT1V_A_CONTROLS:
-        _r, _b = search(_q)
-        ROWS["gate_lot1v_a"].append({
-            "q": _q,
-            "expect": _why,
-            "branch": _b,
-            "hasKey": has_key_of(_q),
-            "n": len(_r),
-            "ok": (_b == _br and len(_r) == _n
-                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [row_out(x) for x in _r],
-        })
-    for _q, _br, _n, _why, _want in LOT1V_B_GAINS + LOT1V_B_CONTROLS:
-        _r, _b = search(_q)
-        ROWS["gate_lot1v_b"].append({
-            "q": _q,
-            "expect": _why,
-            "branch": _b,
-            "hasKey": has_key_of(_q),
-            "n": len(_r),
-            "ok": (_b == _br and len(_r) == _n
-                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [row_out(x) for x in _r],
-        })
-    for _q, _br, _n, _why, _want in LOT1V_V_GAINS + LOT1V_V_CONTROLS:
-        _r, _b = search(_q)
-        ROWS["gate_lot1v_v"].append({
-            "q": _q,
-            "expect": _why,
-            "branch": _b,
-            "hasKey": has_key_of(_q),
-            "n": len(_r),
-            "ok": (_b == _br and len(_r) == _n
-                   and [(x.name.strip(), x.zone, x.kind) for x in _r][:len(_want)] == _want),
-            "rows": [row_out(x) for x in _r],
-        })
-    for _bucket, _spec in [("gate_m5_a8", M5SPEC), ("extra", EXTRASPEC)]:
-        for _q, _exp, _fn in _spec:
-            _r, _b = search(_q)
-            ROWS[_bucket].append({
-                "q": _q,
-                "expect": _exp,
-                "branch": _b,
-                "hasKey": has_key_of(_q),
-                "n": len(_r),
-                "ok": bool(_fn(_r)),
-                "rows": [row_out(x) for x in _r],
-            })
+    ROWS = reference_rows()
     # ADR 008 D7: an artefact whose buckets are not exactly REF_BUCKETS is a
     # DIFFERENT reference — it is never written, however green the rows are.
     # ЛОТ 1в-В: the pending bucket is allowed in the report-only CANDIDATE and
     # nowhere else, so `--freeze` still refuses it until all three sides name it.
-    _drift = bucket_drift(ROWS, pending=() if FREEZE else (PENDING_BUCKET,))
+    _drift = bucket_drift(ROWS, pending=() if FREEZE else (PENDING_BUCKET, M7_BUCKET))
     if _drift:
         raise SystemExit(u"REF_BUCKETS (ADR 008 D7): " + u", ".join(_drift))
     pathlib.Path(OUTDIR).mkdir(parents=True, exist_ok=True)
@@ -3193,6 +3490,9 @@ def main():
     OUT = OUTDIR + ("recall_sweep_v22.md" if CAPMODE == "plan"
                     else "recall_sweep_v22_cap_poi.md")
     open(OUT, "w", encoding="utf-8").write(u"\n".join(L) + u"\n")
+    if MANIFEST:
+        for _path in write_two_manifests(ROWS):
+            print(u"манифест -> %s" % _path)
     print(u"CAPMODE=%s -> %s" % (CAPMODE, OUT))
     print(u"rows -> %s (%d + %d заявки, %d реда общо)"
           % (ROWS_OUT, len(ROWS["gate_m5_a8"]), len(ROWS["extra"]),

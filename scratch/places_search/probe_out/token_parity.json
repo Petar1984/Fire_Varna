@@ -2,17 +2,102 @@
  "_meta": {
   "source": "scratch/places_search/recall_sweep.py (place_tokens)",
   "what": "С6′ tokeniser parity corpus: kept zone aliases + record names",
-  "aliases": 42,
-  "zones_with_aliases": 19,
+  "aliases": 39,
+  "zones_with_aliases": 20,
   "records": 375,
   "names": 374,
   "old_names": 82,
   "addresses": 210,
-  "locations": 48,
-  "legacy_terms": 12,
-  "strings": 768
+  "locations": 53,
+  "legacy_terms": 1,
+  "strings": 759
  },
  "strings": [
+  {
+   "s": "ж.к. БРИЗ",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. БРИЗ-ЮГ",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    },
+    {
+     "s": "iug",
+     "orig": "юг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "ж.к. Бриз-юг",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    },
+    {
+     "s": "iug",
+     "orig": "юг",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "кв. Бриз",
+   "tokens": [
+    {
+     "s": "kv",
+     "orig": "кв",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    }
+   ]
+  },
   {
    "s": "ж.к. Дружба-Аспарухово",
    "tokens": [
@@ -669,176 +754,6 @@
     {
      "s": "iug",
      "orig": "юг",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "Ман.рид",
-   "tokens": [
-    {
-     "s": "man",
-     "orig": "ман",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "Манастирски Рид-бялата Чешма-дъбравата",
-   "tokens": [
-    {
-     "s": "manastirski",
-     "orig": "манастирски",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
-     "num": false
-    },
-    {
-     "s": "bialata",
-     "orig": "бялата",
-     "num": false
-    },
-    {
-     "s": "cheshma",
-     "orig": "чешма",
-     "num": false
-    },
-    {
-     "s": "dabravata",
-     "orig": "дъбравата",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "Манастирски рид",
-   "tokens": [
-    {
-     "s": "manastirski",
-     "orig": "манастирски",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "м-т Манастирски рид",
-   "tokens": [
-    {
-     "s": "m",
-     "orig": "м",
-     "num": false
-    },
-    {
-     "s": "t",
-     "orig": "т",
-     "num": false
-    },
-    {
-     "s": "manastirski",
-     "orig": "манастирски",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "м. МАНАСТИРСКИ РИД",
-   "tokens": [
-    {
-     "s": "m",
-     "orig": "м",
-     "num": false
-    },
-    {
-     "s": "manastirski",
-     "orig": "манастирски",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "с.о. МАНАСТИРСКИ РИД",
-   "tokens": [
-    {
-     "s": "s",
-     "orig": "с",
-     "num": false
-    },
-    {
-     "s": "o",
-     "orig": "о",
-     "num": false
-    },
-    {
-     "s": "manastirski",
-     "orig": "манастирски",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "с.о. Манастирски рид -Бялата чешма - Дъбравата",
-   "tokens": [
-    {
-     "s": "s",
-     "orig": "с",
-     "num": false
-    },
-    {
-     "s": "o",
-     "orig": "о",
-     "num": false
-    },
-    {
-     "s": "manastirski",
-     "orig": "манастирски",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
-     "num": false
-    },
-    {
-     "s": "bialata",
-     "orig": "бялата",
-     "num": false
-    },
-    {
-     "s": "cheshma",
-     "orig": "чешма",
-     "num": false
-    },
-    {
-     "s": "dabravata",
-     "orig": "дъбравата",
      "num": false
     }
    ]
@@ -12249,6 +12164,26 @@
    ]
   },
   {
+   "s": "ж.к. Бриз",
+   "tokens": [
+    {
+     "s": "zh",
+     "orig": "ж",
+     "num": false
+    },
+    {
+     "s": "k",
+     "orig": "к",
+     "num": false
+    },
+    {
+     "s": "briz",
+     "orig": "бриз",
+     "num": false
+    }
+   ]
+  },
+  {
    "s": "к.к. Чайка",
    "tokens": [
     {
@@ -12374,26 +12309,21 @@
    ]
   },
   {
-   "s": "с.о. Манастирски рид",
+   "s": "ж.к. Младост",
    "tokens": [
     {
-     "s": "s",
-     "orig": "с",
+     "s": "zh",
+     "orig": "ж",
      "num": false
     },
     {
-     "s": "o",
-     "orig": "о",
+     "s": "k",
+     "orig": "к",
      "num": false
     },
     {
-     "s": "manastirski",
-     "orig": "манастирски",
-     "num": false
-    },
-    {
-     "s": "rid",
-     "orig": "рид",
+     "s": "mladost",
+     "orig": "младост",
      "num": false
     }
    ]
@@ -12734,6 +12664,66 @@
     {
      "s": "varnenchik",
      "orig": "варненчик",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Морска градина",
+   "tokens": [
+    {
+     "s": "morska",
+     "orig": "морска",
+     "num": false
+    },
+    {
+     "s": "gradina",
+     "orig": "градина",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Приморски парк",
+   "tokens": [
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Приморският парк",
+   "tokens": [
+    {
+     "s": "primorskiat",
+     "orig": "приморският",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
+     "num": false
+    }
+   ]
+  },
+  {
+   "s": "Приморски Парк",
+   "tokens": [
+    {
+     "s": "primorski",
+     "orig": "приморски",
+     "num": false
+    },
+    {
+     "s": "park",
+     "orig": "парк",
      "num": false
     }
    ]
@@ -13094,121 +13084,6 @@
    ]
   },
   {
-   "s": "Морска градина",
-   "tokens": [
-    {
-     "s": "morska",
-     "orig": "морска",
-     "num": false
-    },
-    {
-     "s": "gradina",
-     "orig": "градина",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "к.з. Прибой",
-   "tokens": [
-    {
-     "s": "k",
-     "orig": "к",
-     "num": false
-    },
-    {
-     "s": "z",
-     "orig": "з",
-     "num": false
-    },
-    {
-     "s": "priboi",
-     "orig": "прибой",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "Виница/север",
-   "tokens": [
-    {
-     "s": "vinitsa",
-     "orig": "виница",
-     "num": false
-    },
-    {
-     "s": "sever",
-     "orig": "север",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "м-т Шашкъна",
-   "tokens": [
-    {
-     "s": "m",
-     "orig": "м",
-     "num": false
-    },
-    {
-     "s": "t",
-     "orig": "т",
-     "num": false
-    },
-    {
-     "s": "shashkana",
-     "orig": "шашкъна",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "м-т Горчивата чешма",
-   "tokens": [
-    {
-     "s": "m",
-     "orig": "м",
-     "num": false
-    },
-    {
-     "s": "t",
-     "orig": "т",
-     "num": false
-    },
-    {
-     "s": "gorchivata",
-     "orig": "горчивата",
-     "num": false
-    },
-    {
-     "s": "cheshma",
-     "orig": "чешма",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "м-т Салтанат",
-   "tokens": [
-    {
-     "s": "m",
-     "orig": "м",
-     "num": false
-    },
-    {
-     "s": "t",
-     "orig": "т",
-     "num": false
-    },
-    {
-     "s": "saltanat",
-     "orig": "салтанат",
-     "num": false
-    }
-   ]
-  },
-  {
    "s": "Изгрев 1",
    "tokens": [
     {
@@ -13220,106 +13095,6 @@
      "s": "1",
      "orig": "1",
      "num": true
-    }
-   ]
-  },
-  {
-   "s": "ж.к. Бриз",
-   "tokens": [
-    {
-     "s": "zh",
-     "orig": "ж",
-     "num": false
-    },
-    {
-     "s": "k",
-     "orig": "к",
-     "num": false
-    },
-    {
-     "s": "briz",
-     "orig": "бриз",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "ж.к. Младост",
-   "tokens": [
-    {
-     "s": "zh",
-     "orig": "ж",
-     "num": false
-    },
-    {
-     "s": "k",
-     "orig": "к",
-     "num": false
-    },
-    {
-     "s": "mladost",
-     "orig": "младост",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "Аспарухово/Галата",
-   "tokens": [
-    {
-     "s": "asparuhovo",
-     "orig": "аспарухово",
-     "num": false
-    },
-    {
-     "s": "galata",
-     "orig": "галата",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "м-т Сотира",
-   "tokens": [
-    {
-     "s": "m",
-     "orig": "м",
-     "num": false
-    },
-    {
-     "s": "t",
-     "orig": "т",
-     "num": false
-    },
-    {
-     "s": "sotira",
-     "orig": "сотира",
-     "num": false
-    }
-   ]
-  },
-  {
-   "s": "кв. Св. Иван Рилски",
-   "tokens": [
-    {
-     "s": "kv",
-     "orig": "кв",
-     "num": false
-    },
-    {
-     "s": "sveti",
-     "orig": "свети",
-     "num": false
-    },
-    {
-     "s": "ivan",
-     "orig": "иван",
-     "num": false
-    },
-    {
-     "s": "rilski",
-     "orig": "рилски",
-     "num": false
     }
    ]
   }
