@@ -57,6 +57,11 @@ REFERENCE = REPO / "scratch" / "places_search" / "recall_sweep.py"
 ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
 BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
+# ADR 008 D7 — fail-closed. `REF_BUCKETS` in scratch/places_search/probe_places_fv.mjs
+# is the probe's hand-kept copy of the very same list; RefBucketsTest below compares
+# the two and the artefact against both, so a bucket added on one side alone is red
+# without a browser.
+PROBE = REPO / "scratch" / "places_search" / "probe_places_fv.mjs"
 # The ONE anchor (Амандамент №11): the artefact as it stood before the ЛОТ 1
 # DATA landed — 113 rows over the four buckets, itself frozen against 7a6ea1d
 # and 378a844 (docstring 6).
@@ -468,6 +473,116 @@ def js_extra_forms(text):
     if rest.strip():
         raise AssertionError("unread bytes in the EXTRA_FORMS literal: %r" % rest.strip())
     return table
+
+
+class Lot1vAGateTest(unittest.TestCase):
+    """ЛОТ 1в-А — псевдоними с извор + курираните думи на видовете (04.09).
+
+    Twelve measured rows: nine gains (the Wikidata string of the ВВМУ, the two
+    ЕГ, the class words of ЗПУО/ЗЛЗ/ЗВО, the МДУ) and three controls (the known
+    hole „морско училище“, the generic „варна“, the two-token floor „синчец“).
+    """
+
+    def test_gate(self):
+        failures = REF.check_lot1v_a_gate()
+        self.assertEqual(failures, [], "\n".join(failures))
+
+    def test_the_measured_rows_are_twelve(self):
+        self.assertEqual(len(REF.LOT1V_A_GAINS), 9)
+        self.assertEqual(len(REF.LOT1V_A_CONTROLS), 3)
+
+    def test_the_generic_word_filter_is_load_bearing(self):
+        """G2 — a gate that cannot go red is not a gate. `варна` is put back into
+        every alias token set in place; the control then finds rows that stand in
+        the answer through an alias alone, and check_lot1v_a_gate() says so."""
+        token = REF.skel(u"варна")
+        saved = [(rec, rec.aset) for rec in REF.RECS]
+        try:
+            for rec in REF.RECS:
+                if rec.old_names and any(token in REF.key_of(o).split(u" ")
+                                         for o in rec.old_names):
+                    rec.aset = set(rec.aset) | {token}
+            self.assertNotEqual(REF.check_lot1v_a_gate(), [])
+        finally:
+            for rec, aset in saved:
+                rec.aset = aset
+        self.assertEqual(REF.check_lot1v_a_gate(), [])
+
+    def test_the_two_token_floor_is_load_bearing(self):
+        """Амандамент А4 т. 2, inverted in place: without the floor the one-word
+        „синчец“ reaches EXACT_ALIAS and the hotel whose OLD name is „СИНЧЕЦ“
+        takes the answer away from ДГ 30 „Синчец“, whose CURRENT name it is."""
+        saved = REF.alias_significant
+        try:
+            REF.alias_significant = lambda qt: 2
+            rows, branch = REF.search(u"синчец")
+            self.assertEqual((branch, rows[0].name), ("A0-exact-alias", u"ДАНА ПАЛАС"))
+        finally:
+            REF.alias_significant = saved
+        rows, branch = REF.search(u"синчец")
+        self.assertEqual((branch, rows[0].name), ("M3", u'ДГ 30 "Синчец"'))
+
+    def test_the_exact_alias_index_is_the_whole_alias_and_nothing_else(self):
+        """D2: one key per delivered old name, keyed by the WHOLE normalised
+        string. Measured 04.09: 82 aliases, 82 keys, and the only key that is also
+        a current name belongs to the SAME record."""
+        delivered = sum(len(rec.old_names) for rec in REF.RECS)
+        self.assertEqual(delivered, 82)
+        self.assertEqual(len(REF.EXACT_ALIAS), 82)
+        for key, hits in REF.EXACT_ALIAS.items():
+            for rec, i in hits:
+                self.assertEqual(key, REF.key_of(rec.old_names[i]), rec.name)
+        both = set(REF.EXACT_ALIAS) & set(REF.EXACT_NAME)
+        for key in both:
+            self.assertEqual(set(r.name for r, _i in REF.EXACT_ALIAS[key]),
+                             set(r.name for r in REF.EXACT_NAME[key]), key)
+
+    def test_every_delivered_alias_carries_a_source(self):
+        """D1 in the engine, not only in the payload: same length, closed list."""
+        allowed = {"OSM", "REG", "NTR", "WD", "WEB", "KAIS", "CUR"}
+        for rec in REF.RECS:
+            self.assertEqual(len(rec.old_src), len(rec.old_names), rec.name)
+            for code in rec.old_src:
+                self.assertIn(code, allowed, rec.name)
+
+
+class RefBucketsTest(unittest.TestCase):
+    """ADR 008 D7: the bucket list is fail-closed on all three sides."""
+
+    def test_the_artefact_carries_exactly_the_named_buckets(self):
+        current = json.loads(ROWS.read_text(encoding="utf-8"))
+        self.assertEqual(set(current.keys()) - {"_meta"}, set(BUCKETS))
+
+    def test_the_probe_names_the_same_buckets_in_the_same_order(self):
+        probe = PROBE.read_text(encoding="utf-8")
+        match = re.search(r"const REF_BUCKETS = \[([^\]]*)\];", probe)
+        self.assertIsNotNone(match, "REF_BUCKETS is not a literal in the probe")
+        self.assertEqual(tuple(re.findall(r'"([^"]+)"', match.group(1))), BUCKETS)
+        self.assertNotIn("REF_BUCKETS = [\"gate_m5_a8\", \"extra\", \"gate_p7\", "
+                         "\"gate_lot1\"]\n  .filter(", probe)
+
+
+class PlacesCacheNameTest(unittest.TestCase):
+    """ADR 008 D8: the cache namespace is a hand-kept copy on two sides.
+
+    `index.html` owns the name and changes it with every change of the blobs; the
+    probe WRITES a stale body into that namespace (the В7 staleCache refusal) and
+    reads it back (the warm scenario). A stale copy in the probe turns the refusal
+    scenario into a plain 404 in silence — measured on F5-а, where the constant
+    moved to v3-225. `sw.js` must NOT protect it (D8): the SW does not cache it.
+    """
+
+    def test_the_probe_uses_the_name_index_html_owns(self):
+        index = re.search(r"const PLACES_CACHE = '([^']+)'", INDEX.read_text(encoding="utf-8"))
+        probe = re.search(r'const PLACES_CACHE = "([^"]+)"', PROBE.read_text(encoding="utf-8"))
+        self.assertIsNotNone(index, "PLACES_CACHE is gone from index.html")
+        self.assertIsNotNone(probe, "PLACES_CACHE is gone from the probe")
+        self.assertEqual(index.group(1), probe.group(1))
+
+    def test_the_service_worker_does_not_protect_the_places_cache(self):
+        name = re.search(r"const PLACES_CACHE = '([^']+)'",
+                         INDEX.read_text(encoding="utf-8")).group(1)
+        self.assertNotIn(name, (REPO / "sw.js").read_text(encoding="utf-8"))
 
 
 class Lot1FormTableTest(unittest.TestCase):

@@ -1146,9 +1146,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .place-popup { font-size: 13px; line-height: 1.45; min-width: 180px; max-width: 260px; }
   .place-popup .pp-title { font-weight: 700; margin-bottom: 4px; color: #1f2d3d; }
-  .place-popup .pp-sub, .place-popup .pp-old, .place-popup .pp-src { font-size: 11.5px; color: #6b7785; }
-  /* The four rows are <span>s (the JS contract): inline by default they ran into one line. */
-  .place-popup .pp-title, .place-popup .pp-sub, .place-popup .pp-old, .place-popup .pp-src { display: block; }
+  .place-popup .pp-sub, .place-popup .pp-old, .place-popup .pp-old-src, .place-popup .pp-src { font-size: 11.5px; color: #6b7785; }
+  /* The rows are <span>s (the JS contract): inline by default they ran into one line.
+     ЛОТ 1в (ADR 008 D3) added a fifth — the source of the MATCHED old name. */
+  .place-popup .pp-title, .place-popup .pp-sub, .place-popup .pp-old,
+  .place-popup .pp-old-src, .place-popup .pp-src { display: block; }
   .place-popup .nav-actions { margin-top: 6px; }
   /* Approximate-address result (ADR 001) — a distinct amber ≈ marker + chip, so it
      never reads as a verified building, exact address, or hydrant. Fires only on
@@ -6252,25 +6254,44 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     const PLACES_URL = 'data/hotels.json', CATS_URL = 'data/place_categories.json';
     const PLACES2_URL = 'data/places.json';            // фаза 2: училища/университети/болници/градини
-    const PLACES_CACHE = 'fire-varna-hotels-v2-225';   // our own namespace (Д3)
+    // ADR 008 D8: the NAME is not a contract, the VERSION is — it changes with every
+    // change of the blobs. ЛОТ 1в-А rewrote all three, so v2 → v3 (the count stays 225).
+    const PLACES_CACHE = 'fire-varna-hotels-v3-225';   // our own namespace (Д3)
     const TOP = 8, MIN_Q = 2, DEBOUNCE_MS = 120, FETCH_TIMEOUT_MS = 8000;
     const TOP_TOTAL = 16, GEN_CAP = 300;               // фаза 2 С3: per group / per class
     const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 225, EXPECT2_COUNT = 150;
     const MX = 81152, MY = 110574;               // metres per degree of lon/lat in Varna (М1)
     const LAT_MIN = 43.13, LAT_MAX = 43.35, LON_MIN = 27.65, LON_MAX = 28.10;  // delivery box (Д2)
-    const EXPECT_KEYS = ['beds', 'cat', 'kind', 'lat', 'lon', 'name', 'no_uin', 'old_names', 'src', 'status', 'uins', 'zone'];
+    // ЛОТ 1в (ADR 008 D1/S2): `old_names_src` is a parallel array of the SAME length
+    // and order — the hotels' 13th key, the places' 9th.
+    const EXPECT_KEYS = ['beds', 'cat', 'kind', 'lat', 'lon', 'name', 'no_uin', 'old_names',
+                         'old_names_src', 'src', 'status', 'uins', 'zone'];
     const KINDS = ['Хотел', 'Семеен хотел', 'хотел · без категоризация', 'апарт-хотел'];
     // Фаза 2 (places_phase2_plan.md Д1/Д3): the second delivery - 8 keys, its own
     // kind enum. Same box, same status enum, same cadastral refusal as the hotels.
-    const EXPECT2_KEYS = ['kind', 'lat', 'lon', 'name', 'old_names', 'src', 'status', 'zone'];
+    const EXPECT2_KEYS = ['kind', 'lat', 'lon', 'name', 'old_names', 'old_names_src',
+                          'src', 'status', 'zone'];
     const KINDS2 = ['училище', 'университет', 'болница', 'ДКЦ', 'хоспис', 'детска градина',
                      'детска ясла', 'общежитие'];
     const STATUSES = ['', 'бивш'];
     const CADASTRAL = /\b\d{4,5}\.\d+\.\d+/;     // a cadastral id never rides a public bundle (Д2)
     // §12 В7 + §14 — the exact bytes the browser may trust (the tracked LF blobs).
-    const HOTELS_SHA256 = 'b9ec6b6d62c25fc465d7db80e47241021ee03e4da62977a268199041ccc04d11';
-    const PLACES2_SHA256 = '939513fcde65da618a522ae2a6f4411e8850573a86ca681cd8aa520b9b4e6064';
-    const CATS_SHA256 = '7cf4140b84b29bf3bc68c80197dd10fcd5534e18fa66326650d3157c94e4f926';
+    const HOTELS_SHA256 = '728e8ceb86cd6860baf008485fc99ac2c41ef177b78d9a045d221665dbaa360c';
+    const PLACES2_SHA256 = 'ef98624f2933d5191f927aaab303b248317ea92707be5c60fca5ccff0afa296a';
+    const CATS_SHA256 = '7fb4ddb6959144de831841aaec5236a7d0cd1e212f7244bff44352816497bc13';
+    // ЛОТ 1в (ADR 008 D1, амандамент А3) — the CLOSED list of alias sources and the
+    // word the card says for each. An old name used to inherit the source line of its
+    // RECORD: up to 47 OSM strings sat under a registry row and the card claimed the
+    // register for them. Now every alias carries its own letter (D3).
+    const ALIAS_SRC_LINE = {
+      'OSM': '© OpenStreetMap contributors (ODbL)',
+      'REG': 'регистър (отделен факт)',
+      'NTR': 'Национален туристически регистър',
+      'WD': 'Wikidata (CC0)',
+      'WEB': 'официален сайт',
+      'KAIS': 'КАИС адресно поле (АГКК)',
+      'CUR': 'съкращение (речник)'
+    };
     // Д7 — the source line of a record, worded from the delivery's own licence.
     const SRC_LINE = {
       'НТР УИН': 'име: Национален туристически регистър · координати: КАИС Отворени данни (АГКК)',
@@ -6382,16 +6403,51 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return out;
     }
     const keyOf = (s) => placeTokens(s).map((t) => t.s).join(' ');
+    // ЛОТ 1в амандамент А4 т. 1 (ADR 008 D2): the generic GEOGRAPHIC words of an
+    // alias, normalised by the very tokeniser that will meet them.
+    const ALIAS_GENERIC = new Set(['варна', 'гр', 'град'].map(keyOf));
+    // А4 т. 2: how many tokens of a query are significant (A5's own filter). A
+    // one-word query never reaches EXACT_ALIAS — measured, „синчец“ has to keep
+    // ДГ 30 „Синчец“ first, and a CURRENT name must not lose to somebody's OLD one
+    // on a partial match. The alias tokens are in `aset` anyway.
+    const aliasSignificant = (qt) =>
+      qt.filter((t) => !t.num && t.orig.length > 2 && ADDR.indexOf(t.orig) < 0).length;
+    function exactAlias(qt) {                    // [] = this query is nobody's whole alias
+      if (!EXACT_ALIAS || aliasSignificant(qt) < 2) return [];
+      return EXACT_ALIAS.get(qt.map((t) => t.s).join(' ')) || [];
+    }
+    // Д7/D3: WHICH alias the query matched — the card names the source of THAT
+    // string. -1 = the current name matched (then the record's own `src` speaks).
+    function matchedAliasIndex(rec, qt) {
+      if (!rec || !rec.atk || !rec.atk.length) return -1;
+      const whole = exactAlias(qt);
+      for (const hit of whole) if (hit.rec === rec) return hit.i;
+      for (const t of qt) {
+        if (t.num || t.orig.length <= 2 || ADDR.indexOf(t.orig) >= 0) continue;
+        if (rec.nset.has(t.s)) continue;         // А4: an exact NAME match owns the token
+        for (let i = 0; i < rec.atk.length; i++) if (rec.atk[i].has(t.s)) return i;
+      }
+      return -1;
+    }
 
     // ---- Д2/Д3/В7: load once, validate before trusting, cache only what validated
     let RECS = [], FORMS = null, CLASS_OF = null, placesPromise = null, GROUP_SIZE = null;
     let EXACT_NAME = null;                       // ЛОТ 1 решение 2: joined name tokens -> records
+    let EXACT_ALIAS = null;                      // ЛОТ 1в D2: joined alias tokens -> {rec, i}
     const groupOf = (rec) => KIND_GROUP[rec.e.kind] || rec.e.kind;
     const colourOf = (kind) => GROUP_COLOUR[KIND_GROUP[kind]] || 'hotel';   // К1
     // С3 - the bug Sol found: the <=300 generosity of М3/Б2 was read off the WHOLE
     // index. With 361 records that would switch the keyless branch off entirely, so
     // it is decided per CLASS: a record is generous if its own group is <= GEN_CAP.
     const genOk = (rec) => (GROUP_SIZE.get(groupOf(rec)) || 0) <= GEN_CAP;
+    // ЛОТ 1в D1/S2: same length, same order, every letter from the closed list.
+    // A missing or unknown source is a REFUSAL, not a blank line on the card.
+    function validAliasSrc(r) {
+      if (r.old_names_src.length !== r.old_names.length) return false;
+      for (const code of r.old_names_src)
+        if (typeof code !== 'string' || !ALIAS_SRC_LINE[code]) return false;
+      return true;
+    }
     function validateHotels(d, text) {
       if (!d || !d._meta || !Array.isArray(d.hotels)) return false;
       if (d.hotels.length !== EXPECT_COUNT || d._meta.count !== EXPECT_COUNT) return false;
@@ -6399,7 +6455,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       for (const h of d.hotels) {
         if (Object.keys(h).length !== EXPECT_KEYS.length) return false;
         for (const k of EXPECT_KEYS) if (!(k in h)) return false;
-        for (const k of ['old_names', 'cat', 'beds', 'uins']) if (!Array.isArray(h[k])) return false;
+        for (const k of ['old_names', 'old_names_src', 'cat', 'beds', 'uins']) if (!Array.isArray(h[k])) return false;
+        if (!validAliasSrc(h)) return false;
         if (typeof h.name !== 'string' || !h.name || typeof h.zone !== 'string' || !h.zone) return false;
         if (typeof h.no_uin !== 'boolean') return false;
         if (KINDS.indexOf(h.kind) < 0 || STATUSES.indexOf(h.status) < 0 || !SRC_LINE[h.src]) return false;
@@ -6417,7 +6474,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       for (const p of d.places) {
         if (Object.keys(p).length !== EXPECT2_KEYS.length) return false;
         for (const k of EXPECT2_KEYS) if (!(k in p)) return false;
-        if (!Array.isArray(p.old_names)) return false;
+        if (!Array.isArray(p.old_names) || !Array.isArray(p.old_names_src)) return false;
+        if (!validAliasSrc(p)) return false;
         if (typeof p.name !== 'string' || !p.name || typeof p.zone !== 'string' || !p.zone) return false;
         if (KINDS2.indexOf(p.kind) < 0 || STATUSES.indexOf(p.status) < 0 || !SRC_LINE[p.src]) return false;
         if (!isFinite(p.lat) || !isFinite(p.lon)) return false;
@@ -6550,12 +6608,22 @@ window._hydrantDataReady = (async function loadHydrantData() {
         // П7 step (ж): a quarter alias never displaces a NAME path of THIS record
         for (const t of (zoneExtra.get(h.zone) || []))
           if (ztk.indexOf(t.s) < 0 && !ntk.some((v) => quality(t, v) > 0)) ztk.push(t.s);
-        const aset = new Set();                  // А6: old names are name tokens, minus the noise
-        for (const old of h.old_names)
+        // А6 + ЛОТ 1в амандамент А4 т. 1: old names are name tokens minus the noise
+        // AND minus the generic GEOGRAPHIC words — „Висше военноморско училище,
+        // Варна“ must not answer for the whole city on „варна“. The CLASS words
+        // STAY: measured, without „училище“ the ВВМУ falls to second on
+        // „военноморско училище“ behind „Спортно училище Георги Бенковски“.
+        const aset = new Set(), atk = [];
+        for (const old of h.old_names) {
+          const one = new Set();
           for (const t of placeTokens(old))
-            if (!t.num && t.orig.length > 2 && ADDR.indexOf(t.orig) < 0) aset.add(t.s);
-        return { e: h, ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, kkey: ktk.join(' '),
-                 zkset: new Set(ztk.concat(ktk)), zph: zonePhrase.get(h.zone) || new Set() };
+            if (!t.num && t.orig.length > 2 && ADDR.indexOf(t.orig) < 0
+                && !ALIAS_GENERIC.has(t.s)) { aset.add(t.s); one.add(t.s); }
+          atk.push(one);
+        }
+        return { e: h, ntk: ntk, ktk: ktk, nset: new Set(ntk), aset: aset, atk: atk,
+                 kkey: ktk.join(' '), zkset: new Set(ztk.concat(ktk)),
+                 zph: zonePhrase.get(h.zone) || new Set() };
       });
       // ЛОТ 1 решение 2: the exact-CURRENT-name index. old_names stay out of it on
       // purpose — measured, 0 old-name keys coincide with a populated category key,
@@ -6566,6 +6634,21 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const list = EXACT_NAME.get(key);
         if (list) list.push(rec); else EXACT_NAME.set(key, [rec]);
       }
+      // ЛОТ 1в (ADR 008 D2, S1): the exact-ALIAS index — the WHOLE normalised alias
+      // to (record, index of that alias). A6 keeps an alias as separate TOKENS, so
+      // the full string „Висше военноморско училище, Варна“ loses to the class key
+      // „училище“ (A1 blocks the fail-open). This map is read BEFORE A1, exactly as
+      // EXACT_NAME stands before the category list. Measured 04.09: of the 82 alias
+      // keys exactly one is also a current name — and it is the SAME record.
+      EXACT_ALIAS = new Map();
+      for (const rec of RECS)
+        for (let i = 0; i < rec.e.old_names.length; i++) {
+          const key = keyOf(rec.e.old_names[i]);
+          if (!key) continue;
+          const list = EXACT_ALIAS.get(key);
+          if (!list) EXACT_ALIAS.set(key, [{ rec: rec, i: i }]);
+          else if (!list.some((x) => x.rec === rec)) list.push({ rec: rec, i: i });
+        }
       GROUP_SIZE = new Map();                    // С3: the size of every class
       for (const rec of RECS) GROUP_SIZE.set(groupOf(rec), (GROUP_SIZE.get(groupOf(rec)) || 0) + 1);
       FORMS = new Map();
@@ -6726,7 +6809,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (!RECS.length) return { category: false, hasKey: false, rows: [] };
       const qt = placeTokens(q);
       if (!qt.length) return { category: false, hasKey: false, rows: [] };
-      const c = centre(), sk = splitKeys(qt), hasKey = sk.keys.length > 0;
+      const c = centre();
+      // A0 (ADR 008 D2, амандамент А4 т. 2): a query that IS somebody's whole alias
+      // answers with that record — BEFORE A1 can spend the words on a class key.
+      const alias = exactAlias(qt);
+      if (alias.length)
+        return { category: true, hasKey: false, rows: orderCategory(alias.map((x) => x.rec), c) };
+      const sk = splitKeys(qt), hasKey = sk.keys.length > 0;
       let cls = hasKey ? CLASS_OF.get(sk.keys[0]) : RECS;     // А1: the leftmost key is the class
       const R = sk.slots.filter((x) => x.ki !== 0).map((x) => x.t);
       if (!R.length) {                           // М1: the key alone
@@ -6774,6 +6863,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     let shown = [], shownFor = null, theirStatusFor = null, tidiedByUs = false, keyed = false;
     let gen = 0, dismissed = false, timer = null, warned = false;
     let placeMk = null, placePopup = null, lastPick = null, mineActive = false;
+    let lastAliasI = -1;                         // D3: which old name the pick matched
     let restoreArmed = false;                    // С4: armed by a pick, spent once
     function warnOnce(e) { if (warned) return; warned = true; console.warn('[places-search] ' + ((e && e.message) || e)); }
     const guarded = (fn) => function (ev) { try { fn(ev); } catch (e) { warnOnce(e); } };   // Д11
@@ -6785,7 +6875,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       shown = []; shownFor = null;
     }
     function clearMine() {
-      mineActive = false; lastPick = null; restoreArmed = false;
+      mineActive = false; lastPick = null; lastAliasI = -1; restoreArmed = false;
       if (placePopup) { const p = placePopup; placePopup = null; try { map.closePopup(p); } catch (e) {} }
       if (placeMk) { try { map.removeLayer(placeMk); } catch (e) {} placeMk = null; }
     }
@@ -6885,6 +6975,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       bits.push(h.zone);
       wrap.appendChild(span('pp-sub', bits.join(' · ')));
       if (h.old_names.length) wrap.appendChild(span('pp-old', 'старо име: ' + h.old_names.join(', ')));
+      // ADR 008 D3: when the row was found through an OLD name, the source line of
+      // that STRING is the one that is true — until ЛОТ 1в the card printed the
+      // record's register for an OSM string it never came from.
+      const ai = (h === lastPick) ? lastAliasI : -1;
+      const acode = (ai >= 0 && Array.isArray(h.old_names_src)) ? h.old_names_src[ai] : null;
+      if (acode && ALIAS_SRC_LINE[acode])
+        wrap.appendChild(span('pp-old-src', 'извор на „' + h.old_names[ai] + '“: ' + ALIAS_SRC_LINE[acode]));
       wrap.appendChild(span('pp-src', SRC_LINE[h.src]));
       const nav = buildNavActions(h.lat, h.lon);
       if (nav) wrap.appendChild(nav);
@@ -6917,10 +7014,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
     function pick(rec) {
       if (!rec) return;
+      // D3: WHICH old name this query matched is read BEFORE hideMine() runs —
+      // it clears `shownFor`, and the browser gate of F5-а caught the card coming
+      // up with no source line at all because of exactly that order.
+      const qt = placeTokens(shownFor || '');
       hideMine();
       dropTheirs();
       mineActive = true;
       lastPick = rec.e;
+      lastAliasI = matchedAliasIndex(rec, qt);
       restoreArmed = true;                       // С4: one late .search-popup may be evicted
       anchorHydrantsAt(rec.e.lat, rec.e.lon);    // the operational gain: hydrants around the place
       showPlace(rec.e);
@@ -7053,12 +7155,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }), true);
 
     // The ONE new global name (G12б/G12в read it; the page itself never does).
-    const rowOut = (rec) => ({ name: rec.e.name, zone: rec.e.zone, kind: rec.e.kind,
-                               status: rec.e.status, old_names: rec.e.old_names.slice() });
+    const rowOut = (rec, qt) => ({ name: rec.e.name, zone: rec.e.zone, kind: rec.e.kind,
+                               status: rec.e.status, old_names: rec.e.old_names.slice(),
+                               old_names_src: rec.e.old_names_src.slice(),
+                               matched_alias_i: qt ? matchedAliasIndex(rec, qt) : -1 });
     window.__places = {
       tokens: (q) => placeTokens(q).map((t) => t.s),
-      search: function (q) { const r = search(q); return { category: r.category, hasKey: r.hasKey, rows: r.rows.map(rowOut) }; },
-      rows: () => shown.map(rowOut),
+      search: function (q) {
+        const r = search(q), qt = placeTokens(q);
+        return { category: r.category, hasKey: r.hasKey, rows: r.rows.map((x) => rowOut(x, qt)) };
+      },
+      rows: () => shown.map((x) => rowOut(x, placeTokens(shownFor || ''))),
       ensure: ensurePlaces,
       keys: (q) => (RECS.length ? splitKeys(placeTokens(q)).keys : []),
       keyed: () => keyed

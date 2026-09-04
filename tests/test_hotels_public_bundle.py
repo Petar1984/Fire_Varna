@@ -54,9 +54,9 @@ CATEGORIES = REPO / "data" / "place_categories.json"
 # decision 10 merged „Явор“ into „ГОЛДЪН ЛАЙН“ (one building, two records at 0,00 m;
 # the old name lives on as an alias) and the reason line moved into `_meta.excluded`.
 # The three numbers below are re-measured on that blob; nothing else in it moved.
-HOTELS_SHA256 = "b9ec6b6d62c25fc465d7db80e47241021ee03e4da62977a268199041ccc04d11"
-HOTELS_BYTES = 79691
-HOTELS_GZIP9 = 9301
+HOTELS_SHA256 = "728e8ceb86cd6860baf008485fc99ac2c41ef177b78d9a045d221665dbaa360c"
+HOTELS_BYTES = 85805
+HOTELS_GZIP9 = 9626
 # C16 (§11 П7): the dictionary was re-delivered with a `zones` key — the quarter
 # aliases of the zones that carry a registry entry, schema still 1.
 # ЛОТ 1 (F1-д, varna_3d dee1f76 „P2-д“) then moved the dictionary itself: chips
@@ -66,15 +66,20 @@ HOTELS_GZIP9 = 9301
 # json.dumps({"chips": …, "forms": …}, ensure_ascii=False, sort_keys=True):
 # 30 570 B / 87f35e90ac206ab3… at 23af63f → 32 188 B / 27fe1ca178c7cf17… now.
 #   git -C ../varna_3d show HEAD:data/place_categories.json > data/place_categories.json
-CATEGORIES_SHA256 = "7cf4140b84b29bf3bc68c80197dd10fcd5534e18fa66326650d3157c94e4f926"
-CATEGORIES_BYTES = 48382
-CATEGORIES_GZIP9 = 6358
+CATEGORIES_SHA256 = "7fb4ddb6959144de831841aaec5236a7d0cd1e212f7244bff44352816497bc13"
+CATEGORIES_BYTES = 50941
+CATEGORIES_GZIP9 = 6944
 
 EXPECTED_COUNT = 225
 TOP_LEVEL_KEYS = {"_meta", "hotels"}
-# Plan §2 Д2: exactly these twelve keys on every record, no more and no less.
-RECORD_KEYS = {"beds", "cat", "kind", "lat", "lon", "name",
-               "no_uin", "old_names", "src", "status", "uins", "zone"}
+# Plan §2 Д2 + ЛОТ 1в (ADR 008 D1/S2): exactly these THIRTEEN keys on every record,
+# no more and no less. `old_names_src` is the thirteenth — a parallel array of the
+# same length and order, so every old name names its own source instead of
+# inheriting the record's register.
+RECORD_KEYS = {"beds", "cat", "kind", "lat", "lon", "name", "no_uin", "old_names",
+               "old_names_src", "src", "status", "uins", "zone"}
+# ЛОТ 1в (ADR 008 D1, амандамент А3) — the CLOSED list of alias sources.
+ALIAS_SRC = {"OSM", "REG", "NTR", "WD", "WEB", "KAIS", "CUR"}
 ALLOWED_KIND = {"Хотел", "Семеен хотел", "хотел · без категоризация", "апарт-хотел"}
 ALLOWED_SRC = {"НТР УИН", "Sol/OSM идентификация", "КАИС адресно поле"}
 ALLOWED_STATUS = {"", "бивш"}
@@ -83,6 +88,10 @@ BBOX = (43.13, 43.35, 27.65, 28.10)  # min_lat, max_lat, min_lon, max_lon
 
 # Copied byte-for-byte out of data/hotels.json with python — never retyped by hand.
 LICENCE = 'Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).'
+
+# The second licence line, added by ЛОТ 1в: one expanded name travels as a search
+# alias from OpenStreetMap (way 199237000), so it gets its own sentence.
+LICENCE_OSM = 'Разгърнати имена (псевдоними за търсене) от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0, снапшот 2026-08-10. Днес е един такъв псевдоним (way 199237000); изворът на всеки псевдоним стои в `old_names_src`.'
 
 # A КАИС cadastral identifier is the one thing that must never reach a public payload.
 _CADASTRAL_RE = re.compile(r"\b\d{4,5}\.\d+\.\d+")
@@ -146,9 +155,20 @@ class HotelsBundleTest(unittest.TestCase):
         self.assertEqual(self.doc["_meta"]["count"], EXPECTED_COUNT)
         self.assertEqual(len(self.records), EXPECTED_COUNT)
 
-    def test_every_record_carries_exactly_the_twelve_keys(self):
+    def test_every_record_carries_exactly_the_thirteen_keys(self):
         for rec in self.records:
             self.assertEqual(set(rec.keys()), RECORD_KEYS, rec.get("name"))
+
+    def test_every_alias_carries_its_own_source(self):
+        # ADR 008 D1: same length, same order, every letter from the closed list.
+        # The 15 КАИС address-field names and the one OSM string used to travel
+        # under the record's own `src`; now each says where it came from.
+        for rec in self.records:
+            self.assertIsInstance(rec["old_names_src"], list, rec.get("name"))
+            self.assertEqual(len(rec["old_names_src"]), len(rec["old_names"]),
+                             rec.get("name"))
+            for code in rec["old_names_src"]:
+                self.assertIn(code, ALIAS_SRC, rec.get("name"))
 
     def test_enumerations_are_closed(self):
         for rec in self.records:
@@ -189,10 +209,22 @@ class HotelsBundleTest(unittest.TestCase):
         # The licence sentence names cadastral address fields as a source; nowhere else
         # in the payload may the word appear, because no record may carry a cadnum.
         self.assertIn(LICENCE, self.text)
-        self.assertNotIn("кадаст", self.text.replace(LICENCE, ""))
+        rest = self.text.replace(LICENCE, "").replace(LICENCE_OSM, "")
+        # ЛОТ 1в: 15 old names come from the КАИС address field, so the word rides
+        # the CODE `KAIS`, never the free text — the assertion below still holds.
+        self.assertNotIn("кадаст", rest)
 
     def test_licence_line_is_verbatim(self):
         self.assertEqual(self.doc["_meta"]["licence"], LICENCE)
+
+    def test_the_osm_alias_licence_line_is_verbatim(self):
+        # Амандамент А4 т. 3 (К4): a NEW OSM alias outside the 29 grandfathered ones
+        # is a line in the licences, not just a letter in a row. One such alias today,
+        # and the sentence's own count is measured against the payload.
+        self.assertEqual(self.doc["_meta"]["licence_osm"], LICENCE_OSM)
+        self.assertIn("ODbL 1.0", LICENCE_OSM)
+        osm = [rec["name"] for rec in self.records if "OSM" in rec["old_names_src"]]
+        self.assertEqual(len(osm), 1, osm)
 
     def test_readme_carries_licence_line(self):
         # Plan §5 G9. The licence travels with the data: whoever reads the repo's front
@@ -202,6 +234,8 @@ class HotelsBundleTest(unittest.TestCase):
         readme = (REPO / "README.md").read_text(encoding="utf-8")
         licence = self.doc["_meta"]["licence"]
         self.assertGreaterEqual(readme.count(licence), 2, "licence quoted in BG and EN")
+        self.assertGreaterEqual(readme.count(self.doc["_meta"]["licence_osm"]), 2,
+                                "OSM alias licence line quoted in BG and EN")
         # The bundle is not in the sw.js offline pack; the README says so out loud.
         # assertTrue, not assertIn: a failing assertIn would dump the whole README.
         self.assertTrue("не са част от офлайн пакета" in readme,

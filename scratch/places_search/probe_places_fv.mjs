@@ -708,8 +708,17 @@ const REF_PATH = argOf("--ref", path.join(HERE, "recall_sweep_rows.json"));
 const REF_ROWS = JSON.parse(fs.readFileSync(REF_PATH, "utf8"));
 // С2′: the П7 gate is a bucket of its own, and it is replayed like the other
 // two — so the JS↔Python parity covers the quarter aliases as well.
-const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7", "gate_lot1"]
-  .filter((b) => Array.isArray(REF_ROWS[b]));
+// ADR 008 D7 — FAIL-CLOSED. The `.filter(...)` that used to stand on this line
+// dropped a bucket the file no longer has WITHOUT a word, and never even looked
+// at a bucket the file gained: both are a changed reference, and a changed
+// reference is a red run. The list is hand-kept here and in
+// tests/test_places_search_gate.py (BUCKETS), which compares the two.
+const REF_BUCKETS = ["gate_m5_a8", "extra", "gate_p7", "gate_lot1"];
+const REF_BUCKETS_IN_FILE = Object.keys(REF_ROWS).filter((k) => k !== "_meta");
+const REF_BUCKETS_DRIFT = REF_BUCKETS
+  .filter((b) => !Array.isArray(REF_ROWS[b])).map((b) => "липсва " + b)
+  .concat(REF_BUCKETS_IN_FILE.filter((b) => REF_BUCKETS.indexOf(b) < 0)
+    .map((b) => "нов " + b));
 // С6′: the tokeniser-parity corpus, written by the reference next to us.
 const PARITY = JSON.parse(fs.readFileSync(path.join(OUT_DIR, "token_parity.json"), "utf8"));
 // The placeTokens contract, repeated verbatim from tests/test_places_search_primitives.py
@@ -770,15 +779,24 @@ const P7_BEFORE = [
   // води шест реда по fail-open. Мерени 04.09 с този сценарий, не преписани.
   ["владиславово детска градина", 2, true, "ДГ№40 „Детски свят“"],
   ["детска градина владислав варненчик", 3, true, 'ДГ 39 "Приказка"'],
-  ["владиславово училище", 4, false, "Спортно училище Георги Бенковски"],
+  // ЛОТ 1в-А (04.09), измерено с този сценарий: 4 → 5. С изключен П7 заявката
+  // пада на fail-open по имена, а амандамент А4 т. 1 остави КЛАСОВИТЕ думи на
+  // псевдонима в `aset` — затова ВВМУ „Н. Й. Вапцаров“ („Висше военноморско
+  // училище, Варна“, WD) влиза трети. Водещият ред и редът на другите четири
+  // не мърдат. Същото и за „училище жкизгрев“ по-долу.
+  ["владиславово училище", 5, false, "Спортно училище Георги Бенковски"],
   ["хотел владиславово", 22, false, "Hotel Color"],
   ["дкц владиславово", 6, false, "„ДКЦ Чайка“ ЕООД"],
   ["хотел зпз", 22, false, "Hotel Color"],
   ["горчива чешма хотел", 22, false, "Hotel Color"],
-  ["училище жкизгрев", 4, false, "Спортно училище Георги Бенковски"],
+  ["училище жкизгрев", 5, false, "Спортно училище Георги Бенковски"],
 ];
 
-const PLACES_CACHE = "fire-varna-hotels-v2-225";
+// ADR 008 D8 + ЛОТ 1в: the client's own namespace, hand-kept here because the probe
+// WRITES into it (staleCache) and reads it back (warm). tests/test_places_search_gate.py
+// (PlacesCacheNameTest) compares this literal with index.html — a stale copy would turn
+// the В7 refusal scenario into a plain 404 in silence.
+const PLACES_CACHE = "fire-varna-hotels-v3-225";
 const HOTELS_URL = BASE + "data/hotels.json";
 
 const PL_VISIBLE_JS = "document.getElementById('placesSearchResults').classList.contains('visible')";
@@ -867,6 +885,7 @@ const PLACE_SURFACE_JS = `(function () {
     title: pop ? (pop.querySelector('.pp-title') || {}).textContent || null : null,
     sub: pop ? (pop.querySelector('.pp-sub') || {}).textContent || null : null,
     old: pop ? ((pop.querySelector('.pp-old') || {}).textContent || null) : null,
+    oldSrc: pop ? ((pop.querySelector('.pp-old-src') || {}).textContent || null) : null,
     src: pop ? (pop.querySelector('.pp-src') || {}).textContent || null : null,
     navHrefs: hrefs,
     theirPins: document.querySelectorAll('.search-pin-wrapper').length,
@@ -1069,7 +1088,12 @@ async function checkTokenParity(s) {
     (x) => !expectedOrig.some((e) => e.s === x.s && e.index === x.index));
   if (notSeen.length) warn(`очаквана разлика в orig, която вече я няма: ${notSeen.length}`);
   return { total: strings.length, aliases: PARITY._meta.aliases,
-           records: PARITY._meta.records, passed: strings.length - mismatches.length,
+           records: PARITY._meta.records,
+           // ЛОТ 1в: an alias is a searchable STRING now (EXACT_ALIAS keys the whole
+           // phrase), so the corpus grew by one entry per delivered old name.
+           names: PARITY._meta.names === undefined ? null : PARITY._meta.names,
+           oldNames: PARITY._meta.old_names === undefined ? null : PARITY._meta.old_names,
+           passed: strings.length - mismatches.length,
            compares: "s + orig + num (orig през копие на токенизатора от index.html)",
            copyInstalled: installed === true, copyNote: installed === true ? null : installed,
            expectedOrigDifferences: expectedOrig, expectedOrigNotSeen: notSeen,
@@ -1151,7 +1175,7 @@ async function scenarioCats(s) {
 async function checkReferenceRows(s) {
   const out = { mode: "ordered", queries: [], passedOrdered: 0, passedSets: 0, total: 0, rows: 0 };
   for (const bucket of REF_BUCKETS) {
-    for (const rec of REF_ROWS[bucket]) {
+    for (const rec of (REF_ROWS[bucket] || [])) {
       const got = JSON.parse(await s.ev(
         `JSON.stringify((function (r) { return { category: r.category, rows: r.rows.map(function (x) { return x.name + ' · ' + x.zone; }) }; })(window.__places.search(${JSON.stringify(rec.q)})))`));
       const want = rec.rows.map((r) => r.name + " · " + r.zone);
@@ -1179,7 +1203,7 @@ async function checkReferenceRows(s) {
 async function checkM5Table(s) {
   const out = [];
   for (const bucket of REF_BUCKETS) {
-    for (const rec of REF_ROWS[bucket]) {
+    for (const rec of (REF_ROWS[bucket] || [])) {
       const js = JSON.parse(await s.ev(
         `JSON.stringify((function (r) { return { n: r.rows.length, category: r.category, first3: r.rows.slice(0, 3).map(function (x) { return x.name + ' · ' + x.zone; }) }; })(window.__places.search(${JSON.stringify(rec.q)})))`));
       const dom = await typePlaces(s, rec.q);
@@ -1223,6 +1247,59 @@ async function checkPickAndEscape(s, q) {
     hydrantsChanged: JSON.stringify(before) !== JSON.stringify(after),
     afterEscape: { pins: afterEscape.pins, popups: afterEscape.popups, listVisible: plAfter.visible },
   };
+}
+
+// ЛОТ 1в (ADR 008 D3) — the card names the source of the MATCHED old name.
+// Until this lot an alias inherited the source line of its RECORD, so up to 47 OSM
+// strings were credited to a register they never came from. Measured, not claimed:
+// the ВВМУ is reached ONLY through its Wikidata alias (A0, the whole string), and
+// its card has to say Wikidata; a row reached by its CURRENT name must carry no
+// such line at all. Both halves are a hard gate.
+const ALIAS_CARD_Q = "Висше военноморско училище, Варна";
+const ALIAS_CARD_EXPECT = "извор на „Висше военноморско училище, Варна“: Wikidata (CC0)";
+
+async function checkAliasCard(s) {
+  await navigateFresh(s, "D3 alias card");
+  if (!(await placesReady(s))) return { ready: false, ok: false };
+  const list = await typePlaces(s, ALIAS_CARD_Q);
+  const row = await s.ev(
+    `JSON.stringify(window.__places.search(${JSON.stringify(ALIAS_CARD_Q)}).rows[0] || null)`);
+  const clicked = await s.ev(
+    "(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]');"
+    + " if (!e) return false; e.click(); return true; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const surface = await s.ev(PLACE_SURFACE_JS);
+  await focusInput(s);
+  await pressKey(s, "Escape", 27);
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length === 0", 15000);
+  await clearField(s);
+  // The other half: a row found by its CURRENT name says nothing about an alias.
+  const named = await typePlaces(s, "хотел адмирал");
+  await s.ev("(function () { var e = document.querySelector('#placesSearchResults .pl-item[data-idx=\"0\"]'); if (e) e.click(); return !!e; })()");
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length > 0", 20000);
+  await waitMapStill(s);
+  await waitSettled(s, 30000);
+  const namedSurface = await s.ev(PLACE_SURFACE_JS);
+  await focusInput(s);
+  await pressKey(s, "Escape", 27);
+  await waitFor(s, "document.querySelectorAll('.place-pin-wrapper').length === 0", 15000);
+  await clearField(s);
+  const parsed = row ? JSON.parse(row) : null;
+  const out = {
+    ready: true, query: ALIAS_CARD_Q, clicked: !!clicked,
+    rowsShown: list.rows.length,
+    exportRow: parsed && { name: parsed.name, matched_alias_i: parsed.matched_alias_i,
+                           old_names_src: parsed.old_names_src },
+    title: surface.title, oldSrc: surface.oldSrc, src: surface.src,
+    namedQuery: "хотел адмирал", namedTitle: namedSurface.title,
+    namedOldSrc: namedSurface.oldSrc, namedRows: named.rows.length,
+  };
+  out.ok = out.rowsShown === 1 && !!parsed && parsed.name === "ВВМУ „Н. Й. Вапцаров“"
+           && parsed.matched_alias_i === 0 && parsed.old_names_src[0] === "WD"
+           && out.oldSrc === ALIAS_CARD_EXPECT && out.namedOldSrc === null;
+  return out;
 }
 
 // П7 (§12 В3) — their building panel arrives 3 s late, after we have already put
@@ -1729,7 +1806,9 @@ async function runG4(s) {
   console.log(`     G12б: ${out.tokens.passed}/${out.tokens.total} (в теста: ${out.tokens.rowsInTest} реда)`);
   out.parity = await checkTokenParity(s);
   console.log(`     С6′ токенизатори: ${out.parity.passed}/${out.parity.total} ` +
-              `(${out.parity.aliases} псевдонима + ${out.parity.records} имена, ${out.parity.compares})`);
+              `(${out.parity.aliases} зонови псевдонима + ${out.parity.records} имена` +
+              `${out.parity.oldNames === null ? "" : ` + ${out.parity.oldNames} стари имена`}` +
+              `, ${out.parity.compares})`);
   console.log(`     К2 orig: копие ${out.parity.copyInstalled ? "вдигнато" : "ПАДА"}, ` +
               `очаквани разлики ${out.parity.expectedOrigDifferences.length}` +
               `${out.parity.expectedOrigNotSeen.length ? ` (липсващи очаквани: ${out.parity.expectedOrigNotSeen.length})` : ""}`);
@@ -1741,6 +1820,9 @@ async function runG4(s) {
   out.pick = await checkPickAndEscape(s, "хотел адмирал");
   console.log(`     избор: пин ${out.pick.surface.pins}, попъп "${out.pick.surface.title}", ` +
               `хидрантите различни: ${out.pick.hydrantsChanged}`);
+  out.aliasCard = await checkAliasCard(s);
+  console.log(`     D3 картонче: „${out.aliasCard.title}“ · ${out.aliasCard.oldSrc} · `
+              + `по име: ${out.aliasCard.namedOldSrc === null ? "без ред" : "ПАДА"}`);
   out.lateSheet = await checkLateDetailSheet(s);
   out.refusals = await checkRefusals(s);
   out.races = await checkRaces(s);
@@ -2016,6 +2098,7 @@ async function main() {
       hard.push(`G12в ${g4.reference.passedOrdered}/${g4.reference.total} подредени`);
     if (g4.m5 && g4.m5.some((r) => !r.ok)) hard.push(`М5 ${g4.m5.filter((r) => r.ok).length}/${g4.m5.length}`);
     if (g4.cats && !g4.cats.ok) hard.push("С8′ речник");
+    if (g4.aliasCard && !g4.aliasCard.ok) hard.push("D3 картончето не изписва извора на псевдонима");
     if (g4.editTransition && !g4.editTransition.ok)
       hard.push("К2 преход „хотел адмирал“ → „адмирал“ без изпразване");
     if (!digest.equal)
@@ -2029,6 +2112,10 @@ async function main() {
       hard.push(`G3 среда: before.json ${JSON.stringify(digest.beforeEnv)} ≠ `
                 + `${JSON.stringify({ pageUrl: PAGE_URL, viewport: { width: W, height: H, mobile: MOB } })}`);
   }
+  // ADR 008 D7: the bucket list is a gate in BOTH modes — a reference that gained
+  // or lost a bucket is a different reference, whatever the rows say.
+  if (REF_BUCKETS_DRIFT.length)
+    hard.push(`REF_BUCKETS (ADR 008 D7): ${REF_BUCKETS_DRIFT.join(", ")}`);
 
   console.log(`  конзолни грешки: ${s.errs.length}`);
   if (s.errs.length) for (const e of s.errs) console.log(`     ${String(e).slice(0, 200)}`);

@@ -31,7 +31,11 @@ sec.10 amendment list.
       not a number; with a key any exact/prefix non-numeric match also counts,
       and a purely numeric token counts only with a key and only exact
   A6  old_names are NAME TOKENS (not a phrase), minus tokens <=2 chars and
-      address markers
+      address markers, and (ЛОТ 1в А4 т. 1) minus the generic GEOGRAPHIC words
+      „варна“/„гр“/„град“; the CLASS words of an alias stay -- measured
+  A0  ЛОТ 1в D2 + А4 т. 2: the WHOLE normalised alias is an index of its own
+      (EXACT_ALIAS) and it is consulted BEFORE A1, but only for a query of at
+      least two significant tokens
   A7  order: bestNameKind v (3/2/1) -> nameMatched v -> totalMatched v -> sum v
       -> active before "бивш" -> distance to centre ^ -> name length ^ -> bg abc
   A8  the M5 expectations as corrected by sec.10
@@ -280,6 +284,13 @@ ADDR = set([u"\u0431\u043b", u"\u0431\u043b\u043e\u043a", u"\u0432\u0445",
             u"\u0432\u0445\u043e\u0434", u"\u0443\u043b", u"\u0431\u0443\u043b",
             u"\u043a\u0432", u"\u0436\u043a", u"\u2116"])
 
+# ЛОТ 1в, амандамент А4 т. 1 (ADR 008 D2): the generic GEOGRAPHIC words of an alias
+# never become name tokens — „Висше военноморско училище, Варна“ would otherwise
+# answer for the whole city on „варна“. The CLASS words of an alias STAY:
+# measured 04.09, without „училище“ in `aset` the ВВМУ falls to SECOND on
+# „военноморско училище“ behind the П2 coverage of „Спортно училище“.
+ALIAS_GENERIC = set([skel(u"\u0432\u0430\u0440\u043d\u0430"), skel(u"\u0433\u0440"), skel(u"\u0433\u0440\u0430\u0434")])
+
 
 # ---------------------------------------------------------------- \u041f7 (\u00a711 v2.1)
 # The registry's other spellings of a quarter become ZONE tokens of the records
@@ -441,13 +452,21 @@ class Rec(object):
         self.zkset = set(self.ztk) | set(self.ktk)
         self.zph = ZONE_PHRASES.get(self.zone) or set()   # decision 1: the phrases
         self.kkey = " ".join(self.ktk)
-        # A6: old_names are NAME TOKENS, minus <=2 chars and address markers
+        # A6: old_names are NAME TOKENS, minus <=2 chars and address markers.
+        # ЛОТ 1в А4 т. 1: minus the generic geographic words as well — the class
+        # words stay, which is what puts the ВВМУ first on „военноморско училище“.
+        # D1/D3: the alias STRINGS and their sources travel with the record, so the
+        # index below can key the whole phrase and the card can name its source.
+        self.old_names = list(h.get("old_names") or [])
+        self.old_src = list(h.get("old_names_src") or [])
         self.aset = set()
-        for o in (h.get("old_names") or []):
+        for o in self.old_names:
             for t in place_tokens(o):
                 if t.num:
                     continue
                 if len(t.orig) <= 2 or t.orig in ADDR:
+                    continue
+                if t.s in ALIAS_GENERIC:
                     continue
                 self.aset.add(t.s)
         dy = (self.lat - CENTER[0]) * 110574.0
@@ -466,6 +485,39 @@ RECS = [Rec(h) for h in hotels] + [Rec(p) for p in places2]
 EXACT_NAME = {}
 for _rec in RECS:
     EXACT_NAME.setdefault(u" ".join(_rec.ntk), []).append(_rec)
+
+# ЛОТ 1в, ADR 008 D2 (S1) — the exact-ALIAS index: the WHOLE normalised alias
+# maps to (record, index of that alias). A6 indexes an alias as separate TOKENS,
+# so the full string „Висше военноморско училище, Варна“ loses to the class
+# key „училище“ (A1 blocks the fail-open). The index is consulted BEFORE A1,
+# exactly as EXACT_NAME stands before the category list.
+EXACT_ALIAS = {}
+for _rec in RECS:
+    for _i, _old in enumerate(_rec.old_names):
+        _k = key_of(_old)
+        if not _k:
+            continue
+        _bucket = EXACT_ALIAS.setdefault(_k, [])
+        if not any(_r is _rec for _r, _j in _bucket):
+            _bucket.append((_rec, _i))
+
+
+def alias_significant(qt):
+    """Амандамент А4 т. 2: the significant tokens of a query, A5's own filter.
+
+    A one-word query never reaches EXACT_ALIAS: measured 04.09, „синчец“ has to
+    keep ДГ 30 „Синчец“ first (a CURRENT name must not lose to somebody's OLD
+    one on a partial match), and the alias tokens are in `aset` anyway.
+    """
+    return sum(1 for t in qt
+               if (not t.num) and len(t.orig) > 2 and t.orig not in ADDR)
+
+
+def exact_alias(qt):
+    """The records whose WHOLE alias is exactly this query. [] = no such thing."""
+    if alias_significant(qt) < 2:
+        return []
+    return EXACT_ALIAS.get(u" ".join(t.s for t in qt)) or []
 
 
 def in_class(rec, fk):
@@ -772,6 +824,11 @@ def search(q):
     qt = place_tokens(q)
     if not qt:
         return [], "empty"
+    # A0 (ADR 008 D2, амандамент А4 т. 2): a query that IS somebody's whole
+    # alias answers with that record, before A1 can spend it on a class key.
+    hit = exact_alias(qt)
+    if hit:
+        return order_category([r for r, _i in hit]), "A0-exact-alias"
     keys, slots, dead = split_keys(qt)
     if keys:
         # A1: the LEFTMOST key is the class; the other key words become names.
@@ -1432,6 +1489,115 @@ def check_lot1_gate():
     return bad
 
 
+# --- ЛОТ 1в-А (04.09) — the alias gate: every row below is MEASURED, not wished.
+# The three canals of the lot: the curated class words of the dictionary (S3),
+# the alias tokens in `aset` with the class words kept (амандамент А4 т. 1), and
+# the whole-alias index EXACT_ALIAS behind the two-token floor (А4 т. 2).
+LOT1V_A_GAINS = [
+    (u'Висше военноморско училище, Варна', u'A0-exact-alias', 1,
+     u'А4 т. 2: целият псевдоним (Wikidata Q7035695, CC0, достъп 03.09.2026) '
+     u'се проверява преди A1 — иначе класовият ключ „училище“ го изяжда', [
+        (u'ВВМУ „Н. Й. Вапцаров“', u'кв. Чайка', u'университет'),
+    ]),
+    (u'военноморско', u'M3', 2,
+     u'А4 т. 1: единичният токен на псевдонима е в `aset` — ВВМУ пръв', [
+        (u'ВВМУ „Н. Й. Вапцаров“', u'кв. Чайка', u'университет'),
+        (u'Военноморски клуб', u'район Одесос', u'Хотел'),
+    ]),
+    (u'военноморско училище', u'M2-failopen', 6,
+     u'А4 т. 1: класовата дума ОСТАВА в `aset` — без нея ВВМУ пада втори '
+     u'зад „Спортно училище Георги Бенковски“ (измерено)', [
+        (u'ВВМУ „Н. Й. Вапцаров“', u'кв. Чайка', u'университет'),
+        (u'Спортно училище Георги Бенковски', u'кв. Чайка', u'училище'),
+    ]),
+    (u'гимназия', u'M1-category', 57,
+     u'S3/К2: „гимназия“ → училище (ЗПУО чл. 17–18) — M3/12 става M1/57', [
+        (u'ОУ "Васил Априлов"', u'м-т Шашкъна', u'училище'),
+        (u'8 СОУПЧЕ', u'Морска градина', u'училище'),
+    ]),
+    (u'гимназия богоров', u'M2', 1,
+     u'S3: класовата дума + собственото име — 13 реда стават 1', [
+        (u'ПГИ „Д-р Иван Богоров“', u'ж.к. Младост', u'училище'),
+    ]),
+    (u'поликлиника', u'M1-category', 7,
+     u'S3/К2: разговорната форма, подписана изрично от Петър (Gate 1-А) — 1 → 7', [
+        (u'„ДКЦ 4 – Варна“ ЕООД', u'кв. Изгрев', u'ДКЦ'),
+        (u'„ДКЦ Чайка“ ЕООД', u'кв. Чайка', u'ДКЦ'),
+    ]),
+    (u'диагностично-консултативен център 3', u'M2', 1,
+     u'S3/К2: ЗЛЗ чл. 10 — 0 реда стават 1', [
+        (u'„ДКЦ 3 – Варна“ ЕООД', u'ж.к. Владислав Варненчик', u'ДКЦ'),
+    ]),
+    (u'езикова гимназия', u'M2', 2,
+     u'І ЕГ ← Wikidata Q12291800, IV ЕГ ← Q12299161 + регистъра school#40: '
+     u'12 реда без нито една ЕГ стават 2, I ЕГ пръв', [
+        (u'I ЕГ', u'кв. Изгрев', u'училище'),
+        (u'IV ЕГ Жолио Кюри', u'ж.к. Бриз', u'училище'),
+    ]),
+    (u'международен дом на учените', u'M3', 1,
+     u'К4: OSM way 199237000 (ODbL) — хотелът МДУ се намира по разгърнатото име', [
+        (u'МДУ ФРЕДЕРИК ЖОЛИО-КЮРИ', u'к.к. Св. Св. Константин и Елена', u'Хотел'),
+    ]),
+]
+
+LOT1V_A_CONTROLS = [
+    # Планът §0 и ADR 008 D2: „морско“ ≠ „военноморско“ — известна дупка, която
+    # НЕ се затваря с измислена форма. Мярката: заявката връща морската гимназия
+    # и НУЛА реда на ВВМУ; check_lot1v_a_gate() проверява и второто.
+    (u'морско училище', u'M2', 1,
+     u'известна дупка: ВВМУ НЕ се намира по „морско училище“ (0 реда) — '
+     u'псевдоним не се измисля', [
+        (u'Морска гимназия "Св. Николай Чудотворец"', u'кв. Аспарухово', u'училище'),
+    ]),
+    (u'варна', u'M3', 27,
+     u'А4 т. 1: „варна“ е генерична географска дума и НЕ влиза в `aset` — '
+     u'нула реда само заради псевдоним (проверено поименно)', [
+        (u'Варна', u'район Одесос', u'Семеен хотел'),
+        (u'Marina Varna Apartments', u'кв. Аспарухово', u'апарт-хотел'),
+    ]),
+    (u'синчец', u'M3', 2,
+     u'А4 т. 2: под прага от два значещи токена — сегашното име ДГ 30 „Синчец“ '
+     u'остава пред хотел ДАНА ПАЛАС, чийто СТАР низ е „СИНЧЕЦ“', [
+        (u'ДГ 30 "Синчец"', u'ж.к. Младост', u'детска градина'),
+        (u'ДАНА ПАЛАС', u'к.к. Златни пясъци', u'Хотел'),
+    ]),
+]
+
+
+def check_lot1v_a_gate():
+    """The ЛОТ 1в-А gate; returns the list of failures (empty list = green).
+
+    Same fail-loud contract as check_p7_gate()/check_lot1_gate(): main() exits 1
+    on any entry and tests/test_places_search_gate.py runs this very function.
+    Two of the rows carry a claim a prefix cannot express, so they are checked
+    by name here: „морско училище“ must return NO ВВМУ at all, and „варна“ must
+    return no row that stands there through an alias alone.
+    """
+    bad = []
+    for label, spec in ((u"gain", LOT1V_A_GAINS), (u"control", LOT1V_A_CONTROLS)):
+        for q, branch, n, why, want in spec:
+            rows, br = search(q)
+            got = [(r.name.strip(), r.zone, r.kind) for r in rows]
+            if br != branch:
+                bad.append(u"%s `%s`: branch %s, expected %s" % (label, q, br, branch))
+            if len(rows) != n:
+                bad.append(u"%s `%s`: %d rows, expected %d" % (label, q, len(rows), n))
+            if got[:len(want)] != want:
+                bad.append(u"%s `%s`: rows differ from the measured expectation "
+                           u"(first %d): %s" % (label, q, len(want), got[:len(want)]))
+    hole = [r.name for r in search(u"морско училище")[0] if r.name.startswith(u"ВВМУ")]
+    if hole:
+        bad.append(u"„морско училище“ вече връща ВВМУ (%s) — дупката е затворена "
+                   u"без подпис" % u", ".join(hole))
+    qt = place_tokens(u"варна")
+    alias_only = [r.name for r in search(u"варна")[0]
+                  if all(token_match(r, t)[0] == "alias" for t in qt)]
+    if alias_only:
+        bad.append(u"„варна“ връща редове само по псевдоним: %s"
+                   % u", ".join(alias_only))
+    return bad
+
+
 def check_p7_gate():
     """Runs the gate; returns the list of failures (empty list = green).
 
@@ -1953,6 +2119,13 @@ def main():
     for _r in RECS:
         if _r.name not in _corpus:
             _corpus.append(_r.name)
+    _n_names = len(_corpus) - _n_aliases
+    # ЛОТ 1в D1/D2: an alias is a searchable STRING now (EXACT_ALIAS keys the
+    # whole phrase), so the two tokenisers have to agree on it as well.
+    for _r in RECS:
+        for _o in _r.old_names:
+            if _o not in _corpus:
+                _corpus.append(_o)
     _parity = {
         "_meta": {
             "source": "scratch/places_search/recall_sweep.py (place_tokens)",
@@ -1960,6 +2133,8 @@ def main():
             "aliases": _n_aliases,
             "zones_with_aliases": len(cats.get("zones") or {}),
             "records": len(RECS),
+            "names": _n_names,
+            "old_names": len(_corpus) - _n_aliases - _n_names,
             "strings": len(_corpus),
         },
         "strings": [{"s": _x,
@@ -2010,7 +2185,15 @@ def main():
     for line in lot1_bad:
         print(u"  ЧЕРВЕНО: %s" % line)
 
-    return 1 if (bad or badx or p7_bad or lot1_bad) else 0
+    # ЛОТ 1в-А (псевдоними с извор + курирани думи на видовете): the third gate.
+    lot1v_bad = check_lot1v_a_gate()
+    print(u"ЛОТ 1в-А: гейт %d/%d"
+          % (len(LOT1V_A_GAINS) + len(LOT1V_A_CONTROLS) - len(lot1v_bad),
+             len(LOT1V_A_GAINS) + len(LOT1V_A_CONTROLS)))
+    for line in lot1v_bad:
+        print(u"  ЧЕРВЕНО: %s" % line)
+
+    return 1 if (bad or badx or p7_bad or lot1_bad or lot1v_bad) else 0
 
 
 if __name__ == "__main__":

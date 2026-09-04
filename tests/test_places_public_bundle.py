@@ -47,15 +47,21 @@ PLACES = pathlib.Path(os.environ.get("FIRE_VARNA_PLACES_PATH") or (REPO / "data"
 
 # The tracked LF blob, measured at C11 (varna_3d HEAD ba78a25, branch rezhimi):
 #   git -C ../varna_3d show HEAD:data/fire_varna_places.json > data/places.json
-PLACES_SHA256 = "939513fcde65da618a522ae2a6f4411e8850573a86ca681cd8aa520b9b4e6064"
-PLACES_BYTES = 70912
-PLACES_GZIP9 = 9265
+PLACES_SHA256 = "ef98624f2933d5191f927aaab303b248317ea92707be5c60fca5ccff0afa296a"
+PLACES_BYTES = 76110
+PLACES_GZIP9 = 9642
 
 EXPECTED_COUNT = 150
 TOP_LEVEL_KEYS = {"_meta", "places"}
-# Phase-2 plan §2 Д1: exactly these eight keys on every record — no `i`, no notes, no
-# cadastral identifier.
-RECORD_KEYS = {"kind", "lat", "lon", "name", "old_names", "src", "status", "zone"}
+# Phase-2 plan §2 Д1 + ЛОТ 1в (ADR 008 D1/S2): exactly these NINE keys on every
+# record — no `i`, no notes, no cadastral identifier. `old_names_src` is the ninth.
+RECORD_KEYS = {"kind", "lat", "lon", "name", "old_names", "old_names_src",
+               "src", "status", "zone"}
+# ЛОТ 1в (ADR 008 D1, амандамент А3) — the CLOSED list of alias sources. A place
+# name that travels as an alias carries its own letter; `old_names_src` is a
+# parallel array of the same length and order. Until this lot the card printed the
+# RECORD's register for an alias that came from OSM — up to 47 rows of a lie.
+ALIAS_SRC = {"OSM", "REG", "NTR", "WD", "WEB", "KAIS", "CUR"}
 ALLOWED_KIND = {"училище", "университет", "болница", "ДКЦ", "хоспис", "детска градина",
                 "детска ясла", "общежитие"}
 ALLOWED_SRC = {"OSM",
@@ -68,6 +74,7 @@ BBOX = (43.13, 43.35, 27.65, 28.10)  # min_lat, max_lat, min_lon, max_lon
 
 # Copied byte-for-byte out of data/places.json with python — never retyped by hand.
 LICENCE_OSM = 'Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).'
+LICENCE_WIKIDATA = 'Разгърнати имена (псевдоними за търсене) на 3 места: Wikidata Q7035695, Q12291800, Q12299161, CC0 1.0 Universal, достъп 03.09.2026. Низовете са зафиксирани с датата на достъп (снапшотът), не се теглят живо; изворът на всеки псевдоним стои в `old_names_src`.'
 LICENCE_REGISTRY = 'Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).'
 
 # A КАИС cadastral identifier is the one thing that must never reach a public payload.
@@ -172,9 +179,32 @@ class PlacesBundleTest(unittest.TestCase):
         self.assertEqual(self.doc["_meta"]["count"], EXPECTED_COUNT)
         self.assertEqual(len(self.records), EXPECTED_COUNT)
 
-    def test_every_record_carries_exactly_the_eight_keys(self):
+    def test_every_record_carries_exactly_the_nine_keys(self):
         for rec in self.records:
             self.assertEqual(set(rec.keys()), RECORD_KEYS, rec.get("name"))
+
+    def test_every_alias_carries_its_own_source(self):
+        # ADR 008 D1: same length, same order, every letter from the closed list.
+        # An alias without a source is a STOP in the exporter, a refusal in the
+        # client validator and a red row here — never a blank line on the card.
+        for rec in self.records:
+            self.assertIsInstance(rec["old_names_src"], list, rec["name"])
+            self.assertEqual(len(rec["old_names_src"]), len(rec["old_names"]),
+                             rec["name"])
+            for code in rec["old_names_src"]:
+                self.assertIn(code, ALIAS_SRC, rec["name"])
+
+    def test_the_wikidata_licence_line_is_verbatim(self):
+        # Амандамент А4 т. 3 (К1/К4): Wikidata is a NEW source of names, so it gets a
+        # line of its own — with the three ids, CC0 and the date of the snapshot the
+        # strings were frozen at. The count in the sentence is measured, not claimed.
+        self.assertEqual(self.doc["_meta"]["licence_wikidata"], LICENCE_WIKIDATA)
+        self.assertIn("CC0 1.0 Universal", LICENCE_WIKIDATA)
+        self.assertIn("достъп 03.09.2026", LICENCE_WIKIDATA)
+        for qid in ("Q7035695", "Q12291800", "Q12299161"):
+            self.assertIn(qid, LICENCE_WIKIDATA)
+        wd = [rec["name"] for rec in self.records if "WD" in rec["old_names_src"]]
+        self.assertEqual(len(wd), 3, wd)
 
     def test_enumerations_are_closed(self):
         for rec in self.records:
@@ -221,6 +251,8 @@ class PlacesBundleTest(unittest.TestCase):
                                 "OSM licence line quoted in BG and EN")
         self.assertGreaterEqual(readme.count(self.doc["_meta"]["licence_registry"]), 2,
                                 "registry licence line quoted in BG and EN")
+        self.assertGreaterEqual(readme.count(self.doc["_meta"]["licence_wikidata"]), 2,
+                                "Wikidata licence line quoted in BG and EN")
 
     def test_encoding_is_utf8_without_bom_and_free_of_mojibake(self):
         self.assertFalse(self.raw.startswith(b"\xef\xbb\xbf"))

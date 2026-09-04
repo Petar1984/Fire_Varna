@@ -52,6 +52,7 @@
 | **Национален туристически регистър** | местата за настаняване (хотели) — отделни факти, атрибуция в попъпа |
 | **OpenStreetMap** | имената на училищата, университетите, болниците и детските градини — © OpenStreetMap contributors, ODbL 1.0 |
 | **Регистри (МОН/НЕИСПУО, ИАМН, Община Варна)** | регистровите имена на училищата, детските заведения и лечебните заведения — отделни факти, източникът на всеки ред стои в `src` |
+| **Wikidata** | разгърнатите имена на три училища/висши училища като ПСЕВДОНИМИ ЗА ТЪРСЕНЕ (Q7035695, Q12291800, Q12299161) — CC0 1.0 Universal, снапшот с дата на достъп 03.09.2026 |
 
 Координатите са WGS84. Рядката метаданна (тип, адрес, състояние) остава
 точно толкова рядка, колкото е в източниците — нищо не се измисля. Всяка
@@ -79,6 +80,11 @@
 
 > Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).
 
+Вторият лицензен ред на същата доставка (`_meta.licence_osm`) покрива един
+разгърнат псевдоним за търсене от OpenStreetMap, дословно:
+
+> Разгърнати имена (псевдоними за търсене) от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0, снапшот 2026-08-10. Днес е един такъв псевдоним (way 199237000); изворът на всеки псевдоним стои в `old_names_src`.
+
 В търсачката са и училищата, университетите, болниците, ДКЦ, хосписите и детските градини (броят и sha — в docs/activeContext.md): имената идват от OpenStreetMap (© OpenStreetMap contributors, ODbL 1.0) и от регистрите, посочени в реда-източник на всеки попъп.
 
 Двата лицензни реда на доставката (`data/places.json`, `_meta.licence_osm` и
@@ -87,6 +93,12 @@
 > Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).
 
 > Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).
+
+Третият лицензен ред (`_meta.licence_wikidata`) е за новия извор на ЛОТ 1в:
+разгърнатите имена, които влизат САМО като псевдоними за търсене — не като
+показвано име. Дословно:
+
+> Разгърнати имена (псевдоними за търсене) на 3 места: Wikidata Q7035695, Q12291800, Q12299161, CC0 1.0 Universal, достъп 03.09.2026. Низовете са зафиксирани с датата на достъп (снапшотът), не се теглят живо; изворът на всеки псевдоним стои в `old_names_src`.
 
 Хотелите не са част от офлайн пакета (sw.js): без връзка търсачката на
 места не работи.
@@ -195,6 +207,7 @@ and deduplicated from:
 | **National Tourist Register** | accommodation places (hotels) — separate facts, attribution in the popup |
 | **OpenStreetMap** | the names of the schools, universities, hospitals and kindergartens — © OpenStreetMap contributors, ODbL 1.0 |
 | **Registers (МОН/НЕИСПУО, ИАМН, Община Варна)** | the registry names of the schools, childcare and health establishments — separate facts, the source of every row sits in `src` |
+| **Wikidata** | the expanded names of three schools/higher schools as SEARCH ALIASES (Q7035695, Q12291800, Q12299161) — CC0 1.0 Universal, snapshot accessed 2026-09-03 |
 
 Coordinates are WGS84. Sparse metadata (type, address, operational
 status) stays exactly as sparse as the sources are — nothing is
@@ -222,6 +235,12 @@ verbatim (in Bulgarian, as published):
 
 > Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).
 
+The same delivery's second licence line (`_meta.licence_osm`) covers one
+expanded search alias taken from OpenStreetMap, verbatim (in Bulgarian, as
+published):
+
+> Разгърнати имена (псевдоними за търсене) от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0, снапшот 2026-08-10. Днес е един такъв псевдоним (way 199237000); изворът на всеки псевдоним стои в `old_names_src`.
+
 The search also carries the schools, universities, hospitals, ДКЦ (diagnostic and consultation centres), hospices and kindergartens (the count and the sha — in docs/activeContext.md): the names come from OpenStreetMap (© OpenStreetMap contributors, ODbL 1.0) and from the registers named in the source row of every popup.
 
 The delivery's two licence lines (`data/places.json`, `_meta.licence_osm` and
@@ -230,6 +249,12 @@ The delivery's two licence lines (`data/places.json`, `_meta.licence_osm` and
 > Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).
 
 > Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).
+
+The third licence line (`_meta.licence_wikidata`) is ЛОТ 1в's new source: the
+expanded names enter as SEARCH ALIASES only — never as a displayed name.
+Verbatim (in Bulgarian, as published):
+
+> Разгърнати имена (псевдоними за търсене) на 3 места: Wikidata Q7035695, Q12291800, Q12299161, CC0 1.0 Universal, достъп 03.09.2026. Низовете са зафиксирани с датата на достъп (снапшотът), не се теглят живо; изворът на всеки псевдоним стои в `old_names_src`.
 
 The hotels bundle is not part of the offline pack (sw.js): without a
 connection the places search does not work.
