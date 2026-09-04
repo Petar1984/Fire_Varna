@@ -18,26 +18,35 @@ Until C16 nothing here could go red without a human reading a report:
   3. `p7_added` is exactly the seven tokens in six zones measured (§11 v2.1 plus
      the seventh, `konstanin`, that the renamed resort zone unlocked — Амандамент №10);
   4. ONE data anchor (Амандамент №11): every row of the committed artefact is
-     equal by (q, branch, name, zone) to `git show 23af63f:…rows.json` EXCEPT
+     equal by (q, branch, name, zone) to `git show 6032023:…rows.json` EXCEPT
      the 55 rows Petar signed (Амандамент №8 П1 — `LOT1_DATA_CHANGED`, the list
      in `scratch/places_search/lot1_reference_preview_v2.md` §А+§Б) and the 9
      rows F1-д added (`LOT1_DATA_ADDED`). A row on the signed list that did NOT
      move is red as well, so the list cannot go stale in silence;
   5. ЛОТ 1 (решения 2 и 1, signed 03.09): the gate itself, and the proof that
      each rule is load-bearing — inverted in place, the old answer comes back;
-  6. RETIRED anchors: `FROZEN_COMMIT = 7a6ea1d` (buckets gate_m5_a8 + extra,
-     exception `LOT1_PREPENDED`) and `P7_ANCHOR_COMMIT = 378a844` (bucket
+  6. RETIRED anchors: `FROZEN_COMMIT = 9c89463` (buckets gate_m5_a8 + extra,
+     exception `LOT1_PREPENDED`) and `P7_ANCHOR_COMMIT = a42be4c` (bucket
      gate_p7, exceptions `LOT1_MOVED_P7` — „хотел приморски“, „училище свети
-     никола“, „хотел зеленика“) are gone. 23af63f INHERITS them: that commit is
+     никола“, „хотел зеленика“) are gone. 6032023 INHERITS them: that commit is
      the artefact frozen against both of them and green on both, so the chain
-     7a6ea1d → 378a844 → 23af63f is unbroken, and one anchor now covers all
+     9c89463 → a42be4c → 6032023 is unbroken, and one anchor now covers all
      four buckets and all 122 rows instead of two anchors over 103;
   7. Амандамент №8 П2 („детско заведение“): the form table `EXTRA_FORMS` is
      kept by hand on BOTH sides — the places IIFE of index.html and the
      reference — and the ЛОТ 1 audit proved that deleting „детска ясла“ from
      the client copy left this suite green while only the browser probe went
      red. `Lot1FormTableTest` reads the client literal out of index.html and
-     compares the two tables, then measures the answer itself.
+     compares the two tables, then measures the answer itself;
+  8. REACHABLE anchors (амандамент А5 (2), F9): every commit this file names
+     is an ANCESTOR of HEAD. The rebase of 04.09 rewrote the three it used to
+     name and rewritten commits survive in the reflog of ONE checkout only, so
+     the suite was green here and red in a fresh clone — it was measuring the
+     machine. Each hash was replaced by its rewritten twin, and the twins carry
+     the same artefact byte for byte (23af63f → 6032023 even share one tree),
+     so not one expectation, exception or bucket sum moved with the re-anchoring.
+     `AnchorsReachableTest` is the gate, and it names the pre-rebase hashes as
+     the differential: those three must NOT resolve as ancestors.
 
 Read-only: it runs `git show` through subprocess and touches nothing on disk.
 """
@@ -56,7 +65,7 @@ INDEX = REPO / "index.html"
 REFERENCE = REPO / "scratch" / "places_search" / "recall_sweep.py"
 ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
-# The four buckets the 23af63f anchor holds — the ЛОТ 1 reference, 122 rows.
+# The four buckets the 6032023 anchor holds — the ЛОТ 1 reference, 122 rows.
 BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
 # ADR 008 D7 — fail-closed, and the WHOLE list: F6-а added `gate_lot1v_a`
 # ADDITIVELY (план §2г S3/S6) and F8 added `gate_lot1v_b` the same way, so the
@@ -68,14 +77,30 @@ BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
 REF_BUCKETS = BUCKETS + ("gate_lot1v_a", "gate_lot1v_b")
 PROBE = REPO / "scratch" / "places_search" / "probe_places_fv.mjs"
 # The ONE anchor (Амандамент №11): the artefact as it stood before the ЛОТ 1
-# DATA landed — 113 rows over the four buckets, itself frozen against 7a6ea1d
-# and 378a844 (docstring 6).
-LOT1_DATA_ANCHOR = "23af63f"       # C30 — the last artefact before the ЛОТ 1 data
+# DATA landed — 113 rows over the four buckets, itself frozen against 9c89463
+# and a42be4c (docstring 6).
+LOT1_DATA_ANCHOR = "6032023"       # C30 — the last artefact before the ЛОТ 1 data
 # F6-а (план §2г S6): the SECOND anchor, and the one with no exception list
 # at all. a58010e is ЛОТ 1 as it was pushed; the aliases and the curated class
 # words of F5-а were measured against it and moved NOTHING, so every one of the
 # 122 rows must still equal it. A movement here is a STOP, never a re-freeze.
 LOT1V_A_ANCHOR = "a58010e"         # C37 — main == origin/main, the ЛОТ 1 anchor
+# F9 (план §2г S6): the THIRD anchor — the artefact as ЛОТ 1в-А froze it, five
+# buckets and 134 rows. ЛОТ 1в-Б (the addresses and the A3-street branch) moved
+# none of them, so лот Б ADDS a bucket instead of re-freezing; a movement here is
+# a STOP with a named list, exactly as it is against a58010e.
+LOT1V_B_ANCHOR = "3e169c2"         # F6-а — the last frozen artefact before лот Б
+# Амандамент А5 (2): every anchor the suite reads must be an ANCESTOR of HEAD.
+# The rebase of 04.09 rewrote the three hashes this file used to carry, and a
+# rewritten commit lives on in the reflog of THIS checkout only — `git show` found
+# them here and nowhere else. The twins below are the same commits rewritten in
+# place: each pair shares the artefact blob (23af63f ↔ 6032023 share the whole
+# tree), so re-anchoring moved no expectation, no exception and no bucket sum.
+ANCHORS = (LOT1_DATA_ANCHOR, LOT1V_A_ANCHOR, LOT1V_B_ANCHOR, "9c89463", "a42be4c")
+# The pre-rebase hashes (7a6ea1d → 9c89463, 378a844 → a42be4c, 23af63f → 6032023).
+# They are named for two reasons: the scan in AnchorsReachableTest stays exact,
+# and the ancestry check is PROVED to discriminate — these three are not ancestors.
+REBASED_AWAY = ("7a6ea1d", "378a844", "23af63f")
 # The signed change list: Petar's П1 „да“ of Амандамент №8 over
 # scratch/places_search/lot1_reference_preview_v2.md — §А (18 rows where only the
 # spelling of a label moved: the renamed zone „к.к. Св. Константин“ →
@@ -273,7 +298,7 @@ class FrozenDiffTest(unittest.TestCase):
     """С5′ + Амандамент №11: ONE anchor for all four buckets.
 
     Two things have to hold at once, or the re-freeze proves nothing:
-    the ARTEFACT the probe replays must differ from 23af63f in exactly the 55
+    the ARTEFACT the probe replays must differ from 6032023 in exactly the 55
     signed rows (plus the 9 rows that did not exist there), and the LIVE engine
     must answer exactly what the artefact holds. Either half alone can be fooled
     — a row moving in the engine and in the artefact together would stay green
@@ -307,7 +332,7 @@ class FrozenDiffTest(unittest.TestCase):
 
     def test_every_row_outside_the_signed_list_equals_the_anchor(self):
         """The half that catches a silent drift: any row that is neither signed
-        nor new must be equal to 23af63f by (q, branch, name, zone)."""
+        nor new must be equal to 6032023 by (q, branch, name, zone)."""
         compared = 0
         for bucket in BUCKETS:
             anchor = dict((e["q"], e) for e in self.anchor[bucket])
@@ -904,6 +929,118 @@ class Lot1vBGateTest(unittest.TestCase):
                          u"за активно лечение – Варна“ ЕООД")
 
 
+class Lot1vBAdditiveFreezeTest(unittest.TestCase):
+    """The freeze of F9 — F6-а's shape, one lot later, and against F6-а itself.
+
+    план §2г S6: the candidate is compared with the LAST frozen artefact
+    (`3e169c2`, five buckets, 134 rows) by (bucket, q, branch, hasKey, ordered
+    rows) — plus `kind`, which the artefact schema does not carry and which is
+    therefore measured on the delivery. Zero movements is what makes „add a
+    bucket“ legitimate instead of a re-freeze, so this class carries no exception
+    list either: the day one of the 134 moves, it is a STOP with a named list.
+    """
+
+    # The fourth member of the S6 tuple is not a column of the artefact. It is
+    # `splitKeys()` over the class keys (index.html „const sk = splitKeys(qt)“,
+    # recall_sweep.search()), and every branch name below says what it was for the
+    # query that produced it. „empty“ (no tokens at all) and „A3-street“ (the new
+    # branch answers with or without a key) are the two that do not — they are
+    # named here, and a branch that is on neither list is red.
+    HASKEY_BY_BRANCH = {
+        "M1-category": True,
+        "M2": True,
+        "M2-failopen": True,
+        "A3-record+zone-phrase": True,
+        "A3-category+zone/kind": True,
+        "M3": False,
+        "M3-too-big": False,
+        "A0-exact-alias": False,
+    }
+    HASKEY_NOT_DECIDED_BY_BRANCH = ("empty", "A3-street")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.anchor = frozen_rows(LOT1V_B_ANCHOR)
+        cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
+        cls.frozen_buckets = BUCKETS + ("gate_lot1v_a",)
+
+    def test_the_anchor_is_the_five_buckets_and_134_rows(self):
+        self.assertEqual(set(self.anchor.keys()) - {"_meta"}, set(self.frozen_buckets))
+        self.assertEqual(sum(len(self.anchor[b]) for b in self.frozen_buckets), 134)
+        self.assertNotIn("gate_lot1v_b", self.anchor)
+
+    def test_not_one_of_the_134_rows_moved(self):
+        compared, moved = 0, []
+        for bucket in self.frozen_buckets:
+            anchor = dict((e["q"], e) for e in self.anchor[bucket])
+            current = dict((e["q"], e) for e in self.current[bucket])
+            self.assertEqual(set(anchor), set(current), bucket)
+            for q, was in anchor.items():
+                now = current[q]
+                compared += 1
+                if ((was["branch"], [(r["name"], r["zone"]) for r in was["rows"]])
+                        != (now["branch"], [(r["name"], r["zone"]) for r in now["rows"]])):
+                    moved.append(bucket + "/" + q)
+        self.assertEqual(moved, [], u"движение срещу %s: %s"
+                         % (LOT1V_B_ANCHOR, u", ".join(moved)))
+        self.assertEqual(compared, 134)
+
+    def test_the_kind_of_every_frozen_record_is_unchanged(self):
+        """The third member of the S6 triple, against THIS anchor: ЛОТ 1в-Б
+        rewrote both delivered blobs (the addresses), so „the rows did not move“
+        has to be said about the records they stand on as well."""
+        was, now = delivery_kinds(LOT1V_B_ANCHOR), delivery_kinds()
+        keys, changed, missing = set(), [], []
+        for bucket in self.frozen_buckets:
+            for entry in self.current[bucket]:
+                for row in entry["rows"]:
+                    keys.add((row["name"], row["zone"]))
+        for key in sorted(keys):
+            if key not in was or key not in now:
+                missing.append(key[0])
+            elif was[key] != now[key]:
+                changed.append(u"%s: %s → %s" % (key[0], was[key], now[key]))
+        self.assertEqual(missing, [])
+        self.assertEqual(changed, [])
+        self.assertEqual((len(was), len(now)), (375, 375))
+
+    def test_haskey_could_not_have_moved_and_agrees_with_every_branch(self):
+        """The fourth member. `hasKey` is derived from the class keys of
+        data/place_categories.json — the blob ЛОТ 1в-Б did not touch (byte-equal
+        to the anchor's) — and to keep that from being a claim, the key split is
+        run again over all 134 queries and compared with the branch the ANCHOR
+        recorded. A class key that had moved would flip one of them."""
+        got = subprocess.run(["git", "-C", str(REPO), "show",
+                              LOT1V_B_ANCHOR + ":data/place_categories.json"],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.assertEqual(got.returncode, 0, got.stderr.decode("utf-8", "replace"))
+        self.assertEqual(
+            hashlib.sha256(got.stdout).hexdigest(),
+            hashlib.sha256((REPO / "data" / "place_categories.json").read_bytes()).hexdigest(),
+            "the class keys moved — hasKey is not comparable without a measure")
+        checked = 0
+        for bucket in self.frozen_buckets:
+            for entry in self.anchor[bucket]:
+                branch = entry["branch"]
+                if branch in self.HASKEY_NOT_DECIDED_BY_BRANCH:
+                    continue
+                self.assertIn(branch, self.HASKEY_BY_BRANCH, entry["q"])
+                tokens = REF.place_tokens(entry["q"])
+                has_key = (bool(tokens) and not REF.exact_alias(tokens)
+                           and bool(REF.split_keys(tokens)[0]))
+                self.assertEqual(has_key, self.HASKEY_BY_BRANCH[branch],
+                                 u"%s/%s" % (bucket, entry["q"]))
+                checked += 1
+        self.assertEqual(checked, 133)
+
+    def test_the_only_gained_bucket_is_the_six_new_rows(self):
+        gained = [b for b in self.current if b != "_meta" and b not in self.anchor]
+        self.assertEqual(gained, ["gate_lot1v_b"])
+        self.assertEqual(len(self.current["gate_lot1v_b"]), 6)
+        self.assertEqual(sum(len(e["rows"]) for e in self.current["gate_lot1v_b"]), 15)
+        self.assertEqual(sum(len(self.current[b]) for b in REF_BUCKETS), 140)
+
+
 class Lot1vBBucketTest(unittest.TestCase):
     """The new bucket, and the proof that its gate runs and falls.
 
@@ -1004,6 +1141,55 @@ class RefBucketsTest(unittest.TestCase):
         broken = dict(good)
         broken["extra"] = {"not": "a list"}
         self.assertEqual(REF.bucket_drift(broken), [u"липсва extra"])
+
+
+class AnchorsReachableTest(unittest.TestCase):
+    """Амандамент А5 (2): the anchors are ANCESTORS of HEAD, not reflog ghosts.
+
+    `git show <commit>:<path>` resolves a rewritten commit for as long as the
+    reflog of that one checkout remembers it — so the anchor tests were green
+    here and red in a fresh clone, which is the definition of a gate that lies.
+    Three things are gated: every anchor is an ancestor, every anchor really
+    hands over its artefact, and no OTHER commit hash hides in this file.
+    """
+
+    def ancestry(self, commit):
+        """0 = ancestor of HEAD, anything else = not (128 = does not resolve)."""
+        return subprocess.run(["git", "-C", str(REPO), "merge-base",
+                               "--is-ancestor", commit, "HEAD"],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode
+
+    def test_every_anchor_is_an_ancestor_of_head(self):
+        unreachable = [c for c in ANCHORS if self.ancestry(c) != 0]
+        self.assertEqual(unreachable, [], u"котви извън историята на main: %s"
+                         % u", ".join(unreachable))
+
+    def test_the_check_discriminates(self):
+        """The differential — a gate that cannot go red is not a gate. The three
+        pre-rebase hashes are exactly what the debt was about, and they must NOT
+        pass the check above (in this checkout they still resolve, through the
+        reflog; in a fresh clone they do not resolve at all)."""
+        for commit in REBASED_AWAY:
+            self.assertNotEqual(self.ancestry(commit), 0, commit)
+
+    def test_the_live_anchors_hand_over_their_artefact(self):
+        """Reachable is not the same as usable: the three anchors the suite reads
+        must answer with an artefact of the shape their tests expect."""
+        for commit, buckets in ((LOT1_DATA_ANCHOR, BUCKETS),
+                                (LOT1V_A_ANCHOR, BUCKETS),
+                                (LOT1V_B_ANCHOR, BUCKETS + ("gate_lot1v_a",))):
+            doc = frozen_rows(commit)
+            self.assertEqual(set(doc.keys()) - {"_meta"}, set(buckets), commit)
+        self.assertEqual(sum(len(frozen_rows(LOT1_DATA_ANCHOR)[b]) for b in BUCKETS), 113)
+        self.assertEqual(sum(len(frozen_rows(LOT1V_A_ANCHOR)[b]) for b in BUCKETS), 122)
+
+    def test_no_commit_hash_in_this_file_is_off_the_list(self):
+        """The scan that keeps the list from going stale: every 7-hex word in this
+        file is either an anchor or one of the pre-rebase hashes it replaced. A
+        hash pasted into a docstring tomorrow is red until it is named here."""
+        text = pathlib.Path(__file__).read_text(encoding="utf-8")
+        found = set(re.findall(r"(?<![0-9a-zA-Z_])[0-9a-f]{7}(?![0-9a-zA-Z_])", text))
+        self.assertEqual(found, set(ANCHORS) | set(REBASED_AWAY))
 
 
 class PlacesCacheNameTest(unittest.TestCase):
