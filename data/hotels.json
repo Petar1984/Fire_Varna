@@ -1,11 +1,12 @@
 {
  "_meta": {
-  "generated": "2026-09-04 17:10:35 · python src/export_fire_varna_hotels.py",
+  "generated": "2026-09-05 01:16:51 · python src/export_fire_varna_hotels.py",
   "count": 225,
   "by_zone_src": {
-   "KAIS": 84,
+   "KAIS": 25,
+   "REG": 115,
    "SIGNED_OVERRIDE": 12,
-   "district": 129
+   "district": 73
   },
   "licence": "Имената и регистровите данни: отделни факти от Националния туристически регистър (чл. 4 ЗАПСП; без масово копиране на регистъра). Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md). Старите имена: кадастрални адресни полета + публични източници, всяко с ред в присъдния документ на З1 (22.08.2026). Имената от публична идентификация (OSM, официални сайтове, общински регистри): отделни факти, а не извадка от база — източникът на всеки ред стои в `src` (цикълът „дупката“, 23.08.2026).",
   "licence_osm": "Разгърнати имена (псевдоними за търсене) от OpenStreetMap: „© OpenStreetMap contributors, ODbL“ — лиценз ODbL 1.0, снапшот 2026-08-10. Днес е един такъв псевдоним (way 199237000); изворът на всеки псевдоним стои в `old_names_src`.",
@@ -129,8 +130,12 @@
    ],
    "lat": 43.278488,
    "lon": 28.04183,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -158,8 +163,12 @@
    ],
    "lat": 43.279258,
    "lon": 28.042669,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -223,7 +232,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -256,7 +265,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -286,8 +295,12 @@
    ],
    "lat": 43.281896,
    "lon": 28.038297,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -315,8 +328,12 @@
    ],
    "lat": 43.280324,
    "lon": 28.039723,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -344,8 +361,12 @@
    ],
    "lat": 43.28203,
    "lon": 28.042177,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -373,8 +394,12 @@
    ],
    "lat": 43.282414,
    "lon": 28.04223,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -409,7 +434,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -439,8 +464,12 @@
    ],
    "lat": 43.280568,
    "lon": 28.040618,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -468,8 +497,12 @@
    ],
    "lat": 43.297391,
    "lon": 28.046952,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -501,8 +534,12 @@
    ],
    "lat": 43.296283,
    "lon": 28.046558,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -530,8 +567,12 @@
    ],
    "lat": 43.296848,
    "lon": 28.044391,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -559,8 +600,12 @@
    ],
    "lat": 43.295662,
    "lon": 28.046379,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -588,8 +633,12 @@
    ],
    "lat": 43.293226,
    "lon": 28.046143,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -624,7 +673,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -657,7 +706,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -687,8 +736,12 @@
    ],
    "lat": 43.290101,
    "lon": 28.040728,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -717,8 +770,12 @@
    ],
    "lat": 43.288444,
    "lon": 28.040501,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -754,7 +811,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -784,8 +841,12 @@
    ],
    "lat": 43.286834,
    "lon": 28.041792,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -813,8 +874,12 @@
    ],
    "lat": 43.282603,
    "lon": 28.037994,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -842,8 +907,12 @@
    ],
    "lat": 43.283562,
    "lon": 28.042713,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -871,8 +940,12 @@
    ],
    "lat": 43.280958,
    "lon": 28.039248,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -903,7 +976,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -936,7 +1009,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -969,7 +1042,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1003,7 +1076,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1037,7 +1110,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1071,7 +1144,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1177,7 +1250,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1208,8 +1281,12 @@
    ],
    "lat": 43.286329,
    "lon": 28.043013,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -1278,7 +1355,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1311,7 +1388,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1345,8 +1422,12 @@
    ],
    "lat": 43.28906,
    "lon": 28.040781,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -1374,8 +1455,12 @@
    ],
    "lat": 43.282303,
    "lon": 28.040945,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -1406,7 +1491,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1436,8 +1521,12 @@
    ],
    "lat": 43.29452,
    "lon": 28.046131,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -1468,7 +1557,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -1498,8 +1587,12 @@
    ],
    "lat": 43.287941,
    "lon": 28.043423,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -1594,12 +1687,8 @@
    ],
    "lat": 43.134567,
    "lon": 27.936749,
-   "zone": "с.о. Прибой",
-   "quarter": {
-    "name": "с.о. Прибой",
-    "src": "KAIS",
-    "code": "priboy"
-   },
+   "zone": "район Аспарухово",
+   "quarter": null,
    "district": {
     "name": "Аспарухово",
     "src": "KAIS",
@@ -1627,8 +1716,12 @@
    ],
    "lat": 43.142787,
    "lon": 27.939457,
-   "zone": "район Аспарухово",
-   "quarter": null,
+   "zone": "кв. Галата",
+   "quarter": {
+    "name": "кв. Галата",
+    "src": "REG",
+    "code": "galata"
+   },
    "district": {
     "name": "Аспарухово",
     "src": "KAIS",
@@ -1663,7 +1756,11 @@
     "src": "KAIS",
     "code": "asparuhovo"
    },
-   "locality": null,
+   "locality": {
+    "name": "м-т Зеленика",
+    "src": "REG",
+    "code": "zelenika"
+   },
    "uins": [
     "В1-7З7-5ИШ-1В"
    ],
@@ -1690,8 +1787,12 @@
    ],
    "lat": 43.168152,
    "lon": 27.920835,
-   "zone": "район Аспарухово",
-   "quarter": null,
+   "zone": "кв. Галата",
+   "quarter": {
+    "name": "кв. Галата",
+    "src": "REG",
+    "code": "galata"
+   },
    "district": {
     "name": "Аспарухово",
     "src": "KAIS",
@@ -1699,7 +1800,7 @@
    },
    "locality": {
     "name": "м-т Зеленика",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zelenika"
    },
    "uins": [
@@ -2303,8 +2404,12 @@
    ],
    "lat": 43.294986,
    "lon": 28.042337,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -2403,7 +2508,7 @@
    "zone": "кв. Чайка",
    "quarter": {
     "name": "кв. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kv"
    },
    "district": {
@@ -2433,8 +2538,12 @@
    ],
    "lat": 43.224413,
    "lon": 28.00105,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -2467,8 +2576,12 @@
    ],
    "lat": 43.232397,
    "lon": 28.010387,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -2499,7 +2612,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2537,7 +2650,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2570,7 +2683,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2603,7 +2716,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2636,7 +2749,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2702,7 +2815,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2735,7 +2848,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2768,7 +2881,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2802,8 +2915,12 @@
    ],
    "lat": 43.23797,
    "lon": 28.015761,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -2834,7 +2951,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2867,7 +2984,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2901,7 +3018,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2934,7 +3051,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -2964,12 +3081,8 @@
    ],
    "lat": 43.252166,
    "lon": 28.025082,
-   "zone": "к.к. Чайка",
-   "quarter": {
-    "name": "к.к. Чайка",
-    "src": "KAIS",
-    "code": "chaika_kk"
-   },
+   "zone": "район Приморски",
+   "quarter": null,
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3000,7 +3113,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -3074,12 +3187,8 @@
    ],
    "lat": 43.266802,
    "lon": 28.034674,
-   "zone": "к.к. Чайка",
-   "quarter": {
-    "name": "к.к. Чайка",
-    "src": "KAIS",
-    "code": "chaika_kk"
-   },
+   "zone": "район Приморски",
+   "quarter": null,
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3108,8 +3217,12 @@
    ],
    "lat": 43.264542,
    "lon": 28.032129,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Чайка",
+   "quarter": {
+    "name": "к.к. Чайка",
+    "src": "REG",
+    "code": "chaika_kk"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3140,7 +3253,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -3173,7 +3286,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -3203,12 +3316,8 @@
    ],
    "lat": 43.263775,
    "lon": 28.029876,
-   "zone": "к.к. Чайка",
-   "quarter": {
-    "name": "к.к. Чайка",
-    "src": "KAIS",
-    "code": "chaika_kk"
-   },
+   "zone": "район Приморски",
+   "quarter": null,
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3244,7 +3353,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -3278,7 +3387,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -3316,7 +3425,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -3494,7 +3603,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -3559,12 +3668,8 @@
    ],
    "lat": 43.237252,
    "lon": 28.008643,
-   "zone": "кв. Виница",
-   "quarter": {
-    "name": "кв. Виница",
-    "src": "KAIS",
-    "code": "vinitsa"
-   },
+   "zone": "район Приморски",
+   "quarter": null,
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3597,12 +3702,8 @@
    ],
    "lat": 43.238279,
    "lon": 28.012603,
-   "zone": "с.о. Манастирски рид",
-   "quarter": {
-    "name": "с.о. Манастирски рид",
-    "src": "KAIS",
-    "code": "manastirski_rid"
-   },
+   "zone": "район Приморски",
+   "quarter": null,
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3630,12 +3731,8 @@
    ],
    "lat": 43.236829,
    "lon": 28.011623,
-   "zone": "с.о. Манастирски рид",
-   "quarter": {
-    "name": "с.о. Манастирски рид",
-    "src": "KAIS",
-    "code": "manastirski_rid"
-   },
+   "zone": "район Приморски",
+   "quarter": null,
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3768,7 +3865,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -3834,7 +3931,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -3867,7 +3964,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -3900,7 +3997,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -3930,8 +4027,12 @@
    ],
    "lat": 43.282655,
    "lon": 28.038818,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -3962,7 +4063,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -3992,8 +4093,12 @@
    ],
    "lat": 43.278398,
    "lon": 28.03927,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4022,8 +4127,12 @@
    ],
    "lat": 43.285914,
    "lon": 28.039083,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4051,8 +4160,12 @@
    ],
    "lat": 43.268511,
    "lon": 28.028941,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4083,7 +4196,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -4116,7 +4229,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -4146,8 +4259,12 @@
    ],
    "lat": 43.225607,
    "lon": 28.005158,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4177,8 +4294,12 @@
    ],
    "lat": 43.228434,
    "lon": 28.004321,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4210,7 +4331,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -4281,7 +4402,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -4316,8 +4437,12 @@
    ],
    "lat": 43.227935,
    "lon": 28.002492,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4345,12 +4470,8 @@
    ],
    "lat": 43.251045,
    "lon": 28.026615,
-   "zone": "к.к. Чайка",
-   "quarter": {
-    "name": "к.к. Чайка",
-    "src": "KAIS",
-    "code": "chaika_kk"
-   },
+   "zone": "район Приморски",
+   "quarter": null,
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4381,7 +4502,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -4414,7 +4535,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -4448,7 +4569,7 @@
    "zone": "к.к. Чайка",
    "quarter": {
     "name": "к.к. Чайка",
-    "src": "KAIS",
+    "src": "REG",
     "code": "chaika_kk"
    },
    "district": {
@@ -4478,8 +4599,12 @@
    ],
    "lat": 43.259954,
    "lon": 28.025143,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Чайка",
+   "quarter": {
+    "name": "к.к. Чайка",
+    "src": "REG",
+    "code": "chaika_kk"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4548,8 +4673,12 @@
    ],
    "lat": 43.249601,
    "lon": 28.028443,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Чайка",
+   "quarter": {
+    "name": "к.к. Чайка",
+    "src": "REG",
+    "code": "chaika_kk"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -4789,7 +4918,11 @@
     "src": "KAIS",
     "code": "primorski"
    },
-   "locality": null,
+   "locality": {
+    "name": "Морска градина",
+    "src": "KAIS",
+    "code": "morska_gradina"
+   },
    "uins": [
     "В1-ИП1-2Ч5-1А"
    ],
@@ -4845,8 +4978,12 @@
    ],
    "lat": 43.217989,
    "lon": 27.960312,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "ж.к. Бриз",
+   "quarter": {
+    "name": "ж.к. Бриз",
+    "src": "REG",
+    "code": "briz"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -5060,7 +5197,11 @@
     "src": "KAIS",
     "code": "primorski"
    },
-   "locality": null,
+   "locality": {
+    "name": "Морска градина",
+    "src": "KAIS",
+    "code": "morska_gradina"
+   },
    "uins": [
     "В1-ИН4-5КЕ-1А"
    ],
@@ -5153,7 +5294,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -5186,7 +5327,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -5219,7 +5360,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -5286,7 +5427,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -5319,7 +5460,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -5357,7 +5498,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -5390,7 +5531,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -5420,8 +5561,12 @@
    ],
    "lat": 43.264704,
    "lon": 28.036335,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Чайка",
+   "quarter": {
+    "name": "к.к. Чайка",
+    "src": "REG",
+    "code": "chaika_kk"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -5522,8 +5667,12 @@
    ],
    "lat": 43.228974,
    "lon": 28.004095,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "REG",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -5565,7 +5714,7 @@
    },
    "locality": {
     "name": "м-т Зеленика",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zelenika"
    },
    "uins": [
@@ -5660,7 +5809,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -5940,8 +6089,12 @@
    "beds": [],
    "lat": 43.230967,
    "lon": 28.014349,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Св. Св. Константин и Елена",
+   "quarter": {
+    "name": "к.к. Св. Св. Константин и Елена",
+    "src": "KAIS",
+    "code": "kk_konstantin_elena"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6041,8 +6194,12 @@
    "beds": [],
    "lat": 43.288035,
    "lon": 28.045065,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6096,8 +6253,12 @@
    "beds": [],
    "lat": 43.259957,
    "lon": 28.030331,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Чайка",
+   "quarter": {
+    "name": "к.к. Чайка",
+    "src": "KAIS",
+    "code": "chaika_kk"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6314,7 +6475,7 @@
    "zone": "к.к. Св. Св. Константин и Елена",
    "quarter": {
     "name": "к.к. Св. Св. Константин и Елена",
-    "src": "KAIS",
+    "src": "REG",
     "code": "kk_konstantin_elena"
    },
    "district": {
@@ -6522,8 +6683,12 @@
    ],
    "lat": 43.283281,
    "lon": 28.041885,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6553,8 +6718,12 @@
    ],
    "lat": 43.292697,
    "lon": 28.044165,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6583,7 +6752,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -6611,8 +6780,12 @@
    ],
    "lat": 43.286717,
    "lon": 28.04449,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6659,8 +6832,12 @@
    "beds": [],
    "lat": 43.280736,
    "lon": 28.038171,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6682,8 +6859,12 @@
    "beds": [],
    "lat": 43.281997,
    "lon": 28.037134,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6709,8 +6890,12 @@
    ],
    "lat": 43.289817,
    "lon": 28.041594,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6745,7 +6930,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -6779,8 +6964,12 @@
    ],
    "lat": 43.283278,
    "lon": 28.040634,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6812,8 +7001,12 @@
    ],
    "lat": 43.297969,
    "lon": 28.044638,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6876,7 +7069,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -6907,8 +7100,12 @@
    ],
    "lat": 43.291871,
    "lon": 28.045823,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6939,8 +7136,12 @@
    ],
    "lat": 43.286539,
    "lon": 28.039654,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -6964,8 +7165,12 @@
    "beds": [],
    "lat": 43.279418,
    "lon": 28.036707,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7010,8 +7215,12 @@
    "beds": [],
    "lat": 43.285174,
    "lon": 28.042215,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7033,8 +7242,12 @@
    "beds": [],
    "lat": 43.285684,
    "lon": 28.0395,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7060,8 +7273,12 @@
    ],
    "lat": 43.284662,
    "lon": 28.041097,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7089,8 +7306,12 @@
    "beds": [],
    "lat": 43.281456,
    "lon": 28.038875,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7117,7 +7338,7 @@
    "zone": "к.к. Златни пясъци",
    "quarter": {
     "name": "к.к. Златни пясъци",
-    "src": "KAIS",
+    "src": "REG",
     "code": "zlatni_pyasatsi"
    },
    "district": {
@@ -7143,8 +7364,12 @@
    "beds": [],
    "lat": 43.29639,
    "lon": 28.045538,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7168,8 +7393,12 @@
    ],
    "lat": 43.288722,
    "lon": 28.042102,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7193,8 +7422,12 @@
    "beds": [],
    "lat": 43.287411,
    "lon": 28.040486,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "KAIS",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",
@@ -7220,8 +7453,12 @@
    ],
    "lat": 43.287783,
    "lon": 28.040611,
-   "zone": "район Приморски",
-   "quarter": null,
+   "zone": "к.к. Златни пясъци",
+   "quarter": {
+    "name": "к.к. Златни пясъци",
+    "src": "REG",
+    "code": "zlatni_pyasatsi"
+   },
    "district": {
     "name": "Приморски",
     "src": "KAIS",

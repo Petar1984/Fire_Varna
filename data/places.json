@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "generated": "2026-09-04 17:10:35 · python src/export_fire_varna_places.py",
+  "generated": "2026-09-05 01:16:47 · python src/export_fire_varna_places.py",
   "count": 150,
   "by_kind": {
    "училище": 57,
@@ -14,8 +14,8 @@
   },
   "by_zone_src": {
    "KAIS": 10,
-   "REG": 34,
-   "district": 106
+   "REG": 39,
+   "district": 101
   },
   "licence_osm": "Имената от OpenStreetMap: „имена на обекти © OpenStreetMap contributors, ODbL“ — дословната атрибуция на web/varna_poi_names.json; лиценз ODbL 1.0. Самият пакет е производна база (систематична извадка) и се публикува под ODbL 1.0 — share-alike. Показването на един ред в попъп е Produced Work и за него атрибуцията стига (К8).",
   "licence_registry": "Имената и регистровите данни: отделни факти от регистрите (чл. 4 ЗАПСП; без масово копиране на регистър) — Регистър на лечебните заведения (ИАМН), Регистър на училищата и детските заведения (Община Варна), Регистър на училищата (МОН/НЕИСПУО, одобрено 21.08); източникът на всеки ред стои в `src`. Координатите: собствена геолокация върху отворените данни на КАИС (условията на ФАЗА_0_лицензи.md).",
@@ -1792,8 +1792,12 @@
    "kind": "училище",
    "lat": 43.230786,
    "lon": 27.886868,
-   "zone": "район Младост",
-   "quarter": null,
+   "zone": "ж.к. Младост",
+   "quarter": {
+    "name": "ж.к. Младост",
+    "src": "REG",
+    "code": "mladost"
+   },
    "district": {
     "name": "Младост",
     "src": "KAIS",
@@ -2850,7 +2854,11 @@
     "src": "KAIS",
     "code": "primorski"
    },
-   "locality": null,
+   "locality": {
+    "name": "Морска градина",
+    "src": "KAIS",
+    "code": "morska_gradina"
+   },
    "src": "OSM",
    "old_names": [],
    "old_names_src": [],
@@ -3295,8 +3303,12 @@
    "kind": "детска градина",
    "lat": 43.231698,
    "lon": 27.882499,
-   "zone": "район Младост",
-   "quarter": null,
+   "zone": "ж.к. Младост",
+   "quarter": {
+    "name": "ж.к. Младост",
+    "src": "REG",
+    "code": "mladost"
+   },
    "district": {
     "name": "Младост",
     "src": "KAIS",
@@ -3425,8 +3437,12 @@
    "kind": "детска градина",
    "lat": 43.230535,
    "lon": 27.87528,
-   "zone": "район Младост",
-   "quarter": null,
+   "zone": "ж.к. Младост",
+   "quarter": {
+    "name": "ж.к. Младост",
+    "src": "REG",
+    "code": "mladost"
+   },
    "district": {
     "name": "Младост",
     "src": "KAIS",
@@ -3467,8 +3483,12 @@
    "kind": "детска градина",
    "lat": 43.230077,
    "lon": 27.886423,
-   "zone": "район Младост",
-   "quarter": null,
+   "zone": "ж.к. Младост",
+   "quarter": {
+    "name": "ж.к. Младост",
+    "src": "REG",
+    "code": "mladost"
+   },
    "district": {
     "name": "Младост",
     "src": "KAIS",
@@ -3537,8 +3557,12 @@
    "kind": "детска градина",
    "lat": 43.231797,
    "lon": 27.873446,
-   "zone": "район Младост",
-   "quarter": null,
+   "zone": "ж.к. Младост",
+   "quarter": {
+    "name": "ж.к. Младост",
+    "src": "REG",
+    "code": "mladost"
+   },
    "district": {
     "name": "Младост",
     "src": "KAIS",

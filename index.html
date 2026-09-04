@@ -6259,7 +6259,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // change of the blobs. ЛОТ 1в-А rewrote all three (v2 → v3); ЛОТ 1в-Б added the
     // `address` key to two of them (v3 → v4); ЛОТ 1в-В replaced the single `zone`
     // with the three typed fields in all three, so v4 → v5 (the count stays 225).
-    const PLACES_CACHE = 'fire-varna-hotels-v5-225';   // our own namespace (Д3)
+    // F12 (P7: М2+М3+М6) rewrites the VALUES of those fields — hotels with a named
+    // quarter 96 → 152, places 44 → 49 — so a device holding v5 must not answer
+    // from it: v5 → v6 (the count still stays 225).
+    const PLACES_CACHE = 'fire-varna-hotels-v6-225';   // our own namespace (Д3)
     const TOP = 8, MIN_Q = 2, DEBOUNCE_MS = 120, FETCH_TIMEOUT_MS = 8000;
     const TOP_TOTAL = 16, GEN_CAP = 300;               // фаза 2 С3: per group / per class
     const CACHE_TIMEOUT_MS = 2000, MAX_BODY = 2000000, EXPECT_COUNT = 225, EXPECT2_COUNT = 150;
@@ -6282,9 +6285,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const STATUSES = ['', 'бивш'];
     const CADASTRAL = /\b\d{4,5}\.\d+\.\d+/;     // a cadastral id never rides a public bundle (Д2)
     // §12 В7 + §14 — the exact bytes the browser may trust (the tracked LF blobs).
-    const HOTELS_SHA256 = 'c30f7333d1a9a845b90ca46db0e41496cb722aa2640b6c862ccb8b211bd30100';
-    const PLACES2_SHA256 = '35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9';
-    const CATS_SHA256 = '8e73c6c368a78e14f5d94e580ee495ce3349b10aa0d4ac752d018abeeef41da0';
+    const HOTELS_SHA256 = '46a44ce82f154ca6f77f5001c0393b4654a818ba6d5e8540fb1c6f337fe0418d';
+    const PLACES2_SHA256 = '329310f577e8353673b9014af99624a78ab825fb0ad53e93fc572a28660d88c0';
+    const CATS_SHA256 = '874e33cd00e2f468d6fa1fe717351a5247765ae13d4301374a9a14f83347d054';
     // ЛОТ 1в-В (ADR 008 D9, план §3ж S2) — `legacy_by_row` is keyed by the ORDINAL
     // of a row in its bundle, so it is only ever as true as the bundle it was built
     // against: a re-export that reorders the rows would move every old word onto a
@@ -6296,8 +6299,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // writes CRLF; varna_3d P6-б normalises the bytes before hashing, so one
     // content now has exactly one digest on every checkout (measured 04.09).
     const LEGACY_BUNDLE_SHA = {
-      places: '35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9',
-      hotels: 'c30f7333d1a9a845b90ca46db0e41496cb722aa2640b6c862ccb8b211bd30100'
+      places: '329310f577e8353673b9014af99624a78ab825fb0ad53e93fc572a28660d88c0',
+      hotels: '46a44ce82f154ca6f77f5001c0393b4654a818ba6d5e8540fb1c6f337fe0418d'
     };
     // ЛОТ 1в-В (ADR 008 D9, план §3г/§3ж S1/S4/S6) — the three TYPED location
     // fields. Each is `null` or EXACTLY {name, src, code}, the source and the code
@@ -6311,12 +6314,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const DISTRICT_SRC = ['KAIS', 'SIGNED_OVERRIDE'];
     const DISTRICT_CODES = ['primorski', 'odesos', 'mladost', 'asparuhovo',
                             'vladislav_varnenchik'];
-    const QUARTER_CODES = ['asparuhovo', 'borovets_yug', 'chaika_kk', 'chaika_kv',
-                           'druzhba', 'galata', 'izgrev_kv', 'kk_konstantin_elena',
-                           'manastirski_rid', 'mladost2', 'pobeda', 'priboy', 'troshevo',
-                           'vazrazhdane', 'vazrazhdane1', 'vazrazhdane2', 'vinitsa',
-                           'vladislavovo', 'zlatni_pyasatsi'];
-    const LOCALITY_CODES = ['sveti_nikola', 'vilite', 'zelenika', 'zpz'];
+    const QUARTER_CODES = ['asparuhovo', 'borovets_yug', 'briz', 'chaika_kk',
+                           'chaika_kv', 'druzhba', 'galata', 'izgrev_kv',
+                           'kk_konstantin_elena', 'mladost', 'mladost2', 'pobeda',
+                           'priboy', 'troshevo', 'vazrazhdane', 'vazrazhdane1',
+                           'vazrazhdane2', 'vinitsa', 'vladislavovo', 'zlatni_pyasatsi'];
+    const LOCALITY_CODES = ['morska_gradina', 'sveti_nikola', 'vilite', 'zelenika', 'zpz'];
     const DISTRICT_MARK = 'район';                 // the word, in the card and in a query
     // ЛОТ 1в (ADR 008 D1, амандамент А3) — the CLOSED list of alias sources and the
     // word the card says for each. An old name used to inherit the source line of its

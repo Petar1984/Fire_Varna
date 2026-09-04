@@ -1,0 +1,1519 @@
+{
+  "_meta": {
+    "what": "Поименният allow-списък на доставката F12 (P7: М2+М3+М6) спрямо подписания baseline f06ac06.",
+    "how_to_reproduce": "python -m gates.coverage --places-base git:f06ac06:data/places.json --places-candidate data/places.json --hotels-base git:f06ac06:data/hotels.json --hotels-candidate data/hotels.json --allow gates/allow/2026-09-05_lot1v_v.json",
+    "measured": "places zone_named 127 → 49 (lost 78, changed 18); hotels zone_named 199 → 152 (lost 47, changed 7); общо 150 преместени реда, 0 липсващи/нови/пренаредени.",
+    "why_classes": {
+      "hull_artifact": "Старият етикет идваше от геометрична обвивка, а не от регистров квартал (не е име на квартал в доставката): „Морска градина“ 28, „Западна промишлена зона“ 13, „м-т Шашкъна“ 11, „ж.к. Владислав Варненчик“ 10, „Виница/север“ 3 и др. Новата стойност е район (честното „няма свидетел за квартал“) или друг квартал със свидетел.",
+      "resort_pending": "8-те сблъсъка между каналите (НТР ↔ КАИС/регистър), които чакат окото на Петър: ДАЛИЯ ГАРДЪН, Фрегата, МАГНОЛИЯ 1 И 2, Маяк, НЕПТУН, Романтика, РУСАЛКА, СТРАНДЖА. До подписа картата ги показва с район.",
+      "no_witness": "Старият етикет беше име на регистров квартал, но новата доставка няма нито един свидетел (НТР/регистър/КАИС) за този ред → район X.",
+      "m6_changed": "М6: именуван квартал → друг именуван квартал, със свидетел в новата доставка."
+    },
+    "rule": "resort_pending (8-те по име) > hull_artifact (нормализираният стар етикет не е име на квартал в доставката) > m6_changed (сменен) / no_witness (загубен).",
+    "note": "Всеки ред тук е бюджет за ТОЧНО един преместен ред (дублирано име иска два реда)."
+  },
+  "signed_by": "pending — Петър",
+  "date": "2026-09-05",
+  "rows": [
+    {
+      "file": "places",
+      "name": "3 ОУ Ангел Кънчев",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 0,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "8 СОУПЧЕ",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 1,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "бивше ОУ „Д-р Никола Димитров“",
+      "field": "zone_named",
+      "from": "к.к. Св. Св. Константин и Елена",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 2,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ЧПГ „Антоан дьо Сент-Екзюпери“",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 4,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "I ЕГ",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 6,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "IV ЕГ Жолио Кюри",
+      "field": "zone_named",
+      "from": "ж.к. Бриз",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 9,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Морска гимназия \"Св. Николай Чудотворец\"",
+      "field": "zone_named",
+      "from": "кв. Аспарухово",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 12,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Национално училище по изкуствата \"Добри Христов\"",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 13,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "НУ Васил Левски",
+      "field": "zone_named",
+      "from": "кв. Аспарухово",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 14,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ОУ Черноризец Храбър",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 15,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ОУ Добри Чинтулов",
+      "field": "zone_named",
+      "from": "кв. Трошево",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 16,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ОУ Йордан Йовков",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 19,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОУ „Иван Вазов“",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 20,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОУ Отец Паисий",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 23,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОУ \"Стефан Караджа\"",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 27,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ОУ „Св. Климент Охридски“",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 29,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОУ \"Св.св.Кирил и Методий\"",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 30,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОУ „Свети Иван Рилски“",
+      "field": "zone_named",
+      "from": "ж.к. Възраждане",
+      "to": null,
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 31,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ОУ \"Васил Априлов\"",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 33,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОУ Васил Друмев",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 34,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Първа частна търговска гимназия",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 36,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ПГ по строителство, архитектура и геодезия \"Васил Левски\"",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 38,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ПГГСД „Николай Хайтов“",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 40,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ПГТ „Проф. д-р Асен Златаров\"",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 41,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Професионална гимназия по електротехника",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 42,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "Професионална гимназия по химични и хранително-вкусови технологии \"Д. И. Менделеев\"",
+      "field": "zone_named",
+      "from": "м-т Свети Никола",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 43,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "Професионална Гимназия по Текстил и Моден Дизайн",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 44,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Професионална Техническа Гимназия",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 45,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "СУ „Гео Милев“",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 48,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "VII СУ „Найден Геров“",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 54,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ВТГ „Георги Стойков Раковски\"",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 55,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "Икономически университет - Варна",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 57,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "Икономически университет - Варна, 2-ри корпус",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 58,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Медицински университет „Проф. д-р Параскев Стоянов“",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 59,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Технически университет – Варна",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 60,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ВВМУ „Н. Й. Вапцаров“",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 63,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "„Многопрофилна болница за активно лечение Света Анна – Варна“ АД",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 65,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "Онкологична болница-Марко Антонов",
+      "field": "zone_named",
+      "from": "м. Вилите",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 67,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Специализирана болница по акушерство и гинекология за активно лечение „Проф. д-р Димитър Стаматов“ – Варна“ ЕООД",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 68,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Специализирана болница за активно лечение по детски болести – доктор Лисичкова“ ЕООД",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 69,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Специализирана болница за активно лечение по кардиология Варна“ ЕАД",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 70,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "„Университетска специализирана болница по очни болести за активно лечение – Варна“ ЕООД",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 73,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "Военно-морска болница",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 74,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "„ДКЦ 4 – Варна“ ЕООД",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 77,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "„ДКЦ Чайка“ ЕООД",
+      "field": "zone_named",
+      "from": "кв. Чайка",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 79,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "„ДКЦ Младост-М Варна“ ООД",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 80,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "II ДКЦ Св. Иван Рилски",
+      "field": "zone_named",
+      "from": "ж.к. Дружба",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 81,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "„Хоспис Медицинска грижа“ ООД",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 83,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Хоспис Надежда“ ЕООД",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 85,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Хоспис Света Мария Магдалена“ ЕООД",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 86,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Хоспис Царица Елеонора – Варна“ ЕООД",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 87,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "20 Логопедична ЦДГ",
+      "field": "zone_named",
+      "from": "м-т Салтанат",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 89,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "27 ДГ Успех",
+      "field": "zone_named",
+      "from": "ж.к. Младост",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 90,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "3 ЦДГ Ян Бибиян",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 91,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "46 ДГ Горска приказка",
+      "field": "zone_named",
+      "from": "м. Вилите",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 94,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "Детска градина \"Жирафче\"",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 96,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№10 „Карамфилче“",
+      "field": "zone_named",
+      "from": "ж.к. Победа",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 97,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№11 „Незабравка“",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 98,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№12 „Ян Бибиян“",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 99,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№16 „Слънчева Дъга“",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 100,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№17 „Петър Берон\"",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 101,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ 24 \"Детско градче\"",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 106,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№26 „Изворче\"",
+      "field": "zone_named",
+      "from": "кв. Трошево",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 108,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№40 „Детски свят“",
+      "field": "zone_named",
+      "from": "кв. Владиславово",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 121,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№44 „Валентина Терешкова\"",
+      "field": "zone_named",
+      "from": "кв. Аспарухово",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 123,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ №45 Морски свят",
+      "field": "zone_named",
+      "from": "кв. Аспарухово",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 124,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ 5 \"Слънчо\"",
+      "field": "zone_named",
+      "from": "ж.к. Възраждане",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 125,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№53 „Слънчево зайче“",
+      "field": "zone_named",
+      "from": "ж.к. Възраждане",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 127,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДГ 7 \"Ал.С. Пушкин\"",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 129,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ Мир №13",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 130,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОДГ №14 \"Дружба\"",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 131,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ЦДГ 15 \"Гълъбче\"",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 135,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ЦДГ Пушкин (филиал)",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "OSM",
+      "ordinal": 138,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДЯ №13 „Русалка“",
+      "field": "zone_named",
+      "from": "ж.к. Младост",
+      "to": null,
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 140,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДЯ №4 „Приказен свят“",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 144,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ДЯ №5 „Чуден свят“",
+      "field": "zone_named",
+      "from": "кв. Св. Иван Рилски",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 145,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДЯ №7 „Роза“",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 147,
+      "why": "no_witness"
+    },
+    {
+      "file": "places",
+      "name": "ЦПЛР – Средношколско общежитие „Михаил Колони“",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 149,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ЧСУ „Монтесори Варна“",
+      "field": "zone_named",
+      "from": "Изгрев 1",
+      "to": "кв. Изгрев",
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 5,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "II ОУ „Никола Йонков Вапцаров“",
+      "field": "zone_named",
+      "from": "ж.к. Възраждане",
+      "to": "ж.к. Възраждане 2",
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 7,
+      "why": "m6_changed"
+    },
+    {
+      "file": "places",
+      "name": "ОУ Патриарх Евтимий",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "OSM",
+      "ordinal": 26,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ОУ Стоян Михайловски",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "OSM",
+      "ordinal": 28,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ПГИ „Д-р Иван Богоров“",
+      "field": "zone_named",
+      "from": "ж.к. Младост",
+      "to": "ж.к. Младост 2",
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 39,
+      "why": "m6_changed"
+    },
+    {
+      "file": "places",
+      "name": "СУ „Пейо Крачолов Яворов“",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 51,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "СУУНЗ Проф. д-р Иван Шишманов",
+      "field": "zone_named",
+      "from": "Аспарухово/Галата",
+      "to": "кв. Аспарухово",
+      "src": "OSM",
+      "ordinal": 53,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "І ОУ „Свети княз Борис I“",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "Регистър на училищата (МОН/НЕИСПУО), одобрено 21.08",
+      "ordinal": 56,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Университетска многопрофилна болница за активно лечение „Света Марина““ ЕАД",
+      "field": "zone_named",
+      "from": "м-т Сотира",
+      "to": "к.к. Св. Св. Константин и Елена",
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 72,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„ДКЦ 3 – Варна“ ЕООД",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 76,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "„Хоспис Филаретова“ ЕООД",
+      "field": "zone_named",
+      "from": "с.о. Зеленика",
+      "to": "с.о. Боровец-юг",
+      "src": "Регистър на лечебните заведения (ИАМН)",
+      "ordinal": 82,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ 32 \"Моряче\"",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": "ж.к. Младост",
+      "src": "OSM",
+      "ordinal": 114,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№34 „Лястовичка“",
+      "field": "zone_named",
+      "from": "ж.к. Възраждане",
+      "to": "ж.к. Възраждане 1",
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 116,
+      "why": "m6_changed"
+    },
+    {
+      "file": "places",
+      "name": "ДГ 36 \"Морска звездица\"",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": "ж.к. Младост",
+      "src": "OSM",
+      "ordinal": 117,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№37 „Пламъче“",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 118,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ 39 \"Приказка\"",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "OSM",
+      "ordinal": 119,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДГ№41 „Първи юни“",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 122,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "places",
+      "name": "ДЯ №9 „Детелина“",
+      "field": "zone_named",
+      "from": "ж.к. Дружба",
+      "to": "кв. Аспарухово",
+      "src": "Регистър на училищата и детските заведения (Община Варна)",
+      "ordinal": 148,
+      "why": "m6_changed"
+    },
+    {
+      "file": "hotels",
+      "name": "Дукеса",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 46,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "АДАМО",
+      "field": "zone_named",
+      "from": "Западна промишлена зона",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 47,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Романтика",
+      "field": "zone_named",
+      "from": "к.з. Прибой",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 48,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "Людо",
+      "field": "zone_named",
+      "from": "кв. Галата",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 50,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Бел Епок",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 53,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "ПАНОРАМА",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 54,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "РЕВЕРАНС",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 55,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Орбита",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 56,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "ГАЛЕРИЯ ГРАФИТ",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 57,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "КАПИТОЛ",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 58,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Модус",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 67,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "РОСЛИН ДИМЯТ ХОТЕЛ ВАРНА",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 71,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "РУСАЛКА",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 89,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "СТРАНДЖА",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 92,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "ДАЛИЯ ГАРДЪН",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 96,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "Ниагара",
+      "field": "zone_named",
+      "from": "кв. Виница",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 105,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "НЕПТУН",
+      "field": "zone_named",
+      "from": "к.к. Св. Св. Константин и Елена",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 106,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "Фрегата",
+      "field": "zone_named",
+      "from": "к.к. Св. Св. Константин и Елена",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 107,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "Маяк",
+      "field": "zone_named",
+      "from": "к.к. Св. Св. Константин и Елена",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 108,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "Перла",
+      "field": "zone_named",
+      "from": "Виница/север",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 109,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Гран Иван",
+      "field": "zone_named",
+      "from": "ж.к. Възраждане",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 110,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "МАГНОЛИЯ 1 И 2",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 130,
+      "why": "resort_pending"
+    },
+    {
+      "file": "hotels",
+      "name": "Дива",
+      "field": "zone_named",
+      "from": "Виница/север",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 135,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "КАМПУС 90",
+      "field": "zone_named",
+      "from": "м-т Шашкъна",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 137,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Сорбона",
+      "field": "zone_named",
+      "from": "кв. Изгрев",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 138,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Казабланка Грийн",
+      "field": "zone_named",
+      "from": "кв. Свети Никола",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 141,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Алекта",
+      "field": "zone_named",
+      "from": "м-т Горчивата чешма",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 143,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Перфект",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 146,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Хай",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 147,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Вентура",
+      "field": "zone_named",
+      "from": "кв. Аспарухово",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 148,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Класик",
+      "field": "zone_named",
+      "from": "м-т Салтанат",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 151,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Еника",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 152,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "ЧЕРНО МОРЕ",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 157,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Плаза",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 163,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Санта Марина",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 164,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Джоя",
+      "field": "zone_named",
+      "from": "м. Зеленика",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 166,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Акрополис",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 168,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Marina Varna Apartments",
+      "field": "zone_named",
+      "from": "кв. Аспарухово",
+      "to": null,
+      "src": "Sol/OSM идентификация",
+      "ordinal": 170,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Trigor City / Guest Apartments",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": null,
+      "src": "Sol/OSM идентификация",
+      "ordinal": 174,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Family Hotel Astra",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "Sol/OSM идентификация",
+      "ordinal": 178,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Albatros Suites / „Албатрос“",
+      "field": "zone_named",
+      "from": "к.к. Св. Св. Константин и Елена",
+      "to": null,
+      "src": "Sol/OSM идентификация",
+      "ordinal": 181,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Nikea / Nikeya Park",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": null,
+      "src": "Sol/OSM идентификация",
+      "ordinal": 182,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Hugo Hotel",
+      "field": "zone_named",
+      "from": "Морска градина",
+      "to": null,
+      "src": "Sol/OSM идентификация",
+      "ordinal": 186,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Hotel Bona Vita",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": null,
+      "src": "Sol/OSM идентификация",
+      "ordinal": 192,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Калифорния",
+      "field": "zone_named",
+      "from": "к.к. Св. Св. Константин и Елена",
+      "to": null,
+      "src": "НТР УИН",
+      "ordinal": 198,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Иглика-2",
+      "field": "zone_named",
+      "from": "к.к. Златни пясъци",
+      "to": null,
+      "src": "КАИС адресно поле",
+      "ordinal": 203,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Зл.котва",
+      "field": "zone_named",
+      "from": "к.к. Златни пясъци",
+      "to": null,
+      "src": "КАИС адресно поле",
+      "ordinal": 215,
+      "why": "no_witness"
+    },
+    {
+      "file": "hotels",
+      "name": "Зеленика",
+      "field": "zone_named",
+      "from": "с.о. Зеленика",
+      "to": "кв. Галата",
+      "src": "НТР УИН",
+      "ordinal": 51,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "РИВИЕРА БИЙЧ",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": "к.к. Златни пясъци",
+      "src": "НТР УИН",
+      "ordinal": 104,
+      "why": "m6_changed"
+    },
+    {
+      "file": "hotels",
+      "name": "ПАРК ХОТЕЛ БЕЛВЮ",
+      "field": "zone_named",
+      "from": "к.к. Чайка",
+      "to": "к.к. Златни пясъци",
+      "src": "НТР УИН",
+      "ordinal": 121,
+      "why": "m6_changed"
+    },
+    {
+      "file": "hotels",
+      "name": "Кабакум",
+      "field": "zone_named",
+      "from": "Виница/север",
+      "to": "к.к. Чайка",
+      "src": "НТР УИН",
+      "ordinal": 134,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Камелия",
+      "field": "zone_named",
+      "from": "м. Св. Никола",
+      "to": "ж.к. Бриз",
+      "src": "НТР УИН",
+      "ordinal": 145,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Хотел-ресторант „Комитово ханче“",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "Sol/OSM идентификация",
+      "ordinal": 189,
+      "why": "hull_artifact"
+    },
+    {
+      "file": "hotels",
+      "name": "Станкино ханче",
+      "field": "zone_named",
+      "from": "ж.к. Владислав Варненчик",
+      "to": "кв. Владиславово",
+      "src": "НТР УИН",
+      "ordinal": 197,
+      "why": "hull_artifact"
+    }
+  ]
+}
