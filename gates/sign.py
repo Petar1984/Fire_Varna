@@ -58,6 +58,21 @@ AND THE ANCHOR IT WRITES IS PETAR'S COMMIT (амандамент №8 т. 4): th
 `_meta.queue_reference` in as he signs, and it will not write a commit that is
 not his — a signature that arrives with an anchor the gate blocks is a
 signature that has to be undone by hand.
+
+ONLY A DELTA ROW IS ASKED ABOUT QUERIES (амандамент №9 т. 5). The queue carries
+three kinds of row: a „въпрос“ (no artefact, no `покрива` — Q7 „break-glass:
+вън“), an „артефакт“ (a body to sign and no `покрива` — the baseline, the
+codes) and a „делта“ (a `покрива` field). The refusal rules above are rules
+about deltas; applied to the other two they made a political „не“ unwritable and
+held the delivery over a row that was never about a query. „не“ on a question is
+recorded and goes no further; „не“ on an artefact means the body is NOT signed,
+and the release then blocks on the artefact.
+
+AND IT WRITES DOWN WHAT IT SIGNED (амандамент №9 т. 7): `- **тяло:** <sha256>`
+on the row, the digest of the artefact body without the signature field. Check 6
+recompares that number with the blob at HEAD, so a rewrite that touches no
+digest-bound field is caught by the release gate — and therefore by `--freeze`,
+which reads the release verdict — instead of only by `run_gates` проверка 7.
 """
 
 from __future__ import annotations
@@ -102,14 +117,11 @@ def artefacts():
 def repo_relative(path):
     """The path as the repository names it — for the `git add` line it prints.
 
-    `--queue` may be given relative to the current directory or absolute, so the
-    path is resolved before it is compared with the root; a path outside the
-    checkout is printed as it was given instead of raising.
+    `release.repo_relative` is the one truth (the gate names the same paths in
+    the same shape); a path outside the checkout is printed as it was given
+    instead of raising, because this end of it is a line for a human to copy.
     """
-    try:
-        return str(pathlib.Path(path).resolve().relative_to(REPO_ROOT)).replace("\\", "/")
-    except ValueError:
-        return str(path)
+    return release.repo_relative(path) or str(path)
 
 
 def git_identity():
@@ -254,12 +266,18 @@ def refusal_target_complaint(row, deltas):
     three queries and misspells one of them is a row with a typo in it, and the
     two other refusals do not make the typo true.
 
-    Амандамент №8 т. 1: the measurement is over the RAW `покрива`. Filtering it
-    through `delta_patterns` first meant a pattern with no slash at all —
-    `gate_lot1градина` — vanished before it was measured, and a row whose only
-    content was that word was written as a refusal about nothing. An empty
-    `покрива` under a „не“ is refused for the same reason: the pen writes
-    refusals by name, and there is no name here."""
+    Амандамент №8 т. 1: the measurement is over the RAW `покрива`, through
+    `release.patterns_that_cover` and `release.refusal_pattern_reason` — the two
+    functions the gate itself uses. Filtering the patterns down to the readable
+    ones first meant a pattern with no slash at all — `gate_lot1градина` —
+    vanished before it was measured, and a row whose only content was that word
+    was written as a refusal about nothing. An empty `покрива` under a „не“ is
+    refused for the same reason: the pen writes refusals by name, and there is
+    no name here.
+
+    Only a DELTA row reaches this question (амандамент №9 т. 5); the caller
+    decides the class, so a „не“ on Q7 is not measured against queries it was
+    never about."""
     if not row["covers"]:
         return (u"ред %s отказва заявка, която не съществува: %s"
                 % (row["id"], release.REFUSAL_EMPTY))
@@ -288,13 +306,27 @@ def refusable_deltas_once(cache):
     return cache["deltas"], cache["complaint"]
 
 
-def decide_row(lines, row, decision, today):
-    """Rewrite the `решение` and `дата` fields of one row, in place."""
+def decide_row(lines, row, decision, today, body_sha=None):
+    """Rewrite `решение`, `дата` — and `тяло` — of one row, in place.
+
+    Returns how many of the two REQUIRED fields it rewrote; the caller refuses a
+    row that does not carry both. `body_sha` is the digest of the artefact body
+    this signature is being given to (амандамент №9 т. 7): the field is replaced
+    where the row already has it and inserted after the row's last field where it
+    does not, in the bullet style that row is written in.
+
+    The scan stops at the next heading: an inserted line has to land inside the
+    row it belongs to, and a queue with two headings of one id is a queue this
+    tool must not spread a decision across.
+    """
     changed = 0
     inside = False
+    last_field, body_at, style = None, None, u"- **%s:** %s"
     for i, line in enumerate(lines):
         head = release.QUEUE_HEAD.match(line)
         if head:
+            if inside:
+                break
             inside = head.group(1) == row["id"]
             continue
         if not inside:
@@ -303,6 +335,9 @@ def decide_row(lines, row, decision, today):
         if not pair:
             continue
         key = pair.group(1).strip()
+        if last_field is None and u"**" not in line:
+            style = u"- %s: %s"
+        last_field = i
         if key == release.FIELD_DECISION:
             lines[i] = re.sub(r":(\*\*)?\s*.*$", lambda m: ":%s %s"
                               % (m.group(1) or "", decision), line)
@@ -311,7 +346,30 @@ def decide_row(lines, row, decision, today):
             lines[i] = re.sub(r":(\*\*)?\s*.*$", lambda m: ":%s %s"
                               % (m.group(1) or "", today), line)
             changed += 1
+        elif key == release.FIELD_BODY:
+            body_at = i
+    if body_sha:
+        written = style % (release.FIELD_BODY, body_sha)
+        if body_at is not None:
+            lines[body_at] = written
+        elif last_field is not None:
+            lines.insert(last_field + 1, written)
     return changed
+
+
+def duplicate_field_complaint(row):
+    """Why this row may not be decided at all — or None (амандамент №9 т. 2).
+
+    A field written twice is read by the parser as its last value and by the
+    human as its first; the gate blocks such a row, and the pen will not put a
+    decision into one either — `decide_row` would rewrite BOTH lines and the
+    queue would then say something neither of them said."""
+    doubled = [f for f in (row.get("duplicates") or []) if f in release.KNOWN_FIELDS]
+    if not doubled:
+        return None
+    return (u"ред %s носи два пъти полето „%s“ — един ред, едно решение; "
+            u"оправи опашката с ръка и пусни пак"
+            % (row["id"], u"“, „".join(doubled)))
 
 
 def main(argv):
@@ -371,6 +429,10 @@ def main(argv):
     delta_cache = {}
     anchor_notes = []
     for row, decision in plan:
+        complaint = duplicate_field_complaint(row)
+        if complaint:
+            refusals.append(complaint)
+            continue
         if row["decision"] == NO:
             refusals.append(u"ред %s е ОТКАЗАН на %s — „не“ е терминално "
                             u"(план v2 §0.6)" % (row["id"], row["date"] or u"—"))
@@ -382,7 +444,11 @@ def main(argv):
         if row["decision"] == decision:
             touched.append(u"ред %s вече е %r — нищо не се променя" % (row["id"], decision))
             continue
-        if decision == NO:
+        kind = release.row_class(row)
+        if decision == NO and kind == release.CLASS_DELTA:
+            # The refusal rules of амандаменти 6–8 are rules about DELTAS
+            # (амандамент №9 т. 5): a „не“ on a question or on an artefact
+            # names no query and is not asked to.
             complaint = refusal_scope_complaint(row)
             if complaint:
                 refusals.append(complaint)
@@ -397,32 +463,50 @@ def main(argv):
             if complaint:
                 refusals.append(complaint)
                 continue
-        if decide_row(lines, row, decision, today) < 2:
+
+        # The artefact is prepared BEFORE the row is rewritten: the digest of
+        # the body this signature is given to belongs on the row, and the row is
+        # written once (амандамент №9 т. 7).
+        target = row["artefact"] if decision == YES else u""
+        body, note, body_sha = None, None, None
+        if target:
+            if target not in table:
+                refusals.append(u"ред %s сочи непознат артефакт %r (познати: %s)"
+                                % (row["id"], target, u", ".join(sorted(table))))
+                continue
+            complaint, body = apply_signature(table[target])
+            if complaint:
+                refusals.append(u"ред %s: %s" % (row["id"], complaint))
+                continue
+            if body is not None:
+                body, note, anchor_complaint = with_queue_anchor(table[target], body)
+                if anchor_complaint:
+                    refusals.append(u"ред %s: %s" % (row["id"], anchor_complaint))
+                    continue
+            # `body is None` means the artefact already carries the signature;
+            # the bytes on disk are then the body this row is about.
+            source = body if body is not None else \
+                (REPO_ROOT / table[target]).read_text(encoding="utf-8")
+            try:
+                body_sha = release.body_digest(source)
+            except (ValueError, OSError) as exc:
+                refusals.append(u"ред %s: тялото на %s не може да се смята — %s"
+                                % (row["id"], table[target], exc))
+                continue
+        if decide_row(lines, row, decision, today, body_sha) < 2:
             refusals.append(u"ред %s: липсва „%s“ или „%s“ в тялото на реда"
                             % (row["id"], release.FIELD_DECISION, release.FIELD_DATE))
             continue
-        touched.append(u"ред %s → %s (%s)" % (row["id"], decision, today))
-        if decision != YES:
-            continue
-        target = row["artefact"]
+        touched.append(u"ред %s → %s (%s) · клас %s" % (row["id"], decision, today, kind))
         if not target:
             continue
-        if target not in table:
-            refusals.append(u"ред %s сочи непознат артефакт %r (познати: %s)"
-                            % (row["id"], target, u", ".join(sorted(table))))
-            continue
-        complaint, body = apply_signature(table[target])
-        if complaint:
-            refusals.append(u"ред %s: %s" % (row["id"], complaint))
-            continue
         if body is not None:
-            body, note, anchor_complaint = with_queue_anchor(table[target], body)
-            if anchor_complaint:
-                refusals.append(u"ред %s: %s" % (row["id"], anchor_complaint))
-                continue
             if note:
                 anchor_notes.append(note)
             pending_writes.append((REPO_ROOT / table[target], body))
+        if body_sha:
+            touched.append(u"ред %s · тяло %s → %s"
+                           % (row["id"], body_sha[:12], table[target]))
         signed_files.append(table[target])
 
     if refusals:

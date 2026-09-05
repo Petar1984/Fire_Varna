@@ -66,6 +66,55 @@ the reference THE QUEUE WAS WRITTEN AGAINST forward, so a hand-assembled body
 with an empty `refused` list is caught by the bytes rather than by its own
 bookkeeping.
 
+THE QUEUE IS THE BLOB, NOT THE WORKTREE (амандамент №9 т. 1). A push publishes
+commits, so the rows this gate judges come out of `blob_at("HEAD", <опашка>)`
+like every other body here. Reading the file on disk let all seven gates go
+green over a commit that carried NOT ONE signed row: the pen writes the
+decisions into the worktree, the table read them there, and the blob the push
+would have sent still said `pending`. A queue whose worktree differs from its
+blob is blocked in the same words the signed artefacts get — „работното дърво
+носи друго тяло от блоба на HEAD (пушът праща блоба)“.
+
+AND A „да“ IS WORTH THE HAND THAT WROTE IT (амандамент №9 т. 2). Проверка 7 has
+always asked who introduced a signature and who introduced a digest; nobody
+asked who introduced the WORD „да“. `yes_row_authorship` asks it per row:
+`git log -S` over the verbatim block of the row (`## <id>` up to the next
+heading) has to name a commit of Petar's, or the row is an agent's permission
+with a human's name on the file. The same rule is applied by `run_gates`
+проверка 7, from this function, so the two readers cannot drift.
+
+AND THE MACHINE READS ONLY WHAT THE HUMAN SEES (амандамент №9 т. 2). Markdown
+hides two kinds of region — a ``` fence and an `<!-- -->` comment — and the old
+parser read rows out of both. A „да“ inside a comment is invisible to the man
+who signs the file and authoritative to the gate that reads it, which is the
+whole attack. `parse_queue_text` now skips those regions, and a decision found
+inside one BLOCKS: an invisible answer is not an answer, and hiding one is not
+a typo. A field written twice in one row (`решение:`, `покрива:`) blocks for the
+neighbouring reason — the parser would keep the last of them and the human would
+read the first.
+
+THREE CLASSES OF ROW, ONE QUEUE (амандамент №9 т. 5). Not every row is about a
+delta, and the refusal rules of амандаменти 6–8 are about deltas only:
+
+  * „въпрос“ — no `артефакт` and no `покрива` (Q7 „break-glass: вън“): „не“ is
+    a decision, it is recorded, and it never enters the release;
+  * „артефакт“ — an `артефакт` and no `покрива` (the baseline, the codes): „не“
+    means the artefact is NOT signed, and the release then blocks on the
+    artefact, not on a pattern;
+  * „делта“ — a `покрива` field (present, even empty): the rules of амандаменти
+    6–8 in full, and an empty `покрива` under a „не“ is still the block it was.
+
+THE SIGNATURE PROTECTS THE WHOLE BODY (амандамент №9 т. 7). This gate binds
+fields — the reference digest, the candidate digest, the anchors — and a rewrite
+that touches none of them used to pass it and be caught by проверка 7 alone. So
+`gates.sign` writes the digest of the body it signed onto the row (`- **тяло:**
+<sha256>`, the values without the signature fields) and check 6 recompares it
+with the blob at HEAD. A body that no longer matches has been rewritten after
+the signature; that is Petar's freeze only when his own commit is the newest on
+that path — the rule проверка 7 applies to the same question, now applied here
+too, which is what makes `--freeze` (it reads this verdict, never проверка 7)
+stop as well.
+
 THAT ANCHOR IS WRITTEN DOWN, NOT GUESSED (амандамент №7 т. 3). The reference
 the queue was written against is named explicitly in
 `expectations._meta.queue_reference` — commit, path and digest — by the two
@@ -203,6 +252,76 @@ def introduced_by(rel, needle):
     return (parts[0], parts[1] if len(parts) > 1 else "")
 
 
+def introduced_by_text(rel, needle):
+    """(hash, author) of the OLDEST commit that changed the count of `needle`.
+
+    The twin of `introduced_by`, asked from the other end. For a signature there
+    is one occurrence and the question is „who put it there last“; for the block
+    of a queue row the question is „who wrote this text FIRST“, and the oldest
+    commit the pickaxe reports is that hand. Fail-closed on purpose: a block an
+    agent wrote, Petar deleted and an agent wrote again names the agent.
+
+    None = no commit carries the text at all — it lives in the worktree, and the
+    worktree is nobody's word."""
+    out = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-S" + needle,
+                          "--format=%H\t%an", "--", rel],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise ValueError("git log -S -- %s: %s"
+                         % (rel, out.stderr.decode("utf-8", "replace").strip()))
+    lines = out.stdout.decode("utf-8", "replace").splitlines()
+    if not lines:
+        return None
+    parts = lines[-1].split("\t", 1)
+    return (parts[0], parts[1] if len(parts) > 1 else "")
+
+
+def newest_commit_on(rel):
+    """(hash, author) of the NEWEST commit that touched a path — None if none.
+
+    One truth for the two gates that ask the same question about a signed body:
+    check 6 here (амандамент №9 т. 7) and `run_gates` проверка 7 (амандамент №5
+    т. 3), which calls this one."""
+    out = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-1",
+                          "--format=%H\t%an", "--", rel],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise ValueError("git log -1 -- %s: %s"
+                         % (rel, out.stderr.decode("utf-8", "replace").strip()))
+    lines = out.stdout.decode("utf-8", "replace").splitlines()
+    if not lines:
+        return None
+    parts = lines[0].split("\t", 1)
+    return (parts[0], parts[1] if len(parts) > 1 else "")
+
+
+def repo_relative(path):
+    """The path as the repository names it, or None when it is outside it.
+
+    Both ends are resolved before they are compared: `--queue` may arrive
+    relative to the current directory, and a gate that judges the blob of a path
+    has to know the name git keeps it under."""
+    try:
+        return str(pathlib.Path(path).resolve()
+                   .relative_to(pathlib.Path(str(REPO_ROOT)).resolve())).replace("\\", "/")
+    except (ValueError, OSError):
+        return None
+
+
+def worktree_differs(rel):
+    """True when `git status --porcelain -- <rel>` says anything at all.
+
+    Modified, staged, untracked — all three mean the same thing for a gate that
+    judges what a push sends: the bytes on this disk are not the bytes in the
+    commit."""
+    out = subprocess.run(["git", "-C", str(REPO_ROOT), "status", "--porcelain", "--", rel],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise ValueError("git status --porcelain -- %s: %s"
+                         % (rel, out.stderr.decode("utf-8", "replace").strip()))
+    return bool(out.stdout.decode("utf-8", "replace").strip())
+
+
 def commit_author(commit):
     """The author of one commit — None when git cannot resolve it at all.
 
@@ -230,16 +349,52 @@ def load_engine():
     return module
 
 
+SIGNATURE_FIELD = "signed_by"
+
+
 def signed_by_of(doc):
     """`signed_by` wherever the artefact keeps it — top level or inside `_meta`."""
     if not isinstance(doc, dict):
         return None
-    if "signed_by" in doc:
-        return doc.get("signed_by")
+    if SIGNATURE_FIELD in doc:
+        return doc.get(SIGNATURE_FIELD)
     meta = doc.get("_meta")
     if isinstance(meta, dict):
-        return meta.get("signed_by")
+        return meta.get(SIGNATURE_FIELD)
     return None
+
+
+def body_without_signature(doc):
+    """The artefact body with the SIGNATURE field removed, wherever it lives.
+
+    The digest of a body has to be the same number before and after the act of
+    signing: the pen computes it while it prepares the buffer (compute first,
+    write last) and the gate recomputes it from the blob afterwards. Dropping
+    `signed_by` — the one field `gates.sign` writes — is what makes those two
+    numbers the same."""
+    if not isinstance(doc, dict):
+        return doc
+    out = dict(doc)
+    out.pop(SIGNATURE_FIELD, None)
+    meta = out.get("_meta")
+    if isinstance(meta, dict):
+        meta = dict(meta)
+        meta.pop(SIGNATURE_FIELD, None)
+        out["_meta"] = meta
+    return out
+
+
+def body_digest(raw):
+    """sha256 of an artefact BODY — its values, without the signature field.
+
+    Амандамент №9 т. 7. Canonical (sorted keys, no spaces) on purpose: the
+    number is about what the document SAYS, so re-indenting a signed body is not
+    a rewrite and changing one measurement inside it is. `raw` is bytes (a blob)
+    or text (the buffer the pen is about to write)."""
+    text = raw.decode("utf-8") if isinstance(raw, bytes) else raw
+    canonical = json.dumps(body_without_signature(json.loads(text)),
+                           ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return digest(canonical.encode("utf-8"))
 
 
 # -------------------------------------------------------------------- the queue
@@ -261,6 +416,20 @@ FIELD_COVERS = u"покрива"
 # the freeze rewrites the body after the signature, and the number he recorded
 # is what says he saw the result (амандамент №5 т. 3).
 FIELD_DIGEST = u"дайджест"
+# The digest of the BODY the pen signed — the values without the signature
+# field (амандамент №9 т. 7). Check 6 recompares it with the blob at HEAD.
+FIELD_BODY = u"тяло"
+
+# Every field this parser understands. A field written twice in one row is a
+# block (амандамент №9 т. 2): the parser keeps the last of them, a human reads
+# the first, and „решение: не“ under „решение: да“ is that difference weaponised.
+KNOWN_FIELDS = (FIELD_ID, FIELD_ASK, FIELD_DECISION, FIELD_DATE, FIELD_ARTEFACT,
+                FIELD_COVERS, FIELD_DIGEST, FIELD_BODY)
+
+# The three classes of row (амандамент №9 т. 5).
+CLASS_QUESTION = u"въпрос"
+CLASS_ARTEFACT = u"артефакт"
+CLASS_DELTA = u"делта"
 
 
 def find_queue(explicit):
@@ -283,13 +452,72 @@ def parse_queue(path):
     return parse_queue_text(path.read_text(encoding="utf-8"))
 
 
+# The two regions markdown does not show: a fenced block and an HTML comment.
+FENCE = re.compile(r"^\s*(?:```|~~~)")
+COMMENT_OPEN, COMMENT_CLOSE = u"<!--", u"-->"
+# A `решение` field, with or without the bullet and the emphasis — what a hidden
+# region may not contain (амандамент №9 т. 2).
+DECISION_LINE = re.compile(r"(?:\*\*)?\s*%s\s*:" % re.escape(FIELD_DECISION))
+
+
+def visible_and_hidden(text):
+    """([(n, line)], [(n, line)]) — what a reader sees, and what markdown hides.
+
+    Амандамент №9 т. 2: the machine reads only what the human reads. A ```/~~~
+    fence and an `<!-- -->` comment are invisible in every markdown viewer and
+    in the diff Petar signs off on, so a row written inside one is a row he
+    cannot see. Both are tracked line by line rather than with a regex over the
+    whole text, because a queue is edited by hand and an unclosed fence must
+    swallow the rest of the file rather than reopen the parser to it.
+
+    A line that merely CONTAINS `<!--` is hidden whole. That over-reaches by the
+    few characters in front of the marker, and it over-reaches fail-closed: the
+    alternative is a parser that reads half a line the reader sees as prose."""
+    visible, hidden = [], []
+    in_fence, in_comment = False, False
+    for n, line in enumerate(text.splitlines(), 1):
+        if in_comment:
+            hidden.append((n, line))
+            if COMMENT_CLOSE in line:
+                in_comment = False
+            continue
+        if in_fence:
+            hidden.append((n, line))
+            if FENCE.match(line):
+                in_fence = False
+            continue
+        if FENCE.match(line):
+            hidden.append((n, line))
+            in_fence = True
+            continue
+        if COMMENT_OPEN in line:
+            hidden.append((n, line))
+            if COMMENT_CLOSE not in line.split(COMMENT_OPEN, 1)[1]:
+                in_comment = True
+            continue
+        visible.append((n, line))
+    return visible, hidden
+
+
+def hidden_decisions(text):
+    """[(n, line)] — every `решение:` written where the human cannot see it.
+
+    Not a parse: a complaint. The parser above simply ignores these lines, which
+    is what makes the hidden row powerless; this function is what makes it LOUD,
+    so a queue that carries one is blocked instead of being quietly shorter than
+    it looks."""
+    return [(n, line) for n, line in visible_and_hidden(text)[1]
+            if DECISION_LINE.search(line)]
+
+
 def parse_queue_text(text):
     """The rows of a queue, as data, from the text of one.
 
-    Проверка 7 reads the queue out of the BLOB of a commit rather than off the
-    disk (амандамент №7 т. 2): a digest is Petar's word only where his commit
-    put it, and the worktree is nobody's word. Both readers share this parser,
-    so the blob and the file can never be read by two different rules.
+    Проверка 7 and the release gate both read the queue out of the BLOB of a
+    commit rather than off the disk (амандамент №7 т. 2, №9 т. 1): a decision is
+    Petar's word only where his commit put it, and the worktree is nobody's
+    word. Both readers share this parser, so the blob and the file can never be
+    read by two different rules.
 
     The queue is MARKDOWN because a human reads it and signs it; the shape is
     fixed so a machine can read it too (план v2 §0.6):
@@ -301,23 +529,51 @@ def parse_queue_text(text):
         - **дата:** —
         - **артефакт:** manifest_base_p7
         - **покрива:** gate_lot1v_v/*, gate_m7_bare/*
+
+    Only the VISIBLE lines are read (амандамент №9 т. 2) — see
+    `visible_and_hidden`. Each row also carries:
+
+      * `block` — its verbatim text, from `## <id>` down to its LAST field line,
+        every line in between included whether the reader sees it or not. That
+        is the needle `yes_row_authorship` gives `git log -S`, so a line slipped
+        between the fields of a row moves the authorship of the whole row to
+        that hand. It stops at the last field on purpose: a note appended after
+        a row is not part of the row, and a block that ran to the next heading
+        would let the next hand that touches the file inherit the row;
+      * `duplicates` — the fields written twice in it;
+      * `has_covers` / `has_artefact` — whether the FIELD is there at all, which
+        is what decides the class of the row: `покрива:` with nothing after it is
+        a delta row that refuses nothing, not a question.
     """
+    lines = text.splitlines()
+    visible = set(n for n, _ in visible_and_hidden(text)[0])
     rows, current = [], None
-    for line in text.splitlines():
+
+    def close(row):
+        row["block"] = u"\n".join(lines[row["start"] - 1:row["last"]])
+        rows.append(row)
+
+    for n, line in enumerate(lines, 1):
+        if n not in visible:
+            continue
         head = QUEUE_HEAD.match(line)
         if head:
             if current:
-                rows.append(current)
+                close(current)
             current = {"id": head.group(1), "title": (head.group(2) or "").strip(),
-                       "fields": {}}
+                       "fields": {}, "duplicates": [], "start": n, "last": n}
             continue
         if current is None:
             continue
         pair = QUEUE_KEY.match(line)
         if pair:
-            current["fields"][pair.group(1).strip()] = pair.group(2).strip()
+            key = pair.group(1).strip()
+            if key in current["fields"] and key not in current["duplicates"]:
+                current["duplicates"].append(key)
+            current["fields"][key] = pair.group(2).strip()
+            current["last"] = n
     if current:
-        rows.append(current)
+        close(current)
     out = []
     for row in rows:
         fields = row["fields"]
@@ -331,7 +587,69 @@ def parse_queue_text(text):
             "artefact": (fields.get(FIELD_ARTEFACT) or "").strip(),
             "covers": covers,
             "digest": (fields.get(FIELD_DIGEST) or "").strip(),
+            "body": (fields.get(FIELD_BODY) or "").strip(),
+            "block": row["block"],
+            "duplicates": list(row["duplicates"]),
+            "has_covers": FIELD_COVERS in fields,
+            "has_artefact": FIELD_ARTEFACT in fields,
         })
+    return out
+
+
+def row_class(row):
+    """„въпрос“ · „артефакт“ · „делта“ — амандамент №9 т. 5.
+
+    The refusal rules of амандаменти 6–8 („не“ names an exact query, a refusal
+    that reaches nothing blocks) are rules about DELTAS, and applying them to
+    every row made Q7 („break-glass: вън“) unanswerable: a political „не“ with
+    no `покрива` was read as a refusal about nothing and held the delivery.
+
+    The class is decided by the FIELDS, not by their values: `покрива:` with
+    nothing after it is a delta row whose refusal is empty — still a block —
+    while a row with no `покрива` line at all was never about a delta. A row
+    built by hand (a fixture, a caller that never parsed a file) has no
+    `has_covers`, and then the parsed list answers for it."""
+    if row.get("has_covers", bool(row["covers"])):
+        return CLASS_DELTA
+    if row.get("has_artefact", bool(row.get("artefact"))) and row.get("artefact"):
+        return CLASS_ARTEFACT
+    return CLASS_QUESTION
+
+
+def yes_row_authorship(queue_rel, rows):
+    """Complaints for every „да“ no commit of Petar's ever wrote.
+
+    Амандамент №9 т. 2. Проверка 7 asked who introduced a SIGNATURE and who
+    introduced a DIGEST; nobody asked who introduced the word „да“. An agent
+    that edits the queue, commits it and lets Petar commit anything at all
+    afterwards used to hand itself every permission in the file.
+
+    The needle is the verbatim block of the row, so the question is not „did the
+    string да ever appear“ but „whose commit brought THIS row, as it stands, into
+    the file“ — and a line somebody else slipped into the block makes the block a
+    different text with a different author. `git log -S` per row costs one git
+    call per „да“; the queue of a delivery is a dozen rows, and the price of the
+    other answer was measured in A.2-10."""
+    out = []
+    for row in rows:
+        if row["decision"] != YES:
+            continue
+        block_text = row.get("block")
+        if not block_text:
+            out.append(u"ред %s: „да“ без тяло на реда — авторството не може да "
+                       u"се провери" % row["id"])
+            continue
+        try:
+            origin = introduced_by_text(queue_rel, block_text)
+        except (ValueError, OSError) as exc:
+            out.append(u"ред %s: авторството не можа да се измери: %s" % (row["id"], exc))
+            continue
+        if origin is None:
+            out.append(u"ред %s: „да“, което не е въведено от нито един комит — "
+                       u"пушът праща блоба, не работното дърво" % row["id"])
+        elif origin[1] != HUMAN_AUTHOR:
+            out.append(u"ред %s: „да“ е въведено от %r в %s, а подписва само %s"
+                       % (row["id"], origin[1], origin[0][:7], HUMAN_AUTHOR))
     return out
 
 
@@ -378,21 +696,6 @@ def wildcard_covers(covers):
         if sep and what == "*":
             out.append(pattern)
     return out
-
-
-def delta_patterns(covers):
-    """The `покрива` patterns that speak about a DELTA (`кофа/заявка`).
-
-    A row may also carry a word that names no comparison at all — an artefact,
-    a note. Амандамент №7 т. 1 asks whether a refusal reaches a delta, and only
-    these patterns can, so only these are measured.
-
-    For a „да“ this filter is a convenience. For a „не“ it was a hole: a
-    pattern that falls out here (`gate_lot1градина`, no slash) used to leave
-    the row with nothing to measure and the row was then skipped as „not about
-    deltas“. Амандамент №8 т. 1 measures a refusal over the RAW `покрива`
-    instead, and `refusal_pattern_reason` says why each pattern failed."""
-    return [pattern for pattern in covers if "/" in pattern]
 
 
 # Why one `покрива` pattern of a „не“ row refuses nothing (амандамент №8 т. 1).
@@ -703,23 +1006,34 @@ def refusals_that_cover_nothing(rows, used, reached):
     with no slash (`gate_lot1градина`) is named as malformed instead of being
     filtered away before anybody looks — and a „не“ with an empty `покрива` is
     named too, because refusing nothing at all is the same silence.
-    """
-    if reached is None:
-        return []
+
+    ONLY A DELTA ROW IS ASKED (амандамент №9 т. 5): a „не“ on a question or on
+    an artefact is a decision about something that is not a query, and the
+    release answers it elsewhere (by the artefact, or not at all).
+
+    THE UNCONDITIONAL REASONS ARE GIVEN EVEN WITHOUT AN ANCHOR (амандамент №9
+    т. 3). `reached is None` means the comparison against the queue's reference
+    never happened, so „this pattern reached nothing“ cannot be said — but „this
+    pattern is not a query at all“ and „there is no pattern“ are properties of
+    the row itself, and a row that is malformed on its face is named whether or
+    not the anchor could be read."""
     out = []
     for row in rows:
-        if row["decision"] != NO:
+        if row["decision"] != NO or row_class(row) != CLASS_DELTA:
             continue
         if not row["covers"]:
             out.append(u"ред %s отказва заявка, която не съществува: %s"
                        % (row["id"], REFUSAL_EMPTY))
             continue
-        hit = set(used.get(row["id"]) or ()) | set(reached.get(row["id"]) or ())
+        hit = set(used.get(row["id"]) or ()) | set((reached or {}).get(row["id"]) or ())
         for pattern in row["covers"]:
             reason = refusal_pattern_reason(pattern, hit)
-            if reason:
-                out.append(u"ред %s отказва заявка, която не съществува: %s — %s"
-                           % (row["id"], pattern, reason))
+            if reason is None:
+                continue
+            if reason == REFUSAL_UNREACHED and reached is None:
+                continue
+            out.append(u"ред %s отказва заявка, която не съществува: %s — %s"
+                       % (row["id"], pattern, reason))
     return out
 
 
@@ -796,7 +1110,8 @@ def run(queue_override=None):
             block(u"липсва %s (%s)" % (rel, name))
             continue
         try:
-            doc = json.loads(blob_at("HEAD", rel).decode("utf-8"))
+            raw = blob_at("HEAD", rel)
+            doc = json.loads(raw.decode("utf-8"))
         except (ValueError, OSError) as exc:
             block(u"%s (%s): няма го в блоба на HEAD — %s" % (rel, name, exc))
             continue
@@ -809,7 +1124,7 @@ def run(queue_override=None):
             block(u"%s: работното дърво носи друго тяло от блоба на HEAD "
                   u"(пушът праща блоба)" % rel)
         signature = signed_by_of(doc)
-        artefacts[name] = {"rel": rel, "doc": doc, "signed_by": signature}
+        artefacts[name] = {"rel": rel, "doc": doc, "signed_by": signature, "blob": raw}
         if coverage.is_signed_by_petar(signature):
             say(u"%s: подписан ✓" % rel)
         else:
@@ -910,9 +1225,38 @@ def run(queue_override=None):
     elif not queue_path.exists():
         block(u"опашката %s липсва" % queue_path)
     else:
-        rows = parse_queue(queue_path)
-        say(u"опашка: %s — %d реда" % (queue_path.name, len(rows)))
+        # THE BLOB, never the file (амандамент №9 т. 1). The pen writes the
+        # decisions into the worktree; what a push publishes is the commit, and
+        # a gate that reads the disk goes green over a commit with no signed row
+        # in it at all.
+        queue_rel = repo_relative(queue_path)
+        queue_text = None
+        if queue_rel is None:
+            block(u"опашката %s е извън това репо — гейтът съди блоба на HEAD"
+                  % queue_path)
+        else:
+            try:
+                queue_text = blob_at("HEAD", queue_rel).decode("utf-8")
+            except (ValueError, OSError, UnicodeDecodeError) as exc:
+                block(u"%s: няма я в блоба на HEAD — %s" % (queue_rel, exc))
+        if queue_text is not None:
+            if worktree_differs(queue_rel):
+                block(u"%s: работното дърво носи друго тяло от блоба на HEAD "
+                      u"(пушът праща блоба)" % queue_rel)
+            rows = parse_queue_text(queue_text)
+            say(u"опашка: %s — %d реда (блобът на HEAD)"
+                % (queue_path.name, len(rows)))
+            # A decision written where the reader cannot see it (амандамент №9
+            # т. 2). The parser already ignores it; this is what makes it loud.
+            for line_no, line in hidden_decisions(queue_text):
+                block(u"%s ред %d: „решение“ в скрит регион (коментар или code "
+                      u"fence) — машината чете само каквото човекът вижда: %s"
+                      % (queue_rel, line_no, line.strip()[:60]))
         for row in rows:
+            for field in row.get("duplicates") or []:
+                if field in KNOWN_FIELDS:
+                    block(u"ред %s: полето „%s“ е написано два пъти — един ред, "
+                          u"едно решение" % (row["id"], field))
             if row["decision"] not in DECISIONS:
                 block(u"ред %s: решение %r — само да/не/pending"
                       % (row["id"], row["decision"]))
@@ -927,6 +1271,63 @@ def run(queue_override=None):
                         artefacts[name]["signed_by"]):
                     block(u"ред %s е „да“, а %s не носи подписа"
                           % (row["id"], table[name]))
+            # The two classes that are not about deltas say so out loud, so a
+            # „не“ Petar wrote on a question is visible as a decision rather
+            # than as silence (амандамент №9 т. 5).
+            if row["decision"] == NO:
+                kind = row_class(row)
+                if kind == CLASS_QUESTION:
+                    say(u"ред %s: „не“ по въпрос — решението е записано, в "
+                        u"release не влиза" % row["id"])
+                elif kind == CLASS_ARTEFACT:
+                    say(u"ред %s: „не“ по артефакта %r — артефактът не се "
+                        u"подписва (release съди по него)"
+                        % (row["id"], row["artefact"]))
+
+        # Whose hand wrote the „да“ (амандамент №9 т. 2).
+        if queue_rel is not None and queue_text is not None:
+            for complaint in yes_row_authorship(queue_rel, rows):
+                block(u"%s: %s" % (queue_rel, complaint))
+
+        # …and what the signature was given to (амандамент №9 т. 7): the digest
+        # of the BODY, recorded on the row by the pen, recompared with the blob.
+        for row in rows:
+            want = row.get("body")
+            entry = artefacts.get(row["artefact"]) if row["artefact"] else None
+            if not want or entry is None:
+                continue
+            try:
+                got = body_digest(entry["blob"])
+            except (ValueError, UnicodeDecodeError) as exc:
+                block(u"%s: тялото не може да се смята — %s" % (entry["rel"], exc))
+                continue
+            if got == want:
+                say(u"%s: тялото %s = дайджеста на ред %s ✓"
+                    % (entry["rel"], got[:12], row["id"]))
+                continue
+            # The body moved after the signature. That is the freeze — which
+            # Petar commits (амандамент №6) — or it is a rewrite. The newest
+            # commit on the path is what tells the two apart, exactly as
+            # проверка 7 tells them apart; the difference is that `--freeze`
+            # reads THIS verdict and never reads проверка 7.
+            try:
+                newest = newest_commit_on(entry["rel"])
+            except (ValueError, OSError) as exc:
+                newest = None
+                say(u"%s: последният комит не можа да се прочете — %s"
+                    % (entry["rel"], exc))
+            if newest is not None and newest[1] == HUMAN_AUTHOR:
+                say(u"%s: тялото %s ≠ дайджеста на ред %s (%s) — пренаписано "
+                    u"след подписа, но последният комит по него е %s на %s "
+                    u"(замразяването)"
+                    % (entry["rel"], got[:12], row["id"], want[:12],
+                       newest[0][:7], newest[1]))
+            else:
+                block(u"%s: тялото %s ≠ дайджеста %s на ред %s — подписаното "
+                      u"тяло е пренаписано (последен комит %s на %r)"
+                      % (entry["rel"], got[:12], want[:12], row["id"],
+                         (newest[0][:7] if newest else u"—"),
+                         (newest[1] if newest else u"—")))
 
     # {row id: {pattern that covered a live delta}} — the id half answers the
     # stale-permission rule below, the patterns answer амандамент №8 т. 3.

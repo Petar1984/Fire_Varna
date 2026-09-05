@@ -1761,9 +1761,10 @@ class RefusalSurvivesTheFreezeTest(unittest.TestCase):
         self.assertEqual(len(complaints), 1, complaints)
         self.assertIn(u"gate_lot1/Градината", complaints[0])
         self.assertNotIn(u"gate_lot1/градина —", complaints[0])
-        # An empty `покрива` under a „не“ refuses nothing and says so.
-        empty = release.refusals_that_cover_nothing(
-            [self.row("Q7", u"не", [])], {}, {})
+        # An empty `покрива` FIELD under a „не“ refuses nothing and says so —
+        # the row is about deltas (it has the field), and it names none.
+        blank = dict(self.row("Q7", u"не", []), has_covers=True)
+        empty = release.refusals_that_cover_nothing([blank], {}, {})
         self.assertEqual(len(empty), 1, empty)
         self.assertIn("Q7", empty[0])
         self.assertIn(release.REFUSAL_EMPTY, empty[0])
@@ -1833,6 +1834,179 @@ class RefusalSurvivesTheFreezeTest(unittest.TestCase):
         note = sign.refusal_target_complaint(self.row("Q7", u"не", ["baseline"]), deltas)
         self.assertIsNotNone(note)
         self.assertIn("baseline", note)
+
+    # ------------- амандамент №9: the parser, the classes, the body ----------
+
+    def test_the_parser_reads_only_what_the_reader_sees(self):
+        """Амандамент №9 т. 2: a row inside a comment or a fence is not a row.
+
+        A „да“ written between `<!--` and `-->` is invisible in every markdown
+        viewer and in the diff Petar signs off on, and it was authoritative for
+        the gate that read the file — one queue, two readings, and the machine's
+        was the one nobody could see. It is skipped now, and `hidden_decisions`
+        makes the attempt loud instead of silently shorter."""
+        from gates import release
+        text = (u"## R1 · видим\n"
+                u"- **id:** R1\n"
+                u"- **решение:** pending\n"
+                u"- **покрива:** gate_lot1/градина\n"
+                u"\n"
+                u"<!--\n"
+                u"## R99 · скрит\n"
+                u"- **id:** R99\n"
+                u"- **решение:** да\n"
+                u"- **покрива:** gate_lot1/*\n"
+                u"-->\n"
+                u"\n"
+                u"```\n"
+                u"## R98 · в ограда\n"
+                u"- **решение:** да\n"
+                u"```\n")
+        rows = release.parse_queue_text(text)
+        self.assertEqual([row["id"] for row in rows], ["R1"])
+        self.assertEqual(rows[0]["decision"], release.PENDING)
+        hidden = release.hidden_decisions(text)
+        self.assertEqual(len(hidden), 2, hidden)
+        self.assertEqual([n for n, _ in hidden], [9, 15])
+        # A one-line comment closes itself: the line after it is visible again.
+        self.assertEqual([row["id"] for row in release.parse_queue_text(
+            u"<!-- бележка -->\n## R2 · видим\n- **решение:** да\n")], ["R2"])
+        self.assertEqual(release.hidden_decisions(u"<!-- бележка -->\n"), [])
+
+    def test_the_block_of_a_row_is_its_verbatim_text(self):
+        """The needle `yes_row_authorship` gives `git log -S`.
+
+        It runs from the heading to the row's LAST FIELD — a note appended
+        afterwards is not part of the row, or the next hand to touch the file
+        would inherit the authorship of every row above it. A line slipped
+        BETWEEN the fields does change the block, and that is the point."""
+        from gates import release
+        text = (u"## R1 · първи\n- **id:** R1\n- **решение:** да\n"
+                u"\n<!-- дописано после -->\n"
+                u"## R2 · втори\n- **id:** R2\n- **решение:** pending\n")
+        rows = release.parse_queue_text(text)
+        self.assertEqual(rows[0]["block"],
+                         u"## R1 · първи\n- **id:** R1\n- **решение:** да")
+        self.assertIn(rows[0]["block"], text)
+        self.assertIn(rows[1]["block"], text)
+        self.assertNotIn(u"R2", rows[0]["block"])
+        # …and an inserted line inside the fields makes it a different text
+        between = release.parse_queue_text(
+            u"## R1 · първи\n- **id:** R1\n<!-- вмъкнато -->\n"
+            u"- **решение:** да\n")[0]
+        self.assertIn(u"вмъкнато", between["block"])
+
+    def test_a_field_written_twice_is_named_by_both_readers(self):
+        """Амандамент №9 т. 2: the parser keeps the last, the human reads the
+        first, and the pen would rewrite both lines at once."""
+        from gates import release, sign
+        rows = release.parse_queue_text(
+            u"## R1 · два пъти\n- **id:** R1\n- **решение:** да\n"
+            u"- **решение:** не\n- **покрива:** gate_lot1/*\n"
+            u"- **покрива:** gate_p7/*\n")
+        self.assertEqual(rows[0]["duplicates"],
+                         [release.FIELD_DECISION, release.FIELD_COVERS])
+        complaint = sign.duplicate_field_complaint(rows[0])
+        self.assertIsNotNone(complaint)
+        self.assertIn("R1", complaint)
+        self.assertIn(release.FIELD_DECISION, complaint)
+        self.assertIsNone(sign.duplicate_field_complaint(
+            release.parse_queue_text(u"## R1\n- **решение:** да\n")[0]))
+
+    def test_the_row_classes_decide_who_is_asked_about_queries(self):
+        """Амандамент №9 т. 5 — the cost the executor named after A.2-9.
+
+        „не“ on Q7 („break-glass: вън“) has no `покрива` and never had: under
+        амандамент №8 that was „a refusal that covers nothing“ and it held the
+        whole delivery. Three classes now: a question, an artefact and a delta,
+        and only the delta is measured against queries."""
+        from gates import release, sign
+        question = {"id": "Q7", "decision": release.NO, "covers": [], "artefact": "",
+                    "date": "2026-09-05", "digest": "", "body": "", "title": "",
+                    "ask": "", "has_covers": False, "has_artefact": False}
+        artefact = dict(question, id="R2", artefact="baseline", has_artefact=True)
+        delta = dict(question, id="R9", covers=[u"gate_lot1/градина"],
+                     has_covers=True)
+        blank = dict(question, id="R8", has_covers=True)
+        self.assertEqual(release.row_class(question), release.CLASS_QUESTION)
+        self.assertEqual(release.row_class(artefact), release.CLASS_ARTEFACT)
+        self.assertEqual(release.row_class(delta), release.CLASS_DELTA)
+        self.assertEqual(release.row_class(blank), release.CLASS_DELTA)
+        # Neither the question nor the artefact is accused of refusing nothing.
+        self.assertEqual(release.refusals_that_cover_nothing(
+            [question, artefact], {}, {}), [])
+        # The delta row keeps every rule of амандаменти 6–8.
+        self.assertEqual(len(release.refusals_that_cover_nothing([delta], {}, {})), 1)
+        self.assertEqual(len(release.refusals_that_cover_nothing([blank], {}, {})), 1)
+        # …and the pen asks the query questions of a delta row only.
+        self.assertIsNone(sign.refusal_scope_complaint(question))
+        self.assertIsNotNone(sign.refusal_target_complaint(delta, set()))
+
+    def test_the_unconditional_refusal_reasons_survive_a_missing_anchor(self):
+        """Амандамент №9 т. 3: `reached is None` silenced the whole function.
+
+        „this pattern reached nothing“ cannot be said without the comparison —
+        but „this is not a query at all“ and „there is no pattern“ are
+        properties of the row, and a row that is malformed on its face is named
+        with or without an anchor."""
+        from gates import release
+        malformed = self.row("R9", u"не", [u"gate_lot1градина"])
+        empty = dict(self.row("R8", u"не", []), has_covers=True)
+        typo = self.row("R7", u"не", [u"gate_lot1/Градината"])
+        complaints = release.refusals_that_cover_nothing(
+            [malformed, empty, typo], {}, None)
+        self.assertEqual(len(complaints), 2, complaints)
+        self.assertIn(release.REFUSAL_MALFORMED, complaints[0])
+        self.assertIn(release.REFUSAL_EMPTY, complaints[1])
+        self.assertFalse([c for c in complaints if release.REFUSAL_UNREACHED in c])
+
+    def test_the_body_digest_ignores_the_signature_and_nothing_else(self):
+        """Амандамент №9 т. 7: one number before and after the act of signing.
+
+        The pen computes it while it prepares the buffer and the gate recomputes
+        it from the blob afterwards, so the field the pen itself writes has to
+        fall out of the sum — and every other byte of meaning has to stay in."""
+        from gates import release
+        pending = {"_meta": {"signed_by": "pending — Петър"}, "p7": {"tokens": 2}}
+        signed = {"_meta": {"signed_by": SIGNER}, "p7": {"tokens": 2}}
+        moved = {"_meta": {"signed_by": SIGNER}, "p7": {"tokens": 3}}
+        one = release.body_digest(json.dumps(pending, ensure_ascii=False))
+        self.assertEqual(one, release.body_digest(json.dumps(signed, indent=1)))
+        self.assertNotEqual(one, release.body_digest(json.dumps(moved)))
+        # bytes and text are the same question
+        self.assertEqual(one, release.body_digest(
+            json.dumps(signed, ensure_ascii=False).encode("utf-8")))
+        # a top-level signature is dropped as well as one inside `_meta`
+        self.assertEqual(release.body_digest(json.dumps({"signed_by": SIGNER, "n": 1})),
+                         release.body_digest(json.dumps({"n": 1})))
+
+    def test_the_pen_writes_the_body_digest_onto_the_row(self):
+        """`decide_row` puts the number where the gate looks for it."""
+        from gates import release, sign
+        lines = (u"## R1 · фикстура\n- **id:** R1\n- **решение:** pending\n"
+                 u"- **дата:** —\n- **артефакт:** expectations\n"
+                 u"## R2 · друг\n- **решение:** pending\n- **дата:** —\n"
+                 ).splitlines()
+        row = release.parse_queue_text(u"\n".join(lines))[0]
+        self.assertEqual(sign.decide_row(lines, row, release.YES, "2026-09-05",
+                                         "b" * 64), 2)
+        text = u"\n".join(lines)
+        self.assertIn(u"- **%s:** %s" % (release.FIELD_BODY, "b" * 64), text)
+        # …inside the row it belongs to, never in the next one
+        self.assertLess(text.index(release.FIELD_BODY), text.index(u"## R2"))
+        self.assertEqual(release.parse_queue_text(text)[0]["body"], "b" * 64)
+        self.assertEqual(release.parse_queue_text(text)[1]["body"], "")
+        # a row that already carries the field gets it REPLACED, not doubled
+        again = release.parse_queue_text(text)[0]
+        sign.decide_row(lines, again, release.YES, "2026-09-06", "c" * 64)
+        self.assertEqual(u"\n".join(lines).count(release.FIELD_BODY + u":"), 1)
+        self.assertEqual(release.parse_queue_text(u"\n".join(lines))[0]["body"],
+                         "c" * 64)
+
+    def test_the_dead_delta_filter_is_gone(self):
+        """Амандамент №9 т. 4: `delta_patterns` had no caller left after №8."""
+        from gates import release
+        self.assertFalse(hasattr(release, "delta_patterns"))
 
     def test_the_pen_computes_the_body_and_writes_nothing(self):
         from gates import sign
@@ -2166,6 +2340,215 @@ class FreezeAndAnchorTest(unittest.TestCase):
             {"_meta": {"queue_reference": anchor}})
         self.assertIsNone(complaint)
         self.assertEqual((commit, path), (carrier, "rows.json"))
+
+    # ---- амандамент №9: the queue is the blob and the rows have hands -------
+
+    ENGINE_STUB = (
+        "# A stand-in for recall_sweep.py. `gates.release` imports the engine to\n"
+        "# get the candidate; a gate test has to be able to fail without three\n"
+        "# thousand lines of search behind it.\n"
+        "import json\n"
+        "\n"
+        "ROWS = {\"gate_lot1\": [{\"q\": \"garden\", \"branch\": \"A3\", \"hasKey\": True,\n"
+        "                       \"n\": 1, \"rows\": [{\"name\": \"now\", \"zone\": \"z\",\n"
+        "                                          \"kind\": \"place\"}]}]}\n"
+        "\n"
+        "\n"
+        "def check_manifest_anchors(paths):\n"
+        "    return []\n"
+        "\n"
+        "\n"
+        "def reference_rows():\n"
+        "    return json.loads(json.dumps(ROWS))\n"
+        "\n"
+        "\n"
+        "def dump_rows(doc):\n"
+        "    return json.dumps(doc, ensure_ascii=False, sort_keys=True)\n"
+    )
+
+    QUEUE_ROW = (u"## R1 · фикстура\n"
+                 u"- **id:** R1\n"
+                 u"- **питане:** делтата на доставката\n"
+                 u"- **решение:** да\n"
+                 u"- **дата:** 2026-09-05\n"
+                 u"- **артефакт:** expectations\n"
+                 u"- **покрива:** gate_lot1/*\n"
+                 u"- **тяло:** <тяло>\n")
+
+    def release_repo(self, queue_text, author="Petar1984"):
+        """A repository `gates.release` runs GREEN on, end to end.
+
+        Everything the gate binds is here and nothing else is: one signed
+        artefact, one frozen reference, one engine, one queue — and exactly one
+        delta between the reference and the engine, so the queue row has to do
+        real work for the verdict to be green. Without a green baseline a
+        „blocked“ proves nothing: every one of these tests is a differential.
+        """
+        from gates import release
+        root = self.temp_repo()
+        self.write(root / "index.html", "<html></html>\n")
+        self.write(root / "engine.py", self.ENGINE_STUB)
+        self.write(root / "rows.json", self.body_of(
+            {"gate_lot1": [{"q": "garden", "branch": "A3", "hasKey": True, "n": 1,
+                            "rows": [{"name": "was", "zone": "z",
+                                      "kind": "place"}]}]}))
+        self.use_repo(root, SIGNABLE={"expectations": "expectations.json"},
+                      EXPECTATIONS_REL="expectations.json",
+                      REFERENCE_REL="rows.json", ENGINE_REL="engine.py",
+                      MANIFEST_RELS=(), SHA_PINS=(), ALLOW_DIR="no_allow_dir",
+                      QUEUE_DIR=".", QUEUE_GLOB="ЗА_ПОДПИС_*.md")
+        engine = release.load_engine()
+        candidate = engine.dump_rows(engine.reference_rows())
+        exp = {"_meta": {
+                   "signed_by": SIGNER,
+                   "reference": {"path": "rows.json",
+                                 "sha256": hashlib.sha256(
+                                     (root / "rows.json").read_bytes()).hexdigest()},
+                   "candidate": {"sha256": hashlib.sha256(
+                       candidate.encode("utf-8")).hexdigest()}},
+               "p7": {"tokens": 2}}
+        self.write(root / "expectations.json", self.body_of(exp))
+        body = release.body_digest(self.body_of(exp))
+        queue = root / "ЗА_ПОДПИС_фикстура.md"
+        self.write(queue, queue_text.replace(u"<тяло>", body))
+        self.commit_as(root, author, "sign: R1 да")
+        return root, queue, body
+
+    def blocked_lines(self, result, needle):
+        return [line for line in result["blocked"] if needle in line]
+
+    def test_the_release_judges_the_queue_of_the_blob_not_of_the_disk(self):
+        """Амандамент №9 т. 1 — the hole that made all seven gates lie.
+
+        `gates.sign` writes the decisions into the WORKTREE and Petar commits
+        them; a gate that reads the file instead of the blob went green over a
+        commit that carried not one signed row. The queue is now read exactly
+        like every other body here — from `blob_at("HEAD", …)` — and a worktree
+        that differs from it is blocked in the same words."""
+        from gates import release
+        root, queue, _body = self.release_repo(self.QUEUE_ROW)
+        green = release.run()
+        self.assertEqual(green["exit_code"], release.EXIT_OK, green["blocked"])
+        self.write(queue, queue.read_text(encoding="utf-8") + u"- **бележка:** х\n")
+        dirty = release.run()
+        self.assertEqual(dirty["exit_code"], release.EXIT_BLOCKED)
+        self.assertTrue(self.blocked_lines(
+            dirty, u"работното дърво носи друго тяло от блоба на HEAD"),
+            dirty["blocked"])
+
+    def test_a_yes_on_the_disk_over_a_pending_blob_authorises_nothing(self):
+        """The other half of т. 1: the ROWS come from the commit.
+
+        The signature is on the disk, the commit says `pending`, and the delta
+        the row would have covered is uncovered — which is what the push would
+        publish."""
+        from gates import release
+        root, queue, _body = self.release_repo(
+            self.QUEUE_ROW.replace(u"решение:** да", u"решение:** pending"))
+        self.write(queue, queue.read_text(encoding="utf-8")
+                   .replace(u"решение:** pending", u"решение:** да"))
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        self.assertTrue(self.blocked_lines(result, u"непокрита делта gate_lot1/garden"),
+                        result["blocked"])
+        self.assertTrue(self.blocked_lines(result, u"работното дърво"), result["blocked"])
+
+    def test_a_yes_row_an_agent_introduced_is_not_a_permission(self):
+        """Амандамент №9 т. 2 — the auditor's scenario, exactly.
+
+        The agent turns `pending` into „да“ and commits; Petar then makes one
+        trivial commit to the queue (a note, outside the row). The FILE is his
+        by its newest commit, so амандамент №6 т. 3 is satisfied and проверка 7
+        used to be content — but the word „да“ was never written by his hand.
+        Both readers say so now: the release gate and проверка 7, from one
+        function."""
+        from gates import release, run_gates
+        root, queue, _body = self.release_repo(
+            self.QUEUE_ROW.replace(u"решение:** да", u"решение:** pending"))
+        self.write(queue, queue.read_text(encoding="utf-8")
+                   .replace(u"решение:** pending", u"решение:** да"))
+        agent = self.commit_as(root, "Claude Executor", "gates: a small fix")
+        self.write(queue, queue.read_text(encoding="utf-8") + u"\n<!-- бележка -->\n")
+        self.commit_as(root, "Petar1984", "docs: a note on the queue")
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        named = self.blocked_lines(result, u"„да“ е въведено от")
+        self.assertTrue(named, result["blocked"])
+        self.assertIn("Claude Executor", named[0])
+        self.assertIn(agent[:7], named[0])
+        check = run_gates.check_signature_authorship()
+        self.assertEqual(check.mark, run_gates.BAD, check.lines)
+        self.assertTrue([line for line in check.lines if u"„да“ е въведено от" in line],
+                        check.lines)
+
+    def test_a_decision_hidden_from_the_reader_blocks(self):
+        """Амандамент №9 т. 2: a „да“ in a comment or a fence is not a „да“.
+
+        The row is invisible to the man who signs the file and authoritative to
+        the machine that reads it. It authorises nothing now — and the attempt
+        is named rather than silently dropped."""
+        from gates import release
+        hidden = (u"\n<!--\n## R9 · скрит\n- **id:** R9\n- **решение:** да\n"
+                  u"- **покрива:** gate_lot1/*\n-->\n"
+                  u"\n```\n- **решение:** да\n```\n")
+        root, queue, _body = self.release_repo(
+            self.QUEUE_ROW.replace(u"решение:** да", u"решение:** pending") + hidden)
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        self.assertEqual(len(self.blocked_lines(result, u"в скрит регион")), 2,
+                         result["blocked"])
+        # …and the hidden row never became a row at all
+        self.assertEqual([row["id"] for row in release.parse_queue_text(
+            release.blob_at("HEAD", "ЗА_ПОДПИС_фикстура.md").decode("utf-8"))],
+            ["R1"])
+        self.assertTrue(self.blocked_lines(result, u"непокрита делта"), result["blocked"])
+
+    def test_a_field_written_twice_blocks_the_release(self):
+        """Амандамент №9 т. 2: one row, one decision.
+
+        The parser keeps the last value and the reader reads the first, so
+        „решение: не“ under „решение: да“ is a queue that says two things."""
+        from gates import release
+        doubled = self.QUEUE_ROW.replace(u"- **дата:**",
+                                         u"- **решение:** не\n- **дата:**")
+        root, queue, _body = self.release_repo(doubled)
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        self.assertTrue(self.blocked_lines(result, u"написано два пъти"),
+                        result["blocked"])
+
+    def test_the_body_digest_catches_a_rewrite_no_other_field_binds(self):
+        """Амандамент №9 т. 7 — what проверка 7 alone used to carry.
+
+        The release gate binds fields: the reference digest, the candidate
+        digest, the anchors. A rewrite that touches none of them — `p7.tokens`
+        2 → 3, a number the SUITE reads — left this gate green, and `--freeze`
+        reads this gate's verdict and nothing else. The digest of the whole body
+        is on the row now, so the rewrite falls here too; and when the newest
+        commit on the artefact is Petar's own, the difference is his freeze and
+        the gate says which."""
+        from gates import release
+        root, queue, body = self.release_repo(self.QUEUE_ROW)
+        exp = root / "expectations.json"
+        rewritten = json.loads(exp.read_text(encoding="utf-8"))
+        rewritten["p7"]["tokens"] = 3
+        self.write(exp, self.body_of(rewritten))
+        self.commit_as(root, "Claude Executor", "gates: a small fix")
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        named = self.blocked_lines(result, u"подписаното тяло е пренаписано")
+        self.assertTrue(named, result["blocked"])
+        self.assertIn(body[:12], named[0])
+        self.assertIn("Claude Executor", named[0])
+        # The honest half: a body Petar's OWN commit produced is the freeze —
+        # named out loud, not blocked, and not silent either.
+        rewritten["p7"]["tokens"] = 4
+        self.write(exp, self.body_of(rewritten))
+        self.commit_as(root, "Petar1984", "freeze: the bodies")
+        after = release.run()
+        self.assertEqual(after["exit_code"], release.EXIT_OK, after["blocked"])
+        self.assertTrue([line for line in after["lines"]
+                         if u"пренаписано след подписа" in line], after["lines"])
 
     def test_the_pen_refuses_to_write_an_anchor_of_a_foreign_commit(self):
         """Амандамент №8 т. 4, the pen's half.

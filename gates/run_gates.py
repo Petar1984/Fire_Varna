@@ -24,7 +24,9 @@ Seven checks, one table, one exit code:
                      digest of the resulting body himself (амандамент №5 т. 3),
                      on a queue whose own authorship was settled first
                      (амандамент №6 т. 3) and with HIS commit as the one that
-                     introduced the number (амандамент №8 т. 2)
+                     introduced the number (амандамент №8 т. 2) — and every
+                     „да“ ROW of that queue was introduced by a commit of his
+                     as well (амандамент №9 т. 2)
 
 The gate never imports `unittest` and never reads `tests/`: a check that shares
 code with the suite it guards cannot fail independently of it.
@@ -447,12 +449,12 @@ def git_lines(*args: str) -> list[str]:
 
 
 def last_commit_on(rel: str) -> tuple[str, str] | None:
-    """(hash, author) of the NEWEST commit that touched a path."""
-    lines = git_lines("log", "-1", "--format=%H\t%an", "--", rel)
-    if not lines:
-        return None
-    parts = lines[0].split("\t", 1)
-    return (parts[0], parts[1] if len(parts) > 1 else "")
+    """(hash, author) of the NEWEST commit that touched a path.
+
+    `gates.release.newest_commit_on` is the one truth: check 6 asks the same
+    question about the same paths since амандамент №9 т. 7, and two spellings of
+    it would be two answers."""
+    return release.newest_commit_on(rel)
 
 
 BODY_DIGEST_RE = re.compile(r"body-sha256:\s*([0-9a-f]{64})")
@@ -534,7 +536,14 @@ def check_signature_authorship() -> Check:
     on a queue Petar later touched used to pass with the words „приет по
     опашка“; the auditor's scenario — agent rewrites the signed body, agent
     writes the digest of its result on the row, Petar makes one trivial commit
-    to the queue — turned that sentence into a way through. It fails now."""
+    to the queue — turned that sentence into a way through. It fails now.
+
+    And the queue is not one document with one author but a file of ROWS
+    (амандамент №9 т. 2). The check asked who introduced a signature and who
+    introduced a digest; nobody asked who introduced the word „да“. It asks now,
+    per row, with `release.yes_row_authorship` — the same function the release
+    gate uses, so the two cannot drift — and the complaint about the file itself
+    is raised whatever the blob turns out to contain (амандамент №9 т. 1)."""
     check = Check("7 · авторството на подписите и на тялото (git log -S)")
     needle = release.SIGNATURE_NEEDLE
     targets = dict(release.SIGNABLE)
@@ -566,7 +575,11 @@ def check_signature_authorship() -> Check:
         check.fail(str(exc))
         queue_path = None
     if queue_path is not None and queue_path.exists():
-        queue_rel = str(queue_path.relative_to(REPO_ROOT)).replace("\\", "/")
+        queue_rel = release.repo_relative(queue_path)
+    if queue_path is not None and queue_path.exists() and queue_rel is None:
+        check.fail("опашката %s е извън това репо — авторството ѝ е непроверимо"
+                   % queue_path)
+    elif queue_rel is not None:
         # The rows come out of the BLOB, never off the disk (амандамент №7 т. 2):
         # what a push publishes is the commit, and a digest read from a working
         # body is a number this gate has no author for. `queue_authorship` below
@@ -585,13 +598,22 @@ def check_signature_authorship() -> Check:
         with_digest = [r for r in yes_rows if r["artefact"] and r.get("digest")]
         who, complaint = queue_authorship(queue_rel)
         queue_trusted = complaint is None
-        if yes_rows:
-            signed += len(yes_rows)
-            if complaint:
-                check.fail("%s (%d подписани реда)" % (complaint, len(yes_rows)))
-            else:
-                check.say("%s: %d подписани реда, комит на %s ✓"
-                          % (queue_rel, len(yes_rows), who))
+        signed += len(yes_rows)
+        # Амандамент №9 т. 1: the complaint is raised WHATEVER the blob says. It
+        # used to be printed only when the blob already carried „да“ rows — so a
+        # queue signed on disk and committed as `pending`, or committed by an
+        # agent with no „да“ in it yet, left this row silent and the table green
+        # over a delivery nobody had signed.
+        if complaint:
+            check.fail("%s (%d подписани реда в блоба)" % (complaint, len(yes_rows)))
+        elif yes_rows:
+            check.say("%s: %d подписани реда, комит на %s ✓"
+                      % (queue_rel, len(yes_rows), who))
+        # …and WHO wrote each „да“ (амандамент №9 т. 2). The authorship of the
+        # file is one question; the authorship of the row is the other, and only
+        # the second one says whose hand the permission is.
+        for row_complaint in release.yes_row_authorship(queue_rel, yes_rows):
+            check.fail("%s: %s" % (queue_rel, row_complaint))
         if queue_trusted:
             for row in with_digest:
                 # WHO introduced the number, not who committed the document it
