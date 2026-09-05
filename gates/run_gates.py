@@ -21,7 +21,9 @@ Seven checks, one table, one exit code:
                      Petar1984, never by an agent (`git log -S`) — AND the body
                      it protects has not been rewritten since: the newest commit
                      on a signed artefact is Petar's too, or he recorded the
-                     digest of the resulting body himself (амандамент №5 т. 3)
+                     digest of the resulting body himself (амандамент №5 т. 3),
+                     on a queue whose own authorship was settled first
+                     (амандамент №6 т. 3)
 
 The gate never imports `unittest` and never reads `tests/`: a check that shares
 code with the suite it guards cannot fail independently of it.
@@ -468,17 +470,27 @@ def digests_in_commit_message(commit: str) -> set[str]:
     return set(BODY_DIGEST_RE.findall(body.stdout.decode("utf-8", "replace")))
 
 
-def introduced_by(rel: str, needle: str) -> tuple[str, str] | None:
-    """(hash, author) of the newest commit that changed the count of `needle`.
+def queue_authorship(rel: str) -> tuple[str, str | None]:
+    """(author, complaint) — whose commit the queue is, or why it is nobody's.
 
-    `git log -S` is the pickaxe: it lists exactly the commits where the number
-    of occurrences of the string moved, so the newest of them is the commit
-    that put the signature in. None = the string is in no commit at all."""
-    lines = git_lines("log", "-S" + needle, "--format=%H\t%an", "--", rel)
-    if not lines:
-        return None
-    parts = lines[0].split("\t", 1)
-    return (parts[0], parts[1] if len(parts) > 1 else "")
+    The complaint is None only for a committed queue whose newest commit is
+    Petar's. Everything else — dirty in the worktree, in no commit at all, last
+    touched by an agent — is a queue this gate reads for its rows and trusts for
+    nothing (амандамент №6 т. 3)."""
+    try:
+        dirty = git_lines("status", "--porcelain", "--", rel)
+        last = git_lines("log", "-1", "--format=%H\t%an", "--", rel)
+    except ValueError as exc:
+        return "", str(exc)
+    if dirty:
+        return "", "%s: не е комитнат — пушът праща блоба на HEAD" % rel
+    if not last:
+        return "", "%s: няма комит с този файл" % rel
+    who = last[0].split("\t", 1)[1] if "\t" in last[0] else ""
+    if who != HUMAN_AUTHOR:
+        return who, ("%s: последният комит е на %r, а подписва само %s"
+                     % (rel, who, HUMAN_AUTHOR))
+    return who, None
 
 
 def check_signature_authorship() -> Check:
@@ -488,31 +500,55 @@ def check_signature_authorship() -> Check:
     Executor`, the architect as `Claude Architect`, and only Petar's own commit
     may INTRODUCE `signed_by: "Петър"`. Without this the barrier is a habit; with
     it, an agent that writes the signature itself is red on the next push, and
-    the check names the commit and the author."""
+    the check names the commit and the author.
+
+    The queue is read FIRST (амандамент №6 т. 3), because it is the document
+    that can excuse everything else: a digest on one of its rows is what lets a
+    body through after an agent rewrote it. Its authorship is therefore settled
+    before a digest is taken out of it, and an untrusted queue hands over
+    none — no row of this table says „Петър записа“ about a body he did not."""
     check = Check("7 · авторството на подписите и на тялото (git log -S)")
-    needle = '"signed_by": "%s"' % coverage.SIGNER
+    needle = release.SIGNATURE_NEEDLE
     targets = dict(release.SIGNABLE)
     allow_dir = REPO_ROOT / ALLOW_DIR
     for path in sorted(allow_dir.glob("*.json")) if allow_dir.exists() else []:
         targets["allow:" + path.name] = str(path.relative_to(REPO_ROOT)).replace("\\", "/")
 
-    # The digests Petar recorded on his own queue rows, per artefact name. Read
-    # before the loop so the body check below has them; the authorship of the
-    # queue itself is checked at the end of this function.
+    # --- the QUEUE first (амандамент №6 т. 3) -------------------------------
+    # A digest Petar recorded on his row is what lets a body pass after an agent
+    # rewrote it, so the queue is the one document that must be his BEFORE a
+    # single digest is read out of it. A queue whose newest commit is an agent's
+    # can carry any number at all — it hands over nothing here, and no line of
+    # this table then says „Петър записа“ about a body it blessed.
+    signed = 0
     row_digests: dict[str, set[str]] = {}
+    queue_trusted = False
     try:
         queue_path = release.find_queue(None)
     except ValueError as exc:
         check.fail(str(exc))
         queue_path = None
-    queue_rows: list[dict] = []
     if queue_path is not None and queue_path.exists():
+        queue_rel = str(queue_path.relative_to(REPO_ROOT)).replace("\\", "/")
         queue_rows = release.parse_queue(queue_path)
-        for row in queue_rows:
-            if row["decision"] == release.YES and row["artefact"] and row.get("digest"):
+        yes_rows = [r for r in queue_rows if r["decision"] == release.YES]
+        with_digest = [r for r in yes_rows if r["artefact"] and r.get("digest")]
+        who, complaint = queue_authorship(queue_rel)
+        queue_trusted = complaint is None
+        if yes_rows:
+            signed += len(yes_rows)
+            if complaint:
+                check.fail("%s (%d подписани реда)" % (complaint, len(yes_rows)))
+            else:
+                check.say("%s: %d подписани реда, комит на %s ✓"
+                          % (queue_rel, len(yes_rows), who))
+        if queue_trusted:
+            for row in with_digest:
                 row_digests.setdefault(row["artefact"], set()).add(row["digest"])
+        elif with_digest:
+            check.fail("%s: дайджестите на %d реда НЕ се приемат — авторството на "
+                       "опашката не е потвърдено" % (queue_rel, len(with_digest)))
 
-    signed = 0
     for name in sorted(targets):
         rel = targets[name]
         path = REPO_ROOT / rel
@@ -530,7 +566,7 @@ def check_signature_authorship() -> Check:
             if git_lines("status", "--porcelain", "--", rel):
                 check.fail("%s: подписан, но НЕ е комитнат — пушът праща блоба на HEAD" % rel)
                 continue
-            author = introduced_by(rel, needle)
+            author = release.introduced_by(rel, needle)
         except ValueError as exc:
             check.fail(str(exc))
             continue
@@ -571,29 +607,6 @@ def check_signature_authorship() -> Check:
                            "(%s), а дайджестът на тялото %s не е записан от %s"
                            % (rel, newest[1], newest[0][:7], body[:12], HUMAN_AUTHOR))
 
-    if queue_path is not None and queue_path.exists():
-        rel = str(queue_path.relative_to(REPO_ROOT)).replace("\\", "/")
-        rows = [r for r in queue_rows if r["decision"] == release.YES]
-        if rows:
-            signed += len(rows)
-            try:
-                dirty = git_lines("status", "--porcelain", "--", rel)
-                last = git_lines("log", "-1", "--format=%H\t%an", "--", rel)
-            except ValueError as exc:
-                check.fail(str(exc))
-                dirty, last = [], []
-            if dirty:
-                check.fail("%s: подписани редове, но файлът не е комитнат" % rel)
-            elif not last:
-                check.fail("%s: няма комит с този файл" % rel)
-            else:
-                who = last[0].split("\t", 1)[1] if "\t" in last[0] else ""
-                if who != HUMAN_AUTHOR:
-                    check.fail("%s: последният комит е на %r, а носи %d подписани реда"
-                               % (rel, who, len(rows)))
-                else:
-                    check.say("%s: %d подписани реда, комит на %s ✓"
-                              % (rel, len(rows), who))
     check.say("%d подписани артефакта/реда проверени" % signed)
     return check
 

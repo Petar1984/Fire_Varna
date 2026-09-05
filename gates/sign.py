@@ -33,6 +33,13 @@ files, and `git status --porcelain` is what says so.
 tool will not re-decide it. A decided row is never silently overwritten either
 — re-applying the same decision is a no-op, changing it is a refusal with the
 words „ръчна редакция + нов кръг“.
+
+A „не“ NAMES ITS QUERY (амандамент №6 т. 2): the pen refuses to write „не“ on a
+row whose `покрива` carries `кофа/*`. A refusal over a whole bucket is a class
+permission that happens to say no — it collides with every class „да“ over the
+same bucket, and the collision is the thing that made the verdict depend on the
+order of the file. The rule is enforced where the decision is written, so a
+queue that reached the gate has already been through it.
 """
 
 from __future__ import annotations
@@ -142,6 +149,22 @@ def apply_signature(rel_path):
     return (None, text.replace(pending, signed))
 
 
+def refusal_scope_complaint(row):
+    """Why this row may not be answered „не“ — or None.
+
+    Амандамент №6 т. 2: a refusal is a decision about a named query, so its
+    `покрива` is `кофа/точната заявка`. `кофа/*` under a „не“ would refuse a
+    whole bucket in one word, next to a „да“ that allows the same bucket by
+    class — two rows about the same delta, disagreeing. `gates.release` reads
+    such a queue fail-closed („не“ wins); here it is not written at all."""
+    wide = release.wildcard_covers(row["covers"])
+    if not wide:
+        return None
+    return (u"ред %s отказва с широк шаблон (%s) — „не“ носи ТОЧНАТА заявка "
+            u"(`покрива: кофа/заявката`), не цяла кофа (амандамент №6 т. 2)"
+            % (row["id"], u", ".join(wide)))
+
+
 def decide_row(lines, row, decision, today):
     """Rewrite the `решение` and `дата` fields of one row, in place."""
     changed = 0
@@ -234,6 +257,11 @@ def main(argv):
         if row["decision"] == decision:
             touched.append(u"ред %s вече е %r — нищо не се променя" % (row["id"], decision))
             continue
+        if decision == NO:
+            complaint = refusal_scope_complaint(row)
+            if complaint:
+                refusals.append(complaint)
+                continue
         if decide_row(lines, row, decision, today) < 2:
             refusals.append(u"ред %s: липсва „%s“ или „%s“ в тялото на реда"
                             % (row["id"], release.FIELD_DECISION, release.FIELD_DATE))

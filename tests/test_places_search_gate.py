@@ -1553,7 +1553,8 @@ class ReleaseGateSignatureTest(unittest.TestCase):
 
 
 class RefusalSurvivesTheFreezeTest(unittest.TestCase):
-    """Амандамент №5 т. 1–2: what a freeze may not erase, and what a pen may not write.
+    """Амандамент №5 т. 1–2 и №6 т. 2: what a freeze may not erase, what a pen
+    may not write, and why the ORDER of the queue file does not vote.
 
     The freeze makes the reference equal to the candidate, so a delta Petar
     answered „не“ disappears from the comparison the moment it is frozen — the
@@ -1563,13 +1564,17 @@ class RefusalSurvivesTheFreezeTest(unittest.TestCase):
 
     The second half is the pen: `gates.sign.apply_signature` COMPUTES the signed
     body and writes nothing, so a refusal on a later row cannot leave an earlier
-    artefact already changed.
+    artefact already changed — and `gates.sign.refusal_scope_complaint` refuses
+    to write a „не“ that covers a whole bucket instead of a named query.
     """
 
     def rows(self, decision):
-        return [{"id": "R5", "decision": decision, "covers": ["gate_lot1/*"],
-                 "artefact": "expectations", "date": "2026-09-05", "digest": "",
-                 "title": "", "ask": ""}]
+        return [self.row("R5", decision, ["gate_lot1/*"])]
+
+    def row(self, row_id, decision, covers):
+        return {"id": row_id, "decision": decision, "covers": list(covers),
+                "artefact": "expectations", "date": "2026-09-05", "digest": "",
+                "title": "", "ask": ""}
 
     def recorded(self):
         return {"_meta": {"refused": [{"bucket": "gate_lot1", "q": "градина",
@@ -1607,8 +1612,15 @@ class RefusalSurvivesTheFreezeTest(unittest.TestCase):
         self.assertEqual(row["covers"], ["gate_lot1/*"])
 
     def temp_queue(self):
+        """A queue fixture in a directory of its own, removed with the test.
+
+        Амандамент №6 т. 5: it used to be one fixed name in the system temp, so
+        two checkouts running the suite at the same time wrote over each other's
+        fixture and the failure read as a parser bug."""
         import tempfile
-        path = pathlib.Path(tempfile.gettempdir()) / "fv_queue_fixture.md"
+        holder = tempfile.TemporaryDirectory()
+        self.addCleanup(holder.cleanup)
+        path = pathlib.Path(holder.name) / "ЗА_ПОДПИС_фикстура.md"
         path.write_text("## R5 · фикстура\n"
                         "- **id:** R5\n"
                         "- **решение:** не\n"
@@ -1618,6 +1630,77 @@ class RefusalSurvivesTheFreezeTest(unittest.TestCase):
                         "- **дайджест:** %s\n" % ("a" * 64),
                         encoding="utf-8", newline="\n")
         return str(path)
+
+    # ---------------- амандамент №6 т. 2: the file order does not vote --------
+
+    def refusal_and_class_rows(self):
+        """The two rows of the defect: a „не“ by name and a class „да“ over the
+        same bucket. Read in file order, whichever of them comes first decides —
+        which is how a terminal refusal was silenced by an earlier allowance."""
+        return (self.row("R9", u"не", [u"gate_lot1/градина"]),
+                self.row("R1", u"да", ["gate_lot1/*"]))
+
+    def test_a_refusal_wins_over_a_class_allowance_in_both_orders(self):
+        from gates import release
+        refusal, allowance = self.refusal_and_class_rows()
+        for rows in ([refusal, allowance], [allowance, refusal]):
+            decision, row, matched = release.decide_delta(rows, "gate_lot1", u"градина")
+            order = [r["id"] for r in rows]
+            self.assertEqual(decision, release.NO, order)
+            self.assertEqual(row["id"], "R9", order)
+            self.assertEqual(sorted(r["id"] for r in matched), ["R1", "R9"], order)
+
+    def test_the_more_specific_row_is_the_one_that_speaks(self):
+        """Two „да“ over the same delta: the named query, not the whole bucket."""
+        from gates import release
+        exact = self.row("R7", u"да", [u"gate_lot1/градина"])
+        wide = self.row("R1", u"да", ["gate_lot1/*"])
+        for rows in ([exact, wide], [wide, exact]):
+            decision, row, matched = release.decide_delta(rows, "gate_lot1", u"градина")
+            self.assertEqual(decision, release.YES)
+            self.assertEqual(row["id"], "R7", [r["id"] for r in rows])
+            self.assertEqual(len(matched), 2)
+
+    def test_a_class_row_still_answers_the_queries_nobody_named(self):
+        from gates import release
+        refusal, allowance = self.refusal_and_class_rows()
+        decision, row, matched = release.decide_delta(
+            [refusal, allowance], "gate_lot1", u"детска ясла")
+        self.assertEqual(decision, release.YES)
+        self.assertEqual(row["id"], "R1")
+        self.assertEqual([r["id"] for r in matched], ["R1"])
+
+    def test_a_delta_no_row_touches_is_uncovered_and_nothing_is_used(self):
+        from gates import release
+        refusal, allowance = self.refusal_and_class_rows()
+        decision, row, matched = release.decide_delta(
+            [refusal, allowance], "gate_p7", u"градина")
+        self.assertEqual((decision, row, matched), (None, None, []))
+
+    def test_a_pending_row_covers_nothing_but_counts_as_touched(self):
+        """`pending` is „not answered yet“, never „allowed“ — and the row is
+        still the one that matched, so it is not read as a stale permission."""
+        from gates import release
+        rows = [self.row("R4", release.PENDING, ["gate_lot1/*"])]
+        decision, row, matched = release.decide_delta(rows, "gate_lot1", u"градина")
+        self.assertEqual((decision, row), (None, None))
+        self.assertEqual([r["id"] for r in matched], ["R4"])
+
+    def test_the_pen_refuses_a_refusal_written_over_a_whole_bucket(self):
+        from gates import sign
+        complaint = sign.refusal_scope_complaint(self.row("R9", u"не", ["gate_lot1/*"]))
+        self.assertIsNotNone(complaint)
+        self.assertIn("R9", complaint)
+        self.assertIn("gate_lot1/*", complaint)
+        named = self.row("R9", u"не", [u"gate_lot1/градина", u"gate_p7/градина"])
+        self.assertIsNone(sign.refusal_scope_complaint(named))
+        self.assertIsNone(sign.refusal_scope_complaint(self.row("Q7", u"не", [])))
+
+    def test_the_pen_and_the_gate_read_the_same_wildcard(self):
+        from gates import release
+        self.assertEqual(release.wildcard_covers(["gate_lot1/*", u"gate_p7/градина",
+                                                  "baseline"]),
+                         ["gate_lot1/*"])
 
     def test_the_pen_computes_the_body_and_writes_nothing(self):
         from gates import sign

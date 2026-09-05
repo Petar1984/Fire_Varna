@@ -27,14 +27,22 @@ row whose decision is „не“ (terminal) covering a live delta: BLOCKED. A si
 row that covers nothing: BLOCKED — a stale permission is not a permission (the
 same rule gates/coverage.py applies with exit 3).
 
+THE ORDER OF THE FILE DOES NOT VOTE (амандамент №6 т. 2). Every row that
+matches a delta is collected, never the first one that answers: a „не“ wins over
+any „да“, and among rows that agree the exact `кофа/заявка` is the one the table
+names, so a class row `кофа/*` never speaks for a query somebody answered by
+name. Moving two rows past each other in the file cannot change a verdict.
+
 A REFUSAL SURVIVES THE FREEZE (амандамент №5 т. 1). A freeze makes the
 reference equal to the candidate, so afterwards there is no delta left for the
 queue to refuse and a row Petar answered „не“ would be erased by the very act
 it forbade. Two things stop that here: `expectations._meta.refused` — what the
 freeze SAW, written down by `build_expectations` — is read back and blocks; and
 every „не“ row is re-derived independently against the FROZEN reference, from
-the signed base anchor forward, so a hand-assembled body with an empty
-`refused` list is caught by the bytes rather than by its own bookkeeping.
+the reference THE QUEUE WAS WRITTEN AGAINST forward (амандамент №6 т. 4: the
+`_meta.reference` of the expectations as Petar signed them, not a commit
+constant of the engine), so a hand-assembled body with an empty `refused` list
+is caught by the bytes rather than by its own bookkeeping.
 
 The comparison is FULL and ORDERED: all rows of every query, in their order,
 with their labels; never a head, never a count alone — a count cannot see a
@@ -111,6 +119,11 @@ def signable():
 YES, NO, PENDING = u"да", u"не", u"pending"
 DECISIONS = (YES, NO, PENDING)
 
+# The string that says Petar signed a body. `run_gates` проверка 7 and the
+# refusal anchor below both look for the commit that INTRODUCED it, so the two
+# of them look for exactly the same bytes.
+SIGNATURE_NEEDLE = u'"signed_by": "%s"' % coverage.SIGNER
+
 EXIT_OK = 0
 EXIT_USAGE = 4
 EXIT_BLOCKED = 6
@@ -126,6 +139,27 @@ def blob_at(commit, rel):
         raise ValueError("git show %s:%s: %s"
                          % (commit, rel, out.stderr.decode("utf-8", "replace").strip()))
     return out.stdout
+
+
+def introduced_by(rel, needle):
+    """(hash, author) of the newest commit that changed the count of `needle`.
+
+    `git log -S` is the pickaxe: it lists exactly the commits where the number
+    of occurrences of the string moved, so the newest of them is the commit that
+    put the signature in. None = the string is in no commit at all. It lives
+    here, next to `blob_at`, because two readers need it — `run_gates` проверка 7
+    for the authorship and this module for the body Petar actually signed."""
+    out = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-S" + needle,
+                          "--format=%H\t%an", "--", rel],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise ValueError("git log -S -- %s: %s"
+                         % (rel, out.stderr.decode("utf-8", "replace").strip()))
+    lines = out.stdout.decode("utf-8", "replace").splitlines()
+    if not lines:
+        return None
+    parts = lines[0].split("\t", 1)
+    return (parts[0], parts[1] if len(parts) > 1 else "")
 
 
 def digest(raw):
@@ -236,14 +270,77 @@ def parse_queue(path):
     return out
 
 
-def covers_delta(pattern, bucket, query):
-    """One `покрива` pattern against one delta: `bucket/query` or `bucket/*`."""
+# How closely a `покрива` pattern speaks about one delta. The numbers only ever
+# get compared with each other: EXACT is the query written out by name, WIDE is
+# the whole bucket in one word.
+NO_MATCH, WIDE, EXACT = 0, 1, 2
+
+
+def match_strength(pattern, bucket, query):
+    """NO_MATCH · WIDE (`кофа/*`) · EXACT (`кофа/точната заявка`)."""
     if "/" not in pattern:
-        return False
+        return NO_MATCH
     where, _, what = pattern.partition("/")
     if where != bucket:
-        return False
-    return what == "*" or what == (query or "")
+        return NO_MATCH
+    if what == (query or ""):
+        return EXACT
+    return WIDE if what == "*" else NO_MATCH
+
+
+def covers_delta(pattern, bucket, query):
+    """One `покрива` pattern against one delta: `bucket/query` or `bucket/*`."""
+    return match_strength(pattern, bucket, query) != NO_MATCH
+
+
+def row_strength(row, bucket, query):
+    """The closest thing a whole row says about one delta (0 = it is silent)."""
+    return max([match_strength(p, bucket, query) for p in row["covers"]] or [NO_MATCH])
+
+
+def wildcard_covers(covers):
+    """The patterns of a row that name a whole bucket at once (`кофа/*`).
+
+    Амандамент №6 т. 2: a „не“ is a decision about a named query, so it is
+    written as `кофа/точната заявка`. A refusal spelled `кофа/*` refuses a whole
+    bucket in one word — which reads as a class permission that happens to say
+    „не“, and is exactly the shape that made the verdict depend on the order of
+    the file. `gates.sign` refuses to write one; the gate reads one fail-closed.
+    """
+    out = []
+    for pattern in covers:
+        where, sep, what = pattern.partition("/")
+        if sep and what == "*":
+            out.append(pattern)
+    return out
+
+
+def decide_delta(rows, bucket, query):
+    """The verdict of the WHOLE queue on one delta — never of the first row.
+
+    Амандамент №6 т. 2. Every matching row is collected, then:
+
+      * a „не“ wins, whatever the order of the file and however wide the „да“
+        that also matches — a refusal that can be out-voted is not terminal;
+      * among rows that agree, the more specific pattern is the one named, so a
+        class row `кофа/*` never speaks for a query somebody answered by name;
+      * only `pending` (or nothing) matching means the delta is uncovered.
+
+    Returns `(decision, row, matched)`: `matched` is every row that touches this
+    delta, because a row that matched is a row that was used — marking only the
+    winner would turn the loser into a „stale permission“ on the next line.
+    """
+    matched = []
+    for row in rows:
+        strength = row_strength(row, bucket, query)
+        if strength != NO_MATCH:
+            matched.append((strength, row))
+    everyone = [row for _, row in matched]
+    for decision in (NO, YES):
+        same = [pair for pair in matched if pair[1]["decision"] == decision]
+        if same:
+            return (decision, max(same, key=lambda pair: pair[0])[1], everyone)
+    return (None, None, everyone)
 
 
 # --------------------------------------------------------- reference ↔ candidate
@@ -344,35 +441,72 @@ def refusal_survivors(expectations_doc, rows):
     return out
 
 
-def refused_against_reference(expectations_doc, rows, reference):
-    """Re-derive the refusals from the bytes: signed base → FROZEN reference.
+def queue_reference(expectations_doc):
+    """(commit, path, sha256) — the reference THE QUEUE was written against.
 
-    Independent of `_meta.refused`: the base anchor of the expectations is the
-    reference Petar's queue is written against, so anything a „не“ row covers
-    that still differs between that base and the reference at HEAD is a refusal
-    the delivery is carrying anyway. A body that simply forgot to write its
-    refusals down does not get past this.
+    Амандамент №6 т. 4. Petar answers deltas that were measured against the
+    reference frozen at the time he read the queue, and `_meta.reference` of the
+    expectations names exactly that body. The freeze then makes the reference
+    equal to the candidate and rewrites `_meta.reference` to the new body — so
+    the signed expectations have to be read where they still say what he signed:
+    the blob of the commit that INTRODUCED his signature. That is one anchor
+    instead of `_meta.base`, which is a commit constant of the engine (`f06ac06`)
+    and knows nothing about which queue is being answered.
+
+    Before a signing commit exists there is nothing else to name but the body on
+    HEAD — and then the reference and the candidate still differ by every live
+    delta, so the plain comparison is doing the whole job anyway.
+    """
+    doc, commit = expectations_doc, u"HEAD"
+    signing = introduced_by(EXPECTATIONS_REL, SIGNATURE_NEEDLE)
+    if signing is not None:
+        try:
+            doc = json.loads(blob_at(signing[0], EXPECTATIONS_REL).decode("utf-8"))
+            commit = signing[0]
+        except (ValueError, OSError, UnicodeDecodeError):
+            doc, commit = expectations_doc, u"HEAD"
+    anchor = ((doc or {}).get("_meta") or {}).get("reference") or {}
+    return commit, anchor.get("path"), anchor.get("sha256")
+
+
+def refused_against_reference(expectations_doc, rows, reference):
+    """Re-derive the refusals from the bytes: the queue's reference → the frozen one.
+
+    Independent of `_meta.refused`: anything a „не“ row covers that still differs
+    between the reference the queue was written against and the reference at
+    HEAD is a refusal the delivery is carrying anyway. A body that simply forgot
+    to write its refusals down does not get past this.
     """
     refused_rows = [row for row in rows if row["decision"] == NO and row["covers"]]
     if not refused_rows:
         return []
-    base = ((expectations_doc or {}).get("_meta") or {}).get("base") or {}
-    commit, rel = base.get("commit"), base.get("path")
-    if not commit or not rel:
-        return [u"опашката отказва %d реда, а очакванията нямат котва „base“ — "
-                u"отказът не може да се провери срещу референцията"
+    try:
+        commit, rel, want = queue_reference(expectations_doc)
+    except (ValueError, OSError) as exc:
+        return [u"референцията на опашката не може да се прочете: %s" % exc]
+    if not rel:
+        return [u"опашката отказва %d реда, а подписаните очаквания нямат котва "
+                u"„reference“ — отказът не може да се провери срещу референцията"
                 % len(refused_rows)]
     try:
-        base_doc = json.loads(blob_at(commit, rel).decode("utf-8"))
+        raw = blob_at(commit, rel)
     except (ValueError, OSError) as exc:
-        return [u"котвата „base“ (%s:%s): %s" % (commit, rel, exc)]
+        return [u"референцията на опашката (%s:%s): %s" % (commit, rel, exc)]
+    if want and digest(raw) != want:
+        return [u"референцията на опашката (%s:%s): %s ≠ подписаното %s"
+                % (commit, rel, digest(raw)[:12], want[:12])]
+    try:
+        base_doc = json.loads(raw.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError) as exc:
+        return [u"референцията на опашката (%s:%s): %s" % (commit, rel, exc)]
     out = []
     for delta in compare(entries_of(base_doc), reference):
         for row in refused_rows:
             if any(covers_delta(p, delta["bucket"], delta["q"]) for p in row["covers"]):
-                out.append(u"%s/%s: ред %s е ОТКАЗАН, а разликата спрямо %s е в "
-                           u"замразената референция (%s)"
-                           % (delta["bucket"], delta["q"], row["id"], commit,
+                out.append(u"%s/%s: ред %s е ОТКАЗАН, а разликата спрямо "
+                           u"референцията на опашката (%s) е в замразената "
+                           u"референция (%s)"
+                           % (delta["bucket"], delta["q"], row["id"], commit[:7],
                               u"; ".join(delta["why"])))
                 break
     return out
@@ -541,23 +675,17 @@ def run(queue_override=None):
 
     used, uncovered, refused = set(), [], []
     for delta in deltas:
-        owner = None
-        for row in rows:
-            if not any(covers_delta(p, delta["bucket"], delta["q"]) for p in row["covers"]):
-                continue
-            if row["decision"] == NO:
-                block(u"%s/%s: ред %s е ОТКАЗАН (терминално)"
-                      % (delta["bucket"], delta["q"], row["id"]))
-                refused.append({"bucket": delta["bucket"], "q": delta["q"],
-                                "row": row["id"], "why": delta["why"]})
-                owner = row["id"]
-                used.add(row["id"])
-                break
-            if row["decision"] == YES:
-                owner = row["id"]
-                used.add(row["id"])
-                break
-        if owner is None:
+        # The whole queue answers, not the first row that happens to match
+        # (амандамент №6 т. 2). Every matching row counts as used: a „да“ that
+        # lost to a „не“ still covers a live delta and is not a stale permission.
+        decision, row, matched = decide_delta(rows, delta["bucket"], delta["q"])
+        used.update(other["id"] for other in matched)
+        if decision == NO:
+            block(u"%s/%s: ред %s е ОТКАЗАН (терминално)"
+                  % (delta["bucket"], delta["q"], row["id"]))
+            refused.append({"bucket": delta["bucket"], "q": delta["q"],
+                            "row": row["id"], "why": delta["why"]})
+        elif decision != YES:
             uncovered.append(delta)
     for delta in uncovered[:10]:
         block(u"непокрита делта %s/%s: %s"

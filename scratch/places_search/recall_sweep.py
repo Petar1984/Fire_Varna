@@ -3615,7 +3615,12 @@ def release_verdict(queue_override=None):
     it can erase a delta Petar answered „не“ and leave everything green. The
     file that knows what the queue says is `gates/release.py`, so the freeze
     asks IT instead of growing a second reader of the same queue. It is a GATE:
-    it is computed with the other gates, before anything is written."""
+    it is computed with the other gates, before anything is written.
+
+    Амандамент №6 т. 1: what comes back is read as a VERDICT. The gate blocks
+    for reasons that never reach `uncovered` or `refused` — a signed artefact
+    edited in the worktree, a reference blob that is not in HEAD at all — and a
+    freeze that only looked at those two lists went ahead with exit 0."""
     if str(REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(REPO_ROOT))
     from gates import release as release_gate
@@ -4214,29 +4219,33 @@ def main():
                         .get("signed_by"))
             if (_sig or u"").strip() != SIGNER:
                 blockers.append(u"%s е подписан от „%s“, а не от „%s“" % (_name, _sig, SIGNER))
-        # Амандамент №5 т. 1: the queue has a vote. A delta nobody covered and a
-        # delta Petar REFUSED are both reasons not to freeze — the second one
-        # above all, because freezing is exactly what would make a refused delta
-        # invisible.
+        # Амандамент №5 т. 1: the queue has a vote — freezing is exactly what
+        # would make a refused delta invisible. Амандамент №6 т. 1: the vote is
+        # the release gate's VERDICT, not two of the lists behind it. A release
+        # blocked for any other reason — a signed artefact edited in the
+        # worktree, a missing reference blob, a stale pin — has an empty
+        # `uncovered` and an empty `refused`, and reading only those two froze a
+        # blocked delivery with exit 0. Every blocked line is printed: the
+        # human is told all of it, not the first sentence of it.
         if _release is None:
             blockers.append(u"release-гейтът не отговори — опашката не е прочетена")
-        else:
-            for _delta in _release["uncovered"][:10]:
-                blockers.append(u"непокрита делта %s/%s: %s"
-                                % (_delta["bucket"], _delta["q"],
-                                   u"; ".join(_delta["why"])))
-            if len(_release["uncovered"]) > 10:
-                blockers.append(u"… още %d непокрити делти"
-                                % (len(_release["uncovered"]) - 10))
-            for _item in _refused[:10]:
-                blockers.append(u"ОТКАЗАНА делта %s/%s (ред %s): %s"
-                                % (_item.get("bucket"), _item.get("q"),
-                                   _item.get("row"), u"; ".join(_item.get("why") or [])))
-            if len(_refused) > 10:
-                blockers.append(u"… още %d отказани делти" % (len(_refused) - 10))
-        _fresh = build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA),
-                                    refused=_refused)
-        if engine_blocks(_fresh) != engine_blocks(expectations() or {}):
+        elif _release["exit_code"] != 0:
+            blockers.append(u"release-гейтът не е зелен (%s) — замразяване става "
+                            u"САМО при зелена присъда" % _release["verdict"])
+            for _line in _release["blocked"]:
+                blockers.append(u"release: %s" % _line)
+        try:
+            _fresh = build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA),
+                                        refused=_refused)
+        except (ValueError, OSError, SystemExit) as _exc:
+            # A body that cannot even be measured is a body nobody may freeze.
+            # `SystemExit` is named on purpose: `blob_text` fails loud with it,
+            # and a missing reference blob would otherwise kill the run before
+            # the blockers above are ever printed — the exit code would be right
+            # and the reason unreadable.
+            blockers.append(u"очакванията не могат да се измерят: %s" % _exc)
+            _fresh = None
+        if _fresh is not None and engine_blocks(_fresh) != engine_blocks(expectations() or {}):
             blockers.append(u"измереното сега се различава от подписаното — "
                             u"замразяването не пренася подпис върху друг отговор")
         if blockers:
