@@ -1552,6 +1552,86 @@ class ReleaseGateSignatureTest(unittest.TestCase):
         self.assertGreaterEqual(green, 0)
 
 
+class RefusalSurvivesTheFreezeTest(unittest.TestCase):
+    """Амандамент №5 т. 1–2: what a freeze may not erase, and what a pen may not write.
+
+    The freeze makes the reference equal to the candidate, so a delta Petar
+    answered „не“ disappears from the comparison the moment it is frozen — the
+    exact move the row forbade. `gates.release.refusal_survivors` reads the
+    refusals the freeze wrote down and blocks on them afterwards; it is a pure
+    function over two documents, so it is gated here, without a repository.
+
+    The second half is the pen: `gates.sign.apply_signature` COMPUTES the signed
+    body and writes nothing, so a refusal on a later row cannot leave an earlier
+    artefact already changed.
+    """
+
+    def rows(self, decision):
+        return [{"id": "R5", "decision": decision, "covers": ["gate_lot1/*"],
+                 "artefact": "expectations", "date": "2026-09-05", "digest": "",
+                 "title": "", "ask": ""}]
+
+    def recorded(self):
+        return {"_meta": {"refused": [{"bucket": "gate_lot1", "q": "градина",
+                                       "row": "R5", "why": ["друг етикет"]}]}}
+
+    def test_a_recorded_refusal_blocks_even_with_no_deltas_left(self):
+        from gates import release
+        complaints = release.refusal_survivors(self.recorded(), self.rows(release.NO))
+        self.assertEqual(len(complaints), 1, complaints)
+        self.assertIn("R5", complaints[0])
+        self.assertIn("gate_lot1/градина", complaints[0])
+
+    def test_a_body_with_no_refusals_is_silent(self):
+        from gates import release
+        for doc in ({}, {"_meta": {}}, {"_meta": {"refused": []}}):
+            self.assertEqual(release.refusal_survivors(doc, self.rows(release.NO)), [])
+
+    def test_a_refusal_cannot_be_lifted_by_re_deciding_the_row(self):
+        """„не“ is terminal: a row that came back as „да“ came back by hand."""
+        from gates import release
+        for decision in (release.YES, release.PENDING, ""):
+            complaints = release.refusal_survivors(self.recorded(), self.rows(decision))
+            self.assertEqual(len(complaints), 1, (decision, complaints))
+        complaints = release.refusal_survivors(self.recorded(), [])
+        self.assertEqual(len(complaints), 1, complaints)
+        self.assertIn("няма в опашката", complaints[0])
+
+    def test_the_queue_row_may_carry_a_body_digest(self):
+        """Проверка 7 accepts a digest Petar recorded; the parser must read it."""
+        from gates import release
+        queue = pathlib.Path(self.temp_queue())
+        row = release.parse_queue(queue)[0]
+        self.assertEqual(row["id"], "R5")
+        self.assertEqual(row["digest"], "a" * 64)
+        self.assertEqual(row["covers"], ["gate_lot1/*"])
+
+    def temp_queue(self):
+        import tempfile
+        path = pathlib.Path(tempfile.gettempdir()) / "fv_queue_fixture.md"
+        path.write_text("## R5 · фикстура\n"
+                        "- **id:** R5\n"
+                        "- **решение:** не\n"
+                        "- **дата:** 2026-09-05\n"
+                        "- **артефакт:** expectations\n"
+                        "- **покрива:** gate_lot1/*\n"
+                        "- **дайджест:** %s\n" % ("a" * 64),
+                        encoding="utf-8", newline="\n")
+        return str(path)
+
+    def test_the_pen_computes_the_body_and_writes_nothing(self):
+        from gates import sign
+        rel = "scratch/places_search/expectations.json"
+        before = EXPECTATIONS.read_bytes()
+        complaint, body = sign.apply_signature(rel)
+        self.assertIsNone(complaint, complaint)
+        self.assertEqual(before, EXPECTATIONS.read_bytes(),
+                         "apply_signature е писала по файла — писането е в един блок накрая")
+        if body is not None:
+            self.assertIn('"%s"' % SIGNER, body)
+            self.assertNotIn('"pending — %s"' % SIGNER, body)
+
+
 class PlacesCacheNameTest(unittest.TestCase):
     """ADR 008 D8: the cache namespace is a hand-kept copy on two sides.
 

@@ -27,6 +27,15 @@ row whose decision is „не“ (terminal) covering a live delta: BLOCKED. A si
 row that covers nothing: BLOCKED — a stale permission is not a permission (the
 same rule gates/coverage.py applies with exit 3).
 
+A REFUSAL SURVIVES THE FREEZE (амандамент №5 т. 1). A freeze makes the
+reference equal to the candidate, so afterwards there is no delta left for the
+queue to refuse and a row Petar answered „не“ would be erased by the very act
+it forbade. Two things stop that here: `expectations._meta.refused` — what the
+freeze SAW, written down by `build_expectations` — is read back and blocks; and
+every „не“ row is re-derived independently against the FROZEN reference, from
+the signed base anchor forward, so a hand-assembled body with an empty
+`refused` list is caught by the bytes rather than by its own bookkeeping.
+
 The comparison is FULL and ORDERED: all rows of every query, in their order,
 with their labels; never a head, never a count alone — a count cannot see a
 swap of two rows.
@@ -158,6 +167,11 @@ FIELD_DECISION = u"решение"
 FIELD_DATE = u"дата"
 FIELD_ARTEFACT = u"артефакт"
 FIELD_COVERS = u"покрива"
+# Optional: the digest of the body Petar signed off on. Проверка 7 accepts it
+# instead of his authorship on the NEWEST commit that touched the artefact —
+# the freeze rewrites the body after the signature, and the number he recorded
+# is what says he saw the result (амандамент №5 т. 3).
+FIELD_DIGEST = u"дайджест"
 
 
 def find_queue(explicit):
@@ -217,6 +231,7 @@ def parse_queue(path):
             "date": (fields.get(FIELD_DATE) or "").strip(),
             "artefact": (fields.get(FIELD_ARTEFACT) or "").strip(),
             "covers": covers,
+            "digest": (fields.get(FIELD_DIGEST) or "").strip(),
         })
     return out
 
@@ -297,6 +312,72 @@ def compare(reference, candidate):
     return deltas
 
 
+# ------------------------------------------------- a refusal survives the freeze
+
+def refusal_survivors(expectations_doc, rows):
+    """Complaints for every refusal the freeze WROTE DOWN (`_meta.refused`).
+
+    `--freeze` refuses to run while a „не“ row covers a live delta, so a frozen
+    body should carry an empty list. If it carries anything, that is the freeze
+    saying what it saw, and it blocks — including after the delta itself has
+    been erased by the freeze, which is the whole point (амандамент №5 т. 1).
+    A recorded refusal whose row has since been re-decided blocks as well: „не“
+    is terminal (план v2 §0.6), so a row that changed its mind changed it by
+    hand, and a hand belongs in a new round, not in this gate.
+    """
+    out = []
+    recorded = (((expectations_doc or {}).get("_meta") or {}).get("refused") or [])
+    by_id = dict((row["id"], row) for row in rows)
+    for item in recorded:
+        row_id = item.get("row")
+        where = u"%s/%s" % (item.get("bucket"), item.get("q"))
+        row = by_id.get(row_id)
+        if row is None:
+            out.append(u"%s: записан отказ по ред %s, а такъв ред няма в опашката"
+                       % (where, row_id))
+        elif row["decision"] == NO:
+            out.append(u"%s: ред %s е ОТКАЗАН (терминално) — записано в очакванията"
+                       % (where, row_id))
+        else:
+            out.append(u"%s: записан отказ по ред %s, а редът сега е %r — отказът "
+                       u"не се сваля с ново решение" % (where, row_id, row["decision"]))
+    return out
+
+
+def refused_against_reference(expectations_doc, rows, reference):
+    """Re-derive the refusals from the bytes: signed base → FROZEN reference.
+
+    Independent of `_meta.refused`: the base anchor of the expectations is the
+    reference Petar's queue is written against, so anything a „не“ row covers
+    that still differs between that base and the reference at HEAD is a refusal
+    the delivery is carrying anyway. A body that simply forgot to write its
+    refusals down does not get past this.
+    """
+    refused_rows = [row for row in rows if row["decision"] == NO and row["covers"]]
+    if not refused_rows:
+        return []
+    base = ((expectations_doc or {}).get("_meta") or {}).get("base") or {}
+    commit, rel = base.get("commit"), base.get("path")
+    if not commit or not rel:
+        return [u"опашката отказва %d реда, а очакванията нямат котва „base“ — "
+                u"отказът не може да се провери срещу референцията"
+                % len(refused_rows)]
+    try:
+        base_doc = json.loads(blob_at(commit, rel).decode("utf-8"))
+    except (ValueError, OSError) as exc:
+        return [u"котвата „base“ (%s:%s): %s" % (commit, rel, exc)]
+    out = []
+    for delta in compare(entries_of(base_doc), reference):
+        for row in refused_rows:
+            if any(covers_delta(p, delta["bucket"], delta["q"]) for p in row["covers"]):
+                out.append(u"%s/%s: ред %s е ОТКАЗАН, а разликата спрямо %s е в "
+                           u"замразената референция (%s)"
+                           % (delta["bucket"], delta["q"], row["id"], commit,
+                              u"; ".join(delta["why"])))
+                break
+    return out
+
+
 # --------------------------------------------------------------------- the gate
 
 def run(queue_override=None):
@@ -311,7 +392,12 @@ def run(queue_override=None):
         bad.append(text)
         lines.append(u"✗ " + text)
 
-    # --- 1. the artefacts and their signatures -------------------------------
+    # --- 1. the artefacts and their signatures, READ FROM THE BLOB -----------
+    # Амандамент №5 т. 5: a push publishes the blob at HEAD, so the gate judges
+    # the blob at HEAD. The worktree copy is compared with it as a body (not as
+    # bytes: `.gitattributes` gives a Windows checkout the CRLF twin of the same
+    # OID), and a difference is blocked — that is „signed on my disk, unsigned
+    # in the commit“, which is exactly how an unsigned delivery gets published.
     artefacts = {}
     table = signable()
     for name in sorted(table):
@@ -321,10 +407,18 @@ def run(queue_override=None):
             block(u"липсва %s (%s)" % (rel, name))
             continue
         try:
-            doc = json.loads(path.read_text(encoding="utf-8"))
+            doc = json.loads(blob_at("HEAD", rel).decode("utf-8"))
+        except (ValueError, OSError) as exc:
+            block(u"%s (%s): няма го в блоба на HEAD — %s" % (rel, name, exc))
+            continue
+        try:
+            on_disk = json.loads(path.read_text(encoding="utf-8"))
         except (ValueError, OSError) as exc:
             block(u"%s: %s" % (rel, exc))
             continue
+        if on_disk != doc:
+            block(u"%s: работното дърво носи друго тяло от блоба на HEAD "
+                  u"(пушът праща блоба)" % rel)
         signature = signed_by_of(doc)
         artefacts[name] = {"rel": rel, "doc": doc, "signed_by": signature}
         if coverage.is_signed_by_petar(signature):
@@ -445,7 +539,7 @@ def run(queue_override=None):
                     block(u"ред %s е „да“, а %s не носи подписа"
                           % (row["id"], table[name]))
 
-    used, uncovered = set(), []
+    used, uncovered, refused = set(), [], []
     for delta in deltas:
         owner = None
         for row in rows:
@@ -454,6 +548,8 @@ def run(queue_override=None):
             if row["decision"] == NO:
                 block(u"%s/%s: ред %s е ОТКАЗАН (терминално)"
                       % (delta["bucket"], delta["q"], row["id"]))
+                refused.append({"bucket": delta["bucket"], "q": delta["q"],
+                                "row": row["id"], "why": delta["why"]})
                 owner = row["id"]
                 used.add(row["id"])
                 break
@@ -483,10 +579,27 @@ def run(queue_override=None):
     if rows and not deltas:
         say(u"0 делти — всяко разрешение е приложено (замразяването е в HEAD)")
 
-    return verdict(lines, bad, deltas, uncovered, stale)
+    # --- 7. the refusals, after the freeze has erased the deltas -------------
+    survivors = refusal_survivors(expectations, rows)
+    for complaint in survivors:
+        block(u"отказ: " + complaint)
+        refused.append({"bucket": None, "q": None, "row": None, "why": [complaint]})
+    rederived = refused_against_reference(expectations, rows, reference)
+    for complaint in rederived[:10]:
+        block(u"отказ (от байтовете): " + complaint)
+    if len(rederived) > 10:
+        block(u"… още %d отказани разлики в замразената референция"
+              % (len(rederived) - 10))
+    if rederived:
+        refused.extend({"bucket": None, "q": None, "row": None, "why": [c]}
+                       for c in rederived)
+    if not survivors and not rederived and rows:
+        say(u"отказите: 0 записани, 0 в замразената референция ✓")
+
+    return verdict(lines, bad, deltas, uncovered, stale, refused)
 
 
-def verdict(lines, bad, deltas, uncovered, stale):
+def verdict(lines, bad, deltas, uncovered, stale, refused=None):
     return {
         "exit_code": EXIT_BLOCKED if bad else EXIT_OK,
         "verdict": (u"BLOCKED: %d" % len(bad)) if bad else u"зелено",
@@ -495,6 +608,7 @@ def verdict(lines, bad, deltas, uncovered, stale):
         "deltas": deltas,
         "uncovered": uncovered,
         "stale": stale,
+        "refused": list(refused or []),
     }
 
 

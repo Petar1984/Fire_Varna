@@ -3608,7 +3608,21 @@ def lf_digest(text_body):
     return {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
 
 
-def build_expectations(artefact_text, candidate_doc, sweep):
+def release_verdict(queue_override=None):
+    """`gates.release.run()` for THIS checkout — the release gate's own words.
+
+    Амандамент №5 т. 1: a freeze makes the reference equal to the candidate, so
+    it can erase a delta Petar answered „не“ and leave everything green. The
+    file that knows what the queue says is `gates/release.py`, so the freeze
+    asks IT instead of growing a second reader of the same queue. It is a GATE:
+    it is computed with the other gates, before anything is written."""
+    if str(REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(REPO_ROOT))
+    from gates import release as release_gate
+    return release_gate.run(queue_override)
+
+
+def build_expectations(artefact_text, candidate_doc, sweep, refused=None):
     """The whole body — measured here, signed by Petar, read by the suite."""
     artefact_doc = json.loads(artefact_text)
     reference_doc = blob_json(u"HEAD", ROWS_REL)
@@ -3637,6 +3651,12 @@ def build_expectations(artefact_text, candidate_doc, sweep):
                           what=u"двигателят, върху който са мерени очакванията"),
         "base": commit_anchor(BASE_COMMIT, ROWS_REL,
                               u"замразената референция след лот Б"),
+        # What the queue REFUSED at the moment this body was measured — the
+        # deltas a row answered „не“ covers (амандамент №5 т. 1). `--freeze`
+        # will not run while this is non-empty, and `gates/release.py` reads it
+        # back afterwards: the freeze erases the delta, it does not erase the
+        # refusal.
+        "refused": list(refused or []),
         "inputs": dict((rel, commit_anchor(u"HEAD", rel, u"входът на доставката"))
                        for rel in INPUT_RELS),
     }
@@ -4042,12 +4062,13 @@ def main():
                                 for _t in place_tokens(_x)]}
                     for _x in _corpus],
     }
-    # LF, like every other tracked body this script writes: a CRLF twin on a
-    # Windows worktree has the same OID and different bytes, and a refused
-    # `--freeze` has to leave `git status` clean (амандамент №4 т. 2).
-    pathlib.Path(REPO_PARITY_OUT).write_text(
-        json.dumps(_parity, ensure_ascii=False, indent=1, sort_keys=False) + chr(10),
-        encoding="utf-8", newline=chr(10))
+    # The BODY is measured here; the WRITE is in the last block of main, with
+    # the reference and the expectations (амандамент №5 т. 4). It is a tracked
+    # file, so a refused `--freeze` must leave it byte-untouched even when the
+    # tokeniser corpus has moved — „гейтовете първо, записът последен“ holds for
+    # every tracked body this script owns, not only for the two big ones.
+    _parity_text = (json.dumps(_parity, ensure_ascii=False, indent=1, sort_keys=False)
+                    + chr(10))
 
     OUT = OUTDIR + ("recall_sweep_v22.md" if CAPMODE == "plan"
                     else "recall_sweep_v22_cap_poi.md")
@@ -4141,14 +4162,35 @@ def main():
     red = (sweep_bad or p7_bad or lot1_bad or lot1v_bad or lot1v_b_bad
            or lot1v_v_bad or m7_bad)
 
+    # The release gate is the seventh gate of this run whenever a tracked body
+    # is about to be written: it is the only one that reads Petar's queue, and
+    # амандамент №5 т. 1 gives the freeze two of its answers — the uncovered
+    # deltas and the REFUSED ones. Computed here, with the gates; read below,
+    # with the writes.
+    _release, _refused = None, []
+    if FREEZE or MANIFEST:
+        try:
+            _release = release_verdict()
+        except (ValueError, OSError) as exc:
+            print(u"release-гейтът не можа да отговори: %s" % exc)
+        else:
+            _refused = _release["refused"]
+            print(u"release: %s ; непокрити делти %d ; отказани %d"
+                  % (_release["verdict"], len(_release["uncovered"]), len(_refused)))
+
     # ---------------------------------------------------------------- the writes
     # Амандамент №4 т. 2: the gates are computed ABOVE; the tracked bodies are
     # written HERE, last, and only when there is nothing red and the signature is
     # on the manifests. The old order wrote the reference first and measured
     # afterwards, so a red run left a frozen artefact behind.
+    if not FREEZE:
+        # A report-only run gates nothing and publishes nothing; its tracked
+        # parity corpus is written here, at the end, with the other writes.
+        pathlib.Path(REPO_PARITY_OUT).write_text(_parity_text, encoding="utf-8",
+                                                 newline=chr(10))
     if MANIFEST and not FREEZE:
         _doc = build_expectations(blob_text(u"HEAD", ROWS_REL), ROWS,
-                                  measure_sweep(M5, EXTRA))
+                                  measure_sweep(M5, EXTRA), refused=_refused)
         _path, _signature = write_expectations(_doc, frozen=False)
         print(u"REPORT-ONLY: очаквания -> %s (signed_by: %s)" % (_path, _signature))
 
@@ -4172,7 +4214,28 @@ def main():
                         .get("signed_by"))
             if (_sig or u"").strip() != SIGNER:
                 blockers.append(u"%s е подписан от „%s“, а не от „%s“" % (_name, _sig, SIGNER))
-        _fresh = build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA))
+        # Амандамент №5 т. 1: the queue has a vote. A delta nobody covered and a
+        # delta Petar REFUSED are both reasons not to freeze — the second one
+        # above all, because freezing is exactly what would make a refused delta
+        # invisible.
+        if _release is None:
+            blockers.append(u"release-гейтът не отговори — опашката не е прочетена")
+        else:
+            for _delta in _release["uncovered"][:10]:
+                blockers.append(u"непокрита делта %s/%s: %s"
+                                % (_delta["bucket"], _delta["q"],
+                                   u"; ".join(_delta["why"])))
+            if len(_release["uncovered"]) > 10:
+                blockers.append(u"… още %d непокрити делти"
+                                % (len(_release["uncovered"]) - 10))
+            for _item in _refused[:10]:
+                blockers.append(u"ОТКАЗАНА делта %s/%s (ред %s): %s"
+                                % (_item.get("bucket"), _item.get("q"),
+                                   _item.get("row"), u"; ".join(_item.get("why") or [])))
+            if len(_refused) > 10:
+                blockers.append(u"… още %d отказани делти" % (len(_refused) - 10))
+        _fresh = build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA),
+                                    refused=_refused)
         if engine_blocks(_fresh) != engine_blocks(expectations() or {}):
             blockers.append(u"измереното сега се различава от подписаното — "
                             u"замразяването не пренася подпис върху друг отговор")
@@ -4187,8 +4250,14 @@ def main():
         pathlib.Path(REPO_ROWS_OUT).write_text(_rows_text, encoding="utf-8", newline="\n")
         print(u"FREEZE: замразена референция -> %s" % REPO_ROWS_OUT)
         _path, _signature = write_expectations(
-            build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA)), frozen=True)
+            build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA),
+                               refused=_refused), frozen=True)
         print(u"FREEZE: очаквания -> %s (signed_by: %s)" % (_path, _signature))
+        # The third tracked body of this script, in the same block: a refused
+        # freeze leaves it byte-untouched (амандамент №5 т. 4).
+        pathlib.Path(REPO_PARITY_OUT).write_text(_parity_text, encoding="utf-8",
+                                                 newline=chr(10))
+        print(u"FREEZE: паритет на токенизатора -> %s" % REPO_PARITY_OUT)
 
     return 1 if red else 0
 

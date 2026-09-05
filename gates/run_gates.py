@@ -18,7 +18,10 @@ Seven checks, one table, one exit code:
                      candidate, the pinned inputs and the manifests bound by
                      digest; every delta covered by a signed queue row
   7. authorship      every `signed_by: "Петър"` was introduced by a commit of
-                     Petar1984, never by an agent (`git log -S`)
+                     Petar1984, never by an agent (`git log -S`) — AND the body
+                     it protects has not been rewritten since: the newest commit
+                     on a signed artefact is Petar's too, or he recorded the
+                     digest of the resulting body himself (амандамент №5 т. 3)
 
 The gate never imports `unittest` and never reads `tests/`: a check that shares
 code with the suite it guards cannot fail independently of it.
@@ -439,6 +442,32 @@ def git_lines(*args: str) -> list[str]:
     return out.stdout.decode("utf-8", "replace").splitlines()
 
 
+def last_commit_on(rel: str) -> tuple[str, str] | None:
+    """(hash, author) of the NEWEST commit that touched a path."""
+    lines = git_lines("log", "-1", "--format=%H\t%an", "--", rel)
+    if not lines:
+        return None
+    parts = lines[0].split("\t", 1)
+    return (parts[0], parts[1] if len(parts) > 1 else "")
+
+
+BODY_DIGEST_RE = re.compile(r"body-sha256:\s*([0-9a-f]{64})")
+
+
+def digests_in_commit_message(commit: str) -> set[str]:
+    """Every `body-sha256: <hex>` Petar wrote into a commit message.
+
+    The escape hatch of амандамент №5 т. 3: the freeze rewrites the signed body
+    AFTER Petar's signing commit, so the newest commit on that path can be an
+    agent's. It is accepted only when the human recorded the digest of the
+    resulting body himself — in his own commit or on his own queue row."""
+    body = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-1", "--format=%B", commit],
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if body.returncode != 0:
+        return set()
+    return set(BODY_DIGEST_RE.findall(body.stdout.decode("utf-8", "replace")))
+
+
 def introduced_by(rel: str, needle: str) -> tuple[str, str] | None:
     """(hash, author) of the newest commit that changed the count of `needle`.
 
@@ -460,12 +489,29 @@ def check_signature_authorship() -> Check:
     may INTRODUCE `signed_by: "Петър"`. Without this the barrier is a habit; with
     it, an agent that writes the signature itself is red on the next push, and
     the check names the commit and the author."""
-    check = Check("7 · авторството на подписите (git log -S)")
+    check = Check("7 · авторството на подписите и на тялото (git log -S)")
     needle = '"signed_by": "%s"' % coverage.SIGNER
     targets = dict(release.SIGNABLE)
     allow_dir = REPO_ROOT / ALLOW_DIR
     for path in sorted(allow_dir.glob("*.json")) if allow_dir.exists() else []:
         targets["allow:" + path.name] = str(path.relative_to(REPO_ROOT)).replace("\\", "/")
+
+    # The digests Petar recorded on his own queue rows, per artefact name. Read
+    # before the loop so the body check below has them; the authorship of the
+    # queue itself is checked at the end of this function.
+    row_digests: dict[str, set[str]] = {}
+    try:
+        queue_path = release.find_queue(None)
+    except ValueError as exc:
+        check.fail(str(exc))
+        queue_path = None
+    queue_rows: list[dict] = []
+    if queue_path is not None and queue_path.exists():
+        queue_rows = release.parse_queue(queue_path)
+        for row in queue_rows:
+            if row["decision"] == release.YES and row["artefact"] and row.get("digest"):
+                row_digests.setdefault(row["artefact"], set()).add(row["digest"])
+
     signed = 0
     for name in sorted(targets):
         rel = targets[name]
@@ -490,20 +536,44 @@ def check_signature_authorship() -> Check:
             continue
         if author is None:
             check.fail("%s: подписът не е въведен от нито един комит" % rel)
-        elif author[1] != HUMAN_AUTHOR:
+            continue
+        if author[1] != HUMAN_AUTHOR:
             check.fail("%s: подписът е въведен от %r в %s — подписва само %s"
                        % (rel, author[1], author[0][:7], HUMAN_AUTHOR))
-        else:
-            check.say("%s: подписан в %s от %s ✓" % (rel, author[0][:7], author[1]))
+            continue
+        check.say("%s: подписан в %s от %s ✓" % (rel, author[0][:7], author[1]))
 
-    try:
-        queue_path = release.find_queue(None)
-    except ValueError as exc:
-        check.fail(str(exc))
-        queue_path = None
+        # …and the BODY (амандамент №5 т. 3). A signature protects the bytes it
+        # was given to: an agent commit that rewrites a signed artefact
+        # afterwards leaves the `signed_by` literal untouched, so `git log -S`
+        # never sees it. The newest commit on that path must therefore be
+        # Petar's too — or he must have recorded the digest of the body that
+        # came out, in his signing commit or on his queue row.
+        try:
+            newest = last_commit_on(rel)
+            body = hashlib.sha256(release.blob_at("HEAD", rel)).hexdigest()
+        except ValueError as exc:
+            check.fail(str(exc))
+            continue
+        if newest is None:
+            check.fail("%s: няма комит с този файл" % rel)
+        elif newest[1] == HUMAN_AUTHOR:
+            check.say("%s: тялото %s, последен комит %s от %s ✓"
+                      % (rel, body[:12], newest[0][:7], newest[1]))
+        else:
+            allowed = digests_in_commit_message(author[0])
+            allowed |= row_digests.get(name.split(":", 1)[0], set())
+            if body in allowed:
+                check.say("%s: тялото %s е дайджестът, който Петър записа ✓"
+                          % (rel, body[:12]))
+            else:
+                check.fail("%s: подписан, но последният комит по него е на %r "
+                           "(%s), а дайджестът на тялото %s не е записан от %s"
+                           % (rel, newest[1], newest[0][:7], body[:12], HUMAN_AUTHOR))
+
     if queue_path is not None and queue_path.exists():
         rel = str(queue_path.relative_to(REPO_ROOT)).replace("\\", "/")
-        rows = [r for r in release.parse_queue(queue_path) if r["decision"] == release.YES]
+        rows = [r for r in queue_rows if r["decision"] == release.YES]
         if rows:
             signed += len(rows)
             try:

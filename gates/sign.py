@@ -23,6 +23,12 @@ refuses to run at all while the git identity of the checkout is an agent's.
 named row is decided — план §A.3 R1: „подписва по клас, с възможност за
 изключение по ред“. The exception is the positional pair, the class is `--all`.
 
+It COMPUTES FIRST AND WRITES LAST (амандамент №5 т. 2): the queue is edited in
+memory, every artefact body is prepared in a buffer, and the writes happen in
+one block only after the last row is decided. A refusal on row 2 therefore
+leaves row 1's artefact untouched — „НИЩО НЕ Е ЗАПИСАНО“ means zero changed
+files, and `git status --porcelain` is what says so.
+
 „не“ is TERMINAL (план v2 §0.6): a row that was refused is „отказано“ and this
 tool will not re-decide it. A decided row is never silently overwritten either
 — re-applying the same decision is a no-op, changing it is a refusal with the
@@ -105,26 +111,35 @@ def refuse_if_agent():
 
 
 def apply_signature(rel_path):
-    """Write the signature into one artefact — a textual, byte-minimal edit.
+    """COMPUTE the signed body of one artefact — and write not one byte.
 
-    Re-dumping the JSON would rewrite bytes nobody decided to change and the
-    digest of a signed document is the thing every gate binds to. So the
-    pending literal is replaced and nothing else moves."""
+    Амандамент №5 т. 2: this used to write the file and let a later row refuse,
+    after which the tool printed „НИЩО НЕ Е ЗАПИСАНО“ over a changed worktree.
+    It now returns a buffer and `main` performs every write in one block, after
+    the last decision is known: compute first, write last — the same rule
+    `--freeze` follows.
+
+    Returns `(complaint, text)`: a complaint means nothing may be written at
+    all; `text is None` with no complaint means the artefact already carries the
+    signature (idempotent).
+
+    The edit is textual and byte-minimal on purpose. Re-dumping the JSON would
+    rewrite bytes nobody decided to change, and the digest of a signed document
+    is the thing every gate binds to."""
     path = REPO_ROOT / rel_path
     if not path.exists():
-        return u"липсва %s" % rel_path
+        return (u"липсва %s" % rel_path, None)
     text = path.read_text(encoding="utf-8")
     pending = u'"%s"' % PENDING_SIGNATURE
     signed = u'"%s"' % SIGNER
     if pending not in text:
         if signed in text:
-            return None                      # already signed — idempotent
-        return u"%s не носи %r — не пипам нищо" % (rel_path, PENDING_SIGNATURE)
+            return (None, None)              # already signed — idempotent
+        return (u"%s не носи %r — не пипам нищо" % (rel_path, PENDING_SIGNATURE), None)
     if text.count(pending) != 1:
         return (u"%s носи %d пъти %r — подписът е по един на артефакт"
-                % (rel_path, text.count(pending), PENDING_SIGNATURE))
-    path.write_text(text.replace(pending, signed), encoding="utf-8", newline="\n")
-    return None
+                % (rel_path, text.count(pending), PENDING_SIGNATURE), None)
+    return (None, text.replace(pending, signed))
 
 
 def decide_row(lines, row, decision, today):
@@ -200,9 +215,13 @@ def main(argv):
                  if row["id"] != args.row_id and row["decision"] == PENDING]
 
     today = datetime.date.today().isoformat()
+    # The queue is edited IN MEMORY (`lines`) and the artefacts are computed
+    # into `pending_writes`; not one byte reaches the disk before the loop is
+    # over and `refusals` is empty (амандамент №5 т. 2).
     lines = queue_path.read_text(encoding="utf-8").splitlines()
     table = artefacts()
     touched, refusals, signed_files = [], [], []
+    pending_writes = []
     for row, decision in plan:
         if row["decision"] == NO:
             refusals.append(u"ред %s е ОТКАЗАН на %s — „не“ е терминално "
@@ -229,18 +248,24 @@ def main(argv):
             refusals.append(u"ред %s сочи непознат артефакт %r (познати: %s)"
                             % (row["id"], target, u", ".join(sorted(table))))
             continue
-        complaint = apply_signature(table[target])
+        complaint, body = apply_signature(table[target])
         if complaint:
             refusals.append(u"ред %s: %s" % (row["id"], complaint))
-        else:
-            signed_files.append(table[target])
+            continue
+        if body is not None:
+            pending_writes.append((REPO_ROOT / table[target], body))
+        signed_files.append(table[target])
 
     if refusals:
         for line in refusals:
             sys.stdout.write(u"✗ %s\n" % line)
-        sys.stdout.write(u"НИЩО НЕ Е ЗАПИСАНО — оправи горното и пусни пак.\n")
+        sys.stdout.write(u"НИЩО НЕ Е ЗАПИСАНО — нула променени файлове; "
+                         u"оправи горното и пусни пак.\n")
         return EXIT_REFUSED
 
+    # --- the writes, all of them, here and nowhere else ----------------------
+    for path, body in pending_writes:
+        path.write_text(body, encoding="utf-8", newline="\n")
     queue_path.write_text(u"\n".join(lines) + u"\n", encoding="utf-8", newline="\n")
     for line in touched:
         sys.stdout.write(u"✓ %s\n" % line)
