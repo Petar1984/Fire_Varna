@@ -5,7 +5,7 @@
   "generator": "scratch/places_search/recall_sweep.py --report-only",
   "generated": "2026-09-05",
   "frozen": false,
-  "signed_by": "pending — Петър",
+  "signed_by": "Петър",
   "pending_bucket": "gate_lot1v_v",
   "note": "Референцията НЕ е замразена. Тестовете, които пинват старата, са ЧЕРВЕНИ до подписа — това е гейтът, не дефект.",
   "base": {

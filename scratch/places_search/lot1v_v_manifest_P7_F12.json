@@ -5,7 +5,7 @@
   "generator": "scratch/places_search/recall_sweep.py --manifest (report-only)",
   "generated": "2026-09-05",
   "frozen": false,
-  "signed_by": "pending — Петър",
+  "signed_by": "Петър",
   "note": "Референцията НЕ е замразена и този прогон не я пипа. Тестовете, които пинват старите числа, остават ЧЕРВЕНИ до подписа — това е гейтът, не дефект.",
   "base": {
    "what": "днешният двигател с М7 = OFF",

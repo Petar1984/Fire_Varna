@@ -5,7 +5,7 @@
   "generator": "scratch/places_search/recall_sweep.py --manifest | --freeze",
   "generated": "2026-09-05",
   "frozen": false,
-  "signed_by": "pending — Петър",
+  "signed_by": "Петър",
   "note": "Тестовете четат САМО този файл. Докато подписът е „pending — Петър“ всеки гейт връща един и същ отказ и казва защо.",
   "reference": {
    "sha256": "0bc7a189f4083095982c106a7685cd9d9500267388c7e2d18879a92c9f30b726",
@@ -47,6 +47,13 @@
     "commit": "HEAD",
     "what": "входът на доставката"
    }
+  },
+  "queue_reference": {
+   "sha256": "0bc7a189f4083095982c106a7685cd9d9500267388c7e2d18879a92c9f30b726",
+   "bytes": 256070,
+   "path": "scratch/places_search/recall_sweep_rows.json",
+   "commit": "86b394dddf48cc849627d5ae5dc8cc7adb1c0bf6",
+   "what": "референцията, срещу която е писана опашката"
   }
  },
  "gate_queries": {
