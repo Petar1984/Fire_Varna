@@ -2739,10 +2739,10 @@ def write_manifest(rows_doc, candidate_path, candidate_text):
             "pending_bucket": PENDING_BUCKET,
             "note": (u"Референцията НЕ е замразена. Тестовете, които пинват старата, "
                      u"са ЧЕРВЕНИ до подписа — това е гейтът, не дефект."),
-            "base": dict(sha_of(REPO_ROWS_OUT),
-                         path=u"scratch/places_search/recall_sweep_rows.json",
-                         commit=BASE_COMMIT,
-                         what=u"артефактът и доставката след лот Б"),
+            # F12-ж: the blob at the named commit, not the copy on disk — the
+            # CRLF twin in a Windows worktree is the same OID and different bytes.
+            "base": commit_anchor(BASE_COMMIT, ROWS_REL,
+                                  u"артефактът и доставката след лот Б"),
             # The candidate is a MEASUREMENT and lives in the system temp; only its
             # name and its digest belong in a tracked file (an absolute path would
             # pin this artefact to one machine and one user).
@@ -2973,6 +2973,86 @@ def sha_and_bytes(path):
     return {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
 
 
+# The reference, as the repository names it. An anchor quotes this string, so the
+# path in the manifest and the path git is asked about can never drift apart.
+ROWS_REL = u"scratch/places_search/recall_sweep_rows.json"
+
+
+def sha_and_bytes_at_commit(commit, rel_path):
+    """The digest of the BLOB a commit delivers — never of the file on disk.
+
+    An anchor that names a commit is a claim about history, and history is what
+    `git show <commit>:<path>` returns. The worktree copy of the same path can
+    differ from that blob byte for byte and still leave `git status` clean:
+    `.gitattributes` normalises text to LF on the way into the index, so the
+    reference this script writes with CRLF (266 021 B on a Windows worktree) is
+    the same OID as its 256 070 B blob. Reading the disk made the anchor a
+    property of one checkout on one machine; reading the blob makes it a
+    property of the commit, and a clean clone reproduces the manifest byte for
+    byte (F12-ж, амандамент №3 т. 1)."""
+    import subprocess
+    got = subprocess.run(["git", "-C", str(REPO_ROOT), "show",
+                          u"%s:%s" % (commit, rel_path)],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if got.returncode != 0:
+        raise SystemExit(u"котва: няма блоб %s:%s (%s)"
+                         % (commit, rel_path,
+                            got.stderr.decode("utf-8", "replace").strip()))
+    raw = got.stdout
+    return {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+
+
+def commit_anchor(commit, rel_path, what):
+    """The one shape a commit-named anchor may have — built from the blob."""
+    return dict(sha_and_bytes_at_commit(commit, rel_path),
+                path=rel_path, commit=commit, what=what)
+
+
+def commit_anchors(doc):
+    """[(where, anchor)] — every dict in a manifest that names a commit.
+
+    The walk is structural, not positional: an anchor moved into a new section
+    of a future manifest is still gated, and a new one nobody told the gate
+    about is gated the day it is written."""
+    found = []
+
+    def walk(node, where):
+        if isinstance(node, dict):
+            if "commit" in node and "path" in node and "sha256" in node:
+                found.append((where or u"_root", node))
+            for key in node:
+                walk(node[key], u"%s.%s" % (where, key))
+        elif isinstance(node, list):
+            for i, item in enumerate(node):
+                walk(item, u"%s[%d]" % (where, i))
+
+    walk(doc, u"")
+    return found
+
+
+def check_manifest_anchors(paths):
+    """Fail-loud gate (F12-ж): a commit-named anchor carries the blob's bytes.
+
+    Returns the list of complaints — empty means green. The generator calls it
+    on what it has just written and `manifest_anchor_gate.py` calls it on the
+    tracked manifests, so there is ONE implementation of the rule and no way
+    for the check and the writer to agree with each other while both are wrong."""
+    complaints = []
+    for path in paths:
+        doc = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+        name = pathlib.Path(path).name
+        for where, anchor in commit_anchors(doc):
+            want = sha_and_bytes_at_commit(anchor["commit"], anchor["path"])
+            got = {"sha256": anchor.get("sha256"), "bytes": anchor.get("bytes")}
+            if got != want:
+                complaints.append(
+                    u"%s %s: котвата казва %s / %s B, а блобът %s:%s е %s / %s B"
+                    % (name, where, (got["sha256"] or u"—")[:12], got["bytes"],
+                       anchor["commit"], anchor["path"],
+                       want["sha256"][:12], want["bytes"]))
+    return complaints
+
+
 def manifest_meta(what, base, candidate):
     return {
         "what": what,
@@ -3048,9 +3128,8 @@ def write_two_manifests(rows_with_m7):
         "_meta": manifest_meta(
             u"F12-в · манифест BASE → P7 (данните: М2+М3+М6). М7 е ИЗКЛЮЧЕН тук — "
             u"клонът има свой манифест.",
-            dict(sha_and_bytes(REPO_ROWS_OUT),
-                 path=u"scratch/places_search/recall_sweep_rows.json",
-                 commit=BASE_COMMIT, what=u"замразената референция след лот Б"),
+            commit_anchor(BASE_COMMIT, ROWS_REL,
+                          u"замразената референция след лот Б"),
             {"what": u"днешният двигател с М7 = OFF",
              "sha256": hashlib.sha256(p7_text.encode("utf-8")).hexdigest(),
              "bytes": len(p7_text.encode("utf-8"))}),
@@ -3152,6 +3231,12 @@ def write_two_manifests(rows_with_m7):
         path = out_dir / name
         path.write_text(dump(doc), encoding="utf-8", newline="\n")
         written.append(str(path))
+    # F12-ж: the writer gates itself on what it has just written. A manifest
+    # whose commit-named anchor does not match the blob never reaches Petar.
+    complaints = check_manifest_anchors(written)
+    if complaints:
+        raise SystemExit(u"МАНИФЕСТ · котва не е блобът на комита:\n  " +
+                         u"\n  ".join(complaints))
     return written
 
 
