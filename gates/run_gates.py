@@ -3,7 +3,7 @@
 
     python -m gates.run_gates [--base git:<rev>] [--allow <path>]
 
-Six checks, one table, one exit code:
+Seven checks, one table, one exit code:
 
   1. sha pins        the three SHA256 constants in `index.html` against the
                      LF-normalised bytes of the three delivered blobs — exactly
@@ -17,6 +17,8 @@ Six checks, one table, one exit code:
   6. release         gates/release.py — the frozen reference, the engine
                      candidate, the pinned inputs and the manifests bound by
                      digest; every delta covered by a signed queue row
+  7. authorship      every `signed_by: "Петър"` was introduced by a commit of
+                     Petar1984, never by an agent (`git log -S`)
 
 The gate never imports `unittest` and never reads `tests/`: a check that shares
 code with the suite it guards cannot fail independently of it.
@@ -37,6 +39,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -49,6 +52,8 @@ INDEX_HTML = "index.html"
 BASELINE_PATH = "gates/baseline/MANIFEST.json"
 ALLOW_DIR = "gates/allow"
 SIGNED_FACTS_PATH = "data/signed_facts.json"
+# The only author whose commit may INTRODUCE a signature (§0.5).
+HUMAN_AUTHOR = "Petar1984"
 
 # (constant in index.html, delivered blob)
 SHA_PINS = (
@@ -425,6 +430,104 @@ def check_release(queue_override: str | None) -> Check:
     return check
 
 
+def git_lines(*args: str) -> list[str]:
+    out = subprocess.run(["git", "-C", str(REPO_ROOT)] + list(args),
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise ValueError("git %s: %s" % (" ".join(args),
+                                         out.stderr.decode("utf-8", "replace").strip()))
+    return out.stdout.decode("utf-8", "replace").splitlines()
+
+
+def introduced_by(rel: str, needle: str) -> tuple[str, str] | None:
+    """(hash, author) of the newest commit that changed the count of `needle`.
+
+    `git log -S` is the pickaxe: it lists exactly the commits where the number
+    of occurrences of the string moved, so the newest of them is the commit
+    that put the signature in. None = the string is in no commit at all."""
+    lines = git_lines("log", "-S" + needle, "--format=%H\t%an", "--", rel)
+    if not lines:
+        return None
+    parts = lines[0].split("\t", 1)
+    return (parts[0], parts[1] if len(parts) > 1 else "")
+
+
+def check_signature_authorship() -> Check:
+    """Проверка 7 — a signature is worth the hand that committed it.
+
+    План v2 §0.5 and амандамент №4 т. 6: the executors commit as `Claude
+    Executor`, the architect as `Claude Architect`, and only Petar's own commit
+    may INTRODUCE `signed_by: "Петър"`. Without this the barrier is a habit; with
+    it, an agent that writes the signature itself is red on the next push, and
+    the check names the commit and the author."""
+    check = Check("7 · авторството на подписите (git log -S)")
+    needle = '"signed_by": "%s"' % coverage.SIGNER
+    targets = dict(release.SIGNABLE)
+    allow_dir = REPO_ROOT / ALLOW_DIR
+    for path in sorted(allow_dir.glob("*.json")) if allow_dir.exists() else []:
+        targets["allow:" + path.name] = str(path.relative_to(REPO_ROOT)).replace("\\", "/")
+    signed = 0
+    for name in sorted(targets):
+        rel = targets[name]
+        path = REPO_ROOT / rel
+        if not path.exists():
+            continue
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            check.fail("%s: невалиден JSON — %s" % (rel, exc))
+            continue
+        if not coverage.is_signed_by_petar(release.signed_by_of(doc)):
+            continue
+        signed += 1
+        try:
+            if git_lines("status", "--porcelain", "--", rel):
+                check.fail("%s: подписан, но НЕ е комитнат — пушът праща блоба на HEAD" % rel)
+                continue
+            author = introduced_by(rel, needle)
+        except ValueError as exc:
+            check.fail(str(exc))
+            continue
+        if author is None:
+            check.fail("%s: подписът не е въведен от нито един комит" % rel)
+        elif author[1] != HUMAN_AUTHOR:
+            check.fail("%s: подписът е въведен от %r в %s — подписва само %s"
+                       % (rel, author[1], author[0][:7], HUMAN_AUTHOR))
+        else:
+            check.say("%s: подписан в %s от %s ✓" % (rel, author[0][:7], author[1]))
+
+    try:
+        queue_path = release.find_queue(None)
+    except ValueError as exc:
+        check.fail(str(exc))
+        queue_path = None
+    if queue_path is not None and queue_path.exists():
+        rel = str(queue_path.relative_to(REPO_ROOT)).replace("\\", "/")
+        rows = [r for r in release.parse_queue(queue_path) if r["decision"] == release.YES]
+        if rows:
+            signed += len(rows)
+            try:
+                dirty = git_lines("status", "--porcelain", "--", rel)
+                last = git_lines("log", "-1", "--format=%H\t%an", "--", rel)
+            except ValueError as exc:
+                check.fail(str(exc))
+                dirty, last = [], []
+            if dirty:
+                check.fail("%s: подписани редове, но файлът не е комитнат" % rel)
+            elif not last:
+                check.fail("%s: няма комит с този файл" % rel)
+            else:
+                who = last[0].split("\t", 1)[1] if "\t" in last[0] else ""
+                if who != HUMAN_AUTHOR:
+                    check.fail("%s: последният комит е на %r, а носи %d подписани реда"
+                               % (rel, who, len(rows)))
+                else:
+                    check.say("%s: %d подписани реда, комит на %s ✓"
+                              % (rel, len(rows), who))
+    check.say("%d подписани артефакта/реда проверени" % signed)
+    return check
+
+
 def main(argv: list[str]) -> int:
     # Without this the table dies with UnicodeEncodeError on a cp1252 console
     # before the first row — a crash that reads like a pass (одит 05.09, дефект 4).
@@ -443,6 +546,7 @@ def main(argv: list[str]) -> int:
         check_coverage(args.base, args.allow),
         check_signed_facts(),
         check_release(args.queue),
+        check_signature_authorship(),
     ]
 
     out = sys.stdout
