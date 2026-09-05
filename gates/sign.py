@@ -306,6 +306,41 @@ def refusable_deltas_once(cache):
     return cache["deltas"], cache["complaint"]
 
 
+def hidden_region_complaint(lines, row):
+    """Why the pen may not write into this row — or None (амандамент №10 т. 1).
+
+    A fence or an HTML comment anywhere between the heading of a row and the
+    next VISIBLE heading is a region Petar does not see in the diff he signs and
+    the pen would have written into: `decide_row` used to walk every line, so an
+    example `- **тяло:** …` inside a fence was the field it replaced, the digest
+    of the signed body landed where no reader looks, and the parser — which
+    reads only the visible lines — got a row with no body at all. The pen reads
+    the same lines as the parser now; a row that carries a hidden region is
+    refused rather than signed around, because the queue is a document a human
+    reads and half of this one is not there."""
+    text = u"\n".join(lines)
+    hidden = set(n for n, _ in release.visible_and_hidden(text)[1])
+    if not hidden:
+        return None
+    inside, caught = False, []
+    for n, line in enumerate(lines, 1):
+        if n in hidden:
+            if inside:
+                caught.append(n)
+            continue
+        head = release.QUEUE_HEAD.match(line)
+        if head:
+            if inside:
+                break
+            inside = head.group(1) == row["id"]
+    if not caught:
+        return None
+    return (u"ред %s носи скрит регион (code fence или HTML-коментар) на ред "
+            u"%s — писалката пише само каквото човекът чете; махни го от реда "
+            u"и пусни пак (амандамент №10 т. 1)"
+            % (row["id"], u", ".join(str(n) for n in caught[:5])))
+
+
 def decide_row(lines, row, decision, today, body_sha=None):
     """Rewrite `решение`, `дата` — and `тяло` — of one row, in place.
 
@@ -315,14 +350,23 @@ def decide_row(lines, row, decision, today, body_sha=None):
     where the row already has it and inserted after the row's last field where it
     does not, in the bullet style that row is written in.
 
+    Only the VISIBLE lines are touched (амандамент №10 т. 1), through the same
+    `release.visible_and_hidden` the parser and the gate read with: a field
+    inside a fence or a comment is not a field, so the pen must neither rewrite
+    one nor count one as the last field of the row. That is what kept the digest
+    out of the reader's sight, and with it the body out of the gate's.
+
     The scan stops at the next heading: an inserted line has to land inside the
     row it belongs to, and a queue with two headings of one id is a queue this
     tool must not spread a decision across.
     """
+    hidden = set(n for n, _ in release.visible_and_hidden(u"\n".join(lines))[1])
     changed = 0
     inside = False
     last_field, body_at, style = None, None, u"- **%s:** %s"
     for i, line in enumerate(lines):
+        if (i + 1) in hidden:
+            continue
         head = release.QUEUE_HEAD.match(line)
         if head:
             if inside:
@@ -430,6 +474,10 @@ def main(argv):
     anchor_notes = []
     for row, decision in plan:
         complaint = duplicate_field_complaint(row)
+        if complaint:
+            refusals.append(complaint)
+            continue
+        complaint = hidden_region_complaint(lines, row)
         if complaint:
             refusals.append(complaint)
             continue

@@ -137,10 +137,12 @@ pre-push hook, the words in the table.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import hashlib
 import importlib.util
 import json
 import pathlib
+import posixpath
 import re
 import subprocess
 import sys
@@ -231,25 +233,35 @@ def blob_at(commit, rel):
     return out.stdout
 
 
-def introduced_by(rel, needle):
-    """(hash, author) of the newest commit that changed the count of `needle`.
+def introduced_commits(rel, needle):
+    """[(hash, author)] — every commit where the COUNT of `needle` moved, newest first.
 
-    `git log -S` is the pickaxe: it lists exactly the commits where the number
-    of occurrences of the string moved, so the newest of them is the commit that
-    put the signature in. None = the string is in no commit at all. It lives
-    here, next to `blob_at`, because two readers need it — `run_gates` проверка 7
-    for the authorship and this module for the body Petar actually signed."""
+    `git log -S` is the pickaxe. One call, one list, three readers: the newest
+    of them put a signature in (`introduced_by`), the oldest of them wrote a
+    block of the queue first (`introduced_by_text`), and амандамент №10 т. 2
+    needs BOTH ends of the same list — so they are measured once and cannot
+    drift into two different answers about one string."""
     out = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-S" + needle,
                           "--format=%H\t%an", "--", rel],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if out.returncode != 0:
         raise ValueError("git log -S -- %s: %s"
                          % (rel, out.stderr.decode("utf-8", "replace").strip()))
-    lines = out.stdout.decode("utf-8", "replace").splitlines()
-    if not lines:
-        return None
-    parts = lines[0].split("\t", 1)
-    return (parts[0], parts[1] if len(parts) > 1 else "")
+    commits = []
+    for line in out.stdout.decode("utf-8", "replace").splitlines():
+        parts = line.split("\t", 1)
+        commits.append((parts[0], parts[1] if len(parts) > 1 else ""))
+    return commits
+
+
+def introduced_by(rel, needle):
+    """(hash, author) of the newest commit that changed the count of `needle`.
+
+    None = the string is in no commit at all. It lives here, next to `blob_at`,
+    because two readers need it — `run_gates` проверка 7 for the authorship and
+    this module for the body Petar actually signed."""
+    commits = introduced_commits(rel, needle)
+    return commits[0] if commits else None
 
 
 def introduced_by_text(rel, needle):
@@ -258,22 +270,12 @@ def introduced_by_text(rel, needle):
     The twin of `introduced_by`, asked from the other end. For a signature there
     is one occurrence and the question is „who put it there last“; for the block
     of a queue row the question is „who wrote this text FIRST“, and the oldest
-    commit the pickaxe reports is that hand. Fail-closed on purpose: a block an
-    agent wrote, Petar deleted and an agent wrote again names the agent.
+    commit the pickaxe reports is that hand.
 
     None = no commit carries the text at all — it lives in the worktree, and the
     worktree is nobody's word."""
-    out = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-S" + needle,
-                          "--format=%H\t%an", "--", rel],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if out.returncode != 0:
-        raise ValueError("git log -S -- %s: %s"
-                         % (rel, out.stderr.decode("utf-8", "replace").strip()))
-    lines = out.stdout.decode("utf-8", "replace").splitlines()
-    if not lines:
-        return None
-    parts = lines[-1].split("\t", 1)
-    return (parts[0], parts[1] if len(parts) > 1 else "")
+    commits = introduced_commits(rel, needle)
+    return commits[-1] if commits else None
 
 
 def newest_commit_on(rel):
@@ -432,19 +434,42 @@ CLASS_ARTEFACT = u"артефакт"
 CLASS_DELTA = u"делта"
 
 
+def queues_in_head():
+    """[rel path] — every queue HEAD carries under `QUEUE_DIR`, recursively.
+
+    Амандамент №10 т. 3. The queue that is JUDGED has to be the queue a push
+    publishes, and a glob over the folder answered a different question — about
+    this disk. Two ways through it were measured: a tracked queue deleted from
+    the worktree vanished from the verdict, terminal „не“ and all, and a second
+    queue that was committed and then removed from the worktree stayed invisible
+    while the push carried it.
+
+    `-r` because a queue moved into a subfolder of the same directory is still a
+    queue of this delivery; `-z` because git quotes a Cyrillic name in its
+    default output and a quoted name matches no glob."""
+    out = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-tree", "-r",
+                          "--name-only", "-z", "HEAD", "--", QUEUE_DIR],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise ValueError(u"git ls-tree -- %s: %s"
+                         % (QUEUE_DIR, out.stderr.decode("utf-8", "replace").strip()))
+    names = [n for n in out.stdout.decode("utf-8", "replace").split("\0") if n.strip()]
+    return sorted(n for n in names
+                  if fnmatch.fnmatchcase(posixpath.basename(n), QUEUE_GLOB))
+
+
 def find_queue(explicit):
-    """The one queue of the delivery: named, or the only file in the folder."""
+    """The one queue of the delivery: named, or the only one in HEAD."""
     if explicit:
         return pathlib.Path(explicit)
-    found = sorted((REPO_ROOT / QUEUE_DIR).glob(QUEUE_GLOB))
+    found = queues_in_head()
     if not found:
         return None
     if len(found) > 1:
         # Two queues for one delivery is exactly the ambiguity the gate exists
         # to remove (the same rule run_gates applies to the allow-files).
-        raise ValueError(u"повече от една опашка: %s"
-                         % u", ".join(p.name for p in found))
-    return found[0]
+        raise ValueError(u"повече от една опашка в HEAD: %s" % u", ".join(found))
+    return REPO_ROOT / found[0]
 
 
 def parse_queue(path):
@@ -629,7 +654,14 @@ def yes_row_authorship(queue_rel, rows):
     the file“ — and a line somebody else slipped into the block makes the block a
     different text with a different author. `git log -S` per row costs one git
     call per „да“; the queue of a delivery is a dozen rows, and the price of the
-    other answer was measured in A.2-10."""
+    other answer was measured in A.2-10.
+
+    BOTH ends of the pickaxe answer (амандамент №10 т. 2). The oldest commit
+    alone said „who wrote this text first“ — and a block Petar once signed, then
+    took out of the queue in a later round, could be returned verbatim by an
+    agent: the oldest commit was still his, so the returned row was still a
+    permission. The newest commit that moved the count is the hand that put the
+    row where HEAD carries it, and it has to be his too."""
     out = []
     for row in rows:
         if row["decision"] != YES:
@@ -640,16 +672,25 @@ def yes_row_authorship(queue_rel, rows):
                        u"се провери" % row["id"])
             continue
         try:
-            origin = introduced_by_text(queue_rel, block_text)
+            commits = introduced_commits(queue_rel, block_text)
         except (ValueError, OSError) as exc:
             out.append(u"ред %s: авторството не можа да се измери: %s" % (row["id"], exc))
             continue
-        if origin is None:
+        if not commits:
             out.append(u"ред %s: „да“, което не е въведено от нито един комит — "
                        u"пушът праща блоба, не работното дърво" % row["id"])
-        elif origin[1] != HUMAN_AUTHOR:
-            out.append(u"ред %s: „да“ е въведено от %r в %s, а подписва само %s"
-                       % (row["id"], origin[1], origin[0][:7], HUMAN_AUTHOR))
+            continue
+        # Newest first, oldest last — the same list, asked from both ends. When
+        # one commit is both, it is named once.
+        ends = [(u"най-новият", commits[0])]
+        if commits[-1][0] != commits[0][0]:
+            ends.append((u"най-старият", commits[-1]))
+        for which, origin in ends:
+            if origin[1] != HUMAN_AUTHOR:
+                out.append(u"ред %s: „да“ е въведено от %r в %s (%s комит на "
+                           u"блока), а подписва само %s"
+                           % (row["id"], origin[1], origin[0][:7], which,
+                              HUMAN_AUTHOR))
     return out
 
 
@@ -1223,7 +1264,21 @@ def run(queue_override=None):
     if queue_path is None:
         block(u"няма опашка %s/%s — нищо не е разрешено" % (QUEUE_DIR, QUEUE_GLOB))
     elif not queue_path.exists():
-        block(u"опашката %s липсва" % queue_path)
+        # A tracked queue removed from the worktree is a DELETION, and a
+        # deletion is not an absence (амандамент №10 т. 3): the rows are still
+        # in the commit the push sends, so the gate names the hand rather than
+        # falling back to „няма опашка“ — the sentence a queue that was never
+        # signed would produce.
+        rel = repo_relative(queue_path)
+        try:
+            tracked = rel is not None and rel in queues_in_head()
+        except ValueError:
+            tracked = False
+        if tracked:
+            block(u"опашката %s е в HEAD, а в работното дърво я няма — изтрита "
+                  u"опашка не сваля решенията си (амандамент №10 т. 3)" % rel)
+        else:
+            block(u"опашката %s липсва" % queue_path)
     else:
         # THE BLOB, never the file (амандамент №9 т. 1). The pen writes the
         # decisions into the worktree; what a push publishes is the commit, and
@@ -1271,6 +1326,24 @@ def run(queue_override=None):
                         artefacts[name]["signed_by"]):
                     block(u"ред %s е „да“, а %s не носи подписа"
                           % (row["id"], table[name]))
+                # …and the body has to be bound WHERE THE READER SEES IT
+                # (амандамент №10 т. 1). The pen used to write the digest into
+                # whatever `тяло:` line it found first, including one inside a
+                # fence or a comment; the parser reads only the visible lines,
+                # so such a row arrives here with no body at all and the
+                # artefact is bound to nothing. A digest in a hidden region is
+                # not a signature, and silence about it is how a rewritten body
+                # gets published.
+                if name in artefacts and not row["body"]:
+                    try:
+                        got = body_digest(artefacts[name]["blob"])
+                    except (ValueError, UnicodeDecodeError):
+                        got = None
+                    block(u"ред %s е „да“ по %s, а няма видимо поле „тяло“ — "
+                          u"дайджест, написан в скрит регион, не е подпис "
+                          u"(тялото сега е %s)"
+                          % (row["id"], table[name],
+                             got[:12] if got else u"нечетимо"))
             # The two classes that are not about deltas say so out loud, so a
             # „не“ Petar wrote on a question is visible as a decision rather
             # than as silence (амандамент №9 т. 5).

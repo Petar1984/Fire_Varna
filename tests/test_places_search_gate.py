@@ -2580,6 +2580,140 @@ class FreezeAndAnchorTest(unittest.TestCase):
         self.assertEqual(json.loads(text)["_meta"]["queue_reference"]["commit"], carrier)
 
 
+
+    # ---- амандамент №10: the pen, both ends of a block, and the queue of HEAD
+
+    def test_a_second_queue_in_head_blocks_even_when_the_disk_shows_one(self):
+        """Амандамент №10 т. 3 — which queue is judged is a question about HEAD.
+
+        The glob over the folder answered about the DISK, so a second queue that
+        was committed and then removed from the worktree was invisible to the
+        gate and published by the push all the same. Two queues for one delivery
+        is the ambiguity this gate exists to remove, and it is removed where the
+        push looks: `git ls-tree -r HEAD`."""
+        from gates import release
+        root, queue, _body = self.release_repo(self.QUEUE_ROW)
+        green = release.run()
+        self.assertEqual(green["exit_code"], release.EXIT_OK, green["blocked"])
+        second = root / u"ЗА_ПОДПИС_второ.md"
+        self.write(second, u"## R2 · втора опашка\n- **id:** R2\n"
+                           u"- **решение:** не\n- **дата:** 2026-09-05\n"
+                           u"- **покрива:** gate_lot1/garden\n")
+        self.commit_as(root, "Petar1984", "sign: a second queue")
+        second.unlink()
+        self.assertEqual(set(release.queues_in_head()),
+                         {u"ЗА_ПОДПИС_второ.md", u"ЗА_ПОДПИС_фикстура.md"})
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        self.assertTrue(self.blocked_lines(result, u"повече от една опашка"),
+                        result["blocked"])
+
+    def test_a_body_digest_written_into_a_hidden_region_is_no_signature(self):
+        """Амандамент №10 т. 1 — the blocker: the pen wrote where nobody reads.
+
+        `decide_row` walked every line, so an example inside a fence carried the
+        field the pen was looking for: the digest of the signed body landed in
+        the fence, the parser (which reads only the visible lines) saw a row
+        with no `тяло` at all, and the body was bound to nothing. The pen reads
+        the same visible lines as the parser now — and refuses a row with a
+        hidden region between its fields and the next heading — while check 6
+        blocks a „да“ that names an artefact and shows no body."""
+        from gates import release, sign
+        lines = [u"## R1 · фикстура", u"- **id:** R1", u"- **решение:** pending",
+                 u"- **дата:** —", u"- **артефакт:** expectations",
+                 u"```", u"- **тяло:** пример", u"```"]
+        row = release.parse_queue_text(u"\n".join(lines))[0]
+        self.assertEqual(row["body"], u"", u"редът във фенс не е поле")
+        complaint = sign.hidden_region_complaint(lines, row)
+        self.assertIsNotNone(complaint)
+        self.assertIn("R1", complaint)
+        written = list(lines)
+        self.assertEqual(sign.decide_row(written, row, release.YES,
+                                         "2026-09-05", "a" * 64), 2)
+        self.assertEqual(written[5], u"- **тяло:** " + "a" * 64)
+        self.assertEqual(written[7], u"- **тяло:** пример",
+                         u"писалката е писала в скрития регион")
+        # …and the gate: a „да“ whose body sits where the reader cannot see it
+        root, queue, body = self.release_repo(self.QUEUE_ROW.replace(
+            u"- **тяло:** <тяло>\n", u"<!--\n- **тяло:** <тяло>\n-->\n"))
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        named = self.blocked_lines(result, u"няма видимо поле „тяло“")
+        self.assertTrue(named, result["blocked"])
+        self.assertIn("R1", named[0])
+
+    def test_a_yes_block_an_agent_returned_is_not_a_permission(self):
+        """Амандамент №10 т. 2 — the returned block.
+
+        The pickaxe reports every commit where the count of the block moved, and
+        the OLDEST of them used to answer alone. So a block Petar once signed
+        and later took out could be put back, verbatim, by an agent: the oldest
+        commit was still his and the row was still a permission. Both ends are
+        asked now — and the oldest one being his is what makes this fixture a
+        differential rather than a repeat of амандамент №9."""
+        from gates import release, run_gates
+        root, queue, _body = self.release_repo(
+            self.QUEUE_ROW.replace(u"решение:** да", u"решение:** pending"))
+        pending = queue.read_text(encoding="utf-8")
+        signed = pending.replace(u"решение:** pending", u"решение:** да")
+        self.write(queue, signed)
+        his = self.commit_as(root, "Petar1984", "sign: R1 да")
+        self.write(queue, pending)
+        self.commit_as(root, "Petar1984", "sign: R1 обратно на pending")
+        self.write(queue, signed)
+        agent = self.commit_as(root, "Claude Executor", "gates: a small fix")
+        rel = u"ЗА_ПОДПИС_фикстура.md"
+        block = release.parse_queue_text(signed)[0]["block"]
+        self.assertEqual(release.introduced_by_text(rel, block)[0], his,
+                         u"най-старият комит на блока не е на Петър — "
+                         u"фикстурата не проверява това, което трябва")
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        named = self.blocked_lines(result, u"най-новият")
+        self.assertTrue(named, result["blocked"])
+        self.assertIn("Claude Executor", named[0])
+        self.assertIn(agent[:7], named[0])
+        check = run_gates.check_signature_authorship()
+        self.assertEqual(check.mark, run_gates.BAD, check.lines)
+
+    def test_a_tracked_queue_deleted_from_the_disk_is_named(self):
+        """Амандамент №10 т. 3 и т. 5 — a deletion is not an absence.
+
+        A tracked queue removed from the worktree took its rows out of the
+        verdict: the glob found nothing, check 6 said „няма опашка“ as if none
+        had ever been signed, and check 7 — which never asked HEAD at all —
+        stayed green over a delivery whose signed rows nobody had read. The
+        queue comes from HEAD now, the deletion is named as a deletion, and
+        check 7 complains instead of passing."""
+        from gates import release, run_gates
+        root, queue, _body = self.release_repo(self.QUEUE_ROW)
+        green = release.run()
+        self.assertEqual(green["exit_code"], release.EXIT_OK, green["blocked"])
+        queue.unlink()
+        self.assertEqual(release.queues_in_head(), [u"ЗА_ПОДПИС_фикстура.md"])
+        result = release.run()
+        self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+        self.assertTrue(self.blocked_lines(result, u"в работното дърво я няма"),
+                        result["blocked"])
+        check = run_gates.check_signature_authorship()
+        self.assertEqual(check.mark, run_gates.BAD, check.lines)
+        self.assertTrue([line for line in check.lines
+                         if u"ЗА_ПОДПИС_фикстура.md" in line], check.lines)
+        self.assertFalse([line for line in check.lines if u"извън това репо" in line],
+                         u"изтрита опашка не е опашка в чуждо репо")
+        # …and the cross-check of амандамент №10 т. 5, which holds whatever
+        # `find_queue` comes to answer: a queue HEAD carries and the finder does
+        # not return is a queue nobody read, and check 7 says so instead of
+        # going green over it.
+        finder = release.find_queue
+        release.find_queue = lambda explicit=None: None
+        self.addCleanup(setattr, release, "find_queue", finder)
+        deaf = run_gates.check_signature_authorship()
+        self.assertEqual(deaf.mark, run_gates.BAD, deaf.lines)
+        self.assertTrue([line for line in deaf.lines if u"HEAD носи опашка" in line],
+                        deaf.lines)
+
+
 class PlacesCacheNameTest(unittest.TestCase):
     """ADR 008 D8: the cache namespace is a hand-kept copy on two sides.
 

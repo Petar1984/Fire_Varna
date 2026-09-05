@@ -569,14 +569,33 @@ def check_signature_authorship() -> Check:
     digest_origin: dict[str, dict[str, str]] = {}
     queue_trusted = False
     queue_rel = None
+    ambiguous = False
     try:
         queue_path = release.find_queue(None)
     except ValueError as exc:
         check.fail(str(exc))
         queue_path = None
-    if queue_path is not None and queue_path.exists():
+        ambiguous = True
+    if queue_path is None and not ambiguous:
+        # Амандамент №10 т. 5: silence here is the failure mode. This check
+        # never asked HEAD anything, so a queue that had left the disk — moved,
+        # deleted, never checked out — took its signed rows out of the table and
+        # left the row green, as if the delivery carried no signature at all.
+        try:
+            in_head = release.queues_in_head()
+        except ValueError as exc:
+            in_head = []
+            check.fail("опашките в HEAD не можаха да се изброят — %s" % exc)
+        if in_head:
+            check.fail("HEAD носи опашка (%s), а `find_queue` не върна нито "
+                       "една — подписаните ѝ редове остават непроверени"
+                       % ", ".join(in_head))
+    # The path is named relative to the repository whether or not the file is
+    # still on the disk: the rows are read from the blob, and a queue deleted
+    # from the worktree is exactly the case that must not go quiet.
+    if queue_path is not None:
         queue_rel = release.repo_relative(queue_path)
-    if queue_path is not None and queue_path.exists() and queue_rel is None:
+    if queue_path is not None and queue_rel is None:
         check.fail("опашката %s е извън това репо — авторството ѝ е непроверимо"
                    % queue_path)
     elif queue_rel is not None:
@@ -586,14 +605,26 @@ def check_signature_authorship() -> Check:
         # refuses a dirty queue anyway; reading the blob makes that refusal a
         # property of the reading, not a check somebody could reorder away.
         try:
-            queue_rows = release.parse_queue_text(
-                release.blob_at("HEAD", queue_rel).decode("utf-8"))
+            queue_text = release.blob_at("HEAD", queue_rel).decode("utf-8")
         except (ValueError, OSError, UnicodeDecodeError):
             # No blob at all — the queue is not committed. The rows are still
             # read, so the count below can say how many signatures are at stake;
             # `queue_authorship` refuses such a queue, so no digest of it is ever
             # taken.
-            queue_rows = release.parse_queue(queue_path)
+            try:
+                queue_text = queue_path.read_text(encoding="utf-8")
+            except OSError as exc:
+                queue_text = ""
+                check.fail("%s: нито блоб в HEAD, нито файл на диска — %s"
+                           % (queue_rel, exc))
+        queue_rows = release.parse_queue_text(queue_text)
+        # A decision written where the human cannot see it (амандамент №10 т. 5).
+        # Check 6 has said this since амандамент №9; this check reads the same
+        # blob for its digests, and a hidden „решение“ is a hidden row in both.
+        for line_no, line in release.hidden_decisions(queue_text):
+            check.fail("%s ред %d: „решение“ в скрит регион (коментар или code "
+                       "fence) — машината чете само каквото човекът вижда: %s"
+                       % (queue_rel, line_no, line.strip()[:60]))
         yes_rows = [r for r in queue_rows if r["decision"] == release.YES]
         with_digest = [r for r in yes_rows if r["artefact"] and r.get("digest")]
         who, complaint = queue_authorship(queue_rel)
