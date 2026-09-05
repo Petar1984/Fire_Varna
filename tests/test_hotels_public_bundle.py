@@ -54,9 +54,13 @@ CATEGORIES = REPO / "data" / "place_categories.json"
 # decision 10 merged „Явор“ into „ГОЛДЪН ЛАЙН“ (one building, two records at 0,00 m;
 # the old name lives on as an alias) and the reason line moved into `_meta.excluded`.
 # The three numbers below are re-measured on that blob; nothing else in it moved.
-HOTELS_SHA256 = "c30f7333d1a9a845b90ca46db0e41496cb722aa2640b6c862ccb8b211bd30100"
-HOTELS_BYTES = 142543
-HOTELS_GZIP9 = 13004
+# F12 (P7 = М2 + М3 + М6, commit adad6b0): the delivery was re-exported with the four
+# witness channels, so the typed fields moved on 150 rows and the three numbers are
+# re-measured on the NEW blob. The docstring rule holds — a drift is a re-delivery,
+# and this IS the re-delivery: 142 543 B / c30f7333d1a9… → the values below.
+HOTELS_SHA256 = "46a44ce82f154ca6f77f5001c0393b4654a818ba6d5e8540fb1c6f337fe0418d"
+HOTELS_BYTES = 148685
+HOTELS_GZIP9 = 13084
 # C16 (§11 П7): the dictionary was re-delivered with a `zones` key — the quarter
 # aliases of the zones that carry a registry entry, schema still 1.
 # ЛОТ 1 (F1-д, varna_3d dee1f76 „P2-д“) then moved the dictionary itself: chips
@@ -70,13 +74,19 @@ HOTELS_GZIP9 = 13004
 # — `locations.quarter|district|locality` — and with `legacy_by_row`: the old zone
 # word of every row whose label changed, keyed by that row's ordinal in its bundle
 # and protected by the SHA of the bundle. chips 57, forms 276 → 283, zones 30 → 19.
-CATEGORIES_SHA256 = "8e73c6c368a78e14f5d94e580ee495ce3349b10aa0d4ac752d018abeeef41da0"
-CATEGORIES_BYTES = 64831
-CATEGORIES_GZIP9 = 8836
+# F12 (P7 М2 + М3, commit adad6b0): М3 keeps a legacy zone word only where the old
+# zone is an alias of the new one or a signed override — „the hull was wrong“ no
+# longer earns one — so `legacy_by_row` collapses 209 → 18, while the three location
+# dictionaries gain the codes the delivery now carries: quarter 19 → 20 (`briz`,
+# `mladost` in, `manastirski_rid` out — no row carries it any more), locality 4 → 5
+# (`morska_gradina`). 64 831 B / 8e73c6c368a7… → the values below.
+CATEGORIES_SHA256 = "874e33cd00e2f468d6fa1fe717351a5247765ae13d4301374a9a14f83347d054"
+CATEGORIES_BYTES = 75818
+CATEGORIES_GZIP9 = 9104
 # The closed lists the dictionary and the two payloads have to AGREE on: a code in a
 # record that the dictionary of the same delivery does not name is a broken delivery.
-LOCATION_COUNTS = {"quarter": 19, "district": 5, "locality": 4}
-LEGACY_ROWS = 209
+LOCATION_COUNTS = {"quarter": 20, "district": 5, "locality": 5}
+LEGACY_ROWS = 18
 BUNDLE_SIZES = {"places": 150, "hotels": 225}
 
 EXPECTED_COUNT = 225
@@ -97,14 +107,22 @@ LOCATION_KEYS = {"name", "src", "code"}
 QUARTER_SRC = {"REG", "KAIS", "SIGNED_OVERRIDE"}
 DISTRICT_SRC = {"KAIS", "SIGNED_OVERRIDE"}
 DISTRICT_CODES = {"primorski", "odesos", "mladost", "asparuhovo", "vladislav_varnenchik"}
-QUARTER_CODES = {"asparuhovo", "borovets_yug", "chaika_kk", "chaika_kv", "druzhba",
-                 "galata", "izgrev_kv", "kk_konstantin_elena", "manastirski_rid",
+# F12: the lists are the codes of THIS delivery, the same 20 + 5 + 5 the dictionary
+# names and `index.html` accepts — `briz` and `mladost` in, `manastirski_rid` out,
+# `morska_gradina` a locality. A code the client's closed list does not know makes
+# it reject the whole file, so the three lists here, the dictionary and the client
+# have to stay one set.
+QUARTER_CODES = {"asparuhovo", "borovets_yug", "briz", "chaika_kk", "chaika_kv",
+                 "druzhba", "galata", "izgrev_kv", "kk_konstantin_elena", "mladost",
                  "mladost2", "pobeda", "priboy", "troshevo", "vazrazhdane",
                  "vazrazhdane1", "vazrazhdane2", "vinitsa", "vladislavovo",
                  "zlatni_pyasatsi"}
-LOCALITY_CODES = {"sveti_nikola", "vilite", "zelenika", "zpz"}
-QUARTER_BY_SRC = {"KAIS": 84, "SIGNED_OVERRIDE": 12}
-LOCALITY_COUNT = 4
+LOCALITY_CODES = {"morska_gradina", "sveti_nikola", "vilite", "zelenika", "zpz"}
+# F12: М6 gave the hotels a REG channel (НТР TOCity/TOAddress) they did not have —
+# quarter coverage 96 → 152 rows, {KAIS 84, SIGNED_OVERRIDE 12} → the split below;
+# the localities went 4 → 7 with „Морска градина“.
+QUARTER_BY_SRC = {"REG": 115, "KAIS": 25, "SIGNED_OVERRIDE": 12}
+LOCALITY_COUNT = 7
 # ЛОТ 1в-Б (ADR 008 D5) — `address` is `null` or EXACTLY these four keys, and its
 # source is its OWN closed list: a hotel named by the НТР can carry a КАИС address
 # (К7 (4): a hotel with no НТР address falls back on the body under the pin), so

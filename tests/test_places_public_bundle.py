@@ -47,9 +47,14 @@ PLACES = pathlib.Path(os.environ.get("FIRE_VARNA_PLACES_PATH") or (REPO / "data"
 
 # The tracked LF blob, measured at C11 (varna_3d HEAD ba78a25, branch rezhimi):
 #   git -C ../varna_3d show HEAD:data/fire_varna_places.json > data/places.json
-PLACES_SHA256 = "35aaf0cd5811e3e56181912f280e3beae39e8c5f1867898e023ca00a11d3cbc9"
-PLACES_BYTES = 121621
-PLACES_GZIP9 = 13678
+# F12 (P7 = М2 + М3 + М6, commit adad6b0): the delivery was re-exported — М2 stopped
+# dropping a typed location on `map_label: false`, so five more places carry a quarter
+# — and the three numbers are re-measured on the NEW blob. The docstring rule holds:
+# a drift is a re-delivery, and this IS the re-delivery.
+# 121 621 B / 35aaf0cd5811… → the values below.
+PLACES_SHA256 = "329310f577e8353673b9014af99624a78ab825fb0ad53e93fc572a28660d88c0"
+PLACES_BYTES = 122089
+PLACES_GZIP9 = 13728
 
 EXPECTED_COUNT = 150
 TOP_LEVEL_KEYS = {"_meta", "places"}
@@ -67,14 +72,21 @@ LOCATION_KEYS = {"name", "src", "code"}
 QUARTER_SRC = {"REG", "KAIS", "SIGNED_OVERRIDE"}
 DISTRICT_SRC = {"KAIS", "SIGNED_OVERRIDE"}
 DISTRICT_CODES = {"primorski", "odesos", "mladost", "asparuhovo", "vladislav_varnenchik"}
-QUARTER_CODES = {"asparuhovo", "borovets_yug", "chaika_kk", "chaika_kv", "druzhba",
-                 "galata", "izgrev_kv", "kk_konstantin_elena", "manastirski_rid",
+# F12: the lists are the codes of THIS delivery, the same 20 + 5 + 5 the dictionary
+# names and `index.html` accepts — `briz` and `mladost` in, `manastirski_rid` out,
+# `morska_gradina` a locality. A code the client's closed list does not know makes
+# it reject the whole file, so the three lists here, the dictionary and the client
+# have to stay one set.
+QUARTER_CODES = {"asparuhovo", "borovets_yug", "briz", "chaika_kk", "chaika_kv",
+                 "druzhba", "galata", "izgrev_kv", "kk_konstantin_elena", "mladost",
                  "mladost2", "pobeda", "priboy", "troshevo", "vazrazhdane",
                  "vazrazhdane1", "vazrazhdane2", "vinitsa", "vladislavovo",
                  "zlatni_pyasatsi"}
-LOCALITY_CODES = {"sveti_nikola", "vilite", "zelenika", "zpz"}
-QUARTER_BY_SRC = {"REG": 34, "KAIS": 10}
-LOCALITY_COUNT = 4
+LOCALITY_CODES = {"morska_gradina", "sveti_nikola", "vilite", "zelenika", "zpz"}
+# F12: М2 gave five more places a REG quarter (44 → 49 rows), and one place moved
+# into the „Морска градина“ locality (4 → 5).
+QUARTER_BY_SRC = {"REG": 39, "KAIS": 10}
+LOCALITY_COUNT = 5
 # ЛОТ 1в-Б (ADR 008 D5) — `address` is `null` or EXACTLY these four keys, and its
 # source is its OWN closed list: a school named by the МОН registry can carry a
 # КАИС address, so the card names the source of THAT string, not of the record.
