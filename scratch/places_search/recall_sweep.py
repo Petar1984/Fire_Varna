@@ -421,15 +421,23 @@ for _w in ((cats.get("_meta") or {}).get("zone_generic_words") or []):
         GENERIC_TOKENS.add(_t.s)
 
 
+def significant_token(t):
+    """Steps (а)-(г) of П7 on ONE token — the rule the whole machine shares.
+
+    F12-е: it used to live only inside `significant_tokens` below, so the М7
+    branch (which reads QUERY tokens, not a location string) could not ask it
+    and fell back on the number filter alone. One rule, one place to read it."""
+    return (not t.num and len(t.orig) > 2 and len(t.s) > 2
+            and t.orig not in ADDR and t.s not in GENERIC_TOKENS)
+
+
 def significant_tokens(s):
     """The phrase filter of П7 steps (а)-(г): what is left of a location string.
 
     A number, a token of <=2 characters, an address marker and the dictionary's
     own generic words („район“, „квартал“, „зона“…) never carry a place: that is
     why „район Младост“ and „Младост“ are ONE phrase and „район“ alone is none."""
-    return [t.s for t in place_tokens(s)
-            if not t.num and len(t.orig) > 2 and len(t.s) > 2
-            and t.orig not in ADDR and t.s not in GENERIC_TOKENS]
+    return [t.s for t in place_tokens(s) if significant_token(t)]
 
 
 def location_dicts(cats_doc):
@@ -1166,14 +1174,21 @@ def bare_location_query(R):
 
     A district marker („район X“) has its own branch, a street marker („ул. X“)
     is a street before it is a quarter, and a number is an address — none of
-    the three is a bare location word."""
+    the three is a bare location word.
+
+    F12-е: and every word has to be SIGNIFICANT by the rule the rest of the
+    machine already uses. The literal branch filtered numbers only, so the TYPE
+    PREFIXES the location names carry („к.к.“, „кв.“, „ж.к.“, „м-т“, „с.о.“)
+    reached `qtk`/`ltk` as tokens of their own and answered as places: measured
+    04.09 on this delivery „к“ returned 163 rows and „кв“ 36. A prefix is not a
+    place, and `significant_token` is where that is written down once."""
     if not M7_ENABLED or not R:
         return False
     if any(t.orig == DISTRICT_MARK for t in R):
         return False
     if any(t.orig in STREET_MARK for t in R):
         return False
-    return not any(t.num for t in R)
+    return all(significant_token(t) for t in R)
 
 
 def has_key_of(q):

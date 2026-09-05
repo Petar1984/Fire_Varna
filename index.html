@@ -6488,6 +6488,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
     let EXACT_NAME = null;                       // ЛОТ 1 решение 2: joined name tokens -> records
     let EXACT_ALIAS = null;                      // ЛОТ 1в D2: joined alias tokens -> {rec, i}
     let STREET = null;                           // ЛОТ 1в-Б D6: joined street phrase -> records
+    // F12-е: the dictionary's own generic words, lifted out of buildIndex so the
+    // М7 branch in search() can ask the SAME significance question the index asks.
+    let GENERIC_WORDS = new Set();
+    // Steps (а)-(г) of П7 on ONE token — 1:1 with recall_sweep.py significant_token().
+    const isSignificantToken = (t) => !t.num && t.orig.length > 2 && t.s.length > 2
+      && ADDR.indexOf(t.orig) < 0 && !GENERIC_WORDS.has(t.s);
     const groupOf = (rec) => KIND_GROUP[rec.e.kind] || rec.e.kind;
     const colourOf = (kind) => GROUP_COLOUR[KIND_GROUP[kind]] || 'hotel';   // К1
     // С3 - the bug Sol found: the <=300 generosity of М3/Б2 was read off the WHOLE
@@ -6652,6 +6658,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const generic = new Set();                 // (г) the dictionary's own word list
       for (const word of ((cats && cats._meta && cats._meta.zone_generic_words) || []))
         for (const t of placeTokens(word)) generic.add(t.s);
+      GENERIC_WORDS = generic;                   // F12-е: the same set, readable in search()
       // The phrase filter of steps (а)-(г): a number, a token of <= 2 characters, an
       // address marker and a generic word („район“, „квартал“, „зона“…) carry no
       // place. The ORDER and the boundaries are the point — „морска градина“ is a
@@ -7039,8 +7046,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // place; and the district enters only through rows with no quarter of their
       // own, exactly as the district branch says. `hasKey` stays false, so our
       // section still renders UNDER the untouched building address search.
+      // F12-е: every word must be SIGNIFICANT by the rule the rest of the machine
+      // uses — the number filter alone let the TYPE PREFIXES of the names in
+      // („к.к.“, „кв.“, „ж.к.“, „м-т“, „с.о.“), and „к“ answered with 163 rows.
       if (!hasKey && R.length && !R.some((t) => t.orig === DISTRICT_MARK)
-          && !R.some((t) => STREET_MARK.indexOf(t.orig) >= 0) && !R.some((t) => t.num)) {
+          && !R.some((t) => STREET_MARK.indexOf(t.orig) >= 0) && R.every(isSignificantToken)) {
         const qHit = cls.filter((r) => R.every((t) => r.qtk.indexOf(t.s) >= 0));
         const lHit = cls.filter((r) => R.every((t) => r.ltk.indexOf(t.s) >= 0));
         if (qHit.length || lHit.length) {
