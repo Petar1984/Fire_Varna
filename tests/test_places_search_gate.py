@@ -1713,25 +1713,79 @@ class RefusalSurvivesTheFreezeTest(unittest.TestCase):
         blocked as a stale permission from the first day; this is its twin."""
         from gates import release
         typo = self.row("R9", u"не", [u"gate_lot1/Градината"])
-        complaints = release.refusals_that_cover_nothing([typo], set(), set())
+        complaints = release.refusals_that_cover_nothing([typo], {}, {})
         self.assertEqual(len(complaints), 1, complaints)
         self.assertIn("R9", complaints[0])
         self.assertIn(u"gate_lot1/Градината", complaints[0])
         self.assertIn(u"не съществува", complaints[0])
+        self.assertIn(release.REFUSAL_UNREACHED, complaints[0])
         # A refusal that answers a LIVE delta, and one that answers a difference
-        # against the queue's reference, are both doing their job.
-        self.assertEqual(release.refusals_that_cover_nothing([typo], {"R9"}, set()), [])
-        self.assertEqual(release.refusals_that_cover_nothing([typo], set(), {"R9"}), [])
+        # against the queue's reference, are both doing their job — and both are
+        # counted BY PATTERN (амандамент №8 т. 3), never by row.
+        hit = {"R9": {u"gate_lot1/Градината"}}
+        self.assertEqual(release.refusals_that_cover_nothing([typo], hit, {}), [])
+        self.assertEqual(release.refusals_that_cover_nothing([typo], {}, hit), [])
         # No comparison, no accusation: `reached is None` means the anchor could
         # not be read, and that complaint is already on the table.
-        self.assertEqual(release.refusals_that_cover_nothing([typo], set(), None), [])
+        self.assertEqual(release.refusals_that_cover_nothing([typo], {}, None), [])
         # And this rule speaks only about „не“ — the stale „да“ has its own.
         allowance = self.row("R1", u"да", [u"gate_lot1/Градината"])
-        self.assertEqual(release.refusals_that_cover_nothing([allowance], set(), set()), [])
-        # A row that names no delta at all (an artefact, a note) is not refusing
-        # a query and is not measured as if it were.
-        self.assertEqual(release.refusals_that_cover_nothing(
-            [self.row("Q7", u"не", ["baseline"])], set(), set()), [])
+        self.assertEqual(release.refusals_that_cover_nothing([allowance], {}, {}), [])
+
+    def test_a_refusal_is_measured_per_pattern_over_the_raw_covers(self):
+        """Амандамент №8 т. 1 и т. 3 — the two ways past the row-level check.
+
+        (а) `gate_lot1градина` has no slash, so `delta_patterns` dropped it and
+        a row whose only content was that word was skipped as „not about
+        deltas“ — the queue refused, the gate said nothing at all;
+        (б) a row that refuses three queries and misspells one of them reached
+        something, so the whole row counted as doing its job while the third
+        refusal was as mute as the row in (а).
+        """
+        from gates import release
+        # (а) the malformed pattern is NAMED, not filtered away.
+        malformed = self.row("R9", u"не", [u"gate_lot1градина"])
+        complaints = release.refusals_that_cover_nothing([malformed], {}, {})
+        self.assertEqual(len(complaints), 1, complaints)
+        self.assertIn(u"gate_lot1градина", complaints[0])
+        self.assertIn(release.REFUSAL_MALFORMED, complaints[0])
+        # …and it stays named even when the row reached something with it,
+        # because a pattern a machine cannot read as a query never reaches.
+        self.assertEqual(len(release.refusals_that_cover_nothing(
+            [malformed], {"R9": {u"gate_lot1градина"}}, {})), 1)
+        # (б) one misspelling among two: the good one is silent, the bad one is
+        # named, and the row is not excused by the half that works.
+        mixed = self.row("R9", u"не", [u"gate_lot1/градина", u"gate_lot1/Градината"])
+        complaints = release.refusals_that_cover_nothing(
+            [mixed], {"R9": {u"gate_lot1/градина"}}, {})
+        self.assertEqual(len(complaints), 1, complaints)
+        self.assertIn(u"gate_lot1/Градината", complaints[0])
+        self.assertNotIn(u"gate_lot1/градина —", complaints[0])
+        # An empty `покрива` under a „не“ refuses nothing and says so.
+        empty = release.refusals_that_cover_nothing(
+            [self.row("Q7", u"не", [])], {}, {})
+        self.assertEqual(len(empty), 1, empty)
+        self.assertIn("Q7", empty[0])
+        self.assertIn(release.REFUSAL_EMPTY, empty[0])
+        # A word that names an artefact instead of a query is malformed as a
+        # refusal — амандамент №8 т. 1 makes „нула валидни шаблона“ a block.
+        note = release.refusals_that_cover_nothing(
+            [self.row("Q7", u"не", ["baseline"])], {}, {})
+        self.assertEqual(len(note), 1, note)
+        self.assertIn("baseline", note[0])
+        self.assertIn(release.REFUSAL_MALFORMED, note[0])
+
+    def test_the_patterns_that_covered_a_delta_are_named_one_by_one(self):
+        """`patterns_that_cover` is the per-pattern bookkeeping of the gate."""
+        from gates import release
+        row = self.row("R9", u"не", [u"gate_lot1/градина", u"gate_lot1/Градината",
+                                     u"gate_lot1градина"])
+        deltas = [("gate_lot1", u"градина"), ("gate_p7", u"хотел приморски")]
+        self.assertEqual(release.patterns_that_cover(row, deltas),
+                         set([u"gate_lot1/градина"]))
+        wide = self.row("R1", u"да", ["gate_lot1/*"])
+        self.assertEqual(release.patterns_that_cover(wide, deltas), set(["gate_lot1/*"]))
+        self.assertEqual(release.patterns_that_cover(wide, []), set())
 
     def test_the_pen_refuses_a_refusal_whose_query_does_not_exist(self):
         """Амандамент №7 т. 1, the other end: the typo is caught by the hand.
@@ -1748,12 +1802,37 @@ class RefusalSurvivesTheFreezeTest(unittest.TestCase):
         self.assertIn(u"gate_lot1/Градината", complaint)
         named = self.row("R9", u"не", [u"gate_lot1/градина"])
         self.assertIsNone(sign.refusal_target_complaint(named, deltas))
-        # One misspelling among three is still a misspelling: the check is per
-        # pattern, so two true refusals cannot carry a fourth that is not.
+        # One misspelling among two is still a misspelling: the check is per
+        # pattern, so a true refusal cannot carry a second one that is not — and
+        # the complaint names the misspelling, not the pattern that works.
         mixed = self.row("R9", u"не", [u"gate_lot1/градина", u"gate_lot1/Градината"])
-        self.assertIsNotNone(sign.refusal_target_complaint(mixed, deltas))
-        # A row that names no delta pattern is not this rule's business.
-        self.assertIsNone(sign.refusal_target_complaint(self.row("Q7", u"не", []), deltas))
+        complaint = sign.refusal_target_complaint(mixed, deltas)
+        self.assertIsNotNone(complaint)
+        self.assertIn(u"gate_lot1/Градината", complaint)
+        self.assertNotIn(u"gate_lot1/градина (", complaint)
+
+    def test_the_pen_measures_the_raw_covers_of_a_refusal(self):
+        """Амандамент №8 т. 1: the pen asks the same question the gate does.
+
+        `gate_lot1градина` never reached the measurement — `delta_patterns`
+        dropped it — so the pen wrote the „не“ and the gate then skipped the row
+        as „not about deltas“. Both halves of the barrier were open at once."""
+        from gates import release, sign
+        deltas = set([("gate_lot1", u"градина"), ("gate_p7", u"хотел приморски")])
+        malformed = sign.refusal_target_complaint(
+            self.row("R9", u"не", [u"gate_lot1градина"]), deltas)
+        self.assertIsNotNone(malformed)
+        self.assertIn(u"gate_lot1градина", malformed)
+        self.assertIn(release.REFUSAL_MALFORMED, malformed)
+        # A „не“ with nothing at all in `покрива` refuses nothing.
+        empty = sign.refusal_target_complaint(self.row("Q7", u"не", []), deltas)
+        self.assertIsNotNone(empty)
+        self.assertIn("Q7", empty)
+        self.assertIn(release.REFUSAL_EMPTY, empty)
+        # …and a word that names an artefact is not a query either.
+        note = sign.refusal_target_complaint(self.row("Q7", u"не", ["baseline"]), deltas)
+        self.assertIsNotNone(note)
+        self.assertIn("baseline", note)
 
     def test_the_pen_computes_the_body_and_writes_nothing(self):
         from gates import sign
@@ -2006,6 +2085,116 @@ class FreezeAndAnchorTest(unittest.TestCase):
         complaints, reached = release.refused_against_reference({"_meta": {}}, rows_in, {})
         self.assertEqual(len(complaints), 1, complaints)
         self.assertIsNone(reached)
+
+    # ------------- амандамент №8 т. 2: whose hand wrote the digest -----------
+
+    def test_check_7_fails_on_a_digest_an_agent_introduced(self):
+        """The auditor's scenario, end to end, in a repository of its own.
+
+        An agent rewrites the signed body; the SAME agent writes the digest of
+        its own result onto Petar's queue row; then Petar makes one trivial
+        commit to the queue — a typo fix, a note. The queue is now „his“ by its
+        newest commit (амандамент №6 т. 3 is satisfied) and the digest matches
+        the body perfectly, so the third branch of проверка 7 said „приет по
+        опашка, комитната от Petar1984 ✓“ and the rewritten body went through.
+        Амандамент №8 т. 2: only a digest HIS commit introduced counts, and the
+        check now names the hand that actually typed the number."""
+        from gates import run_gates
+        root = self.temp_repo()
+        exp = root / "expectations.json"
+        queue = root / "ЗА_ПОДПИС_фикстура.md"
+        self.write(exp, self.body_of({"_meta": {"signed_by": SIGNER}, "n": 1}))
+        row = ("## R1 · фикстура\n- **id:** R1\n- **решение:** да\n"
+               "- **дата:** 2026-09-05\n- **артефакт:** expectations\n"
+               "- **покрива:** gate_lot1/*\n")
+        self.write(queue, row)
+        self.use_repo(root, SIGNABLE={"expectations": "expectations.json"},
+                      QUEUE_DIR=".", QUEUE_GLOB="ЗА_ПОДПИС_*.md")
+        self.commit_as(root, "Petar1984", "sign: R1 да")
+
+        # 1. the agent rewrites the signed body AND records its own digest.
+        self.write(exp, self.body_of({"_meta": {"signed_by": SIGNER}, "n": 2}))
+        digest = hashlib.sha256(exp.read_bytes()).hexdigest()
+        self.write(queue, row + "- **дайджест:** %s\n" % digest)
+        agent_commit = self.commit_as(root, "Claude Executor", "gates: a small fix")
+        # 2. Petar touches the queue for something else entirely.
+        self.write(queue, row + "- **дайджест:** %s\n\n<!-- бележка -->\n" % digest)
+        self.commit_as(root, "Petar1984", "docs: a note on the queue")
+
+        check = run_gates.check_signature_authorship()
+        self.assertEqual(check.mark, run_gates.BAD, check.lines)
+        named = [line for line in check.lines
+                 if u"въведен в опашката от" in line and u"Claude Executor" in line]
+        self.assertTrue(named, check.lines)
+        self.assertIn(agent_commit[:7], named[0])
+        self.assertIn(run_gates.HUMAN_AUTHOR, named[0])
+        # Not one line of the table may claim this body was Petar's word.
+        self.assertFalse([line for line in check.lines if u"Петър записа" in line],
+                         check.lines)
+        self.assertFalse([line for line in check.lines if u"приет по опашка" in line],
+                         check.lines)
+
+    # -------------- амандамент №8 т. 4: the anchor is the CARRIER ------------
+
+    def test_the_anchor_is_the_reference_carrier_not_the_signing_commit(self):
+        """Two different commits, and the anchor is the one with the bytes.
+
+        The signing commit cannot be the anchor: it does not exist yet when
+        `build_expectations` and `gates.sign` write the field. The anchor is the
+        commit that CARRIES the frozen reference — амандамент №8 т. 4 — and this
+        test keeps the two apart on purpose: Petar freezes and commits the
+        reference, then signs in a LATER commit that does not touch it."""
+        from gates import release
+        root = self.temp_repo()
+        rows = root / "rows.json"
+        queue = root / "ЗА_ПОДПИС_фикстура.md"
+        self.write(rows, self.body_of({"gate_lot1": []}))
+        self.write(queue, "## R1 · фикстура\n- **id:** R1\n- **решение:** pending\n")
+        self.use_repo(root, REFERENCE_REL="rows.json")
+        self.commit_as(root, "Claude Executor", "test: the лот-Б reference")
+        self.write(rows, self.body_of({"gate_lot1": [{"q": u"градина"}]}))
+        carrier = self.commit_as(root, "Petar1984", "freeze: the bodies")
+        # The signature lands afterwards, in a commit of its own.
+        self.write(queue, "## R1 · фикстура\n- **id:** R1\n- **решение:** да\n")
+        signing = self.commit_as(root, "Petar1984", "sign: R1 да")
+        self.assertNotEqual(carrier, signing)
+        anchor = release.queue_reference_anchor()
+        self.assertEqual(anchor["commit"], carrier)
+        self.assertEqual(anchor["sha256"],
+                         hashlib.sha256(rows.read_bytes()).hexdigest())
+        commit, path, sha, complaint = release.queue_reference(
+            {"_meta": {"queue_reference": anchor}})
+        self.assertIsNone(complaint)
+        self.assertEqual((commit, path), (carrier, "rows.json"))
+
+    def test_the_pen_refuses_to_write_an_anchor_of_a_foreign_commit(self):
+        """Амандамент №8 т. 4, the pen's half.
+
+        `release.queue_reference` already BLOCKS an anchor whose commit is not
+        Petar's. Without the same rule here the pen would write that anchor into
+        the body as he signs it — a signature born already blocked, undoable
+        only by editing a signed document by hand."""
+        from gates import release, sign
+        root = self.temp_repo()
+        rows = root / "rows.json"
+        self.write(rows, self.body_of({"gate_lot1": []}))
+        self.use_repo(root, REFERENCE_REL="rows.json")
+        agent = self.commit_as(root, "Claude Executor", "test: a reference")
+        body = self.body_of({"_meta": {"signed_by": SIGNER}})
+        text, note, complaint = sign.with_queue_anchor(release.EXPECTATIONS_REL, body)
+        self.assertIsNotNone(complaint)
+        self.assertIn(agent[:7], complaint)
+        self.assertIn("Claude Executor", complaint)
+        self.assertIn(release.HUMAN_AUTHOR, complaint)
+        self.assertEqual(text, body, u"котвата е писана върху отказан комит")
+        self.assertIsNone(note)
+        # …and with Petar as the author of the carrier the field is written.
+        self.write(rows, self.body_of({"gate_lot1": [{"q": u"градина"}]}))
+        carrier = self.commit_as(root, "Petar1984", "freeze: the bodies")
+        text, note, complaint = sign.with_queue_anchor(release.EXPECTATIONS_REL, body)
+        self.assertIsNone(complaint)
+        self.assertIn(carrier[:7], note)
+        self.assertEqual(json.loads(text)["_meta"]["queue_reference"]["commit"], carrier)
 
 
 class PlacesCacheNameTest(unittest.TestCase):

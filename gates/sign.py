@@ -48,6 +48,16 @@ a row that names none of them. `gate_lot1/Градината` instead of
 the gate stayed green over the difference Petar meant to refuse, and the freeze
 carried it into the reference. The gate blocks such a row now; here it is never
 written, and the answer comes back while the human is still at the keyboard.
+
+THE QUESTION IS ASKED OF THE RAW `покрива` (амандамент №8 т. 1): every word of
+it, per pattern, including the ones a machine cannot read as a query at all
+(`gate_lot1градина`, no slash) and including none at all — an empty `покрива`
+under a „не“ refuses nothing and is refused here.
+
+AND THE ANCHOR IT WRITES IS PETAR'S COMMIT (амандамент №8 т. 4): the pen fills
+`_meta.queue_reference` in as he signs, and it will not write a commit that is
+not his — a signature that arrives with an anchor the gate blocks is a
+signature that has to be undone by hand.
 """
 
 from __future__ import annotations
@@ -173,6 +183,15 @@ def with_queue_anchor(rel_path, text):
     without touching a byte beyond the signature. A body that cannot get a valid
     anchor is not signed at all: the complaint travels with the refusals, which
     is what „нищо не е записано“ means here as everywhere else.
+
+    AND THE ANCHOR HAS TO BE PETAR'S COMMIT (амандамент №8 т. 4). The gate
+    already blocks a `_meta.queue_reference` whose commit belongs to somebody
+    else (`release.queue_reference`); the pen refuses to WRITE one. Otherwise
+    the signature and the refusal it protects would be born already broken —
+    Petar signs, the gate blocks him for a field his own tool just filled in,
+    and the only way out is a hand edit of a signed body. The freeze is
+    committed by Petar (амандамент №6), so the carrier of the reference is his
+    commit; when it is not, this is the round to say so.
     """
     if rel_path != release.EXPECTATIONS_REL:
         return (text, None, None)
@@ -181,6 +200,14 @@ def with_queue_anchor(rel_path, text):
     except (ValueError, OSError) as exc:
         return (text, None, u"котвата „_meta.%s“ не можа да се измери: %s"
                 % (release.QUEUE_REFERENCE_KEY, exc))
+    author = release.commit_author(anchor["commit"])
+    if author != release.HUMAN_AUTHOR:
+        return (text, None,
+                u"котвата „_meta.%s“ би сочила комит %s на %r — референцията, "
+                u"срещу която се пише опашката, стои в комит на %s "
+                u"(замразяването го комитва Петър)"
+                % (release.QUEUE_REFERENCE_KEY, anchor["commit"][:7],
+                   author or u"—", release.HUMAN_AUTHOR))
     try:
         doc = json.loads(text)
     except ValueError as exc:
@@ -225,16 +252,29 @@ def refusal_target_complaint(row, deltas):
     has to hit at least one of them, or the row is a decision about something
     that does not exist. The check is per PATTERN on purpose: a row that refuses
     three queries and misspells one of them is a row with a typo in it, and the
-    two other refusals do not make the typo true."""
-    missing = [pattern for pattern in release.delta_patterns(row["covers"])
-               if not any(release.covers_delta(pattern, bucket, query)
-                          for bucket, query in deltas)]
+    two other refusals do not make the typo true.
+
+    Амандамент №8 т. 1: the measurement is over the RAW `покрива`. Filtering it
+    through `delta_patterns` first meant a pattern with no slash at all —
+    `gate_lot1градина` — vanished before it was measured, and a row whose only
+    content was that word was written as a refusal about nothing. An empty
+    `покрива` under a „не“ is refused for the same reason: the pen writes
+    refusals by name, and there is no name here."""
+    if not row["covers"]:
+        return (u"ред %s отказва заявка, която не съществува: %s"
+                % (row["id"], release.REFUSAL_EMPTY))
+    hit = release.patterns_that_cover(row, deltas)
+    missing = []
+    for pattern in row["covers"]:
+        reason = release.refusal_pattern_reason(pattern, hit)
+        if reason:
+            missing.append(u"%s (%s)" % (pattern, reason))
     if not missing:
         return None
     return (u"ред %s отказва заявка, която не съществува: %s — „не“ се пише по "
             u"ТОЧНАТА заявка от текущите делти на gates.release (амандамент №7 "
-            u"т. 1); провери изписването с `python -m gates.release`"
-            % (row["id"], u", ".join(missing)))
+            u"т. 1, №8 т. 1); провери изписването с `python -m gates.release`"
+            % (row["id"], u"; ".join(missing)))
 
 
 def refusable_deltas_once(cache):

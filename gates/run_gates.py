@@ -23,7 +23,8 @@ Seven checks, one table, one exit code:
                      on a signed artefact is Petar's too, or he recorded the
                      digest of the resulting body himself (амандамент №5 т. 3),
                      on a queue whose own authorship was settled first
-                     (амандамент №6 т. 3)
+                     (амандамент №6 т. 3) and with HIS commit as the one that
+                     introduced the number (амандамент №8 т. 2)
 
 The gate never imports `unittest` and never reads `tests/`: a check that shares
 code with the suite it guards cannot fail independently of it.
@@ -526,7 +527,14 @@ def check_signature_authorship() -> Check:
     that can excuse everything else: a digest on one of its rows is what lets a
     body through after an agent rewrote it. Its authorship is therefore settled
     before a digest is taken out of it, and an untrusted queue hands over
-    none — no row of this table says „Петър записа“ about a body he did not."""
+    none — no row of this table says „Петър записа“ about a body he did not.
+
+    And a queue that IS his is still only his word about the rows his own
+    commits wrote (амандамент №8 т. 2). A digest introduced by an agent commit
+    on a queue Petar later touched used to pass with the words „приет по
+    опашка“; the auditor's scenario — agent rewrites the signed body, agent
+    writes the digest of its result on the row, Petar makes one trivial commit
+    to the queue — turned that sentence into a way through. It fails now."""
     check = Check("7 · авторството на подписите и на тялото (git log -S)")
     needle = release.SIGNATURE_NEEDLE
     targets = dict(release.SIGNABLE)
@@ -541,7 +549,15 @@ def check_signature_authorship() -> Check:
     # can carry any number at all — it hands over nothing here, and no line of
     # this table then says „Петър записа“ about a body it blessed.
     signed = 0
+    # Амандамент №8 т. 2: `row_digests` holds ONLY the digests a commit of
+    # Petar's put on the queue. The rest are not simply absent — a digest an
+    # agent typed onto his row is an attempt, and the attempt is named — so they
+    # are kept apart in `foreign_digests` as {artefact: {digest: (commit, who)}}.
     row_digests: dict[str, set[str]] = {}
+    foreign_digests: dict[str, dict[str, tuple[str | None, str | None]]] = {}
+    # {artefact: {digest: commit}} — where Petar's own accepted digest was
+    # written down, for the line that says so.
+    digest_origin: dict[str, dict[str, str]] = {}
     queue_trusted = False
     queue_rel = None
     try:
@@ -578,7 +594,17 @@ def check_signature_authorship() -> Check:
                           % (queue_rel, len(yes_rows), who))
         if queue_trusted:
             for row in with_digest:
-                row_digests.setdefault(row["artefact"], set()).add(row["digest"])
+                # WHO introduced the number, not who committed the document it
+                # sits in (амандамент №8 т. 2). A queue Petar committed is his
+                # word about the ROWS he wrote; a digest an agent added to it in
+                # an earlier commit rode in on his signature of the file.
+                origin = queue_digest_commit(queue_rel, row["digest"]) or (None, None)
+                if origin[1] == HUMAN_AUTHOR:
+                    row_digests.setdefault(row["artefact"], set()).add(row["digest"])
+                    digest_origin.setdefault(row["artefact"], {})[row["digest"]] = origin[0]
+                else:
+                    foreign_digests.setdefault(
+                        row["artefact"], {})[row["digest"]] = origin
         elif with_digest:
             check.fail("%s: дайджестите на %d реда НЕ се приемат — авторството на "
                        "опашката не е потвърдено" % (queue_rel, len(with_digest)))
@@ -632,24 +658,32 @@ def check_signature_authorship() -> Check:
                       % (rel, body[:12], newest[0][:7], newest[1]))
         else:
             in_message = digests_in_commit_message(author[0])
-            on_row = row_digests.get(name.split(":", 1)[0], set())
-            # Where the number came from decides what this line may CLAIM
-            # (амандамент №7 т. 2). His own signing-commit message is his hand,
-            # full stop. A number on a queue row is his hand only if his commit
-            # is the one that introduced it; otherwise the queue is merely a
-            # document he committed, and the words say exactly that — never
-            # „Петър записа“ about a digest an agent typed.
-            wrote_it = (queue_digest_commit(queue_rel, body)
-                        if body in on_row and queue_rel else None)
+            artefact = name.split(":", 1)[0]
+            on_row = row_digests.get(artefact, set())
+            foreign = foreign_digests.get(artefact, {})
+            # Where the number came from decides whether this line may PASS
+            # (амандамент №8 т. 2). His own signing-commit message is his hand,
+            # full stop; a number on a queue row is his hand only if his commit
+            # is the one that introduced it. Until now the third case — a digest
+            # an agent wrote onto his row — was accepted with the words „приет
+            # по опашка“, which is exactly the attack: an agent rewrites the
+            # signed body, writes the digest of its own result on the row, and
+            # one trivial commit of Petar's on the queue makes the check green.
+            # It is a failure now, and it names the hand and the commit.
             if body in in_message:
                 check.say("%s: тялото %s е дайджестът, който Петър записа в %s ✓"
                           % (rel, body[:12], author[0][:7]))
-            elif body in on_row and wrote_it and wrote_it[1] == HUMAN_AUTHOR:
-                check.say("%s: тялото %s е дайджестът, който Петър записа на "
-                          "опашката в %s ✓" % (rel, body[:12], wrote_it[0][:7]))
             elif body in on_row:
-                check.say("%s: тялото %s — приет по опашка, комитната от %s ✓"
-                          % (rel, body[:12], HUMAN_AUTHOR))
+                where = (digest_origin.get(artefact, {}).get(body) or "")[:7]
+                check.say("%s: тялото %s е дайджестът, който Петър записа на "
+                          "опашката в %s ✓" % (rel, body[:12], where))
+            elif body in foreign:
+                commit, who = foreign[body]
+                check.fail("%s: дайджестът на тялото %s е въведен в опашката от "
+                           "%r в %s, а подписва само %s"
+                           % (rel, body[:12], who or "—",
+                              commit[:7] if commit else "работното дърво",
+                              HUMAN_AUTHOR))
             else:
                 check.fail("%s: подписан, но последният комит по него е на %r "
                            "(%s), а дайджестът на тялото %s не е записан от %s"

@@ -38,6 +38,18 @@ words as the stale permission: a decision about a query that does not exist is
 not a decision. `gates.sign` applies the same test where the refusal is
 written, so the typo is caught by the hand that makes it.
 
+AND IT IS MEASURED PER PATTERN, OVER THE RAW `покрива` (амандамент №8 т. 1 и
+т. 3). Reading the row as a whole left two ways through. A pattern with no
+slash at all — `gate_lot1градина` — was not a delta pattern, so it was dropped
+before the measurement and the row it was the ONLY content of was skipped
+entirely: the queue said „не“, the gate said nothing. And a row that refuses
+three queries and misspells one of them reached something, so the whole row
+counted as doing its job while the misspelled third refusal was mute. Every
+pattern of a „не“ row must therefore hit by itself; the ones that do not are
+named one by one, with the reason — „шаблонът не е във вида кофа/заявка“ or
+„не улучва нито жива делта, нито разлика спрямо котвата“ — and an empty
+`покрива` under a „не“ is the same block with the same words.
+
 THE ORDER OF THE FILE DOES NOT VOTE (амандамент №6 т. 2). Every row that
 matches a delta is collected, never the first one that answers: a „не“ wins over
 any „да“, and among rows that agree the exact `кофа/заявка` is the one the table
@@ -373,8 +385,46 @@ def delta_patterns(covers):
 
     A row may also carry a word that names no comparison at all — an artefact,
     a note. Амандамент №7 т. 1 asks whether a refusal reaches a delta, and only
-    these patterns can, so only these are measured."""
+    these patterns can, so only these are measured.
+
+    For a „да“ this filter is a convenience. For a „не“ it was a hole: a
+    pattern that falls out here (`gate_lot1градина`, no slash) used to leave
+    the row with nothing to measure and the row was then skipped as „not about
+    deltas“. Амандамент №8 т. 1 measures a refusal over the RAW `покрива`
+    instead, and `refusal_pattern_reason` says why each pattern failed."""
     return [pattern for pattern in covers if "/" in pattern]
+
+
+# Why one `покрива` pattern of a „не“ row refuses nothing (амандамент №8 т. 1).
+# The two reasons are different mistakes: the first is a pattern a machine
+# cannot even read as a query, the second is a query nobody delivered.
+REFUSAL_MALFORMED = u"шаблонът не е във вида кофа/заявка"
+REFUSAL_UNREACHED = u"не улучва нито жива делта, нито разлика спрямо котвата"
+# An empty `покрива` under a „не“ is neither of the two — there is no pattern
+# to name, so the row itself is named.
+REFUSAL_EMPTY = u"„покрива“ е празно — „не“ се пише по ТОЧНАТА заявка (кофа/заявка)"
+
+
+def refusal_pattern_reason(pattern, hit):
+    """Why this pattern of a „не“ row covers nothing — or None when it does.
+
+    `hit` is the set of patterns of that row which reached something. The two
+    readers of this rule — the gate and `gates.sign` — get their words from
+    here, so a refusal is refused with the same sentence wherever it is caught.
+    """
+    if "/" not in pattern:
+        return REFUSAL_MALFORMED
+    return None if pattern in hit else REFUSAL_UNREACHED
+
+
+def patterns_that_cover(row, deltas):
+    """The `покрива` patterns of one row that hit at least one of these deltas.
+
+    `deltas` is any iterable of `(кофа, заявка)` pairs. Per PATTERN, because
+    амандамент №8 т. 3 asks which of them did the work, not whether the row
+    did."""
+    return set(pattern for pattern in row["covers"]
+               if any(covers_delta(pattern, bucket, query) for bucket, query in deltas))
 
 
 def decide_delta(rows, bucket, query):
@@ -584,16 +634,18 @@ def refused_against_reference(expectations_doc, rows, reference):
     HEAD is a refusal the delivery is carrying anyway. A body that simply forgot
     to write its refusals down does not get past this.
 
-    `reached` is the set of row ids that answered such a difference — what
+    `reached` is `{row id: {pattern that answered such a difference}}` — what
     амандамент №7 т. 1 needs to tell „this refusal covers nothing“ apart from
-    „this refusal is doing its job“. It is None when the comparison could not be
+    „this refusal is doing its job“, PER PATTERN since амандамент №8 т. 3: a row
+    that reached a difference with one of its three patterns has still written
+    the other two about nothing. It is None when the comparison could not be
     made at all (no anchor, foreign anchor, unreadable blob): then the complaint
     on the table is about the anchor, and no row may be called empty on the
     strength of a comparison that never happened.
     """
     refused_rows = [row for row in rows if row["decision"] == NO and row["covers"]]
     if not refused_rows:
-        return ([], set())
+        return ([], {})
     commit, rel, want, complaint = queue_reference(expectations_doc)
     if complaint:
         return ([u"опашката отказва %d реда, а %s" % (len(refused_rows), complaint)],
@@ -609,22 +661,31 @@ def refused_against_reference(expectations_doc, rows, reference):
         base_doc = json.loads(raw.decode("utf-8"))
     except (ValueError, UnicodeDecodeError) as exc:
         return ([u"референцията на опашката (%s:%s): %s" % (commit, rel, exc)], None)
-    out, reached = [], set()
+    out, reached = [], {}
     for delta in compare(entries_of(base_doc), reference):
+        spoke = None
         for row in refused_rows:
-            if any(covers_delta(p, delta["bucket"], delta["q"]) for p in row["covers"]):
-                reached.add(row["id"])
-                out.append(u"%s/%s: ред %s е ОТКАЗАН, а разликата спрямо "
-                           u"референцията на опашката (%s) е в замразената "
-                           u"референция (%s)"
-                           % (delta["bucket"], delta["q"], row["id"], commit[:7],
-                              u"; ".join(delta["why"])))
-                break
+            hits = [p for p in row["covers"]
+                    if covers_delta(p, delta["bucket"], delta["q"])]
+            if not hits:
+                continue
+            # Every row that reaches this difference is recorded, with the
+            # patterns that did it; only the first one is complained about, so
+            # the table keeps one line per difference as it always has.
+            reached.setdefault(row["id"], set()).update(hits)
+            if spoke is None:
+                spoke = row
+        if spoke is not None:
+            out.append(u"%s/%s: ред %s е ОТКАЗАН, а разликата спрямо "
+                       u"референцията на опашката (%s) е в замразената "
+                       u"референция (%s)"
+                       % (delta["bucket"], delta["q"], spoke["id"], commit[:7],
+                          u"; ".join(delta["why"])))
     return (out, reached)
 
 
 def refusals_that_cover_nothing(rows, used, reached):
-    """Complaints for every „не“ that refuses a query which does not exist.
+    """Complaints, PER PATTERN, for every „не“ that refuses nothing.
 
     Амандамент №7 т. 1 — the twin of the stale-permission rule. A „да“ that
     covers nothing is blocked because a permission for a delta nobody delivered
@@ -633,6 +694,15 @@ def refusals_that_cover_nothing(rows, used, reached):
     gate went green, and one freeze later the refused difference was inside the
     reference. A refusal has to reach something — a live delta (`used`) or a
     difference between the queue's reference and the frozen one (`reached`).
+
+    Амандамент №8 т. 1 и т. 3 close the two remaining ways past it. `used` and
+    `reached` are `{row id: {pattern that hit}}`, so the question is asked of
+    every pattern separately: a row that refuses three queries and misspells one
+    of them is a row with a typo in it, and the two true refusals do not make
+    the third one true. The measurement is over the RAW `покрива`, so a pattern
+    with no slash (`gate_lot1градина`) is named as malformed instead of being
+    filtered away before anybody looks — and a „не“ with an empty `покрива` is
+    named too, because refusing nothing at all is the same silence.
     """
     if reached is None:
         return []
@@ -640,12 +710,16 @@ def refusals_that_cover_nothing(rows, used, reached):
     for row in rows:
         if row["decision"] != NO:
             continue
-        patterns = delta_patterns(row["covers"])
-        if not patterns or row["id"] in used or row["id"] in reached:
+        if not row["covers"]:
+            out.append(u"ред %s отказва заявка, която не съществува: %s"
+                       % (row["id"], REFUSAL_EMPTY))
             continue
-        out.append(u"ред %s отказва заявка, която не съществува: %s — нито жива "
-                   u"делта, нито разлика спрямо референцията на опашката"
-                   % (row["id"], u", ".join(patterns)))
+        hit = set(used.get(row["id"]) or ()) | set(reached.get(row["id"]) or ())
+        for pattern in row["covers"]:
+            reason = refusal_pattern_reason(pattern, hit)
+            if reason:
+                out.append(u"ред %s отказва заявка, която не съществува: %s — %s"
+                           % (row["id"], pattern, reason))
     return out
 
 
@@ -854,13 +928,17 @@ def run(queue_override=None):
                     block(u"ред %s е „да“, а %s не носи подписа"
                           % (row["id"], table[name]))
 
-    used, uncovered, refused = set(), [], []
+    # {row id: {pattern that covered a live delta}} — the id half answers the
+    # stale-permission rule below, the patterns answer амандамент №8 т. 3.
+    used, uncovered, refused = {}, [], []
     for delta in deltas:
         # The whole queue answers, not the first row that happens to match
         # (амандамент №6 т. 2). Every matching row counts as used: a „да“ that
         # lost to a „не“ still covers a live delta and is not a stale permission.
         decision, row, matched = decide_delta(rows, delta["bucket"], delta["q"])
-        used.update(other["id"] for other in matched)
+        for other in matched:
+            used.setdefault(other["id"], set()).update(
+                patterns_that_cover(other, [(delta["bucket"], delta["q"])]))
         if decision == NO:
             block(u"%s/%s: ред %s е ОТКАЗАН (терминално)"
                   % (delta["bucket"], delta["q"], row["id"]))
