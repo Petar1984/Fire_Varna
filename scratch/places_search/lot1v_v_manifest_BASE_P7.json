@@ -16,21 +16,30 @@
   },
   "candidate": {
    "what": "днешният двигател с М7 = OFF",
-   "sha256": "ec63163ce473e9952f1614e1063fc238a89a0a03793aa5c9350594ad4c82fdd3",
-   "bytes": 934618
+   "sha256": "9fa260e9c4f0423991b4a943aad67258827bd6e5f5788da62339689cd2564dd0",
+   "bytes": 934547
   },
   "inputs": {
    "data/places.json": {
     "sha256": "329310f577e8353673b9014af99624a78ab825fb0ad53e93fc572a28660d88c0",
-    "bytes": 122089
+    "bytes": 122089,
+    "path": "data/places.json",
+    "commit": "HEAD",
+    "what": "входът на доставката"
    },
    "data/hotels.json": {
     "sha256": "46a44ce82f154ca6f77f5001c0393b4654a818ba6d5e8540fb1c6f337fe0418d",
-    "bytes": 148685
+    "bytes": 148685,
+    "path": "data/hotels.json",
+    "commit": "HEAD",
+    "what": "входът на доставката"
    },
    "data/place_categories.json": {
     "sha256": "874e33cd00e2f468d6fa1fe717351a5247765ae13d4301374a9a14f83347d054",
-    "bytes": 75818
+    "bytes": 75818,
+    "path": "data/place_categories.json",
+    "commit": "HEAD",
+    "what": "входът на доставката"
    }
   }
  },
@@ -2496,7 +2505,7 @@
    "branch": "A3-location",
    "hasKey": true,
    "n": 11,
-   "ok": false,
+   "ok": true,
    "rows": [
     {
      "name": "СУ „Неофит Бозвели“",
@@ -2657,7 +2666,7 @@
    "branch": "A3-location",
    "hasKey": true,
    "n": 1,
-   "ok": false,
+   "ok": true,
    "rows": [
     {
      "name": "II ОУ „Никола Йонков Вапцаров“",
@@ -2684,7 +2693,7 @@
    "branch": "M2-failopen",
    "hasKey": true,
    "n": 22,
-   "ok": false,
+   "ok": true,
    "rows": [
     {
      "name": "Hotel Color",
@@ -3032,7 +3041,7 @@
    "branch": "A3-location",
    "hasKey": true,
    "n": 2,
-   "ok": false,
+   "ok": true,
    "rows": [
     {
      "name": "Класик",
@@ -3154,7 +3163,7 @@
    "branch": "A3-location",
    "hasKey": true,
    "n": 4,
-   "ok": false,
+   "ok": true,
    "rows": [
     {
      "name": "ДГ 39 \"Приказка\"",
@@ -3410,7 +3419,7 @@
    "branch": "M2",
    "hasKey": true,
    "n": 1,
-   "ok": false,
+   "ok": true,
    "rows": [
     {
      "name": "Морска гимназия \"Св. Николай Чудотворец\"",

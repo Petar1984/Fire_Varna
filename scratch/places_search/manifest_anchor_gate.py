@@ -1,8 +1,10 @@
 """F12-ж gate: a manifest anchor that names a commit carries the BLOB's bytes.
 
-  python manifest_anchor_gate.py               # the tracked manifests -> expect PASS
-  python manifest_anchor_gate.py --broken DIR  # write disk-byte copies into DIR
-                                               # and gate THOSE  -> expect FAIL (exit 2)
+  python manifest_anchor_gate.py                   # the tracked manifests -> expect PASS
+  python manifest_anchor_gate.py --broken DIR      # write disk-byte copies into DIR
+                                                   # and gate THOSE -> expect FAIL (exit 2)
+  python manifest_anchor_gate.py --broken-crlf DIR # every anchor recomputed on the
+                                                   # CRLF twin of its blob -> FAIL
 
 The second form is the deliberately broken input: every commit-named anchor is
 recomputed from the file on disk, exactly as the generator did before F12-ж. On
@@ -11,9 +13,17 @@ a Windows worktree the reference is the CRLF twin of its blob (266 021 B against
 about the same commit — and the gate has to say so. A gate that has never failed
 is not a gate.
 
+Амандамент №4 т. 3: `_meta.inputs` are commit anchors now, so the walk covers
+the three delivered blobs as well. On a checkout with `eol=lf` the disk copy of
+`data/*.json` IS the blob, so the first broken input cannot move them — the
+second one does: it recomputes every anchor on the CRLF twin of its own blob,
+which is exactly what a Windows worktree with `core.autocrlf=true` would hand a
+generator that reads the disk.
+
 The rule itself lives in recall_sweep.py (`check_manifest_anchors`), which is
 what the generator calls on what it has just written. One rule, one place.
 """
+import hashlib
 import importlib.util
 import json
 import pathlib
@@ -52,8 +62,32 @@ def break_anchors(src_dir, dst_dir):
     return out, broken
 
 
+def crlf_anchors(src_dir, dst_dir):
+    """Recompute every commit anchor on the CRLF twin of the blob it names."""
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    out, broken = [], 0
+    for name in MANIFESTS:
+        doc = json.loads((src_dir / name).read_text(encoding="utf-8"))
+        for _where, anchor in rs.commit_anchors(doc):
+            raw = rs.blob_text(anchor["commit"], anchor["path"]).encode("utf-8")
+            twin = raw.replace(chr(10).encode(), (chr(13) + chr(10)).encode())
+            anchor["sha256"] = hashlib.sha256(twin).hexdigest()
+            anchor["bytes"] = len(twin)
+            broken += 1
+        target = dst_dir / name
+        target.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + chr(10),
+                          encoding="utf-8", newline=chr(10))
+        out.append(str(target))
+    return out, broken
+
+
 def main():
-    if "--broken" in sys.argv:
+    if "--broken-crlf" in sys.argv:
+        dst = pathlib.Path(sys.argv[sys.argv.index("--broken-crlf") + 1]).resolve()
+        paths, broken = crlf_anchors(HERE, dst)
+        print(u"счупен вход: %d котви, преброени върху CRLF-близнака на блоба -> %s"
+              % (broken, dst))
+    elif "--broken" in sys.argv:
         dst = pathlib.Path(sys.argv[sys.argv.index("--broken") + 1]).resolve()
         paths, broken = break_anchors(HERE, dst)
         print(u"счупен вход: %d котви преписани с байтовете от диска -> %s"

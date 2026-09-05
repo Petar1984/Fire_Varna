@@ -6663,8 +6663,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // address marker and a generic word („район“, „квартал“, „зона“…) carry no
       // place. The ORDER and the boundaries are the point — „морска градина“ is a
       // phrase, „градина“ alone is not.
-      const sigTokens = (s) => placeTokens(s).filter((t) => !t.num && t.orig.length > 2 &&
-        t.s.length > 2 && ADDR.indexOf(t.orig) < 0 && !generic.has(t.s)).map((t) => t.s);
+      // Амандамент №3 т. 5: ONE significance rule on the client too. This used to
+      // be a second copy of the predicate; a copy is a rule that can drift by one
+      // edit, and `isSignificantToken` is the same question search() asks.
+      const sigTokens = (s) => placeTokens(s).filter(isSignificantToken).map((t) => t.s);
       const LOC_INDEX = new Map();               // class -> code -> {name, extra, phrases}
       for (const cls of LOC_CLASSES) {
         const entries = (locs[cls] && typeof locs[cls] === 'object') ? locs[cls] : {};
@@ -7049,7 +7051,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // F12-е: every word must be SIGNIFICANT by the rule the rest of the machine
       // uses — the number filter alone let the TYPE PREFIXES of the names in
       // („к.к.“, „кв.“, „ж.к.“, „м-т“, „с.о.“), and „к“ answered with 163 rows.
-      if (!hasKey && R.length && !R.some((t) => t.orig === DISTRICT_MARK)
+      // Амандамент №3 т. 6 — fail-closed: an EMPTY GENERIC_WORDS means the
+      // dictionary did not load, and a degraded client must not invent its own
+      // significance rule and answer with places (the reference: the same guard
+      // on GENERIC_TOKENS in bare_location_query).
+      if (!hasKey && GENERIC_WORDS.size && R.length && !R.some((t) => t.orig === DISTRICT_MARK)
           && !R.some((t) => STREET_MARK.indexOf(t.orig) >= 0) && R.every(isSignificantToken)) {
         const qHit = cls.filter((r) => R.every((t) => r.qtk.indexOf(t.s) >= 0));
         const lHit = cls.filter((r) => R.every((t) => r.ltk.indexOf(t.s) >= 0));

@@ -1,9 +1,15 @@
 """Regenerate scratch/places_search/m7_trigger_tokens.json — measured, never hand-listed.
 
 Usage:
-  python gen_m7_tokens.py --check   # rebuild with the OLD (literal) branch and diff
-                                    # against the tracked file: proves the generator
+  python gen_m7_tokens.py --check   # rebuild with the CURRENT engine and diff against
+                                    # the tracked file -> GREEN means the tracked list
+                                    # is what this engine answers today
   python gen_m7_tokens.py --write   # write the file with the CURRENT engine (F12-е)
+
+Амандамент №4 т. 4: `--check` used to rebuild with the OLD literal branch, so it
+was red BY CONSTRUCTION and its green never meant anything. The literal branch
+is the deliberately broken input and it lives where broken inputs belong —
+`m7_significance_gate.py --literal`. No tracked tool is red by design.
 """
 import importlib.util
 import json
@@ -21,34 +27,11 @@ rs = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(rs)
 
 
-def literal_branch(R):
-    """The F12-б branch shape, before F12-е: numbers filtered, nothing else."""
-    if not rs.M7_ENABLED or not R:
-        return False
-    if any(t.orig == rs.DISTRICT_MARK for t in R):
-        return False
-    if any(t.orig in rs.STREET_MARK for t in R):
-        return False
-    return not any(t.num for t in R)
-
-
-META_OLD = {
-    "what": "М7 („голото място“, план §3й-б S4): всяка единична дума, която може да задейства клона.",
-    "rule": "Дума в `qtk` или `ltk` на поне един изнесен ред. `legtk` (старите зонови думи на реда) и `ktk` (видът) НЕ задействат — затова „зпз“ влиза САМО като днешната местност, не като наследена дума.",
-    "how_to_reproduce": "зареди scratch/places_search/recall_sweep.py като модул и извикай search(<дума>) — клонът е `M7-bare-location`.",
-}
-
 META_NEW = {
     "what": "М7 („голото място“, план §3й-б S4): всяка единична дума, която може да задейства клона.",
     "rule": "Дума в `qtk` или `ltk` на поне един изнесен ред И значима по правилото на останалата машина (F12-е: >2 знака в двете изписвания, без типов префикс „кв/жк/к/м/с/о/т/и“, без число, без общата дума на речника). `legtk` (старите зонови думи на реда) и `ktk` (видът) НЕ задействат — затова „зпз“ влиза САМО като днешната местност, не като наследена дума.",
     "how_to_reproduce": "зареди scratch/places_search/recall_sweep.py като модул и извикай search(<дума>) — клонът е `M7-bare-location`.",
 }
-
-FOR_SIGNATURE_OLD = [
-    "„зпз“: и алиас на местността Западна промишлена зона, и наследена дума на реда — по правилото по-горе задейства САМО като местност (1 ред).",
-    "Думите с `word_class` = „short“ (к, кв, м, о, с, т, жк, и, 1, 2) идват от ПРЕФИКСА на името („к.к.“, „кв.“, „м-т“, „с.о.“, „ж.к.“), не от мястото. Планът изброява само филтъра „без токен-число“, затова днес „кв“ отговаря с 36 реда, а „к“ — със 163. Останалата част от машинарията за места хвърля тези думи (значимият токен иска >2 знака и в двата изписа). ЧАКА решение: остава ли клонът буквален, или взима същия филтър за значимост.",
-    "„приморски“ и „приморският“ са алиаси на местността Морска градина — затова районна на вид дума отговаря през М7. Контролата на Сол (гейт 6) очакваше M3.",
-]
 
 FOR_SIGNATURE_NEW = [
     "„зпз“: и алиас на местността Западна промишлена зона, и наследена дума на реда — по правилото по-горе задейства САМО като местност (1 ред).",
@@ -130,12 +113,10 @@ def build(meta, for_signature):
 
 
 if "--check" in sys.argv:
-    current = rs.bare_location_query
-    rs.bare_location_query = literal_branch
-    text = build(META_OLD, FOR_SIGNATURE_OLD)
-    rs.bare_location_query = current
+    text = build(META_NEW, FOR_SIGNATURE_NEW)
     tracked = TARGET.read_text(encoding="utf-8")
-    print("reproduced the tracked file byte for byte:", text == tracked)
+    print("the current engine reproduces the tracked file byte for byte:",
+          text == tracked)
     if text != tracked:
         import difflib
         for line in list(difflib.unified_diff(tracked.splitlines(), text.splitlines(),
@@ -144,7 +125,7 @@ if "--check" in sys.argv:
         sys.exit(2)
 elif "--write" in sys.argv:
     text = build(META_NEW, FOR_SIGNATURE_NEW)
-    TARGET.write_text(text, encoding="utf-8", newline="\n")
+    TARGET.write_text(text, encoding="utf-8", newline=chr(10))
     doc = json.loads(text)
     print("written:", TARGET, "tokens", doc["_meta"]["measured"]["tokens"],
           "trigger_today", doc["_meta"]["measured"]["trigger_today"])

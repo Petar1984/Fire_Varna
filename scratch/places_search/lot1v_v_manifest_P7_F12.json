@@ -9,26 +9,35 @@
   "note": "Референцията НЕ е замразена и този прогон не я пипа. Тестовете, които пинват старите числа, остават ЧЕРВЕНИ до подписа — това е гейтът, не дефект.",
   "base": {
    "what": "днешният двигател с М7 = OFF",
-   "sha256": "ec63163ce473e9952f1614e1063fc238a89a0a03793aa5c9350594ad4c82fdd3",
-   "bytes": 934618
+   "sha256": "9fa260e9c4f0423991b4a943aad67258827bd6e5f5788da62339689cd2564dd0",
+   "bytes": 934547
   },
   "candidate": {
    "what": "днешният двигател с М7 = ON",
-   "sha256": "63d77df8ec7175118e0985d53d2023161b336aedce7a066b84078c87cb1ab6e1",
-   "bytes": 1204358
+   "sha256": "61967588780f529d39c722e3d75b3c95c547e89339e717184e6e1d233213301d",
+   "bytes": 1204287
   },
   "inputs": {
    "data/places.json": {
     "sha256": "329310f577e8353673b9014af99624a78ab825fb0ad53e93fc572a28660d88c0",
-    "bytes": 122089
+    "bytes": 122089,
+    "path": "data/places.json",
+    "commit": "HEAD",
+    "what": "входът на доставката"
    },
    "data/hotels.json": {
     "sha256": "46a44ce82f154ca6f77f5001c0393b4654a818ba6d5e8540fb1c6f337fe0418d",
-    "bytes": 148685
+    "bytes": 148685,
+    "path": "data/hotels.json",
+    "commit": "HEAD",
+    "what": "входът на доставката"
    },
    "data/place_categories.json": {
     "sha256": "874e33cd00e2f468d6fa1fe717351a5247765ae13d4301374a9a14f83347d054",
-    "bytes": 75818
+    "bytes": 75818,
+    "path": "data/place_categories.json",
+    "commit": "HEAD",
+    "what": "входът на доставката"
    }
   }
  },
@@ -49,8 +58,6 @@
  "controls_outside_the_buckets": [
   {
    "q": "приморски",
-   "expected_branch": "M3",
-   "expected_first": "ПРИМОРСКИ",
    "without_m7": {
     "branch": "M3",
     "n": 1,
@@ -65,8 +72,6 @@
   },
   {
    "q": "владислав варненчик",
-   "expected_branch": "M3",
-   "expected_first": "КАРНИВАЛ",
    "without_m7": {
     "branch": "M3",
     "n": 1,

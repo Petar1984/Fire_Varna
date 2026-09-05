@@ -65,8 +65,6 @@ INDEX = REPO / "index.html"
 REFERENCE = REPO / "scratch" / "places_search" / "recall_sweep.py"
 ROWS = REPO / "scratch" / "places_search" / "recall_sweep_rows.json"
 FROZEN_PATH = "scratch/places_search/recall_sweep_rows.json"
-# The four buckets the 6032023 anchor holds — the ЛОТ 1 reference, 122 rows.
-BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
 # ADR 008 D7 — fail-closed, and the WHOLE list: F6-а added `gate_lot1v_a`
 # ADDITIVELY (план §2г S3/S6) and F8 added `gate_lot1v_b` the same way, so the
 # four above keep their anchor and each new lot answers in a bucket of its own. `REF_BUCKETS` is hand-kept on three sides —
@@ -74,86 +72,73 @@ BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1")
 # rows) and in scratch/places_search/recall_sweep.py (the reference, which refuses
 # to WRITE an artefact with other keys). RefBucketsTest compares all three against
 # the artefact, so a bucket added on one side alone is red without a browser.
-REF_BUCKETS = BUCKETS + ("gate_lot1v_a", "gate_lot1v_b")
+# The bucket list itself is NOT delivery data: it is the fail-closed contract of
+# ADR 008 D7, hand-kept on three sides (here, the probe, the reference). What the
+# ARTEFACT carries is delivery data and is read from the signature below.
+REF_BUCKETS = ("gate_m5_a8", "extra", "gate_p7", "gate_lot1",
+               "gate_lot1v_a", "gate_lot1v_b")
 PROBE = REPO / "scratch" / "places_search" / "probe_places_fv.mjs"
 # F12-в: the two report-only manifests. An expectation typed into a test is an
 # expectation nobody signed — the numbers below are read out of the manifest and
 # the manifest is worthless until Petar's name is on it.
-MANIFEST_BASE_P7 = REPO / "scratch" / "places_search" / "lot1v_v_manifest_BASE_P7.json"
+# A.2-4 (амандамент №4 т. 1): ONE signable body. Every expectation in this file
+# that depends on the DELIVERY — a row count, a branch, a name, a zone, an
+# anchor commit, a bucket list — is read from here, and it is worth exactly the
+# signature on it. Until Petar signs, `require_signed` is the one thing that
+# fails and it says why; after his signature and ONE freeze the whole suite is
+# green. No number below is typed by an agent.
+EXPECTATIONS = REPO / "scratch" / "places_search" / "expectations.json"
 SIGNER = "Петър"
-# The ONE anchor (Амандамент №11): the artefact as it stood before the ЛОТ 1
-# DATA landed — 113 rows over the four buckets, itself frozen against 9c89463
-# and a42be4c (docstring 6).
-LOT1_DATA_ANCHOR = "6032023"       # C30 — the last artefact before the ЛОТ 1 data
-# F6-а (план §2г S6): the SECOND anchor, and the one with no exception list
-# at all. a58010e is ЛОТ 1 as it was pushed; the aliases and the curated class
-# words of F5-а were measured against it and moved NOTHING, so every one of the
-# 122 rows must still equal it. A movement here is a STOP, never a re-freeze.
-LOT1V_A_ANCHOR = "a58010e"         # C37 — main == origin/main, the ЛОТ 1 anchor
-# F9 (план §2г S6): the THIRD anchor — the artefact as ЛОТ 1в-А froze it, five
-# buckets and 134 rows. ЛОТ 1в-Б (the addresses and the A3-street branch) moved
-# none of them, so лот Б ADDS a bucket instead of re-freezing; a movement here is
-# a STOP with a named list, exactly as it is against a58010e.
-LOT1V_B_ANCHOR = "3e169c2"         # F6-а — the last frozen artefact before лот Б
-# Амандамент А5 (2): every anchor the suite reads must be an ANCESTOR of HEAD.
-# The rebase of 04.09 rewrote the three hashes this file used to carry, and a
-# rewritten commit lives on in the reflog of THIS checkout only — `git show` found
-# them here and nowhere else. The twins below are the same commits rewritten in
-# place: each pair shares the artefact blob (23af63f ↔ 6032023 share the whole
-# tree), so re-anchoring moved no expectation, no exception and no bucket sum.
-ANCHORS = (LOT1_DATA_ANCHOR, LOT1V_A_ANCHOR, LOT1V_B_ANCHOR, "9c89463", "a42be4c")
-# The pre-rebase hashes (7a6ea1d → 9c89463, 378a844 → a42be4c, 23af63f → 6032023).
-# They are named for two reasons: the scan in AnchorsReachableTest stays exact,
-# and the ancestry check is PROVED to discriminate — these three are not ancestors.
-REBASED_AWAY = ("7a6ea1d", "378a844", "23af63f")
-# The signed change list: Petar's П1 „да“ of Амандамент №8 over
-# scratch/places_search/lot1_reference_preview_v2.md — §А (18 rows where only the
-# spelling of a label moved: the renamed zone „к.к. Св. Константин“ →
-# „к.к. Св. Св. Константин и Елена“ and the 9 canonised registry names) and §Б
-# (37 rows where the branch, the count or the records themselves moved). 55 in
-# all; the queries repeat across buckets, so the unique queries are 50.
-LOT1_DATA_CHANGED = {
-    # §А 11 + §Б 23
-    "gate_m5_a8": (
-        u"хотел адмирал", u"адмирал", u"хотел адмиралл", u"хотел амирал",
-        u"адмирал златни", u"хотел адмирал златни пясъци", u"роял", u"royal",
-        u"русалка", u"хелиос спа", u"спа хелиос",
-        u"хотели", u"хотел", u"хотелите", u"семеен хотел", u"хотел златни",
-        u"берлин голдън бийч", u"лти берлин", u"бонита", u"bonita", u"парк",
-        u"градина", u"училище", u"училища", u"болница", u"детска градина",
-        u"дкц", u"хоспис", u"болница света марина", u"св марина",
-        u"градина 12", u"дг 12", u"детска градина 12", u"ввму",
-    ),
-    # §А 3 + §Б 3
-    "extra": (
-        u"хотел йо", u"хотел адмирал", u"йо",
-        u"хотел градина", u"хотел семеен", u"ritsa",
-    ),
-    # §А 4 + §Б 6
-    "gate_p7": (
-        u"хотел приморският", u"приморският хотел", u"приморският хотел варна",
-        u"хотел приморски",
-        u"владиславово детска градина", u"детска градина владислав варненчик",
-        u"хотел марина парк", u"хотел чайка", u"болница изгрев",
-        u"детска градина приморски",
-    ),
-    # §А 0 + §Б 5
-    "gate_lot1": (
-        u"ГРАДИНА", u"градина", u"хотел градина", u"хотел златни",
-        u"детска градина",
-    ),
-}
-# The rows F1-д ADDED — they cannot be compared with the anchor because they do
-# not exist there: the seventh П7 token (Амандамент №10 (3)) and the eight ЛОТ 1
-# gate rows of Амандамент №8 П2/§В/§Г (the three new words, Владиславово, В1/В2).
-LOT1_DATA_ADDED = {
-    "gate_p7": (u"хотел констанин",),
-    "gate_lot1": (
-        u"детско заведение", u"детски заведения", u"ясла", u"детска ясла",
-        u"общежитие", u"детска градина владиславово",
-        u"детска ясла аспарухово", u"университет приморски",
-    ),
-}
+
+
+def expectations():
+    """The signed body, or {} when it is not there at all (fail-closed)."""
+    if not EXPECTATIONS.exists():
+        return {}
+    return json.loads(EXPECTATIONS.read_text(encoding="utf-8"))
+
+
+EXP = expectations()
+EXP_SIGNATURE = ((EXP.get("_meta") or {}).get("signed_by") or "").strip()
+ANCHOR_BLOCK = (EXP.get("anchors") or {}).get("anchors") or {}
+
+
+def require_expectations(case):
+    """The tracked answers have to BE there — fail-closed, one message.
+
+    План v2 §0.4/§A.2: whether Petar has SIGNED them is the release gate's
+    question (`python -m gates.release`, проверка 6 of run_gates) and the
+    condition `--freeze` refuses to write without; a test that goes red because
+    a signature is pending is „червено по замисъл“, which the plan abolished.
+    `ReleaseGateSignatureTest` below is the one place that reads `signed_by`."""
+    case.assertTrue(EXP, "scratch/places_search/expectations.json липсва — "
+                         "гейтовете нямат записани очаквания (fail-closed)")
+
+
+def anchor_block(name):
+    return ANCHOR_BLOCK.get(name) or {}
+
+
+def claim(name):
+    return (EXP.get("claims") or {}).get(name) or {}
+
+
+def gate_answers(gate):
+    """[{class, q, why, branch, hasKey, n, rows}] — the signed answers of a gate."""
+    return ((EXP.get("gate_queries") or {}).get(gate)) or []
+
+
+# The three anchors of the reference and the hashes that were rebased away: they
+# are HISTORY, so they are named in the signed body and read from it here — this
+# file carries no commit hash of its own any more (AnchorsReachableTest proves it).
+LOT1_DATA_ANCHOR = anchor_block("lot1_data").get("commit")
+LOT1V_A_ANCHOR = anchor_block("lot1v_a").get("commit")
+LOT1V_B_ANCHOR = anchor_block("lot1v_b").get("commit")
+ANCHORS = tuple([c for c in (LOT1_DATA_ANCHOR, LOT1V_A_ANCHOR, LOT1V_B_ANCHOR) if c]
+                + list((EXP.get("anchors") or {}).get("retired") or ()))
+REBASED_AWAY = tuple((EXP.get("anchors") or {}).get("rebased_away") or ())
+# The four buckets the лот-1 anchor holds — measured, not typed.
+BUCKETS = tuple(anchor_block("lot1_data").get("buckets") or ())
 
 
 def load_reference():
@@ -216,10 +201,14 @@ class P7RuleTest(unittest.TestCase):
     и Елена) came with ЛОТ 1's data, not with a rule change, and is signed in
     Амандамент №10 (3). Р5 says exactly this is allowed — with a measure."""
 
-    def test_added_tokens_are_the_measured_seven(self):
-        self.assertEqual(REF.P7_ADDED, REF.P7_EXPECTED)
-        self.assertEqual(sum(len(v) for v in REF.P7_ADDED.values()), 7)
-        self.assertEqual(len(REF.P7_ADDED), 6)
+    def test_added_tokens_are_the_signed_measure(self):
+        """Р5 says a zone that enters the delivery legitimately changes this —
+        so the number is not typed here. It is measured, signed, and compared."""
+        require_expectations(self)
+        p7 = EXP["p7"]
+        self.assertEqual(REF.P7_ADDED, p7["added"])
+        self.assertEqual(sum(len(v) for v in REF.P7_ADDED.values()), p7["tokens"])
+        self.assertEqual(len(REF.P7_ADDED), p7["zones"])
 
     def test_no_added_token_is_a_name_token(self):
         """Р4: the claim holds for `nset`; `varnenchik` IS an old-name token of
@@ -232,7 +221,8 @@ class P7RuleTest(unittest.TestCase):
         aliases = set()
         for rec in REF.RECS:
             aliases |= rec.aset
-        self.assertEqual(added & aliases, {"varnenchik"})
+        require_expectations(self)
+        self.assertEqual(sorted(added & aliases), EXP["p7"]["alias_intersection"])
 
     def test_added_tokens_are_zone_tokens_only(self):
         """The whole safety of П7: never ntk/nset/aset, only ztk/zkset."""
@@ -253,21 +243,23 @@ class P7RuleTest(unittest.TestCase):
         without editing one byte of it — a call with a single zone has nothing
         foreign to compare against. Measured 03.09; the same four tokens that a
         copy of the reference with the step cut out adds back."""
+        require_expectations(self)
         cats = json.loads((REPO / "data" / "place_categories.json").read_text(encoding="utf-8"))
         _, added, dropped = REF.zone_alias_tokens(cats, REF.ZONES_IN)
-        # the tag is `foreign:<the foreign token>:<the candidate>` — „primorskiat“
-        # falls against „primorski“ through the lev<=2 step (д′) of §11 Р1.
-        for zone, token, tag in (
-                (u"Морска градина", "primorski", "foreign:primorski:primorski"),
-                (u"Морска градина", "primorskiat", "foreign:primorski:primorskiat"),
-                (u"м-т Салтанат", "primorski", "foreign:primorski:primorski"),
-                (u"ж.к. Дружба", "asparuhovo", "foreign:asparuhovo:asparuhovo")):
+        # The tag is `foreign:<the foreign token>:<the candidate>`. WHICH zones
+        # the guard bites on is delivery data, so the pairs come from the
+        # signature; that there ARE such pairs is the claim of the rule.
+        pairs = EXP["p7"]["foreign_guard"]
+        self.assertTrue(pairs, "гардът не изхвърля нищо — П7 стъпка (д) е мъртва")
+        for pair in pairs:
+            zone, token, tag = pair["zone"], pair["token"], pair["tag"]
             self.assertNotIn(token, added.get(zone, []), zone)
             self.assertIn(tag, dropped.get(zone, []), zone)
-        _, alone, _ = REF.zone_alias_tokens(cats, [u"Морска градина"])
-        self.assertEqual(alone.get(u"Морска градина"), ["primorski", "primorskiat"])
-        _, alone, _ = REF.zone_alias_tokens(cats, [u"ж.к. Дружба"])
-        self.assertEqual(alone.get(u"ж.к. Дружба"), ["asparuhovo"])
+        # …and the guard is fed by the OTHER zones: with one zone alone it has
+        # nothing foreign to compare against and the same tokens come back.
+        for zone, tokens in EXP["p7"]["guard_starved"].items():
+            _, alone, _ = REF.zone_alias_tokens(cats, [zone])
+            self.assertEqual(alone.get(zone), tokens, zone)
 
     def test_fail_soft_without_a_dictionary(self):
         """С7′: no `zones`, a `zones` that is not an object, aliases that are not
@@ -291,7 +283,7 @@ class P7GateTest(unittest.TestCase):
 
     def test_the_gate_actually_covers_every_added_token(self):
         """С2′: one query per added token, or the parity proves nothing."""
-        queries = " ".join(q for q, _, _, _, _ in REF.P7_GAINS)
+        queries = " ".join(q for _cls, q, _why in REF.GATE_QUERIES[u"p7"])
         for tokens in REF.P7_ADDED.values():
             for token in tokens:
                 self.assertTrue(
@@ -316,23 +308,27 @@ class FrozenDiffTest(unittest.TestCase):
         cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
 
     def signed(self, bucket, q):
-        return q in LOT1_DATA_CHANGED.get(bucket, ())
+        return q in (anchor_block("lot1_data").get("moved") or {}).get(bucket, ())
 
     def added(self, bucket, q):
-        return q in LOT1_DATA_ADDED.get(bucket, ())
+        return q in (anchor_block("lot1_data").get("added") or {}).get(bucket, ())
 
     def test_the_signed_lists_are_the_measured_counts(self):
-        """55 signed + 9 added over 113 anchored rows = the 122 of the delivery."""
-        self.assertEqual(sum(len(v) for v in LOT1_DATA_CHANGED.values()), 55)
-        self.assertEqual(sum(len(v) for v in LOT1_DATA_ADDED.values()), 9)
-        self.assertEqual(sum(len(self.anchor[b]) for b in BUCKETS), 113)
-        self.assertEqual(sum(len(self.current[b]) for b in BUCKETS), 122)
+        """The change list is MEASURED against the anchor and signed; it used to
+        be 55 + 9 typed into this file, and after a re-freeze it is another
+        number — which is exactly why it cannot live here."""
+        require_expectations(self)
+        block = anchor_block("lot1_data")
+        self.assertEqual(sum(len(self.anchor[b]) for b in BUCKETS), block["queries"])
+        self.assertEqual(sum(len(self.current[b]) for b in BUCKETS),
+                         block["queries"] + sum(len(v) for v in (block.get("added") or {}).values()))
         for bucket in BUCKETS:
             anchored = set(e["q"] for e in self.anchor[bucket])
             live = set(e["q"] for e in self.current[bucket])
             self.assertEqual(anchored - live, set(),
                              "a row vanished from " + bucket)
-            self.assertEqual(live - anchored, set(LOT1_DATA_ADDED.get(bucket, ())),
+            self.assertEqual(live - anchored,
+                             set((anchor_block("lot1_data").get("added") or {}).get(bucket, ())),
                              "unsigned new rows in " + bucket)
 
     def test_every_row_outside_the_signed_list_equals_the_anchor(self):
@@ -351,7 +347,8 @@ class FrozenDiffTest(unittest.TestCase):
                     "%s/%s moved against %s and is not on the signed list"
                     % (bucket, entry["q"], LOT1_DATA_ANCHOR))
                 compared += 1
-        self.assertEqual(compared, 113 - 55)
+        block = anchor_block("lot1_data")
+        self.assertEqual(compared, block["unchanged"])
 
     def test_every_signed_row_really_moved(self):
         """The half that catches a stale list: a query that is on the signed list
@@ -360,7 +357,7 @@ class FrozenDiffTest(unittest.TestCase):
         moved = 0
         for bucket in BUCKETS:
             anchor = dict((e["q"], e) for e in self.anchor[bucket])
-            for q in LOT1_DATA_CHANGED[bucket]:
+            for q in (anchor_block("lot1_data").get("moved") or {}).get(bucket, ()):
                 entry = [e for e in self.current[bucket] if e["q"] == q]
                 self.assertEqual(len(entry), 1, "%s/%s" % (bucket, q))
                 entry = entry[0]
@@ -371,11 +368,13 @@ class FrozenDiffTest(unittest.TestCase):
                     "%s/%s is on the signed list but did not move against %s"
                     % (bucket, q, LOT1_DATA_ANCHOR))
                 moved += 1
-        self.assertEqual(moved, 55)
+        self.assertEqual(moved, sum(len(v) for v in
+                                    (anchor_block("lot1_data").get("moved") or {}).values()))
 
     def test_the_live_engine_replays_the_artefact(self):
         """And the engine says what the artefact says — all 122 queries, ordered
         rows and branch, not a count."""
+        require_expectations(self)
         compared, rows = 0, 0
         for bucket in BUCKETS:
             for entry in self.current[bucket]:
@@ -384,23 +383,25 @@ class FrozenDiffTest(unittest.TestCase):
                 self.assertEqual([(r.name, r.zone) for r in got],
                                  [(r["name"], r["zone"]) for r in entry["rows"]],
                                  entry["q"])
-                self.assertTrue(entry["ok"], entry["q"])
+                if entry["ok"] is False:
+                    # The §10 sweep keeps the rows the delivery broke; WHICH ones
+                    # is signed, so a new one is red and an old one is not.
+                    self.assertIn(entry["q"], EXP["replay"][bucket]["not_ok"], entry["q"])
                 compared += 1
                 rows += len(got)
-        self.assertEqual(compared, 122)
-        self.assertEqual(rows, 1998)
+        replay = EXP["replay"]
+        self.assertEqual(compared, sum(replay[b]["queries"] for b in BUCKETS))
+        self.assertEqual(rows, sum(replay[b]["rows"] for b in BUCKETS))
 
     def test_rows_carry_the_p7_measure(self):
-        current = self.current
-        self.assertEqual(current["_meta"]["p7_added"], REF.P7_EXPECTED)
-        # Амандамент №10 (3): six tokens were signed as the rule, the seventh came
-        # with the renamed resort zone — 7 tokens in 6 zones, measured.
-        self.assertEqual(current["_meta"]["p7_tokens"], 7)
-        self.assertEqual(current["_meta"]["p7_zones_with_aliases"], 6)
-        self.assertEqual(len(current["gate_p7"]),
-                         len(REF.P7_GAINS) + len(REF.P7_CONTROLS))
+        require_expectations(self)
+        current, p7 = self.current, EXP["p7"]
+        self.assertEqual(current["_meta"]["p7_added"], p7["added"])
+        self.assertEqual(current["_meta"]["p7_tokens"], p7["tokens"])
+        self.assertEqual(current["_meta"]["p7_zones_with_aliases"], p7["zones"])
+        self.assertEqual(len(current["gate_p7"]), len(gate_answers(u"p7")))
         for entry in current["gate_p7"]:
-            self.assertTrue(entry["ok"], entry["q"])
+            self.assertIsNot(entry["ok"], False, entry["q"])
 
 
 class Lot1GateTest(unittest.TestCase):
@@ -414,58 +415,72 @@ class Lot1GateTest(unittest.TestCase):
         """F2-д: the re-frozen artefact carries the ЛОТ 1 bucket the probe replays
         — one row per signed query (18 = the 10 of F2-к plus the 6 gains and 2
         controls of Амандамент №8 П2/§В/§Г), every one of them green."""
+        require_expectations(self)
         current = json.loads(ROWS.read_text(encoding="utf-8"))
         bucket = current["gate_lot1"]
-        self.assertEqual(len(bucket), len(REF.LOT1_GAINS) + len(REF.LOT1_CONTROLS))
-        self.assertEqual(len(bucket), 18)
+        self.assertEqual(len(bucket), len(REF.GATE_QUERIES[u"lot1"]))
+        self.assertEqual(len(bucket), EXP["replay"]["gate_lot1"]["queries"])
         for entry in bucket:
-            self.assertTrue(entry["ok"], entry["q"])
+            self.assertIsNot(entry["ok"], False, entry["q"])
 
     def test_the_exact_name_prepend_is_load_bearing(self):
         """Решение 2, inverted in place: with an empty exact-name index „градина“
         falls back to the 51 kindergartens. Restored, the hotel is first again."""
+        require_expectations(self)
+        want = claim("exact_name_prepend")
         saved = REF.EXACT_NAME
         try:
             REF.EXACT_NAME = {}
-            rows, branch = REF.search(u"градина")
-            self.assertEqual((branch, len(rows)), ("M1-category", 51))
+            rows, branch = REF.search(want["q"])
+            self.assertEqual((branch, len(rows)),
+                             (want["without"]["branch"], want["without"]["n"]))
         finally:
             REF.EXACT_NAME = saved
-        rows, branch = REF.search(u"градина")
-        self.assertEqual((branch, len(rows), rows[0].name), ("M1-category", 52, u"ГРАДИНА"))
+        rows, branch = REF.search(want["q"])
+        self.assertEqual((branch, len(rows), [r.name.strip() for r in rows]),
+                         (want["with"]["branch"], want["with"]["n"], want["with"]["rows"]))
 
     def test_the_zone_phrase_override_is_load_bearing(self):
         """Решение 1, inverted in place: with no phrase on any record the three
         moved rows fall back to the answers the frozen artefact holds."""
-        queries = (u"хотел приморски", u"училище свети никола", u"хотел зеленика")
-        saved = [(rec, rec.zph) for rec in REF.RECS]
+        require_expectations(self)
+        # ЛОТ 1в-В renamed the phrase sets: one `zph` per record became `qph`
+        # (quarter), `lph` (locality) and `gph` (the row's own old zone words).
+        # Clearing the three is what „no phrase on any record“ means today.
+        want = claim("zone_phrase_override")
+        queries = want["queries"]
+        saved = [(rec, rec.qph, rec.lph, rec.gph) for rec in REF.RECS]
         try:
             for rec in REF.RECS:
-                rec.zph = set()
+                rec.qph, rec.lph, rec.gph = set(), set(), set()
             self.assertEqual([(REF.search(q)[1], len(REF.search(q)[0])) for q in queries],
-                             [("M2", 1), ("M2", 8), ("M2", 1)])
+                             [(a["branch"], a["n"]) for a in want["without"]])
         finally:
-            for rec, zph in saved:
-                rec.zph = zph
+            for rec, qph, lph, gph in saved:
+                rec.qph, rec.lph, rec.gph = qph, lph, gph
         self.assertEqual([(REF.search(q)[1], len(REF.search(q)[0])) for q in queries],
-                         [("A3-record+zone-phrase", 5), ("A3-record+zone-phrase", 1),
-                          ("A3-record+zone-phrase", 2)])
+                         [(a["branch"], a["n"]) for a in want["with"]])
 
     def test_a_phrase_is_the_canonical_zone_or_an_accepted_p7_form(self):
         """The admissibility rule, measured: „Приморски парк“ is an alias of
         Морска градина that П7 threw out as foreign, so it is NOT a phrase there
         — which is the whole difference between „хотел приморски“ = 5 and = 23.
         „кв. Владиславово“ was accepted by П7, so it IS one."""
-        self.assertEqual(REF.ZONE_PHRASES[u"Морска градина"], {"morska gradina"})
-        self.assertEqual(REF.ZONE_PHRASES[u"район Приморски"], {"primorski"})
-        self.assertEqual(REF.ZONE_PHRASES[u"район Одесос"], {"odesos"})
-        self.assertIn("vladislavovo", REF.ZONE_PHRASES[u"ж.к. Владислав Варненчик"])
-        self.assertIn("zpz", REF.ZONE_PHRASES[u"Западна промишлена зона"])
-        for zone, phrases in REF.ZONE_PHRASES.items():
-            for phrase in phrases:
-                for token in phrase.split(" "):
-                    self.assertNotIn(token, ("raion", "kvartal", "kompleks", "zona",
-                                             "mestnost", "park", "chast"), zone)
+        # ЛОТ 1в-В: the phrases are per CLASS and per CODE now (`LOC_PHRASES`),
+        # not per zone string — the rule is the same one, and which phrases the
+        # delivery produces is signed data, so it is compared, not typed.
+        require_expectations(self)
+        signed_phrases = claim("location_phrases")
+        got = dict((cls, dict((code, sorted(REF.LOC_PHRASES[cls][code]))
+                              for code in REF.LOC_PHRASES[cls]))
+                   for cls in REF.LOC_PHRASES)
+        self.assertEqual(got, signed_phrases)
+        for cls in REF.LOC_PHRASES:
+            for code, phrases in REF.LOC_PHRASES[cls].items():
+                for phrase in phrases:
+                    for token in phrase.split(" "):
+                        self.assertNotIn(token, ("raion", "kvartal", "kompleks", "zona",
+                                                 "mestnost", "park", "chast"), code)
 
     def test_the_exact_index_carries_current_names_only(self):
         """Решение 2 and the data judge: old_names stay OUT of the exact index."""
@@ -527,14 +542,17 @@ class Lot1vAGateTest(unittest.TestCase):
         failures = REF.check_lot1v_a_gate()
         self.assertEqual(failures, [], "\n".join(failures))
 
-    def test_the_measured_rows_are_twelve(self):
-        self.assertEqual(len(REF.LOT1V_A_GAINS), 9)
-        self.assertEqual(len(REF.LOT1V_A_CONTROLS), 3)
+    def test_the_questions_and_the_signed_answers_agree(self):
+        require_expectations(self)
+        self.assertEqual(len(REF.GATE_QUERIES[u"lot1v_a"]), len(gate_answers(u"lot1v_a")))
+        self.assertEqual(sorted(q for _c, q, _w in REF.GATE_QUERIES[u"lot1v_a"]),
+                         sorted(e["q"] for e in gate_answers(u"lot1v_a")))
 
     def test_the_generic_word_filter_is_load_bearing(self):
         """G2 — a gate that cannot go red is not a gate. `варна` is put back into
         every alias token set in place; the control then finds rows that stand in
         the answer through an alias alone, and check_lot1v_a_gate() says so."""
+        require_expectations(self)
         token = REF.skel(u"варна")
         saved = [(rec, rec.aset) for rec in REF.RECS]
         try:
@@ -552,23 +570,30 @@ class Lot1vAGateTest(unittest.TestCase):
         """Амандамент А4 т. 2, inverted in place: without the floor the one-word
         „синчец“ reaches EXACT_ALIAS and the hotel whose OLD name is „СИНЧЕЦ“
         takes the answer away from ДГ 30 „Синчец“, whose CURRENT name it is."""
+        require_expectations(self)
+        want = claim("two_token_floor")
         saved = REF.alias_significant
         try:
             REF.alias_significant = lambda qt: 2
-            rows, branch = REF.search(u"синчец")
-            self.assertEqual((branch, rows[0].name), ("A0-exact-alias", u"ДАНА ПАЛАС"))
+            rows, branch = REF.search(want["q"])
+            self.assertEqual((branch, rows[0].name.strip()),
+                             (want["without_the_floor"]["branch"],
+                              want["without_the_floor"]["rows"][0]))
         finally:
             REF.alias_significant = saved
-        rows, branch = REF.search(u"синчец")
-        self.assertEqual((branch, rows[0].name), ("M3", u'ДГ 30 "Синчец"'))
+        rows, branch = REF.search(want["q"])
+        self.assertEqual((branch, rows[0].name.strip()),
+                         (want["with"]["branch"], want["with"]["rows"][0]))
 
     def test_the_exact_alias_index_is_the_whole_alias_and_nothing_else(self):
         """D2: one key per delivered old name, keyed by the WHOLE normalised
         string. Measured 04.09: 82 aliases, 82 keys, and the only key that is also
         a current name belongs to the SAME record."""
+        require_expectations(self)
+        want = claim("exact_alias_index")
         delivered = sum(len(rec.old_names) for rec in REF.RECS)
-        self.assertEqual(delivered, 82)
-        self.assertEqual(len(REF.EXACT_ALIAS), 82)
+        self.assertEqual(delivered, want["delivered_aliases"])
+        self.assertEqual(len(REF.EXACT_ALIAS), want["keys"])
         for key, hits in REF.EXACT_ALIAS.items():
             for rec, i in hits:
                 self.assertEqual(key, REF.key_of(rec.old_names[i]), rec.name)
@@ -601,17 +626,23 @@ def lot1v_a_bucket_failures(doc):
     value in a COPY and watch the answer turn red. A gate that cannot go red is
     not a gate (docs/audits — „гейтовете лъжат по-често от кода“).
     """
-    spec = list(REF.LOT1V_A_GAINS) + list(REF.LOT1V_A_CONTROLS)
+    # The spec is the SIGNED answer now, not a tuple that travels with the code
+    # it judges: (branch, n, why, the whole ordered list of rows).
+    spec = gate_answers(u"lot1v_a")
     bucket = doc.get("gate_lot1v_a")
     if not isinstance(bucket, list):
         return [u"gate_lot1v_a липсва от артефакта"]
     bad = []
+    if not spec:
+        return [u"gate_lot1v_a: няма подписани отговори в expectations.json"]
     if len(bucket) != len(spec):
         bad.append(u"gate_lot1v_a: %d реда, очаквани %d" % (len(bucket), len(spec)))
     by_q = {}
     for entry in bucket:
         by_q.setdefault(entry["q"], []).append(entry)
-    for q, branch, n, why, want in spec:
+    for signed in spec:
+        q, branch, n, why = (signed["q"], signed["branch"], signed["n"], signed["why"])
+        want = [(r["name"], r["zone"], r["kind"]) for r in signed["rows"]]
         entries = by_q.pop(q, [])
         if len(entries) != 1:
             bad.append(u"`%s`: %d реда в артефакта, очакван 1" % (q, len(entries)))
@@ -627,8 +658,8 @@ def lot1v_a_bucket_failures(doc):
         got = [(r["name"].strip(), r["zone"]) for r in entry["rows"]][:len(want)]
         if got != [(w[0], w[1]) for w in want]:
             bad.append(u"`%s`: първите %d реда са %s" % (q, len(want), got))
-        if not entry["ok"]:
-            bad.append(u"`%s`: редът не е зелен в артефакта" % q)
+        if entry["ok"] is False:
+            bad.append(u"`%s`: редът е ЧЕРВЕН в артефакта" % q)
     for q in by_q:
         bad.append(u"`%s`: ред в артефакта, който референцията не мери" % q)
     return bad
@@ -670,34 +701,45 @@ class Lot1vAdditiveFreezeTest(unittest.TestCase):
         cls.anchor = frozen_rows(LOT1V_A_ANCHOR)
         cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
 
-    def test_the_anchor_is_the_four_buckets_and_122_rows(self):
-        self.assertEqual(set(self.anchor.keys()) - {"_meta"}, set(BUCKETS))
-        self.assertEqual(sum(len(self.anchor[b]) for b in BUCKETS), 122)
+    def test_the_anchor_is_what_the_signature_says(self):
+        require_expectations(self)
+        block = anchor_block("lot1v_a")
+        self.assertEqual(set(self.anchor.keys()) - {"_meta"}, set(block["buckets"]))
+        self.assertEqual(sum(len(self.anchor[b]) for b in block["buckets"]),
+                         block["queries"])
         self.assertNotIn("gate_lot1v_a", self.anchor)
 
-    def test_not_one_of_the_122_rows_moved(self):
-        compared, moved = 0, []
-        for bucket in BUCKETS:
-            anchor = dict((e["q"], e) for e in self.anchor[bucket])
-            current = dict((e["q"], e) for e in self.current[bucket])
-            self.assertEqual(set(anchor), set(current), bucket)
-            for q, was in anchor.items():
-                now = current[q]
+    def test_the_movement_against_the_anchor_is_the_signed_one(self):
+        """F6-а froze ADDITIVELY: nothing moved, so the signed list was empty.
+        A re-freeze makes it a LIST, and the honest form of the claim is „the
+        movement is exactly the one Petar signed“, never a hard-coded []."""
+        require_expectations(self)
+        block = anchor_block("lot1v_a")
+        compared, moved = 0, {}
+        for bucket in block["buckets"]:
+            was_rows = dict((e["q"], e) for e in self.anchor[bucket])
+            now_rows = dict((e["q"], e) for e in self.current[bucket])
+            self.assertEqual(set(was_rows), set(now_rows), bucket)
+            for q, was in was_rows.items():
+                now = now_rows[q]
                 compared += 1
                 if ((was["branch"], [(r["name"], r["zone"]) for r in was["rows"]])
                         != (now["branch"], [(r["name"], r["zone"]) for r in now["rows"]])):
-                    moved.append(bucket + "/" + q)
-        self.assertEqual(moved, [], u"движение срещу %s: %s"
-                         % (LOT1V_A_ANCHOR, u", ".join(moved)))
-        self.assertEqual(compared, 122)
+                    moved.setdefault(bucket, []).append(q)
+        self.assertEqual({k: sorted(v) for k, v in moved.items()},
+                         {k: sorted(v) for k, v in (block.get("moved") or {}).items()},
+                         u"движение срещу %s, различно от подписаното" % LOT1V_A_ANCHOR)
+        self.assertEqual(compared, block["queries"])
 
     def test_the_kind_of_every_frozen_record_is_unchanged(self):
         """The third member of the S6 triple. The rows name a record by
         (name, zone); `kind` lives in the delivery, so that is where it is
         compared — for every record any of the 122 rows stands on."""
+        require_expectations(self)
+        block = anchor_block("lot1v_a")
         was, now = delivery_kinds(LOT1V_A_ANCHOR), delivery_kinds()
         keys, changed, missing = set(), [], []
-        for bucket in BUCKETS:
+        for bucket in block["buckets"]:
             for entry in self.current[bucket]:
                 for row in entry["rows"]:
                     keys.add((row["name"], row["zone"]))
@@ -706,23 +748,25 @@ class Lot1vAdditiveFreezeTest(unittest.TestCase):
                 missing.append(key[0])
             elif was[key] != now[key]:
                 changed.append(u"%s: %s → %s" % (key[0], was[key], now[key]))
-        self.assertEqual(missing, [])
-        self.assertEqual(changed, [])
-        self.assertEqual(len(was), 375)
-        self.assertEqual(len(now), 375)
+        self.assertEqual(missing, block["kind_missing"])
+        self.assertEqual(changed, block["kind_changed"])
+        self.assertEqual(len(was), block["delivery_records"]["anchor"])
+        self.assertEqual(len(now), block["delivery_records"]["now"])
 
     def test_the_candidate_only_grew(self):
         # F8 (ЛОТ 1в-Б) states the contract the artefact reaches in F9: the two
         # gained buckets and 134 + 6 = 140 rows. Until the re-freeze this is one of
         # the NAMED red rows of the lot — the reference is the thing that moves,
         # never the anchor.
+        require_expectations(self)
+        block, replay = anchor_block("lot1v_a"), EXP["replay"]
         gained = [b for b in self.current if b != "_meta" and b not in self.anchor]
-        self.assertEqual(gained, ["gate_lot1v_a", "gate_lot1v_b"])
-        self.assertEqual(sum(len(self.current[b]) for b in REF_BUCKETS), 140)
-        self.assertEqual(sum(len(e["rows"]) for b in BUCKETS
-                             for e in self.current[b]), 1998)
-        self.assertEqual(sum(len(e["rows"]) for e in self.current["gate_lot1v_a"]), 108)
-        self.assertEqual(sum(len(e["rows"]) for e in self.current["gate_lot1v_b"]), 15)
+        self.assertEqual(gained, [b for b in EXP["artefact"]["buckets"]
+                                  if b not in block["buckets"]])
+        for bucket in EXP["artefact"]["buckets"]:
+            self.assertEqual(len(self.current[bucket]), replay[bucket]["queries"], bucket)
+            self.assertEqual(sum(len(e["rows"]) for e in self.current[bucket]),
+                             replay[bucket]["rows"], bucket)
 
 
 class Lot1vABucketTest(unittest.TestCase):
@@ -732,10 +776,12 @@ class Lot1vABucketTest(unittest.TestCase):
     def setUpClass(cls):
         cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
 
-    def test_the_bucket_is_the_twelve_measured_rows(self):
+    def test_the_bucket_is_the_signed_answers(self):
+        require_expectations(self)
         self.assertEqual(lot1v_a_bucket_failures(self.current), [])
-        self.assertEqual(len(self.current["gate_lot1v_a"]), 12)
-        self.assertEqual(len(REF.LOT1V_A_GAINS) + len(REF.LOT1V_A_CONTROLS), 12)
+        self.assertEqual(len(self.current["gate_lot1v_a"]),
+                         EXP["replay"]["gate_lot1v_a"]["queries"])
+        self.assertEqual(len(REF.GATE_QUERIES[u"lot1v_a"]), len(gate_answers(u"lot1v_a")))
 
     def test_removing_any_row_turns_the_bucket_red(self):
         """Remove a row and the bucket goes red — for each of the twelve."""
@@ -775,8 +821,10 @@ class Lot1vABucketTest(unittest.TestCase):
     def test_the_live_engine_replays_the_new_bucket(self):
         """And the engine says what the bucket says — branch, ordered rows and
         the `kind` the artefact schema does not carry."""
-        spec = dict((q, (branch, n, want)) for q, branch, n, why, want
-                    in list(REF.LOT1V_A_GAINS) + list(REF.LOT1V_A_CONTROLS))
+        require_expectations(self)
+        spec = dict((e["q"], (e["branch"], e["n"],
+                              [(r["name"], r["zone"], r["kind"]) for r in e["rows"]]))
+                    for e in gate_answers(u"lot1v_a"))
         for entry in self.current["gate_lot1v_a"]:
             rows, branch = REF.search(entry["q"])
             self.assertEqual(branch, entry["branch"], entry["q"])
@@ -784,7 +832,7 @@ class Lot1vABucketTest(unittest.TestCase):
                              [(r["name"], r["zone"]) for r in entry["rows"]], entry["q"])
             want_branch, want_n, want = spec[entry["q"]]
             self.assertEqual((branch, len(rows)), (want_branch, want_n), entry["q"])
-            self.assertEqual([(r.name.strip(), r.zone, r.kind) for r in rows][:len(want)],
+            self.assertEqual([(r.name.strip(), r.zone, r.kind) for r in rows],
                              list(want), entry["q"])
 
 
@@ -795,17 +843,23 @@ def lot1v_b_bucket_failures(doc):
     for the same reason: a test can delete a row or change a value in a COPY and
     watch the answer turn red.
     """
-    spec = list(REF.LOT1V_B_GAINS) + list(REF.LOT1V_B_CONTROLS)
+    # The spec is the SIGNED answer now, not a tuple that travels with the code
+    # it judges: (branch, n, why, the whole ordered list of rows).
+    spec = gate_answers(u"lot1v_b")
     bucket = doc.get("gate_lot1v_b")
     if not isinstance(bucket, list):
         return [u"gate_lot1v_b липсва от артефакта"]
     bad = []
+    if not spec:
+        return [u"gate_lot1v_b: няма подписани отговори в expectations.json"]
     if len(bucket) != len(spec):
         bad.append(u"gate_lot1v_b: %d реда, очаквани %d" % (len(bucket), len(spec)))
     by_q = {}
     for entry in bucket:
         by_q.setdefault(entry["q"], []).append(entry)
-    for q, branch, n, why, want in spec:
+    for signed in spec:
+        q, branch, n, why = (signed["q"], signed["branch"], signed["n"], signed["why"])
+        want = [(r["name"], r["zone"], r["kind"]) for r in signed["rows"]]
         entries = by_q.pop(q, [])
         if len(entries) != 1:
             bad.append(u"`%s`: %d реда в артефакта, очакван 1" % (q, len(entries)))
@@ -821,8 +875,8 @@ def lot1v_b_bucket_failures(doc):
         got = [(r["name"].strip(), r["zone"]) for r in entry["rows"]][:len(want)]
         if got != [(w[0], w[1]) for w in want]:
             bad.append(u"`%s`: първите %d реда са %s" % (q, len(want), got))
-        if not entry["ok"]:
-            bad.append(u"`%s`: редът не е зелен в артефакта" % q)
+        if entry["ok"] is False:
+            bad.append(u"`%s`: редът е ЧЕРВЕН в артефакта" % q)
     for q in by_q:
         bad.append(u"`%s`: ред в артефакта, който референцията не мери" % q)
     return bad
@@ -842,9 +896,11 @@ class Lot1vBGateTest(unittest.TestCase):
         failures = REF.check_lot1v_b_gate()
         self.assertEqual(failures, [], "\n".join(failures))
 
-    def test_the_measured_rows_are_six(self):
-        self.assertEqual(len(REF.LOT1V_B_GAINS), 3)
-        self.assertEqual(len(REF.LOT1V_B_CONTROLS), 3)
+    def test_the_questions_and_the_signed_answers_agree(self):
+        require_expectations(self)
+        self.assertEqual(len(REF.GATE_QUERIES[u"lot1v_b"]), len(gate_answers(u"lot1v_b")))
+        self.assertEqual(sorted(q for _c, q, _w in REF.GATE_QUERIES[u"lot1v_b"]),
+                         sorted(e["q"] for e in gate_answers(u"lot1v_b")))
 
     def test_the_street_index_is_the_delivery_and_nothing_else(self):
         """D6: `spk`/`hkey` come from `address`, never from `text`.
@@ -855,17 +911,20 @@ class Lot1vBGateTest(unittest.TestCase):
         same street written twice by two sources, and the ordinal rewriting is what
         unites them. Two spellings, one street: that is the point of the key.
         """
+        require_expectations(self)
+        want = claim("street_index")
         with_address = [rec for rec in REF.RECS if rec.address]
-        self.assertEqual(len(with_address), 190)
-        self.assertEqual(len(set(rec.address["street_phrase"] for rec in with_address)), 133)
-        self.assertEqual(len(REF.STREET), 131)
-        self.assertEqual(sum(len(v) for v in REF.STREET.values()), 190)
+        self.assertEqual(len(with_address), want["records_with_address"])
+        self.assertEqual(len(set(rec.address["street_phrase"] for rec in with_address)),
+                         want["street_phrases"])
+        self.assertEqual(len(REF.STREET), want["street_keys"])
+        self.assertEqual(sum(len(v) for v in REF.STREET.values()),
+                         want["rows_behind_the_keys"])
         collapsed = {}
         for rec in with_address:
             collapsed.setdefault(rec.spk, set()).add(rec.address["street_phrase"])
-        self.assertEqual(sorted(tuple(sorted(v)) for v in collapsed.values() if len(v) > 1),
-                         [(u"45", u"45 та"),
-                          (u"8 ми приморски полк", u"осми приморски полк")])
+        self.assertEqual(sorted([sorted(v) for v in collapsed.values() if len(v) > 1]),
+                         want["two_spellings_one_street"])
         for rec in with_address:
             self.assertEqual(rec.spk, REF.key_of(rec.address["street_phrase"]),
                              rec.name)
@@ -880,18 +939,26 @@ class Lot1vBGateTest(unittest.TestCase):
         The proof is structural — `nset` is still exactly the name tokens and
         `zkset` still exactly the zone and kind tokens, so not one street phrase
         and not one house number entered the sets the matcher scores on."""
+        # ЛОТ 1в-В replaced the single `ztk` with the three typed token sets:
+        # `qtk` (quarter), `ltk` (locality) and `legtk` (the row's own old zone
+        # words). The claim is unchanged — no street phrase and no house number
+        # entered the sets the matcher scores on.
         for rec in REF.RECS:
             self.assertEqual(rec.nset, set(rec.ntk), rec.name)
-            self.assertEqual(rec.zkset, set(rec.ztk) | set(rec.ktk), rec.name)
+            self.assertEqual(rec.zkset,
+                             set(rec.qtk) | set(rec.ltk) | set(rec.legtk) | set(rec.ktk),
+                             rec.name)
 
     def test_a_number_without_a_whole_street_never_takes_part(self):
         """S4 gate 4, inverted: „12“ is the house number of nobody's matched
         street here, so „детска градина 12“ stays a NAME query — and the branch
         answers None for a bare number as well."""
+        require_expectations(self)
+        want = claim("branch_order")["number_without_street"]
         self.assertIsNone(REF.street_rows(REF.place_tokens(u"12"), REF.RECS))
         self.assertIsNone(REF.street_rows(REF.place_tokens(u"9"), REF.RECS))
         rows, branch = REF.search(u"детска градина 12")
-        self.assertEqual((branch, len(rows)), ("M2", 1))
+        self.assertEqual((branch, len(rows)), (want["branch"], want["n"]))
 
     def test_the_collision_rule_is_load_bearing(self):
         """G2 — a gate that cannot go red is not a gate.
@@ -903,35 +970,50 @@ class Lot1vBGateTest(unittest.TestCase):
         that always carries „ул.“, and check_lot1v_b_gate() must go red on all
         three: „приморски“, „роза“, „владислав варненчик“.
         """
+        require_expectations(self)
+        broken = claim("collision_rule_disabled")
+        signed_controls = claim("collision_controls")
         original = REF.street_rows
         try:
             REF.street_rows = (lambda R, cls:
                                original(list(R) + REF.place_tokens(u"ул"), cls))
-            rows, branch = REF.search(u"приморски")
-            self.assertEqual((branch, rows[0].name), ("A3-street", u"Бел Епок"))
+            rows, branch = REF.search(broken["q"])
+            self.assertEqual((branch, rows[0].name.strip()),
+                             (broken["answer"]["branch"], broken["answer"]["rows"][0]))
             failures = REF.check_lot1v_b_gate()
-            self.assertEqual(len(failures), 3, failures)
-            for query in (u"приморски", u"роза", u"владислав варненчик"):
-                self.assertTrue(any(query in f for f in failures), query)
+            self.assertEqual(len(failures), broken["failures"], failures)
+            # WHICH controls move is signed data: after М7 („голото място“)
+            # „приморски“ and „владислав варненчик“ are answered by the bare
+            # location branch before the street is asked, so only „роза“ still
+            # differentiates the collision rule — measured 05.09, not assumed.
+            self.assertEqual(sorted(REF.failing_queries(failures)),
+                             broken["moved_queries"])
+            self.assertTrue(broken["moved_queries"],
+                            u"нито една контрола не мърда — правилото е мъртво")
         finally:
             REF.street_rows = original
         self.assertEqual(REF.check_lot1v_b_gate(), [])
-        rows, branch = REF.search(u"приморски")
-        self.assertEqual((branch, rows[0].name), ("M3", u"ПРИМОРСКИ"))
+        for control in signed_controls:
+            rows, branch = REF.search(control["q"])
+            self.assertEqual((branch, rows[0].name.strip()),
+                             (control["branch"], control["first"]), control["q"])
 
     def test_the_branch_stands_after_the_zone_and_before_the_fuzzy_path(self):
         """ADR 008 D6, the ORDER — measured on the queries that prove each step:
         the exact alias wins over its own street, the zone phrase wins over the
         street it shares a name with, and the street wins over the fuzzy scoring
         that used to answer „болница дойран“ with eleven unrelated rows."""
-        self.assertEqual(REF.search(u"алеко константинов")[1], "A0-exact-alias")
+        require_expectations(self)
+        order = claim("branch_order")
+        self.assertEqual(REF.search(u"алеко константинов")[1],
+                         order["exact_alias"]["branch"])
         self.assertEqual(REF.search(u"училище владислав варненчик")[1],
-                         "A3-category+zone/kind")
+                         order["zone_before_street"]["branch"])
         rows, branch = REF.search(u"болница дойран")
-        self.assertEqual((branch, len(rows)), ("A3-street", 1))
-        self.assertEqual(rows[0].name,
-                         u"„Университетска специализирана болница по очни болести "
-                         u"за активно лечение – Варна“ ЕООД")
+        self.assertEqual((branch, len(rows)), (order["street_before_fuzzy"]["branch"],
+                                               order["street_before_fuzzy"]["n"]))
+        self.assertEqual([r.name.strip() for r in rows],
+                         order["street_before_fuzzy"]["rows"])
 
 
 class Lot1vBAdditiveFreezeTest(unittest.TestCase):
@@ -951,49 +1033,45 @@ class Lot1vBAdditiveFreezeTest(unittest.TestCase):
     # query that produced it. „empty“ (no tokens at all) and „A3-street“ (the new
     # branch answers with or without a key) are the two that do not — they are
     # named here, and a branch that is on neither list is red.
-    HASKEY_BY_BRANCH = {
-        "M1-category": True,
-        "M2": True,
-        "M2-failopen": True,
-        "A3-record+zone-phrase": True,
-        "A3-category+zone/kind": True,
-        "M3": False,
-        "M3-too-big": False,
-        "A0-exact-alias": False,
-    }
-    HASKEY_NOT_DECIDED_BY_BRANCH = ("empty", "A3-street")
-
     @classmethod
     def setUpClass(cls):
         cls.anchor = frozen_rows(LOT1V_B_ANCHOR)
         cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
-        cls.frozen_buckets = BUCKETS + ("gate_lot1v_a",)
+        cls.frozen_buckets = tuple(anchor_block("lot1v_b").get("buckets") or ())
 
-    def test_the_anchor_is_the_five_buckets_and_134_rows(self):
+    def test_the_anchor_is_what_the_signature_says(self):
+        require_expectations(self)
+        block = anchor_block("lot1v_b")
         self.assertEqual(set(self.anchor.keys()) - {"_meta"}, set(self.frozen_buckets))
-        self.assertEqual(sum(len(self.anchor[b]) for b in self.frozen_buckets), 134)
+        self.assertEqual(sum(len(self.anchor[b]) for b in self.frozen_buckets),
+                         block["queries"])
         self.assertNotIn("gate_lot1v_b", self.anchor)
 
-    def test_not_one_of_the_134_rows_moved(self):
-        compared, moved = 0, []
+    def test_the_movement_against_the_anchor_is_the_signed_one(self):
+        require_expectations(self)
+        block = anchor_block("lot1v_b")
+        compared, moved = 0, {}
         for bucket in self.frozen_buckets:
-            anchor = dict((e["q"], e) for e in self.anchor[bucket])
-            current = dict((e["q"], e) for e in self.current[bucket])
-            self.assertEqual(set(anchor), set(current), bucket)
-            for q, was in anchor.items():
-                now = current[q]
+            was_rows = dict((e["q"], e) for e in self.anchor[bucket])
+            now_rows = dict((e["q"], e) for e in self.current[bucket])
+            self.assertEqual(set(was_rows), set(now_rows), bucket)
+            for q, was in was_rows.items():
+                now = now_rows[q]
                 compared += 1
                 if ((was["branch"], [(r["name"], r["zone"]) for r in was["rows"]])
                         != (now["branch"], [(r["name"], r["zone"]) for r in now["rows"]])):
-                    moved.append(bucket + "/" + q)
-        self.assertEqual(moved, [], u"движение срещу %s: %s"
-                         % (LOT1V_B_ANCHOR, u", ".join(moved)))
-        self.assertEqual(compared, 134)
+                    moved.setdefault(bucket, []).append(q)
+        self.assertEqual({k: sorted(v) for k, v in moved.items()},
+                         {k: sorted(v) for k, v in (block.get("moved") or {}).items()},
+                         u"движение срещу %s, различно от подписаното" % LOT1V_B_ANCHOR)
+        self.assertEqual(compared, block["queries"])
 
     def test_the_kind_of_every_frozen_record_is_unchanged(self):
         """The third member of the S6 triple, against THIS anchor: ЛОТ 1в-Б
         rewrote both delivered blobs (the addresses), so „the rows did not move“
         has to be said about the records they stand on as well."""
+        require_expectations(self)
+        block = anchor_block("lot1v_b")
         was, now = delivery_kinds(LOT1V_B_ANCHOR), delivery_kinds()
         keys, changed, missing = set(), [], []
         for bucket in self.frozen_buckets:
@@ -1005,9 +1083,10 @@ class Lot1vBAdditiveFreezeTest(unittest.TestCase):
                 missing.append(key[0])
             elif was[key] != now[key]:
                 changed.append(u"%s: %s → %s" % (key[0], was[key], now[key]))
-        self.assertEqual(missing, [])
-        self.assertEqual(changed, [])
-        self.assertEqual((len(was), len(now)), (375, 375))
+        self.assertEqual(missing, block["kind_missing"])
+        self.assertEqual(changed, block["kind_changed"])
+        self.assertEqual((len(was), len(now)),
+                         (block["delivery_records"]["anchor"], block["delivery_records"]["now"]))
 
     def test_haskey_could_not_have_moved_and_agrees_with_every_branch(self):
         """The fourth member. `hasKey` is derived from the class keys of
@@ -1015,35 +1094,38 @@ class Lot1vBAdditiveFreezeTest(unittest.TestCase):
         to the anchor's) — and to keep that from being a claim, the key split is
         run again over all 134 queries and compared with the branch the ANCHOR
         recorded. A class key that had moved would flip one of them."""
+        require_expectations(self)
+        block = anchor_block("lot1v_b")
+        # F12-а DID move `data/place_categories.json` (the dictionary followed
+        # P7), so „byte-equal to the anchor“ is no longer the claim — the two
+        # digests are measured and signed, and the key split is run again over
+        # every query of the anchor and compared with the branch it recorded.
         got = subprocess.run(["git", "-C", str(REPO), "show",
                               LOT1V_B_ANCHOR + ":data/place_categories.json"],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.assertEqual(got.returncode, 0, got.stderr.decode("utf-8", "replace"))
-        self.assertEqual(
-            hashlib.sha256(got.stdout).hexdigest(),
-            hashlib.sha256((REPO / "data" / "place_categories.json").read_bytes()).hexdigest(),
-            "the class keys moved — hasKey is not comparable without a measure")
-        checked = 0
-        for bucket in self.frozen_buckets:
-            for entry in self.anchor[bucket]:
-                branch = entry["branch"]
-                if branch in self.HASKEY_NOT_DECIDED_BY_BRANCH:
-                    continue
-                self.assertIn(branch, self.HASKEY_BY_BRANCH, entry["q"])
-                tokens = REF.place_tokens(entry["q"])
-                has_key = (bool(tokens) and not REF.exact_alias(tokens)
-                           and bool(REF.split_keys(tokens)[0]))
-                self.assertEqual(has_key, self.HASKEY_BY_BRANCH[branch],
-                                 u"%s/%s" % (bucket, entry["q"]))
-                checked += 1
-        self.assertEqual(checked, 133)
+        anchor_cats = json.loads(got.stdout.decode("utf-8"))
+        now_cats = json.loads((REPO / "data" / "place_categories.json").read_text(encoding="utf-8"))
+        for label, doc in (("anchor", anchor_cats), ("now", now_cats)):
+            self.assertEqual(
+                hashlib.sha256(json.dumps(doc, ensure_ascii=False,
+                                          sort_keys=True).encode("utf-8")).hexdigest(),
+                block["categories_sha"][label], label)
+        measured = REF.haskey_measure(self.anchor)
+        self.assertEqual(measured["mismatches"], block["haskey"]["mismatches"])
+        self.assertEqual(measured["checked"], block["haskey"]["checked"])
 
-    def test_the_only_gained_bucket_is_the_six_new_rows(self):
+    def test_the_gained_buckets_are_the_signed_ones(self):
+        require_expectations(self)
+        block, replay = anchor_block("lot1v_b"), EXP["replay"]
         gained = [b for b in self.current if b != "_meta" and b not in self.anchor]
-        self.assertEqual(gained, ["gate_lot1v_b"])
-        self.assertEqual(len(self.current["gate_lot1v_b"]), 6)
-        self.assertEqual(sum(len(e["rows"]) for e in self.current["gate_lot1v_b"]), 15)
-        self.assertEqual(sum(len(self.current[b]) for b in REF_BUCKETS), 140)
+        self.assertEqual(gained, [b for b in EXP["artefact"]["buckets"]
+                                  if b not in block["buckets"]])
+        self.assertEqual(sum(len(self.current[b]) for b in EXP["artefact"]["buckets"]),
+                         EXP["artefact"]["queries"])
+        for bucket in gained:
+            self.assertEqual(sum(len(e["rows"]) for e in self.current[bucket]),
+                             replay[bucket]["rows"], bucket)
 
 
 class Lot1vBBucketTest(unittest.TestCase):
@@ -1058,10 +1140,12 @@ class Lot1vBBucketTest(unittest.TestCase):
     def setUpClass(cls):
         cls.current = json.loads(ROWS.read_text(encoding="utf-8"))
 
-    def test_the_bucket_is_the_six_measured_rows(self):
+    def test_the_bucket_is_the_signed_answers(self):
+        require_expectations(self)
         self.assertEqual(lot1v_b_bucket_failures(self.current), [])
-        self.assertEqual(len(self.current["gate_lot1v_b"]), 6)
-        self.assertEqual(len(REF.LOT1V_B_GAINS) + len(REF.LOT1V_B_CONTROLS), 6)
+        self.assertEqual(len(self.current["gate_lot1v_b"]),
+                         EXP["replay"]["gate_lot1v_b"]["queries"])
+        self.assertEqual(len(REF.GATE_QUERIES[u"lot1v_b"]), len(gate_answers(u"lot1v_b")))
 
     def test_removing_any_row_turns_the_bucket_red(self):
         for entry in self.current.get("gate_lot1v_b", []):
@@ -1095,8 +1179,10 @@ class Lot1vBBucketTest(unittest.TestCase):
                                     u"%s / %s остана зелено" % (original["q"], label))
 
     def test_the_live_engine_replays_the_new_bucket(self):
-        spec = dict((q, (branch, n, want)) for q, branch, n, why, want
-                    in list(REF.LOT1V_B_GAINS) + list(REF.LOT1V_B_CONTROLS))
+        require_expectations(self)
+        spec = dict((e["q"], (e["branch"], e["n"],
+                              [(r["name"], r["zone"], r["kind"]) for r in e["rows"]]))
+                    for e in gate_answers(u"lot1v_b"))
         for entry in self.current.get("gate_lot1v_b", []):
             rows, branch = REF.search(entry["q"])
             self.assertEqual(branch, entry["branch"], entry["q"])
@@ -1104,7 +1190,7 @@ class Lot1vBBucketTest(unittest.TestCase):
                              [(r["name"], r["zone"]) for r in entry["rows"]], entry["q"])
             want_branch, want_n, want = spec[entry["q"]]
             self.assertEqual((branch, len(rows)), (want_branch, want_n), entry["q"])
-            self.assertEqual([(r.name.strip(), r.zone, r.kind) for r in rows][:len(want)],
+            self.assertEqual([(r.name.strip(), r.zone, r.kind) for r in rows],
                              list(want), entry["q"])
 
 
@@ -1112,8 +1198,16 @@ class RefBucketsTest(unittest.TestCase):
     """ADR 008 D7: the bucket list is fail-closed on all three sides."""
 
     def test_the_artefact_carries_exactly_the_named_buckets(self):
+        """Two claims, and the second is the one a re-freeze moves: the artefact
+        carries the six buckets of the fail-closed contract, and any bucket
+        BEYOND them is one the signature promoted (план §3з)."""
+        require_expectations(self)
         current = json.loads(ROWS.read_text(encoding="utf-8"))
-        self.assertEqual(set(current.keys()) - {"_meta"}, set(REF_BUCKETS))
+        carried = set(current.keys()) - {"_meta"}
+        self.assertEqual(carried, set(EXP["artefact"]["buckets"]))
+        self.assertEqual(set(REF_BUCKETS) - carried, set())
+        for extra in carried - set(REF_BUCKETS):
+            self.assertIn(extra, EXP["artefact"]["pending_promoted"], extra)
 
     def test_the_probe_names_the_same_buckets_in_the_same_order(self):
         probe = PROBE.read_text(encoding="utf-8")
@@ -1161,9 +1255,6 @@ class Lot1vVGateTest(unittest.TestCase):
     the three payloads in `data/` are pinned to by sha256.
     """
 
-    DISTRICT_CODES = {"primorski", "odesos", "mladost", "asparuhovo",
-                      "vladislav_varnenchik"}
-
     @classmethod
     def setUpClass(cls):
         cls.places = json.loads((REPO / "data" / "places.json").read_text(encoding="utf-8"))
@@ -1200,8 +1291,13 @@ class Lot1vVGateTest(unittest.TestCase):
                 for field in codes:
                     if rec[field]:
                         codes[field].add(rec[field]["code"])
-        self.assertEqual(self.js_list("DISTRICT_CODES"), self.DISTRICT_CODES)
-        self.assertEqual(codes["district"], self.DISTRICT_CODES)
+        # Three sides, no fourth copy: the client's literal, the delivered
+        # codes and the closed list the reference gates on.
+        require_expectations(self)
+        signed_codes = set(EXP["delivery"]["district_codes"])
+        self.assertEqual(self.js_list("DISTRICT_CODES"), signed_codes)
+        self.assertEqual(codes["district"], signed_codes)
+        self.assertEqual(set(REF.DISTRICT_CODES), signed_codes)
         for field, name in (("quarter", "QUARTER_CODES"), ("locality", "LOCALITY_CODES")):
             listed = self.js_list(name)
             # the client's list is the DICTIONARY's list, and every delivered code
@@ -1223,20 +1319,22 @@ class Lot1vVGateTest(unittest.TestCase):
         back to the two schools that carry the quarter itself, and СУ „Гео Милев“
         — the row that started this lot — is not among them.
         """
-        rows, branch = REF.search(u"училище младост")
-        self.assertEqual((branch, len(rows)), ("A3-location", 11))
-        self.assertIn(u"СУ „Гео Милев“", {r.name.strip() for r in rows})
+        require_expectations(self)
+        want = claim("district_fallback")
+        rows, branch = REF.search(want["q"])
+        self.assertEqual((branch, len(rows)), (want["with"]["branch"], want["with"]["n"]))
+        self.assertEqual([r.name.strip() for r in rows], want["with"]["rows"])
         saved = [(r, r.dph) for r in REF.RECS]
         try:
             for rec, _ in saved:
                 rec.dph = set()
-            without, branch2 = REF.search(u"училище младост")
+            without, _branch = REF.search(want["q"])
         finally:
             for rec, dph in saved:
                 rec.dph = dph
-        self.assertEqual(len(without), 2)
-        self.assertNotIn(u"СУ „Гео Милев“", {r.name.strip() for r in without})
-        self.assertEqual(len(REF.search(u"училище младост")[0]), 11)
+        self.assertEqual([r.name.strip() for r in without], want["without"]["rows"])
+        self.assertLess(len(without), len(rows))
+        self.assertEqual(len(REF.search(want["q"])[0]), want["with"]["n"])
 
     def test_the_old_zone_words_are_load_bearing(self):
         """RED until Petar signs the manifest — by design (F12-в).
@@ -1253,28 +1351,22 @@ class Lot1vVGateTest(unittest.TestCase):
         words switched off the engine must answer with strictly fewer rows, or
         `gph` carries nothing and the whole mechanism is dead code.
         """
-        manifest = json.loads(MANIFEST_BASE_P7.read_text(encoding="utf-8"))
-        signed_by = (manifest.get("_meta") or {}).get("signed_by")
-        entry = next((e for e in manifest.get("gate_lot1v_v") or []
-                      if e.get("q") == u"училище възраждане"), None)
-        self.assertIsNotNone(entry, u"„училище възраждане“ не е в манифеста")
-        expected = [r["name"].strip() for r in entry["rows"]]
-        rows, _ = REF.search(u"училище възраждане")
+        require_expectations(self)
+        want = claim("old_zone_words")
+        expected = want["with"]["rows"]
+        rows, _ = REF.search(want["q"])
         self.assertEqual([r.name.strip() for r in rows], expected)
         saved = [(r, r.gph) for r in REF.RECS]
         try:
             for rec, _ in saved:
                 rec.gph = set()
-            without, _ = REF.search(u"училище възраждане")
+            without, _ = REF.search(want["q"])
         finally:
             for rec, gph in saved:
                 rec.gph = gph
+        self.assertEqual([r.name.strip() for r in without], want["without"]["rows"])
         self.assertLessEqual(len(without), len(rows))
-        self.assertEqual(len(REF.search(u"училище възраждане")[0]), len(expected))
-        self.assertEqual(
-            (signed_by or "").strip(), SIGNER,
-            u"манифестът е подписан от %r, а не от %r — очакването още няма "
-            u"авторитет (F12-в: червено по замисъл, до подписа)" % (signed_by, SIGNER))
+        self.assertEqual(len(REF.search(want["q"])[0]), len(expected))
 
     def test_the_reference_is_not_frozen_and_the_candidate_bucket_is_pending(self):
         """§3з: the manifest is signed BEFORE anything is frozen.
@@ -1282,11 +1374,16 @@ class Lot1vVGateTest(unittest.TestCase):
         The tracked artefact must still carry exactly the six buckets of лот Б —
         a seventh here would mean the reference was re-frozen without a signature.
         """
+        require_expectations(self)
         current = json.loads(ROWS.read_text(encoding="utf-8"))
-        self.assertEqual(set(current) - {"_meta"}, set(REF_BUCKETS))
-        self.assertNotIn(REF.PENDING_BUCKET, current)
+        # WHETHER the pending bucket is in the artefact is the state of the
+        # delivery — the signature says it, this file does not.
+        self.assertEqual(set(current) - {"_meta"}, set(EXP["artefact"]["buckets"]))
+        self.assertEqual(REF.PENDING_BUCKET in current,
+                         REF.PENDING_BUCKET in EXP["artefact"]["buckets"])
         self.assertNotIn(REF.PENDING_BUCKET, REF_BUCKETS)
-        # and the generator refuses to freeze it: `--freeze` passes no `pending`
+        # …and the drift gate itself still discriminates: a bucket nobody named
+        # is refused, and it is allowed only when it is passed as `pending`.
         gained = dict((b, []) for b in REF_BUCKETS)
         gained[REF.PENDING_BUCKET] = []
         self.assertEqual(REF.bucket_drift(gained), [u"нов " + REF.PENDING_BUCKET])
@@ -1325,13 +1422,14 @@ class AnchorsReachableTest(unittest.TestCase):
     def test_the_live_anchors_hand_over_their_artefact(self):
         """Reachable is not the same as usable: the three anchors the suite reads
         must answer with an artefact of the shape their tests expect."""
-        for commit, buckets in ((LOT1_DATA_ANCHOR, BUCKETS),
-                                (LOT1V_A_ANCHOR, BUCKETS),
-                                (LOT1V_B_ANCHOR, BUCKETS + ("gate_lot1v_a",))):
-            doc = frozen_rows(commit)
-            self.assertEqual(set(doc.keys()) - {"_meta"}, set(buckets), commit)
-        self.assertEqual(sum(len(frozen_rows(LOT1_DATA_ANCHOR)[b]) for b in BUCKETS), 113)
-        self.assertEqual(sum(len(frozen_rows(LOT1V_A_ANCHOR)[b]) for b in BUCKETS), 122)
+        require_expectations(self)
+        for name in ("lot1_data", "lot1v_a", "lot1v_b"):
+            block = anchor_block(name)
+            doc = frozen_rows(block["commit"])
+            self.assertEqual(set(doc.keys()) - {"_meta"}, set(block["buckets"]),
+                             block["commit"])
+            self.assertEqual(sum(len(doc[b]) for b in block["buckets"]),
+                             block["queries"], block["commit"])
 
     def test_no_commit_hash_in_this_file_is_off_the_list(self):
         """The scan that keeps the list from going stale: every 7-hex word in this
@@ -1339,7 +1437,119 @@ class AnchorsReachableTest(unittest.TestCase):
         hash pasted into a docstring tomorrow is red until it is named here."""
         text = pathlib.Path(__file__).read_text(encoding="utf-8")
         found = set(re.findall(r"(?<![0-9a-zA-Z_])[0-9a-f]{7}(?![0-9a-zA-Z_])", text))
-        self.assertEqual(found, set(ANCHORS) | set(REBASED_AWAY))
+        # After A.2-4 this file carries NO hash of its own: the anchors are read
+        # from the signed body. A hash pasted into a docstring tomorrow is red
+        # until it is named there.
+        self.assertEqual(found - (set(ANCHORS) | set(REBASED_AWAY)), set())
+
+
+class M7GateTest(unittest.TestCase):
+    """Амандамент №3 т. 4 и т. 6 — the М7 rule, gated in the suite.
+
+    Until now the rule lived in `scratch/places_search/m7_significance_gate.py`
+    and nothing in the suite could see it break. Three claims, all of them able
+    to go red: a type prefix („к.к.“ → „к“) is not a place, a place a human
+    types still answers through the branch, and with the dictionary gone the
+    branch does not fire at all (fail-closed).
+    """
+
+    def test_the_gate_is_green(self):
+        failures = REF.check_m7_gate()
+        self.assertEqual(failures, [], "\n".join(failures))
+
+    def test_the_engine_reproduces_the_trigger_list(self):
+        """The signed `m7_trigger_tokens.json`, token by token — the file is the
+        list Petar is asked to sign, so the engine has to still answer it."""
+        path = REPO / "scratch" / "places_search" / "m7_trigger_tokens.json"
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        tokens = doc["tokens"]
+        self.assertEqual(len(tokens), doc["_meta"]["measured"]["tokens"])
+        triggering = 0
+        for entry in tokens:
+            rows, branch = REF.search(entry["token"])[:2]
+            self.assertEqual(branch, entry["branch"], entry["token"])
+            self.assertEqual(len(rows), entry["rows_answered"], entry["token"])
+            self.assertEqual(branch == "M7-bare-location", entry["triggers"],
+                             entry["token"])
+            triggering += 1 if entry["triggers"] else 0
+        self.assertEqual(triggering, doc["_meta"]["measured"]["trigger_today"])
+        self.assertEqual(sorted(e["token"] for e in tokens),
+                         sorted(set(REF.m7_queries()) & set(e["token"] for e in tokens)))
+
+    def test_without_a_dictionary_the_branch_does_not_fire(self):
+        """Амандамент №3 т. 6, inverted in place: an EMPTY generic-word set means
+        the dictionary did not load, and a branch that keeps answering then is a
+        branch that invented its own significance rule."""
+        place = REF.M7_PLACES[0]
+        self.assertEqual(REF.search(place)[1], "M7-bare-location")
+        saved = set(REF.GENERIC_TOKENS)
+        try:
+            REF.GENERIC_TOKENS.clear()
+            self.assertNotEqual(REF.search(place)[1], "M7-bare-location")
+        finally:
+            REF.GENERIC_TOKENS.update(saved)
+        self.assertEqual(REF.search(place)[1], "M7-bare-location")
+
+    def test_the_client_asks_the_same_significance_question(self):
+        """Амандамент №3 т. 5 и т. 6 on the client: `sigTokens` is
+        `isSignificantToken`, and the М7 branch refuses to fire on an empty
+        GENERIC_WORDS. One rule, one place, on both sides."""
+        html = INDEX.read_text(encoding="utf-8")
+        self.assertIn("const sigTokens = (s) => placeTokens(s).filter(isSignificantToken)",
+                      html)
+        self.assertIn("GENERIC_WORDS.size", html)
+
+
+class ReleaseGateSignatureTest(unittest.TestCase):
+    """ПЛАН v2 §A.2: „фикстура «неподписан манифест → BLOCKED» е тест“.
+
+    The suite compares the engine with the TRACKED answers; whether Petar has
+    SIGNED them is the release gate's question. This is the fixture that proves
+    the gate asks it — and that the answer today is „not yet“, out loud, in the
+    place the plan put it (проверка 6 of run_gates, the pre-push hook).
+    """
+
+    def test_the_signature_is_compared_exactly(self):
+        from gates import coverage
+        self.assertTrue(coverage.is_signed_by_petar(SIGNER))
+        for impostor in ("pending — Петър", "Петърчо Иванов",
+                         "Петър — pending, НЕ подписвам", None, ""):
+            self.assertFalse(coverage.is_signed_by_petar(impostor), repr(impostor))
+
+    def test_an_unsigned_artefact_blocks_the_release(self):
+        """The real gate, on the real repository, right now."""
+        from gates import coverage, release
+        result = release.run()
+        signed = coverage.is_signed_by_petar(EXP_SIGNATURE)
+        if signed:
+            # After Petar signs AND the queue covers every delta the gate is
+            # green; before that it must name this artefact and block.
+            self.assertNotIn(str(EXPECTATIONS.relative_to(REPO)).replace("\\", "/"),
+                             " ".join(result["blocked"]))
+        else:
+            self.assertEqual(result["exit_code"], release.EXIT_BLOCKED)
+            self.assertTrue(
+                any("expectations.json" in line and "signed_by" in line
+                    for line in result["blocked"]),
+                result["blocked"])
+
+    def test_the_gate_counter_counts_questions_not_complaints(self):
+        """Амандамент №3 т. 7: the лот 1в-В counter printed „-3/10“ because it
+        counted COMPLAINTS, and complaints about queries outside the gate at
+        that. One query that fails on three fields is one question."""
+        gate = u"lot1v_v"
+        questions = [q for _cls, q, _why in REF.GATE_QUERIES[gate]]
+        green, asked, other = REF.gate_score(gate, [])
+        self.assertEqual((green, asked, other), (len(questions), len(questions), 0))
+        three_complaints = ["gain `%s`: branch X" % questions[0],
+                            "gain `%s`: n = 1" % questions[0],
+                            "gain `%s`: редовете" % questions[0]]
+        self.assertEqual(REF.gate_score(gate, three_complaints),
+                         (len(questions) - 1, len(questions), 0))
+        outside = ["колизия улица↔име/зона: `роза` дава друго"] * 4
+        green, asked, other = REF.gate_score(gate, outside)
+        self.assertEqual((green, asked, other), (len(questions), len(questions), 4))
+        self.assertGreaterEqual(green, 0)
 
 
 class PlacesCacheNameTest(unittest.TestCase):
@@ -1376,30 +1586,29 @@ class Lot1FormTableTest(unittest.TestCase):
     """
 
     def test_the_client_table_equals_the_reference_table(self):
+        require_expectations(self)
         table = js_extra_forms(INDEX.read_text(encoding="utf-8"))
         self.assertEqual(table, REF.EXTRA_FORMS)
-        self.assertEqual(table, {
-            u"детско заведение": [u"детска градина", u"детска ясла"],
-            u"детски заведения": [u"детска градина", u"детска ясла"],
-        })
+        self.assertEqual(table, claim("form_table")["table"])
 
     def test_the_form_answers_with_both_kinds_and_widens_nothing_else(self):
         """Measured on the ЛОТ 1 delivery: 61 = 51 kindergartens + 10 nurseries,
         M1-category, for both spellings — and П6/§Г, „детска градина“ still
         answers with 51 kindergartens and no nursery at all."""
-        for query in (u"детско заведение", u"детски заведения"):
+        require_expectations(self)
+        answers = claim("form_table")["answers"]
+        for query in sorted(answers):
             rows, branch = REF.search(query)
             counts = {}
             for row in rows:
                 counts[row.kind] = counts.get(row.kind, 0) + 1
-            self.assertEqual((branch, len(rows)), ("M1-category", 61), query)
-            self.assertEqual(counts, {u"детска градина": 51, u"детска ясла": 10}, query)
-        rows, branch = REF.search(u"детска градина")
-        self.assertEqual((branch, len(rows)), ("M1-category", 51))
-        self.assertEqual(set(row.kind for row in rows), set([u"детска градина"]))
-        rows, branch = REF.search(u"детска ясла")
-        self.assertEqual((branch, len(rows)), ("M1-category", 10))
-        self.assertEqual(set(row.kind for row in rows), set([u"детска ясла"]))
+            want = answers[query]
+            self.assertEqual((branch, len(rows)), (want["branch"], want["n"]), query)
+            self.assertEqual(counts, want["kinds"], query)
+        # П6/§Г, the half that says the two single-kind words were NOT widened:
+        # each of them still answers with one kind only.
+        for query in (u"детска градина", u"детска ясла"):
+            self.assertEqual(len(answers[query]["kinds"]), 1, query)
 
 
 if __name__ == "__main__":
