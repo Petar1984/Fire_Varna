@@ -57,8 +57,9 @@ INDEX_HTML = "index.html"
 BASELINE_PATH = "gates/baseline/MANIFEST.json"
 ALLOW_DIR = "gates/allow"
 SIGNED_FACTS_PATH = "data/signed_facts.json"
-# The only author whose commit may INTRODUCE a signature (§0.5).
-HUMAN_AUTHOR = "Petar1984"
+# The only author whose commit may INTRODUCE a signature (§0.5) — one string,
+# kept in `gates.release` and read by every gate that asks whose hand it was.
+HUMAN_AUTHOR = release.HUMAN_AUTHOR
 
 # (constant in index.html, delivered blob)
 SHA_PINS = (
@@ -470,6 +471,25 @@ def digests_in_commit_message(commit: str) -> set[str]:
     return set(BODY_DIGEST_RE.findall(body.stdout.decode("utf-8", "replace")))
 
 
+def queue_digest_commit(queue_rel: str, body_digest: str) -> tuple[str, str] | None:
+    """(hash, author) of the commit that INTRODUCED this digest into the queue.
+
+    Амандамент №7 т. 2: a digest is Petar's word only where his own commit put
+    it. `git log -S<digest> -- <queue>` lists the commits where the number of
+    occurrences of that string moved, so the OLDEST of them is the one that
+    wrote the number down; the newest would be whoever touched it last, which is
+    the opposite question. `None` means no commit carries it — the number lives
+    in the worktree, and the worktree is nobody's word."""
+    try:
+        lines = git_lines("log", "-S" + body_digest, "--format=%H\t%an", "--", queue_rel)
+    except ValueError:
+        return None
+    if not lines:
+        return None
+    commit, _tab, who = lines[-1].partition("\t")
+    return (commit, who)
+
+
 def queue_authorship(rel: str) -> tuple[str, str | None]:
     """(author, complaint) — whose commit the queue is, or why it is nobody's.
 
@@ -523,6 +543,7 @@ def check_signature_authorship() -> Check:
     signed = 0
     row_digests: dict[str, set[str]] = {}
     queue_trusted = False
+    queue_rel = None
     try:
         queue_path = release.find_queue(None)
     except ValueError as exc:
@@ -530,7 +551,20 @@ def check_signature_authorship() -> Check:
         queue_path = None
     if queue_path is not None and queue_path.exists():
         queue_rel = str(queue_path.relative_to(REPO_ROOT)).replace("\\", "/")
-        queue_rows = release.parse_queue(queue_path)
+        # The rows come out of the BLOB, never off the disk (амандамент №7 т. 2):
+        # what a push publishes is the commit, and a digest read from a working
+        # body is a number this gate has no author for. `queue_authorship` below
+        # refuses a dirty queue anyway; reading the blob makes that refusal a
+        # property of the reading, not a check somebody could reorder away.
+        try:
+            queue_rows = release.parse_queue_text(
+                release.blob_at("HEAD", queue_rel).decode("utf-8"))
+        except (ValueError, OSError, UnicodeDecodeError):
+            # No blob at all — the queue is not committed. The rows are still
+            # read, so the count below can say how many signatures are at stake;
+            # `queue_authorship` refuses such a queue, so no digest of it is ever
+            # taken.
+            queue_rows = release.parse_queue(queue_path)
         yes_rows = [r for r in queue_rows if r["decision"] == release.YES]
         with_digest = [r for r in yes_rows if r["artefact"] and r.get("digest")]
         who, complaint = queue_authorship(queue_rel)
@@ -597,11 +631,25 @@ def check_signature_authorship() -> Check:
             check.say("%s: тялото %s, последен комит %s от %s ✓"
                       % (rel, body[:12], newest[0][:7], newest[1]))
         else:
-            allowed = digests_in_commit_message(author[0])
-            allowed |= row_digests.get(name.split(":", 1)[0], set())
-            if body in allowed:
-                check.say("%s: тялото %s е дайджестът, който Петър записа ✓"
-                          % (rel, body[:12]))
+            in_message = digests_in_commit_message(author[0])
+            on_row = row_digests.get(name.split(":", 1)[0], set())
+            # Where the number came from decides what this line may CLAIM
+            # (амандамент №7 т. 2). His own signing-commit message is his hand,
+            # full stop. A number on a queue row is his hand only if his commit
+            # is the one that introduced it; otherwise the queue is merely a
+            # document he committed, and the words say exactly that — never
+            # „Петър записа“ about a digest an agent typed.
+            wrote_it = (queue_digest_commit(queue_rel, body)
+                        if body in on_row and queue_rel else None)
+            if body in in_message:
+                check.say("%s: тялото %s е дайджестът, който Петър записа в %s ✓"
+                          % (rel, body[:12], author[0][:7]))
+            elif body in on_row and wrote_it and wrote_it[1] == HUMAN_AUTHOR:
+                check.say("%s: тялото %s е дайджестът, който Петър записа на "
+                          "опашката в %s ✓" % (rel, body[:12], wrote_it[0][:7]))
+            elif body in on_row:
+                check.say("%s: тялото %s — приет по опашка, комитната от %s ✓"
+                          % (rel, body[:12], HUMAN_AUTHOR))
             else:
                 check.fail("%s: подписан, но последният комит по него е на %r "
                            "(%s), а дайджестът на тялото %s не е записан от %s"

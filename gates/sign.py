@@ -40,6 +40,14 @@ permission that happens to say no — it collides with every class „да“ ov
 same bucket, and the collision is the thing that made the verdict depend on the
 order of the file. The rule is enforced where the decision is written, so a
 queue that reached the gate has already been through it.
+
+AND THAT QUERY HAS TO EXIST (амандамент №7 т. 1): before it writes „не“ the pen
+asks `gates.release.refusable_deltas()` for the deltas of the moment and refuses
+a row that names none of them. `gate_lot1/Градината` instead of
+`gate_lot1/градина` used to be a refusal about nothing: it matched no delta,
+the gate stayed green over the difference Petar meant to refuse, and the freeze
+carried it into the reference. The gate blocks such a row now; here it is never
+written, and the answer comes back while the human is still at the keyboard.
 """
 
 from __future__ import annotations
@@ -59,7 +67,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 SIGNER = u"Петър"
 PENDING_SIGNATURE = u"pending — Петър"
-HUMAN = u"Petar1984"
+HUMAN = release.HUMAN_AUTHOR
 # The identities the agents commit with (амандамент №4 т. 6). The tool refuses
 # to run under any of them: without this the barrier is only a habit.
 AGENT_IDENTITIES = (u"Claude Executor", u"Claude Architect",
@@ -149,6 +157,50 @@ def apply_signature(rel_path):
     return (None, text.replace(pending, signed))
 
 
+def with_queue_anchor(rel_path, text):
+    """(text, note, complaint) — the expectations body with a CURRENT queue anchor.
+
+    Амандамент №7 т. 3: both writers of `_meta.queue_reference` name the same
+    reference — `recall_sweep.build_expectations` when it measures the body and
+    this tool when Petar signs one. Normally the generator has already written
+    it and nothing moves: the edit of a signature stays the byte-minimal
+    substitution it has always been. The field is rewritten here only when it is
+    missing (a body measured before this rule) or stale (a freeze has been
+    committed since), and then the note says so out loud, because the bytes of a
+    signed document changed for a second reason.
+
+    Only the expectations carry this anchor — the other artefacts are signed
+    without touching a byte beyond the signature. A body that cannot get a valid
+    anchor is not signed at all: the complaint travels with the refusals, which
+    is what „нищо не е записано“ means here as everywhere else.
+    """
+    if rel_path != release.EXPECTATIONS_REL:
+        return (text, None, None)
+    try:
+        anchor = release.queue_reference_anchor()
+    except (ValueError, OSError) as exc:
+        return (text, None, u"котвата „_meta.%s“ не можа да се измери: %s"
+                % (release.QUEUE_REFERENCE_KEY, exc))
+    try:
+        doc = json.loads(text)
+    except ValueError as exc:
+        return (text, None, u"%s не е валиден JSON: %s" % (rel_path, exc))
+    meta = doc.get("_meta")
+    if not isinstance(meta, dict):
+        return (text, None,
+                u"%s няма `_meta` — котвата няма къде да се запише" % rel_path)
+    if meta.get(release.QUEUE_REFERENCE_KEY) == anchor:
+        return (text, None, None)
+    meta[release.QUEUE_REFERENCE_KEY] = anchor
+    # The same dump the generator uses (`indent=1`, no ASCII escaping): the two
+    # writers of this body have to produce one shape, or the diff of a signature
+    # would be the whole file.
+    return (json.dumps(doc, ensure_ascii=False, indent=1) + u"\n",
+            u"котва „_meta.%s“ → %s (%s)" % (release.QUEUE_REFERENCE_KEY,
+                                             anchor["commit"][:7], anchor["path"]),
+            None)
+
+
 def refusal_scope_complaint(row):
     """Why this row may not be answered „не“ — or None.
 
@@ -163,6 +215,37 @@ def refusal_scope_complaint(row):
     return (u"ред %s отказва с широк шаблон (%s) — „не“ носи ТОЧНАТА заявка "
             u"(`покрива: кофа/заявката`), не цяла кофа (амандамент №6 т. 2)"
             % (row["id"], u", ".join(wide)))
+
+
+def refusal_target_complaint(row, deltas):
+    """Why this „не“ names a query nobody delivered — or None.
+
+    Амандамент №7 т. 1. `deltas` is the set of `(кофа, заявка)` pairs
+    `gates.release` is judging right now; every `покрива` pattern of a refusal
+    has to hit at least one of them, or the row is a decision about something
+    that does not exist. The check is per PATTERN on purpose: a row that refuses
+    three queries and misspells one of them is a row with a typo in it, and the
+    two other refusals do not make the typo true."""
+    missing = [pattern for pattern in release.delta_patterns(row["covers"])
+               if not any(release.covers_delta(pattern, bucket, query)
+                          for bucket, query in deltas)]
+    if not missing:
+        return None
+    return (u"ред %s отказва заявка, която не съществува: %s — „не“ се пише по "
+            u"ТОЧНАТА заявка от текущите делти на gates.release (амандамент №7 "
+            u"т. 1); провери изписването с `python -m gates.release`"
+            % (row["id"], u", ".join(missing)))
+
+
+def refusable_deltas_once(cache):
+    """The delta set, measured at most once per run (the engine costs a second).
+
+    Returns `(deltas, complaint)` and remembers both: a queue with five „не“
+    rows asks the same question five times and gets the same answer, computed
+    once, so the pen can never judge two rows against two different sets."""
+    if "deltas" not in cache:
+        cache["deltas"], cache["complaint"] = release.refusable_deltas()
+    return cache["deltas"], cache["complaint"]
 
 
 def decide_row(lines, row, decision, today):
@@ -245,6 +328,8 @@ def main(argv):
     table = artefacts()
     touched, refusals, signed_files = [], [], []
     pending_writes = []
+    delta_cache = {}
+    anchor_notes = []
     for row, decision in plan:
         if row["decision"] == NO:
             refusals.append(u"ред %s е ОТКАЗАН на %s — „не“ е терминално "
@@ -259,6 +344,16 @@ def main(argv):
             continue
         if decision == NO:
             complaint = refusal_scope_complaint(row)
+            if complaint:
+                refusals.append(complaint)
+                continue
+            deltas, why_not = refusable_deltas_once(delta_cache)
+            if why_not:
+                # The live half of the set is still measured; the missing half
+                # is said out loud, because a „не“ answered against half a
+                # picture is a decision the human should see the shape of.
+                sys.stdout.write(u"⚠ котвата на отказите: %s\n" % why_not)
+            complaint = refusal_target_complaint(row, deltas)
             if complaint:
                 refusals.append(complaint)
                 continue
@@ -281,6 +376,12 @@ def main(argv):
             refusals.append(u"ред %s: %s" % (row["id"], complaint))
             continue
         if body is not None:
+            body, note, anchor_complaint = with_queue_anchor(table[target], body)
+            if anchor_complaint:
+                refusals.append(u"ред %s: %s" % (row["id"], anchor_complaint))
+                continue
+            if note:
+                anchor_notes.append(note)
             pending_writes.append((REPO_ROOT / table[target], body))
         signed_files.append(table[target])
 
@@ -299,6 +400,8 @@ def main(argv):
         sys.stdout.write(u"✓ %s\n" % line)
     for rel in signed_files:
         sys.stdout.write(u"✓ подпис „%s“ → %s\n" % (SIGNER, rel))
+    for note in anchor_notes:
+        sys.stdout.write(u"✓ %s\n" % note)
 
     paths = [repo_relative(queue_path)] + signed_files
     sys.stdout.write(

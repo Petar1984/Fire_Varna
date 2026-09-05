@@ -27,6 +27,17 @@ row whose decision is „не“ (terminal) covering a live delta: BLOCKED. A si
 row that covers nothing: BLOCKED — a stale permission is not a permission (the
 same rule gates/coverage.py applies with exit 3).
 
+A REFUSAL THAT COVERS NOTHING IS BLOCKED TOO (амандамент №7 т. 1). The stale
+rule above used to speak only about „да“, and that asymmetry was a hole with a
+one-letter key: a „не“ written over `gate_lot1/Градината` when the delta is
+`gate_lot1/градина` matched nothing, said nothing, and left the gate green over
+the very difference Petar had refused — after which the freeze carried it into
+the reference. A „не“ that reaches neither a live delta nor a difference
+between the queue's reference and the frozen one is now BLOCKED, in the same
+words as the stale permission: a decision about a query that does not exist is
+not a decision. `gates.sign` applies the same test where the refusal is
+written, so the typo is caught by the hand that makes it.
+
 THE ORDER OF THE FILE DOES NOT VOTE (амандамент №6 т. 2). Every row that
 matches a delta is collected, never the first one that answers: a „не“ wins over
 any „да“, and among rows that agree the exact `кофа/заявка` is the one the table
@@ -39,10 +50,20 @@ queue to refuse and a row Petar answered „не“ would be erased by the very 
 it forbade. Two things stop that here: `expectations._meta.refused` — what the
 freeze SAW, written down by `build_expectations` — is read back and blocks; and
 every „не“ row is re-derived independently against the FROZEN reference, from
-the reference THE QUEUE WAS WRITTEN AGAINST forward (амандамент №6 т. 4: the
-`_meta.reference` of the expectations as Petar signed them, not a commit
-constant of the engine), so a hand-assembled body with an empty `refused` list
-is caught by the bytes rather than by its own bookkeeping.
+the reference THE QUEUE WAS WRITTEN AGAINST forward, so a hand-assembled body
+with an empty `refused` list is caught by the bytes rather than by its own
+bookkeeping.
+
+THAT ANCHOR IS WRITTEN DOWN, NOT GUESSED (амандамент №7 т. 3). The reference
+the queue was written against is named explicitly in
+`expectations._meta.queue_reference` — commit, path and digest — by the two
+tools that measure it (`recall_sweep.build_expectations` and `gates.sign`).
+Deriving it with `git log -S` was aimable: one agent commit that adds a SECOND
+occurrence of `"signed_by": "Петър"` becomes the newest commit the pickaxe
+reports, the anchor moves to a body the agent controls and the refusal goes
+with it. The commit in the field must be Petar's own — амандамент №6 makes him
+the author of every freeze — and a foreign anchor BLOCKS with words instead of
+falling back to a commit constant of the engine.
 
 The comparison is FULL and ORDERED: all rows of every query, in their order,
 with their labels; never a head, never a count alone — a count cannot see a
@@ -119,10 +140,18 @@ def signable():
 YES, NO, PENDING = u"да", u"не", u"pending"
 DECISIONS = (YES, NO, PENDING)
 
-# The string that says Petar signed a body. `run_gates` проверка 7 and the
-# refusal anchor below both look for the commit that INTRODUCED it, so the two
-# of them look for exactly the same bytes.
+# The string that says Petar signed a body. `run_gates` проверка 7 looks for
+# the commit that INTRODUCED it; the refusal anchor no longer derives anything
+# from it (амандамент №7 т. 3), it is written down.
 SIGNATURE_NEEDLE = u'"signed_by": "%s"' % coverage.SIGNER
+
+# The only author whose commit may carry a signature or a signed reference
+# (план v2 §0.5). One string, read by this module, by `run_gates` проверка 7 and
+# by the pen — three readers of one rule.
+HUMAN_AUTHOR = u"Petar1984"
+
+# `_meta.queue_reference` — the explicit anchor of a refusal (амандамент №7 т. 3).
+QUEUE_REFERENCE_KEY = u"queue_reference"
 
 EXIT_OK = 0
 EXIT_USAGE = 4
@@ -160,6 +189,20 @@ def introduced_by(rel, needle):
         return None
     parts = lines[0].split("\t", 1)
     return (parts[0], parts[1] if len(parts) > 1 else "")
+
+
+def commit_author(commit):
+    """The author of one commit — None when git cannot resolve it at all.
+
+    An anchor that names a commit is a claim about a hand: амандамент №7 т. 3
+    asks who committed the body a refusal is measured against, and a name git
+    refuses to give is an answer too (fail-closed at the call site)."""
+    out = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-1",
+                          "--format=%an", commit, "--"],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        return None
+    return out.stdout.decode("utf-8", "replace").strip() or None
 
 
 def digest(raw):
@@ -224,7 +267,17 @@ def find_queue(explicit):
 
 
 def parse_queue(path):
-    """The rows of the queue file, as data.
+    """The rows of the queue FILE — `parse_queue_text` over its bytes."""
+    return parse_queue_text(path.read_text(encoding="utf-8"))
+
+
+def parse_queue_text(text):
+    """The rows of a queue, as data, from the text of one.
+
+    Проверка 7 reads the queue out of the BLOB of a commit rather than off the
+    disk (амандамент №7 т. 2): a digest is Petar's word only where his commit
+    put it, and the worktree is nobody's word. Both readers share this parser,
+    so the blob and the file can never be read by two different rules.
 
     The queue is MARKDOWN because a human reads it and signs it; the shape is
     fixed so a machine can read it too (план v2 §0.6):
@@ -238,7 +291,7 @@ def parse_queue(path):
         - **покрива:** gate_lot1v_v/*, gate_m7_bare/*
     """
     rows, current = [], None
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in text.splitlines():
         head = QUEUE_HEAD.match(line)
         if head:
             if current:
@@ -313,6 +366,15 @@ def wildcard_covers(covers):
         if sep and what == "*":
             out.append(pattern)
     return out
+
+
+def delta_patterns(covers):
+    """The `покрива` patterns that speak about a DELTA (`кофа/заявка`).
+
+    A row may also carry a word that names no comparison at all — an artefact,
+    a note. Амандамент №7 т. 1 asks whether a refusal reaches a delta, and only
+    these patterns can, so only these are measured."""
+    return [pattern for pattern in covers if "/" in pattern]
 
 
 def decide_delta(rows, bucket, query):
@@ -442,74 +504,193 @@ def refusal_survivors(expectations_doc, rows):
 
 
 def queue_reference(expectations_doc):
-    """(commit, path, sha256) — the reference THE QUEUE was written against.
+    """(commit, path, sha256, complaint) — the reference THE QUEUE was written against.
 
-    Амандамент №6 т. 4. Petar answers deltas that were measured against the
-    reference frozen at the time he read the queue, and `_meta.reference` of the
-    expectations names exactly that body. The freeze then makes the reference
-    equal to the candidate and rewrites `_meta.reference` to the new body — so
-    the signed expectations have to be read where they still say what he signed:
-    the blob of the commit that INTRODUCED his signature. That is one anchor
-    instead of `_meta.base`, which is a commit constant of the engine (`f06ac06`)
-    and knows nothing about which queue is being answered.
+    Амандамент №7 т. 3: the anchor is a FIELD, `_meta.queue_reference`, written
+    by the two tools that measure it — `recall_sweep.build_expectations` when it
+    produces the body and `gates.sign` when Petar signs one. Until now it was
+    derived: „the newest commit that moved the signature string, then read
+    `_meta.reference` out of its blob“. That derivation can be aimed. An agent
+    commit that adds a SECOND occurrence of `"signed_by": "Петър"` is the newest
+    commit `git log -S` reports, so the anchor moves to a body the agent chose —
+    and with it every refusal the queue was carrying.
 
-    Before a signing commit exists there is nothing else to name but the body on
-    HEAD — and then the reference and the candidate still differ by every live
-    delta, so the plain comparison is doing the whole job anyway.
+    Two things are demanded of the field and both BLOCK rather than fall back:
+    the anchor exists at all, and its commit is Petar's own (амандамент №6 makes
+    him the author of every freeze, so the reference a queue answers about is
+    always in a commit of his). `_meta.base` never votes here: it is a commit
+    constant of the engine and knows nothing about which queue is being answered.
     """
-    doc, commit = expectations_doc, u"HEAD"
-    signing = introduced_by(EXPECTATIONS_REL, SIGNATURE_NEEDLE)
-    if signing is not None:
-        try:
-            doc = json.loads(blob_at(signing[0], EXPECTATIONS_REL).decode("utf-8"))
-            commit = signing[0]
-        except (ValueError, OSError, UnicodeDecodeError):
-            doc, commit = expectations_doc, u"HEAD"
-    anchor = ((doc or {}).get("_meta") or {}).get("reference") or {}
-    return commit, anchor.get("path"), anchor.get("sha256")
+    anchor = ((expectations_doc or {}).get("_meta") or {}).get(QUEUE_REFERENCE_KEY) or {}
+    commit, rel, want = anchor.get("commit"), anchor.get("path"), anchor.get("sha256")
+    if not commit or not rel:
+        return (None, None, None,
+                u"подписаните очаквания нямат изрична котва „_meta.%s“ (комит + "
+                u"път + дайджест) — отказът няма срещу какво да се провери"
+                % QUEUE_REFERENCE_KEY)
+    author = commit_author(commit)
+    if author is None:
+        return (None, None, None,
+                u"котвата „_meta.%s“ сочи комит %s, който git не разпознава"
+                % (QUEUE_REFERENCE_KEY, commit[:7]))
+    if author != HUMAN_AUTHOR:
+        return (None, None, None,
+                u"котвата „_meta.%s“ сочи комит %s на %r — референцията, срещу "
+                u"която е писана опашката, стои в комит на %s"
+                % (QUEUE_REFERENCE_KEY, commit[:7], author, HUMAN_AUTHOR))
+    return (commit, rel, want, None)
+
+
+def reference_commit():
+    """The commit that CARRIES the frozen reference right now.
+
+    `git log -1 -- <reference>`: the newest commit that changed those bytes. It
+    is the commit a queue is answered against, because the deltas Petar reads
+    are measured from exactly that body forward — and амандамент №6 makes him
+    the author of every freeze, so it is his commit, which is what
+    `queue_reference` then demands of the anchor."""
+    out = subprocess.run(["git", "-C", str(REPO_ROOT), "log", "-1", "--format=%H",
+                          "--", REFERENCE_REL],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise ValueError(u"git log -- %s: %s"
+                         % (REFERENCE_REL, out.stderr.decode("utf-8", "replace").strip()))
+    lines = out.stdout.decode("utf-8", "replace").splitlines()
+    if not lines:
+        raise ValueError(u"%s не е в нито един комит" % REFERENCE_REL)
+    return lines[0].strip()
+
+
+def queue_reference_anchor():
+    """The value `_meta.queue_reference` must carry right now — commit and bytes.
+
+    ONE truth for the two writers of that field (амандамент №7 т. 3):
+    `recall_sweep.build_expectations`, which measures the body, and
+    `gates.sign`, which refreshes it under Petar's hand as he signs. Same shape
+    as every other commit anchor in this delivery — path, commit, digest, size —
+    so the structural anchor walk reads it like the rest."""
+    commit = reference_commit()
+    raw = blob_at(commit, REFERENCE_REL)
+    return {"sha256": digest(raw), "bytes": len(raw), "path": REFERENCE_REL,
+            "commit": commit,
+            "what": u"референцията, срещу която е писана опашката"}
 
 
 def refused_against_reference(expectations_doc, rows, reference):
-    """Re-derive the refusals from the bytes: the queue's reference → the frozen one.
+    """(complaints, reached) — the refusals re-derived from the BYTES.
 
     Independent of `_meta.refused`: anything a „не“ row covers that still differs
     between the reference the queue was written against and the reference at
     HEAD is a refusal the delivery is carrying anyway. A body that simply forgot
     to write its refusals down does not get past this.
+
+    `reached` is the set of row ids that answered such a difference — what
+    амандамент №7 т. 1 needs to tell „this refusal covers nothing“ apart from
+    „this refusal is doing its job“. It is None when the comparison could not be
+    made at all (no anchor, foreign anchor, unreadable blob): then the complaint
+    on the table is about the anchor, and no row may be called empty on the
+    strength of a comparison that never happened.
     """
     refused_rows = [row for row in rows if row["decision"] == NO and row["covers"]]
     if not refused_rows:
-        return []
-    try:
-        commit, rel, want = queue_reference(expectations_doc)
-    except (ValueError, OSError) as exc:
-        return [u"референцията на опашката не може да се прочете: %s" % exc]
-    if not rel:
-        return [u"опашката отказва %d реда, а подписаните очаквания нямат котва "
-                u"„reference“ — отказът не може да се провери срещу референцията"
-                % len(refused_rows)]
+        return ([], set())
+    commit, rel, want, complaint = queue_reference(expectations_doc)
+    if complaint:
+        return ([u"опашката отказва %d реда, а %s" % (len(refused_rows), complaint)],
+                None)
     try:
         raw = blob_at(commit, rel)
     except (ValueError, OSError) as exc:
-        return [u"референцията на опашката (%s:%s): %s" % (commit, rel, exc)]
+        return ([u"референцията на опашката (%s:%s): %s" % (commit, rel, exc)], None)
     if want and digest(raw) != want:
-        return [u"референцията на опашката (%s:%s): %s ≠ подписаното %s"
-                % (commit, rel, digest(raw)[:12], want[:12])]
+        return ([u"референцията на опашката (%s:%s): %s ≠ подписаното %s"
+                 % (commit, rel, digest(raw)[:12], want[:12])], None)
     try:
         base_doc = json.loads(raw.decode("utf-8"))
     except (ValueError, UnicodeDecodeError) as exc:
-        return [u"референцията на опашката (%s:%s): %s" % (commit, rel, exc)]
-    out = []
+        return ([u"референцията на опашката (%s:%s): %s" % (commit, rel, exc)], None)
+    out, reached = [], set()
     for delta in compare(entries_of(base_doc), reference):
         for row in refused_rows:
             if any(covers_delta(p, delta["bucket"], delta["q"]) for p in row["covers"]):
+                reached.add(row["id"])
                 out.append(u"%s/%s: ред %s е ОТКАЗАН, а разликата спрямо "
                            u"референцията на опашката (%s) е в замразената "
                            u"референция (%s)"
                            % (delta["bucket"], delta["q"], row["id"], commit[:7],
                               u"; ".join(delta["why"])))
                 break
+    return (out, reached)
+
+
+def refusals_that_cover_nothing(rows, used, reached):
+    """Complaints for every „не“ that refuses a query which does not exist.
+
+    Амандамент №7 т. 1 — the twin of the stale-permission rule. A „да“ that
+    covers nothing is blocked because a permission for a delta nobody delivered
+    is not a permission; a „не“ that covers nothing was simply MUTE, and mute is
+    worse: `gate_lot1/Градината` for `gate_lot1/градина` refused nothing, the
+    gate went green, and one freeze later the refused difference was inside the
+    reference. A refusal has to reach something — a live delta (`used`) or a
+    difference between the queue's reference and the frozen one (`reached`).
+    """
+    if reached is None:
+        return []
+    out = []
+    for row in rows:
+        if row["decision"] != NO:
+            continue
+        patterns = delta_patterns(row["covers"])
+        if not patterns or row["id"] in used or row["id"] in reached:
+            continue
+        out.append(u"ред %s отказва заявка, която не съществува: %s — нито жива "
+                   u"делта, нито разлика спрямо референцията на опашката"
+                   % (row["id"], u", ".join(patterns)))
     return out
+
+
+def refusable_deltas(expectations_doc=None):
+    """({(bucket, q)}, complaint) — every delta a „не“ could be about right now.
+
+    The union of what this gate judges: the LIVE deltas (the frozen reference at
+    HEAD ↔ the engine candidate) and the differences between the reference the
+    queue was written against and the frozen one — the second half is what a
+    refusal still reaches after a freeze has erased the first. `gates.sign` asks
+    THIS function before it writes a „не“ (амандамент №7 т. 1), so the pen and
+    the gate measure a refusal against one and the same set, and a typo is
+    refused by the hand that makes it instead of going mute in the gate.
+
+    The complaint is about the second half only: without a readable anchor the
+    live deltas are still the honest answer for a queue nobody has frozen yet.
+    """
+    try:
+        reference_doc = json.loads(blob_at("HEAD", REFERENCE_REL).decode("utf-8"))
+    except (ValueError, OSError, UnicodeDecodeError) as exc:
+        return (set(), u"референцията (%s) не може да се прочете: %s"
+                % (REFERENCE_REL, exc))
+    reference = entries_of(reference_doc)
+    try:
+        candidate = entries_of(load_engine().reference_rows())
+    except (ValueError, OSError, SystemExit) as exc:
+        return (set(), u"двигателят не отговори: %s" % exc)
+    out = set((delta["bucket"], delta["q"]) for delta in compare(reference, candidate))
+    if expectations_doc is None:
+        try:
+            expectations_doc = json.loads(
+                blob_at("HEAD", EXPECTATIONS_REL).decode("utf-8"))
+        except (ValueError, OSError, UnicodeDecodeError) as exc:
+            return (out, u"очакванията (%s) не могат да се прочетат: %s"
+                    % (EXPECTATIONS_REL, exc))
+    commit, rel, _want, complaint = queue_reference(expectations_doc)
+    if complaint:
+        return (out, complaint)
+    try:
+        base_doc = json.loads(blob_at(commit, rel).decode("utf-8"))
+    except (ValueError, OSError, UnicodeDecodeError) as exc:
+        return (out, u"референцията на опашката (%s:%s): %s" % (commit, rel, exc))
+    out |= set((delta["bucket"], delta["q"])
+               for delta in compare(entries_of(base_doc), reference))
+    return (out, None)
 
 
 # --------------------------------------------------------------------- the gate
@@ -712,7 +893,7 @@ def run(queue_override=None):
     for complaint in survivors:
         block(u"отказ: " + complaint)
         refused.append({"bucket": None, "q": None, "row": None, "why": [complaint]})
-    rederived = refused_against_reference(expectations, rows, reference)
+    rederived, reached = refused_against_reference(expectations, rows, reference)
     for complaint in rederived[:10]:
         block(u"отказ (от байтовете): " + complaint)
     if len(rederived) > 10:
@@ -721,8 +902,13 @@ def run(queue_override=None):
     if rederived:
         refused.extend({"bucket": None, "q": None, "row": None, "why": [c]}
                        for c in rederived)
-    if not survivors and not rederived and rows:
-        say(u"отказите: 0 записани, 0 в замразената референция ✓")
+
+    # --- 8. and a refusal that reaches nothing (амандамент №7 т. 1) ---------
+    empty = refusals_that_cover_nothing(rows, used, reached)
+    for complaint in empty:
+        block(complaint)
+    if not survivors and not rederived and not empty and rows:
+        say(u"отказите: 0 записани, 0 в замразената референция, 0 празни ✓")
 
     return verdict(lines, bad, deltas, uncovered, stale, refused)
 

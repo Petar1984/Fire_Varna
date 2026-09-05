@@ -3627,6 +3627,59 @@ def release_verdict(queue_override=None):
     return release_gate.run(queue_override)
 
 
+def queue_reference_anchor():
+    """`_meta.queue_reference` — the reference THE QUEUE is answered against.
+
+    Амандамент №7 т. 3: the anchor of a refusal is written down, not derived by
+    asking `git log -S` which commit last moved the signature (a pickaxe an
+    agent commit can aim). The commit is asked of `gates.release`, which is also
+    what `gates.sign` asks when Petar signs a body — ONE truth for the two
+    writers of this field, so a signature can never move the anchor."""
+    if str(REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(REPO_ROOT))
+    from gates import release as release_gate
+    return release_gate.queue_reference_anchor()
+
+
+def freeze_blockers(release_result):
+    """What the freeze takes from the release gate — its VERDICT, verbatim.
+
+    Амандамент №6 т. 1: the gate blocks for reasons that never reach `uncovered`
+    or `refused` (a signed artefact edited in the worktree, a reference blob
+    missing from HEAD), and a freeze that read only those two lists went ahead
+    with exit 0 over a blocked delivery. Амандамент №7 т. 4а: it is a FUNCTION so
+    a test can hand it a non-green verdict and read the blocker back, instead of
+    the rule being provable only by a fifty-second sweep."""
+    if release_result is None:
+        return [u"release-гейтът не отговори — опашката не е прочетена"]
+    if release_result.get("exit_code") != 0:
+        out = [u"release-гейтът не е зелен (%s) — замразяване става САМО при "
+               u"зелена присъда" % release_result.get("verdict")]
+        out.extend(u"release: %s" % line for line in (release_result.get("blocked") or []))
+        return out
+    return []
+
+
+def freeze_writes(blockers, writes):
+    """The last operation of a freeze: either the words, or the bytes.
+
+    `writes` is a sequence of zero-argument callables, each performing ONE write
+    and returning the line that reports it. With any blocker not one of them is
+    called — „ЗАМРАЗЯВАНЕТО НЕ Е ИЗВЪРШЕНО“ then means zero changed files, which
+    `git status` can check, rather than a promise in a print. Returns
+    `(exit_code, lines)`; the tests drive it over a temporary directory, so
+    „нула записани байта“ is measured and not asserted about a mock."""
+    if blockers:
+        print(u"\nЗАМРАЗЯВАНЕТО НЕ Е ИЗВЪРШЕНО:")
+        for line in blockers:
+            print(u"  ⛔ %s" % line)
+        return 1, []
+    lines = [do_write() for do_write in writes]
+    for line in lines:
+        print(line)
+    return 0, lines
+
+
 def build_expectations(artefact_text, candidate_doc, sweep, refused=None):
     """The whole body — measured here, signed by Petar, read by the suite."""
     artefact_doc = json.loads(artefact_text)
@@ -3656,6 +3709,11 @@ def build_expectations(artefact_text, candidate_doc, sweep, refused=None):
                           what=u"двигателят, върху който са мерени очакванията"),
         "base": commit_anchor(BASE_COMMIT, ROWS_REL,
                               u"замразената референция след лот Б"),
+        # The reference THE QUEUE is answered against — explicit, so nothing has
+        # to be derived from the signature string (амандамент №7 т. 3). `base`
+        # above is a commit constant of this engine and knows nothing about
+        # which queue is being signed; this one is measured at every write.
+        "queue_reference": queue_reference_anchor(),
         # What the queue REFUSED at the moment this body was measured — the
         # deltas a row answered „не“ covers (амандамент №5 т. 1). `--freeze`
         # will not run while this is non-empty, and `gates/release.py` reads it
@@ -4227,13 +4285,7 @@ def main():
         # `uncovered` and an empty `refused`, and reading only those two froze a
         # blocked delivery with exit 0. Every blocked line is printed: the
         # human is told all of it, not the first sentence of it.
-        if _release is None:
-            blockers.append(u"release-гейтът не отговори — опашката не е прочетена")
-        elif _release["exit_code"] != 0:
-            blockers.append(u"release-гейтът не е зелен (%s) — замразяване става "
-                            u"САМО при зелена присъда" % _release["verdict"])
-            for _line in _release["blocked"]:
-                blockers.append(u"release: %s" % _line)
+        blockers.extend(freeze_blockers(_release))
         try:
             _fresh = build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA),
                                         refused=_refused)
@@ -4248,25 +4300,32 @@ def main():
         if _fresh is not None and engine_blocks(_fresh) != engine_blocks(expectations() or {}):
             blockers.append(u"измереното сега се различава от подписаното — "
                             u"замразяването не пренася подпис върху друг отговор")
-        if blockers:
-            print(u"\nЗАМРАЗЯВАНЕТО НЕ Е ИЗВЪРШЕНО:")
-            for line in blockers:
-                print(u"  ⛔ %s" % line)
-            return 1
-        # The reference the JS is gated against lives next to the probe that
-        # replays it — one file, one generator. LF on purpose: the CRLF twin on
-        # a Windows worktree is the same OID and different bytes (F12-ж).
-        pathlib.Path(REPO_ROWS_OUT).write_text(_rows_text, encoding="utf-8", newline="\n")
-        print(u"FREEZE: замразена референция -> %s" % REPO_ROWS_OUT)
-        _path, _signature = write_expectations(
-            build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA),
-                               refused=_refused), frozen=True)
-        print(u"FREEZE: очаквания -> %s (signed_by: %s)" % (_path, _signature))
-        # The third tracked body of this script, in the same block: a refused
-        # freeze leaves it byte-untouched (амандамент №5 т. 4).
-        pathlib.Path(REPO_PARITY_OUT).write_text(_parity_text, encoding="utf-8",
-                                                 newline=chr(10))
-        print(u"FREEZE: паритет на токенизатора -> %s" % REPO_PARITY_OUT)
+        def _write_reference():
+            # The reference the JS is gated against lives next to the probe that
+            # replays it — one file, one generator. LF on purpose: the CRLF twin
+            # on a Windows worktree is the same OID and different bytes (F12-ж).
+            pathlib.Path(REPO_ROWS_OUT).write_text(_rows_text, encoding="utf-8",
+                                                   newline="\n")
+            return u"FREEZE: замразена референция -> %s" % REPO_ROWS_OUT
+
+        def _write_expectations():
+            _path, _signature = write_expectations(
+                build_expectations(_rows_text, ROWS, measure_sweep(M5, EXTRA),
+                                   refused=_refused), frozen=True)
+            return u"FREEZE: очаквания -> %s (signed_by: %s)" % (_path, _signature)
+
+        def _write_parity():
+            # The third tracked body of this script, in the same block: a refused
+            # freeze leaves it byte-untouched (амандамент №5 т. 4).
+            pathlib.Path(REPO_PARITY_OUT).write_text(_parity_text, encoding="utf-8",
+                                                     newline=chr(10))
+            return u"FREEZE: паритет на токенизатора -> %s" % REPO_PARITY_OUT
+
+        _code, _written = freeze_writes(blockers, [_write_reference,
+                                                   _write_expectations,
+                                                   _write_parity])
+        if _code:
+            return _code
 
     return 1 if red else 0
 
