@@ -2,10 +2,17 @@
 # Push policy for Fire_Varna — the tracked source of .git/hooks/pre-push.
 # Install with:  cp scripts/hooks/pre-push .git/hooks/pre-push
 #
-# Two lines of defence, in this order:
+# Three lines of defence, in this order:
 #   1. a human at an interactive terminal (agents and scripts are blocked);
-#   2. `python -m gates.run_gates` — one exit code for every gate.
-# Break-glass exists for the red gate only: it can never make an agent push.
+#   2. `python -m unittest discover -s tests` — the suite;
+#   3. `python -m gates.run_gates` — one exit code for every gate, release
+#      gate (проверка 6) and signature authorship (проверка 7) included.
+#
+# There is NO break-glass any more (план „ИЗЧИСТВАНЕ“ v2 §0.4, Q7). It existed
+# for the red gate alone and it was still an environment variable away from
+# publishing an unsigned delivery — „червено = блокирано“ has no second half.
+# A push that must happen with a red gate happens after the gate is made green
+# or after Petar removes this hook with his own hand, and both leave a trace.
 
 set -u
 
@@ -18,38 +25,39 @@ if [ ! -t 2 ]; then
   exit 1
 fi
 
-# ---- 2. the gates ----
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
   echo "  ⛔ push blocked — not inside a git worktree." >&2
   exit 1
 }
 cd "$ROOT" || exit 1
 
-# No PYTHONIOENCODING prop: the gate reconfigures its own stdout/stderr to
-# utf-8 (gates/coverage.py `use_utf8_console`). A hook that props the gate up
-# hides the day the gate stops standing on its own (Амандамент №2, A.10).
+# ---- 2. the suite ----
+# PYTHONIOENCODING is set for THIS step only. The gate reconfigures its own
+# console (gates/coverage.py `use_utf8_console`) and is therefore run bare — a
+# hook that props the gate up hides the day it stops standing on its own
+# (Амандамент №2, A.10). `unittest` is stdlib: we do not own its console
+# handling, and a UnicodeEncodeError there would be a red that teaches the
+# human to bypass the hook instead of a red that means something.
+PYTHONIOENCODING=utf-8 python -m unittest discover -s tests
+TESTS=$?
+if [ "$TESTS" -ne 0 ]; then
+  echo "" >&2
+  echo "  ⛔ push blocked — tests red (python -m unittest discover -s tests → $TESTS)." >&2
+  echo "     Червено = блокирано. Виж имената по-горе." >&2
+  echo "" >&2
+  exit 1
+fi
+
+# ---- 3. the gates ----
 python -m gates.run_gates
-STATUS=$?
-
-if [ "$STATUS" -eq 0 ]; then
-  exit 0
+GATES=$?
+if [ "$GATES" -ne 0 ]; then
+  echo "" >&2
+  echo "  ⛔ push blocked — gates red (python -m gates.run_gates → $GATES)." >&2
+  echo "     Виж таблицата по-горе, gates/out/coverage.md и опашката" >&2
+  echo "     scratch/places_search/ЗА_ПОДПИС_<дата>.md." >&2
+  echo "" >&2
+  exit 1
 fi
 
-# Fail closed: a gate that could not run at all is a red gate, not a green one.
-if [ -n "${FV_BREAK_GLASS:-}" ]; then
-  mkdir -p gates/out
-  echo "$(date -u '+%Y-%m-%dT%H:%M:%SZ') exit=$STATUS reason=$FV_BREAK_GLASS" >> gates/out/break_glass.log
-  echo "" >&2
-  echo "  ⚠ break-glass push — gates red (exit $STATUS), pushed anyway." >&2
-  echo "     Довод: $FV_BREAK_GLASS" >&2
-  echo "     Записано в gates/out/break_glass.log" >&2
-  echo "" >&2
-  exit 0
-fi
-
-echo "" >&2
-echo "  ⛔ push blocked — gates red (python -m gates.run_gates → $STATUS)." >&2
-echo "     Виж таблицата по-горе и gates/out/coverage.md." >&2
-echo "     Break-glass: FV_BREAK_GLASS=\"<довод>\" git push …" >&2
-echo "" >&2
-exit 1
+exit 0
