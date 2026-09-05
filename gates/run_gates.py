@@ -3,7 +3,7 @@
 
     python -m gates.run_gates [--base git:<rev>] [--allow <path>]
 
-Five checks, one table, one exit code:
+Six checks, one table, one exit code:
 
   1. sha pins        the three SHA256 constants in `index.html` against the
                      LF-normalised bytes of the three delivered blobs — exactly
@@ -14,6 +14,9 @@ Five checks, one table, one exit code:
   4. coverage        gates/coverage.py against the last signed baseline
                      (gates/baseline/MANIFEST.json); no baseline = STOP
   5. signed_facts    data/signed_facts.json — the small judging file
+  6. release         gates/release.py — the frozen reference, the engine
+                     candidate, the pinned inputs and the manifests bound by
+                     digest; every delta covered by a signed queue row
 
 The gate never imports `unittest` and never reads `tests/`: a check that shares
 code with the suite it guards cannot fail independently of it.
@@ -38,6 +41,7 @@ import sys
 from pathlib import Path
 
 from gates import coverage
+from gates import release
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -401,6 +405,26 @@ def check_signed_facts() -> Check:
     return check
 
 
+def check_release(queue_override: str | None) -> Check:
+    """Проверка 6 — gates/release.py, run here so the push waits on it too.
+
+    The gate lives in its own module because it is the one check that imports
+    the search engine: keeping it out of this file leaves `run_gates` importable
+    even when the reference is mid-edit, and the failure is then this row, not
+    an ImportError before the table."""
+    check = Check("6 · release (референция ↔ двигател ↔ подписана опашка)")
+    try:
+        result = release.run(queue_override)
+    except (ValueError, OSError, json.JSONDecodeError) as exc:
+        check.fail("release: %s" % exc)
+        return check
+    for line in result["lines"]:
+        check.say(line)
+    if result["exit_code"] != release.EXIT_OK:
+        check.fail("release изход %d — %s" % (result["exit_code"], result["verdict"]))
+    return check
+
+
 def main(argv: list[str]) -> int:
     # Without this the table dies with UnicodeEncodeError on a cp1252 console
     # before the first row — a crash that reads like a pass (одит 05.09, дефект 4).
@@ -409,6 +433,7 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description="Fire_Varna gates — one exit code")
     ap.add_argument("--base", help="git:<rev> — вместо подписания baseline")
     ap.add_argument("--allow", help="gates/allow/<ГГГГ-ММ-ДД>_<тема>.json")
+    ap.add_argument("--queue", help="scratch/places_search/ЗА_ПОДПИС_<дата>.md")
     args = ap.parse_args(argv)
 
     checks = [
@@ -417,6 +442,7 @@ def main(argv: list[str]) -> int:
         check_no_cad_ids(),
         check_coverage(args.base, args.allow),
         check_signed_facts(),
+        check_release(args.queue),
     ]
 
     out = sys.stdout
