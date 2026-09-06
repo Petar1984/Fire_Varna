@@ -11,7 +11,7 @@
   "candidates_file": "m2_1_candidates_v2.json",
   "candidates_sha256": "1331130e5f113737dfe4e4354a69acb81ab0affd32b7747416da38c07a2e96bb"
  },
- "exported_at": "2026-09-06T21:22:00",
+ "exported_at": "2026-09-06T21:22:27",
  "changes": [
   "vazrazhdane1 → 13337602",
   "vayalar → alias_of sredna_traka",
@@ -19,7 +19,7 @@
   "briz → 3710735 (кв. Бриз (кв. Почивка)) — Petar's four-sided description, measured 0 m to each side",
   "evksinograd → 5729429 (EN 'Euxinograd' = BG 'Траката - разширение'), Petar's URL",
   "dobreva → wikimapia_union [5729380, 5729421] (Petar 07.09)",
-  "vinitsa_sever → alias_of dobreva (Petar 07.09)"
+  "vinitsa_sever → excluded (Petar 07.09: „го изключваме“; registry: deactivate the code)"
  ],
  "decisions": [
   {
@@ -793,14 +793,14 @@
    "code": "vinitsa_sever",
    "display": "с.о. Виница-север",
    "kind": "с.о.",
-   "choice": "alias_of",
+   "choice": "excluded",
    "wm_id": null,
    "wm_polygon_sha256": null,
    "wm_title": null,
-   "reason": "Петър: „не е Виница-север“ — името остава като второ име на Добрева чешма в регистъра (ход Р); полигонът 5729421 влиза в обединението на dobreva",
-   "decided_by": "Petar via Claude Architect (his words 07.09: „Виница-север всъщност е част от Добрева чешма, а не е Виница-север“)",
-   "decided_at": "2026-09-06T21:22:00",
-   "alias_of": "dobreva"
+   "reason": "Петър (07.09): „Виница-север го изключваме“ — кодът отпада от регистъра като квартал/с.о. (ход Р: деактивиране), не е второ име; площта е Добрева чешма",
+   "decided_by": "Petar via Claude Architect (his words 07.09)",
+   "decided_at": "2026-09-06T21:22:27",
+   "alias_of": null
   },
   {
    "code": "vladislavovo",
