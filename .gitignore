@@ -80,3 +80,8 @@ hydrants_varna (7).html.bak.*
 /scratch/basemap_b2/index_html.diff
 # Гейтовете пишат тук (coverage.md/json, break_glass.log) — изход, не източник.
 gates/out/
+
+# raw geometry answers of external services and any GeoJSON under the research notes never enter the public repo (night plan Н0, gate C3)
+/scratch/places_search/agkk_inspire_*/
+/scratch/places_search/**/*.geojson
+/scratch/places_search/*.geojson
