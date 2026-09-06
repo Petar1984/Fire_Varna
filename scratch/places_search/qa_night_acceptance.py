@@ -15,6 +15,10 @@ Negative fixtures (each MUST exit != 0):
   * a copy with one flipped hex character in a write-set sha256,
   * a copy with a tampered commit author.
 
+Every recorded exit code must carry the name and the command it was measured with (an exit
+code nobody can re-run is not evidence), and the report must quote the sha256 of the signed
+plan body.
+
 The gate does not trust the report: every sha256 is recomputed from the file on disk and
 every commit sha, author and message is re-read from git. The verbatim messages and the
 write-set paths are parsed out of the SIGNED plan, so a report that renames a lot's message
@@ -390,6 +394,21 @@ def main():
         # --- gates and negative fixtures ---
         gate_exits = [as_int(g["exit"]) for g in block["gates"]]
         neg_exits = [as_int(n["exit"]) for n in block["negatives"]]
+
+        # An exit code nobody can re-run is not evidence: every recorded line must
+        # carry a name AND the command it was measured with.
+        recorded = block["gates"] + block["negatives"] + block["probes"]
+        without_command = [
+            entry
+            for entry in recorded
+            if len(entry["rest"]) < 2 or not all(part.strip() for part in entry["rest"][:2])
+        ]
+        rep.check(
+            "C9 %s·всеки изход с име и команда" % lot,
+            not without_command,
+            "редове без команда: %d от %d" % (len(without_command), len(recorded)),
+        )
+
         if status == STATUS_NOT_RUN:
             rep.check(
                 "C9 %s·без гейт" % lot,
@@ -489,6 +508,22 @@ def main():
             touched == sorted(p for p, _s in block["files"]),
             "комитнати: %s" % ", ".join(touched),
         )
+
+    # --- C11: the report is tied to the SIGNED body of the plan ----------------
+    # The plan records the sha256 of the body Petar signed; a report that does not
+    # quote it cannot be attributed to a signed plan.
+    signed_sha = None
+    for line in plan_text.split("\n"):
+        if "Подписаното тяло" in line:
+            found = re.findall(r"[0-9a-f]{64}", line)
+            if found:
+                signed_sha = found[0]
+            break
+    rep.check(
+        "C11 подпис·тялото на плана",
+        bool(signed_sha) and signed_sha in report_text,
+        "подписано тяло: %s" % (signed_sha or "планът не обявява sha"),
+    )
 
     print("")
     if rep.failed:
