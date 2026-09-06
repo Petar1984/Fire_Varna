@@ -1,0 +1,19 @@
+{
+  "schema_version": "1",
+  "signed_by": "Petar via Claude Architect (words 07.09: Кочмар и Възраждане 4 не са във Владиславово)",
+  "signed_at": "2026-09-07T00:10:58+03:00",
+  "resolutions": [
+    {
+      "code": "kochmar",
+      "district": "mladost",
+      "basis": "agkk_au5 10135-03",
+      "resolution": "petar_agkk"
+    },
+    {
+      "code": "vazrazhdane4",
+      "district": "mladost",
+      "basis": "agkk_au5 10135-03",
+      "resolution": "petar_agkk"
+    }
+  ]
+}
