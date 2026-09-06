@@ -16,7 +16,8 @@
   "vazrazhdane1 → 13337602",
   "vayalar → alias_of sredna_traka",
   "akchelar → 1855512 (Белица)",
-  "briz → 3710735 (кв. Бриз (кв. Почивка)) — Petar's four-sided description, measured 0 m to each side"
+  "briz → 3710735 (кв. Бриз (кв. Почивка)) — Petar's four-sided description, measured 0 m to each side",
+  "evksinograd → 5729429 (EN 'Euxinograd' = BG 'Траката - разширение'), Petar's URL"
  ],
  "decisions": [
   {
@@ -203,13 +204,13 @@
    "code": "evksinograd",
    "display": "Евксиноград",
    "kind": "кв",
-   "choice": "deferred",
-   "wm_id": null,
-   "wm_polygon_sha256": null,
-   "wm_title": null,
-   "reason": "",
-   "decided_by": "Petar (board, unsigned proba)",
-   "decided_at": "2026-09-06T03:34:48.160Z"
+   "choice": "wikimapia",
+   "wm_id": 5729429,
+   "wm_polygon_sha256": "65245f2daa022aaa5565c763971c6878ff170ca164fb258772a4ecbe437e7f3d",
+   "wm_title": "Селищно образувание Траката - разширение",
+   "reason": "Петър посочи wikimapia.org/5729429 („Euxinograd“ на английски; българското заглавие на същия обект е „Селищно образувание Траката - разширение“, вече в замразения файл); измерено: 1,73 km², допира Виница (0 m), резиденцията (17 m) и Св. Константин (7 m); кадастърът нарича земята Траката — конфликт на имена, записан",
+   "decided_by": "Petar via Claude Architect (his URL, measured)",
+   "decided_at": "2026-09-06T08:29:28"
   },
   {
    "code": "fichoza",
