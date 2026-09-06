@@ -1,0 +1,372 @@
+{
+  "schema_version": "1.1",
+  "lot": "Н0",
+  "what": "Пинове на нощната смяна „Границите“ (06→07.09.2026): sha256 на всеки вход, базовата ревизия, мръсният проследен диф, ahead/behind на трите репа и G19. Нула геометрия — само имена, кодове, хешове и числа.",
+  "generated_by": "Claude Executor",
+  "generated_at": "2026-09-06T18:35:14+03:00",
+  "attribution": "Кварталните граници в пинатите входове са по Wikimapia.org (обектите се назовават с wm_id и URL в самите входове) — CC BY-SA, © Wikimapia contributors, доброволен неофициален извор; условията: https://wikimapia.org/terms/ , проверени 2026-09-06. Уличните оси на карето „Младост 2“ са от OpenStreetMap — ODbL, © OpenStreetMap contributors. Районните полигони са от АГКК INSPIRE (частен провенанс, не пътува публично).",
+  "plan": {
+    "file": "docs/plans/ПЛАН_НОЩНА_СМЯНА_Границите_06.09.md",
+    "signed_body_sha256": "4ce6ea842a0acd12e4ed2005316190acdb032dec8191502696c3d0a249253766",
+    "signed_body_commit": "42b2635",
+    "lot_repo": "fire_varna",
+    "lot_write_set": [
+      "scratch/places_search/noshtna_pins_06.09.json",
+      "scratch/places_search/qa_night_pins.py"
+    ]
+  },
+  "prior_run": {
+    "run": 1,
+    "verdict": "ЧЕРВЕН",
+    "failed_check": "C3 git check-ignore за всеки геометричен път",
+    "cause": "scratch/places_search/agkk_inspire_2026-09-05/*.geojson не бяха покрити от нито едно правило в .gitignore (находка F1 на прогон 1); гейтът спря лота и НЕ беше заобиколен.",
+    "fix_by": "архитект, комит 57ab8ebff32038028c98dfe8a8044c63dac2b3b8 — .gitignore получава /scratch/places_search/agkk_inspire_*/ и правила за всеки .geojson под scratch/places_search/. Поправката е ИЗВЪН write-set-а на Н0 и е направена от друг агент, не от изпълнителя.",
+    "note": "Прогон 2 (този) преизмерва всичко срещу новия HEAD на Fire_Varna и пуска гейта наново."
+  },
+  "repos": {
+    "fire_varna": {
+      "path": "C:/git/Fire_Varna",
+      "branch": "main",
+      "upstream": "origin/main",
+      "head": "57ab8ebff32038028c98dfe8a8044c63dac2b3b8",
+      "ahead": 46,
+      "behind": 2,
+      "note": "HEAD на прогон 2, измерен ПРЕДИ комита на Н0. Спрямо прогон 1 (d8628346) са добавени три комита: 093b259 (Н3-а фикстури), 65a0c7a (докладът 07.09, ще бъде пренаписан от Н5) и 57ab8eb (поправката на .gitignore). Разминат клон: origin/main носи два комита на Petar1984 (1af2140 ingest #33, 18948de ingest #34), които ги няма локално; общата основа е fd13907 — сливането/пребазирането е работа на Петър, не на изпълнителя."
+    },
+    "varna_3d": {
+      "path": "C:/git/varna_3d",
+      "branch": "rezhimi",
+      "upstream": "origin/rezhimi",
+      "head": "8d60aebb365fb8e74ccc863d3b3db90b74180a3b",
+      "ahead": 41,
+      "behind": 0,
+      "note": "HEAD е НЕПРОМЕНЕН спрямо прогон 1 и съвпада дословно с измерения в плана §2а base_rev."
+    },
+    "varna_buildings": {
+      "path": "C:/git/Varna_buildings",
+      "branch": "main",
+      "upstream": "origin/main",
+      "head": "4c6b482470cbb601407dbeb22eb0cc64f4da30cc",
+      "ahead": 1,
+      "behind": 0,
+      "note": "Четем само config/quarter_registry.json; регистърът не се пипа (червена черта 3)."
+    }
+  },
+  "base_rev": {
+    "repo": "varna_3d",
+    "branch": "rezhimi",
+    "commit": "8d60aebb365fb8e74ccc863d3b3db90b74180a3b",
+    "why": "Пълният HEAD на varna_3d, замразен преди всяка промяна (план §2а). Леджер-блобът се чете само оттук: git show 8d60aebb…:scratch/refactor/_addr/lot1v_locations_375.json",
+    "ledger_blob_sha256": "d5050f1cfb3d4289e62a288b64a4658b15106a7876f7aa8fb1d1a39980c76075",
+    "ledger_worktree_equals_blob": true
+  },
+  "g19": {
+    "gh_path": "C:/Program Files/GitHub CLI/gh.exe",
+    "repo": "Petar1984/varna_3d",
+    "command": "\"C:/Program Files/GitHub CLI/gh.exe\" repo view Petar1984/varna_3d --json visibility",
+    "expected": "PRIVATE",
+    "observed": "PRIVATE",
+    "observed_at": "2026-09-06T18:34:00+03:00",
+    "exit_code": 0
+  },
+  "dirty_tracked": {
+    "varna_3d": [
+      {
+        "path": "scratch/place_bodies/qa_place_bodies.md",
+        "worktree_sha256": "51b0f4d9c148e143d8eb177524962e4c235f9864df6c9497cf501cd9acbf2c88",
+        "head_blob_sha256": "32eb915994754f46c02e1b4ec0bf15efb4691555494eed4f7060bfa011a5e8e9",
+        "note": "ЕДИНСТВЕНИЯТ мръсен проследен файл на varna_3d — чужд диф, част от основата; не се пипа и не се комитва (план §2а). Двата sha са непроменени спрямо прогон 1."
+      }
+    ],
+    "varna_buildings": [
+      {
+        "path": "scratch/phase_1_12_part_a_conflicts.json",
+        "worktree_sha256": "2af093a732bca9072f6b6364e997b7066295f0e9e571f433980fa605cfd40803",
+        "head_blob_sha256": "fb53333c55516ec2f94e8e8d2ddf19660261dc1eaa2761899088446b084aca21",
+        "note": "Чужд диф — само записан, не се пипа."
+      },
+      {
+        "path": "scratch/phase_1_12_part_a_no_evidence.json",
+        "worktree_sha256": "41f337eb51835347e6dae4a781cf719dadb77391150dc1630ec643c7c369c0b4",
+        "head_blob_sha256": "59d4ad85c679935814c0511b19660da4fd537b737965c22b86d4661583317436",
+        "note": "Чужд диф — само записан, не се пипа."
+      },
+      {
+        "path": "scratch/phase_1_12_part_a_systemic_candidates.json",
+        "worktree_sha256": "e71119d6c052276f95a8f9cfaa1aaba1bb8ffac6fc65c8b1dd0f59785342859f",
+        "head_blob_sha256": "dab549f5ef167550e2928e31aa0cb9ccf49cd7c25ce619bd92d445f0525ad3b1",
+        "note": "Чужд диф — само записан, не се пипа."
+      },
+      {
+        "path": "tools/build_number_pins.py",
+        "worktree_sha256": "11ce0ddf8cd3ea7c82f201c5ef667bfdc47b8a2361d8e072ae7a18e3373b59da",
+        "head_blob_sha256": "de535d0ca1747b6c3ff65a7354d251e0da6be7f7cf9425f4a33a523b464f22d3",
+        "note": "Чужд диф — само записан, не се пипа."
+      }
+    ],
+    "fire_varna": []
+  },
+  "inputs": [
+    {
+      "id": "decisions_3",
+      "repo": "fire_varna",
+      "role": "решенията (проба) — входът на Н1 и на Б0 т. 8",
+      "is_geometry_file": false,
+      "worktree_paths": [
+        "scratch/places_search/granitsi_decisions_3_2026-09-06_proba.json"
+      ],
+      "worktree_sha256": "8fe8db5e750536fd338844c1ec69740252699457b51b3171585b95010688f178",
+      "worktree_bytes": 31514,
+      "blob": {
+        "rev": "b6e627d0fb19e039a062aba955d030301ae45b2e",
+        "path": "scratch/places_search/granitsi_decisions_3_2026-09-06_proba.json",
+        "sha256": "ec2813e1c074b9b623b153f9ee2a9b9c549f3ad27d806b6314642354a34356f6",
+        "bytes": 30668,
+        "blob_oid": "7b00220c7436c8f03fa52babb5da3f6b57d25071"
+      },
+      "commit": {
+        "sha": "b6e627d0fb19e039a062aba955d030301ae45b2e",
+        "author_name": "Claude Architect",
+        "author_email": "architect@local",
+        "authored_at": "2026-09-06T08:29:28+03:00",
+        "last_author_on_path": "Claude Architect"
+      },
+      "state": "agent_committed_proba",
+      "note": "ДВА различни sha за един файл: работното дърво е с CRLF (8fe8db5e…), блобът в git е с LF (ec2813e1…). Б0 т. 8 подписва БЛОБА — ec2813e1c074b9b623b153f9ee2a9b9c549f3ad27d806b6314642354a34356f6"
+    },
+    {
+      "id": "decisions_2",
+      "repo": "fire_varna",
+      "role": "предшественикът по based_on на decisions_3",
+      "is_geometry_file": false,
+      "worktree_paths": [
+        "scratch/places_search/granitsi_decisions_2_2026-09-06_proba.json"
+      ],
+      "worktree_sha256": "3ad5da796fddfb04068ac9d0ecfe52ff5112c6681b5505311772ceae37c5a4f8",
+      "worktree_bytes": 27789,
+      "note": "МЯРКА СРЕЩУ ПЛАНА: файлът СЪЩЕСТВУВА на диска и sha-то му съвпада дословно с based_on.sha256 в decisions_3 — веригата назад НЕ е скъсана на това стъпало. Скъсва се едно стъпало по-назад: based_on на decisions_2 е null (67 реда там срещу 68 в decisions_3)."
+    },
+    {
+      "id": "frozen_v2",
+      "repo": "fire_varna",
+      "role": "замразеният уикимапийски набор v2 — обявеният вход на решенията",
+      "is_geometry_file": true,
+      "worktree_paths": [
+        "scratch/boundary_gallery/frozen_2026-09-06/wikimapia_quarters_2026-09-06_v2.geojson",
+        "scratch/boundary_gallery/granitsi_preview_05.09/wikimapia_quarters_frozen_2026-09-06_v2.geojson"
+      ],
+      "worktree_sha256": "b53a3322b1a6e5670ea17f7638ab77d198e120d108e623fa7bc78ae702daf976",
+      "worktree_bytes": 589222,
+      "features": 288,
+      "note": "Двете копия са байт-еднакви — веригата се доказва по sha, не по име (план §3). Съвпада с inputs.frozen_sha256 в decisions_3."
+    },
+    {
+      "id": "raw_snapshot",
+      "repo": "fire_varna",
+      "role": "суровият снапшот на уикимапийските места (изворът на frozen)",
+      "is_geometry_file": true,
+      "worktree_paths": [
+        "scratch/boundary_gallery/frozen_2026-09-06/wikimapia_varna_places_raw_2026-09-06.json"
+      ],
+      "worktree_sha256": "1c0561cb7e612e72f291ca33d603cc6ef7713b88ab5af7cbd6d942fbc18a7fbe",
+      "worktree_bytes": 5071516,
+      "note": "11303 срещания на ключа polygon — суровите отговори на Wikimapia."
+    },
+    {
+      "id": "m2_1_candidates_v2",
+      "repo": "fire_varna",
+      "role": "обявеният вход на решенията (кандидатите код→wm_id)",
+      "is_geometry_file": false,
+      "worktree_paths": [
+        "scratch/boundary_gallery/frozen_2026-09-06/m2_1_candidates_2026-09-06_v2.json",
+        "scratch/boundary_gallery/granitsi_preview_05.09/m2_1_candidates_v2.json"
+      ],
+      "worktree_sha256": "1331130e5f113737dfe4e4354a69acb81ab0affd32b7747416da38c07a2e96bb",
+      "worktree_bytes": 18934,
+      "rows": 84,
+      "note": "Байт-еднакви под две имена; съвпада с inputs.candidates_sha256 в decisions_3. Нула геометрия вътре — таблица код→кандидат."
+    },
+    {
+      "id": "wikimapia_extra_5729429",
+      "repo": "fire_varna",
+      "role": "Евксиноград — извън обявения frozen манифест, записва се изрично",
+      "is_geometry_file": true,
+      "worktree_paths": [
+        "scratch/boundary_gallery/granitsi_preview_05.09/wikimapia_extra_2026-09-06.geojson"
+      ],
+      "worktree_sha256": "b220423c6f954405fb0dbf94621fab30a8b6585e7156089c67e14dfa41382dd8",
+      "worktree_bytes": 3713,
+      "features": 1,
+      "wm_id": 5729429,
+      "wm_title": "Селищно образувание Траката - разширение",
+      "row_polygon_sha256_in_decisions": "65245f2daa022aaa5565c763971c6878ff170ca164fb258772a4ecbe437e7f3d",
+      "note": "Хешът на полигона в този вход и в реда evksinograd на решенията съвпадат. Конфликт на имена с кадастъра (Траката) — сутрешен ред за регистъра."
+    },
+    {
+      "id": "mladost2_face",
+      "repo": "fire_varna",
+      "role": "карето на Младост 2 по улици (D2 — ЗАКЛЮЧЕНО за Н1)",
+      "is_geometry_file": true,
+      "worktree_paths": [
+        "scratch/boundary_gallery/granitsi_preview_05.09/mladost2_streets_proposal.geojson"
+      ],
+      "worktree_sha256": "66fd3f57f76d4f104911dc2f7576f33e678435b6e1156a19d61c0bf34030f5b8",
+      "worktree_bytes": 2971,
+      "features": 1,
+      "source_label_inside": "declared_local_knowledge",
+      "method": "street_bounded_face",
+      "streets": ["бул. Република", "ул. Вяра", "бул. Цар Освободител", "бул. Сливница"],
+      "note": "Етикетът declared_local_knowledge вътре е отменен от амандамент №2 §3.7 — Н1 има точно тази отрицателна фикстура. Оси от OSM (ODbL)."
+    },
+    {
+      "id": "agkk_au5",
+      "repo": "fire_varna",
+      "role": "петте района на АГКК INSPIRE — филтърът „вътре във Варна“ и мярката за район",
+      "is_geometry_file": true,
+      "worktree_paths": [
+        "scratch/places_search/agkk_inspire_2026-09-05/agkk_au5_varna.geojson",
+        "scratch/boundary_gallery/granitsi_preview_05.09/agkk_au5_varna.geojson"
+      ],
+      "worktree_sha256": "78a2de59600eb103719ca072b3963c6b7195598a65a66e4653c7cd53c966c669",
+      "worktree_bytes": 61469,
+      "features": 5,
+      "national_codes": ["10135-01", "10135-02", "10135-03", "10135-04", "10135-05"],
+      "note": "Оригиналът е свалянето от 05.09 (scratch/places_search/agkk_inspire_2026-09-05/, пинат в agkk_inspire_measure_05.09.md); второто копие е работно за превюто. Байт-еднакви. Низът 10135 е позволен само в частния провенанс и в мярката (план §4). И двата пътя вече са игнорирани — /scratch/boundary_gallery/ пази второто копие, а комит 57ab8eb добави /scratch/places_search/agkk_inspire_*/ за оригинала (виж findings.F1)."
+    },
+    {
+      "id": "quarter_registry",
+      "repo": "varna_buildings",
+      "role": "регистърът на кварталите — четен, НЕ се пипа (червена черта 3)",
+      "is_geometry_file": false,
+      "worktree_paths": ["config/quarter_registry.json"],
+      "worktree_sha256": "7d21740101a2fc65ca0cb289fee10f8116e8505eec313c921252469ac236d4d6",
+      "worktree_bytes": 52299,
+      "blob": {
+        "repo": "varna_buildings",
+        "rev": "4c6b482470cbb601407dbeb22eb0cc64f4da30cc",
+        "path": "config/quarter_registry.json",
+        "sha256": "7d21740101a2fc65ca0cb289fee10f8116e8505eec313c921252469ac236d4d6",
+        "bytes": 52299,
+        "blob_oid": "5c08e30044f4bea3bf2905a332c5d0dffb7f165c"
+      },
+      "entries": 84,
+      "entries_with_parents": 6,
+      "schema_version": "1.1",
+      "note": "Работното копие и блобът съвпадат байт по байт (LF и в двете). Нула координати вътре."
+    },
+    {
+      "id": "ledger_375",
+      "repo": "varna_3d",
+      "role": "леджерът на местата — базата на G17; НЕ се презаписва тази нощ",
+      "is_geometry_file": false,
+      "worktree_paths": ["scratch/refactor/_addr/lot1v_locations_375.json"],
+      "worktree_sha256": "d5050f1cfb3d4289e62a288b64a4658b15106a7876f7aa8fb1d1a39980c76075",
+      "worktree_bytes": 554596,
+      "blob": {
+        "repo": "varna_3d",
+        "rev": "8d60aebb365fb8e74ccc863d3b3db90b74180a3b",
+        "path": "scratch/refactor/_addr/lot1v_locations_375.json",
+        "sha256": "d5050f1cfb3d4289e62a288b64a4658b15106a7876f7aa8fb1d1a39980c76075",
+        "bytes": 554596
+      },
+      "rows": 375,
+      "written_quarters": 201,
+      "quarantine": 0,
+      "meta_keys": 14,
+      "meta_has_base_rev": false,
+      "note": "Работното копие == блобът при base_rev. _meta НЯМА base_rev (потвърждава план §1); затова base_rev идва отвън — от пиновете."
+    }
+  ],
+  "measured": {
+    "decisions_3": {
+      "rows": 68,
+      "choice": {
+        "wikimapia": 60,
+        "deferred": 6,
+        "declared_streets": 1,
+        "alias_of": 1
+      },
+      "rows_with_wm_id": 60,
+      "precision_m_present": 0,
+      "row_keys": ["alias_of", "choice", "code", "decided_at", "decided_by", "display", "kind", "reason", "streets", "wm_id", "wm_polygon_sha256", "wm_title"],
+      "top_level_keys": ["schema_version", "board", "based_on", "inputs", "exported_at", "changes", "decisions"],
+      "has_attribution_row": false,
+      "deferred_codes": ["bokluk_tarla", "botanicheska", "malka_chaika", "mikro4", "starite_lozya", "vilite"],
+      "alias_of_row": {"code": "vayalar", "alias_of": "sredna_traka"},
+      "declared_streets_row": "mladost2",
+      "decided_at_min": "2026-09-06T03:33:25.929Z",
+      "decided_at_max": "2026-09-06T08:29:28",
+      "wm_polygon_sha256_samples": {
+        "abatko": "c2e0662df8b93876edceb8349c918e32775ccba09945daaf1e1f430990f77bc4",
+        "mladost2": "80f40ee1317704b5e9d9de520806a4097a75752bbcf6e3eed897a856a89168e9",
+        "evksinograd": "65245f2daa022aaa5565c763971c6878ff170ca164fb258772a4ecbe437e7f3d"
+      }
+    },
+    "varna_3d_state_sha256": {
+      "data/place_identity.json": "e8b4c836f6020d55589867e5de6d819c3e7f81a6194d0fa92f237af81b6533b6",
+      "data/fire_varna_places.json": "329310f577e8353673b9014af99624a78ab825fb0ad53e93fc572a28660d88c0",
+      "data/fire_varna_hotels.json": "46a44ce82f154ca6f77f5001c0393b4654a818ba6d5e8540fb1c6f337fe0418d",
+      "web/varna_buildings_info.json": "f7ee3e072ee1d51f831f7067058e962e558f1c9daa8660ed4dcac6f6df27df20",
+      "note": "Основата за гейтовете на Н2-0/Н2/Н4 (преди == след). web/varna_buildings_3d.geojson не се хешва тук — 29.9 MB, мярката му е в лотовете, които го четат."
+    },
+    "fire_varna_tracked_geometry_in_boundary_gallery": 0,
+    "fire_varna_tracked_geojson_in_places_search": 0
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "ЗАТВОРЕНА — гейтът беше ЧЕРВЕН на прогон 1",
+      "what": "scratch/places_search/agkk_inspire_2026-09-05/agkk_au5_varna.geojson (и съседните му agkk_gn_surfaces_varna.geojson, agkk_gn_points_varna.json) НЕ бяха покрити от нито едно правило в .gitignore на Fire_Varna: git check-ignore даваше изход 1. Файловете бяха непроследени, тоест червена черта 2 не беше нарушена — но една команда git add върху папката ги правеше проследена геометрия.",
+      "why_it_matters": ".gitignore:64 пази само /scratch/boundary_gallery/; INSPIRE свалянето от 05.09 живее извън нея.",
+      "resolution": "Комит 57ab8ebff32038028c98dfe8a8044c63dac2b3b8 (Claude Architect) добави /scratch/places_search/agkk_inspire_*/, scratch/places_search/**/*.geojson и scratch/places_search/*.geojson. Измерено на прогон 2: git check-ignore дава изход 0 за всичките 7 геометрични пътя. Поправката е на архитекта, извън write-set-а на Н0 — изпълнителят не пипа .gitignore."
+    },
+    {
+      "id": "F2",
+      "severity": "поправка на плана",
+      "what": "Планът §3 иска да се запише, че предшественикът granitsi_decisions_2_… липсва на диска. Измерено: файлът е там, sha 3ad5da79… и съвпада с based_on.sha256 в decisions_3.",
+      "why_it_matters": "Веригата назад е цяла едно стъпало; скъсва се при decisions_2, чийто based_on е null."
+    },
+    {
+      "id": "F3",
+      "severity": "внимание при подпис",
+      "what": "decisions_3 има два различни sha256: работното дърво (CRLF) 8fe8db5e…, блобът (LF) ec2813e1….",
+      "why_it_matters": "Б0 т. 8 подписва блоба през git show — подписваният низ е ec2813e1c074b9b623b153f9ee2a9b9c549f3ad27d806b6314642354a34356f6."
+    },
+    {
+      "id": "F4",
+      "severity": "поправка на плана",
+      "what": "Във varna_3d data/place_identity.json, data/fire_varna_places.json, data/fire_varna_hotels.json и scratch/refactor/_addr/lot1v_locations_375.json са ПРОСЛЕДЕНИ, макар правилата .gitignore:4 (data/*) и :66 (scratch/*) да ги хващат при --no-index.",
+      "why_it_matters": "Планът §1 ги нарича „игнорирани“. Проследен файл дава проследен диф — ходът по Б0 т. 11 (подмяна на place_identity.json) ще се види в git status и иска комит на Петър."
+    },
+    {
+      "id": "F5",
+      "severity": "за сутринта",
+      "what": "Fire_Varna: main е 46 напред и 2 НАЗАД спрямо origin/main (1af2140, 18948de — ingest цикли #33 и #34 на Petar1984); обща основа fd13907.",
+      "why_it_matters": "Пушът сутринта иска първо сливане/пребазиране. Агент не пипа origin."
+    },
+    {
+      "id": "F6",
+      "severity": "вход за Н1",
+      "what": "Редът mladost2 в решенията е choice=declared_streets с wm_id=null, но носи непразно wm_polygon_sha256 (80f40ee1…).",
+      "why_it_matters": "Точно случаят на отрицателната фикстура „не-уикимапийски ред с непразно wm_* → ✗“ (план §3 Н1). Сглобяването не бива да го чете като уикимапийски ред."
+    },
+    {
+      "id": "F7",
+      "severity": "потвърдено",
+      "what": "Леджерът няма _meta.base_rev (14 ключа); 375 реда, 201 написани квартала, 0 в карантина.",
+      "why_it_matters": "D18/G17 четат git show <base_rev>: — променливата идва от тези пинове, не от файла."
+    },
+    {
+      "id": "F8",
+      "severity": "сутрешен дълг",
+      "what": "granitsi_decisions_3_…json няма ред за атрибуция, а назовава 60 wm_id и заглавия.",
+      "why_it_matters": "ToS §1.G важи и при рендиране в GitHub. Планът го обявява за сутрешен дълг, не за нощна поправка."
+    },
+    {
+      "id": "F9",
+      "severity": "измерено на прогон 2",
+      "what": "Нито един sha256 от прогон 1 не се е променил — 11 работни файла, 3 блоба, 5 мръсни проследени файла в двете чужди репа и четирите състояния на varna_3d дават същите стойности. varna_3d HEAD също е непроменен (8d60aebb…), тоест base_rev на плана §2а е още валиден.",
+      "why_it_matters": "Червеното на прогон 1 беше само за игнорирането, не за данните — основата не е мърдала между двата прогона."
+    }
+  ]
+}
