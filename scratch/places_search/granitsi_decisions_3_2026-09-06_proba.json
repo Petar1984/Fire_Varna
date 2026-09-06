@@ -15,7 +15,8 @@
  "changes": [
   "vazrazhdane1 → 13337602",
   "vayalar → alias_of sredna_traka",
-  "akchelar → 1855512 (Белица)"
+  "akchelar → 1855512 (Белица)",
+  "briz → 3710735 (кв. Бриз (кв. Почивка)) — Petar's four-sided description, measured 0 m to each side"
  ],
  "decisions": [
   {
@@ -131,12 +132,12 @@
    "display": "ж.к. Бриз",
    "kind": "жк",
    "choice": "wikimapia",
-   "wm_id": 20252491,
-   "wm_polygon_sha256": "25514be87067f8361160fe5b60cc3398b3aa49b248141f62b7614ffc0df754dc",
-   "wm_title": "кв. Бриз - юг",
-   "reason": "",
-   "decided_by": "Petar (board, unsigned proba)",
-   "decided_at": "2026-09-06T04:28:49.060Z"
+   "wm_id": 3710735,
+   "wm_polygon_sha256": "54311a248fd7aa95cbecca470a5d20fc88278eb0917ed7def2b964e339882fa8",
+   "wm_title": "кв. Бриз (кв. Почивка)",
+   "reason": "Петър (06.09 ~07:30): „разшири го — да опира в Свети Никола на изток, бул. Княз Борис I на юг, Акчелар на север, бул. 8-ми Приморски полк на запад“; измерено: полигонът „кв. Бриз (кв. Почивка)“ е на 0 m от всичките четири (припокриване със съседите 0,1 ha) → той е описанието му",
+   "decided_by": "Petar via Claude Architect (his description, measured)",
+   "decided_at": "2026-09-06T08:07:36"
   },
   {
    "code": "chaika_kk",
