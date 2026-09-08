@@ -6,7 +6,17 @@
   "polygons": 95,
   "rule": "code: карта 08.09 (К37/К38) > регистър по име/алиас > нов по slug; kind по префикса на imot; district = свидетел АГКК AU5 по центроид (G23); include: да / решение (обекти, без полигон) / отложено (0 сгради)",
   "signed_by": "pending — Петър",
-  "privacy": "без геометрия и без суров провенанс (обяви, хешове на сурови отговори) — те стоят само в частното репо varna_3d и в игнорираната папка (G29)"
+  "privacy": "без геометрия и без суров провенанс (обяви, хешове на сурови отговори) — те стоят само в частното репо varna_3d и в игнорираната папка (G29)",
+  "kind_registry_rule": "imot вид → вид от затворената таблица KIND_NORM (varna_3d/src/fire_varna_locations.py:150-154): кв.→кв · ж.к./подрайон→жк · район→кв (ДА СЕ ПОДПИШЕ; алтернатива мр) · м-т→м-т (клас locality) · к.к.→кк · в.з.→вз · промишлена зона→пз · Метро/Завод Дружба→зона · с./обект → без вид (не влизат в v2)",
+  "decisions_open": [
+   "район→кв или мр",
+   "5 обекта: точка/alias, не клетка",
+   "3 района без полигон: чакане/ръчно/no_boundary",
+   "11 отложени (0 сгради)",
+   "13 без район по АГКК → район по решение",
+   "precision_m за плочката",
+   "низът за атрибуция"
+  ]
  },
  "virtual_parents": [
   {
@@ -77,7 +87,9 @@
    "n_adverts": 53,
    "buildings": 232,
    "area_km2": 0.225,
-   "n_pts": 18
+   "n_pts": 18,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5491",
@@ -93,7 +105,9 @@
    "n_adverts": 744,
    "buildings": 4929,
    "area_km2": 2.342,
-   "n_pts": 105
+   "n_pts": 105,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5840",
@@ -109,7 +123,9 @@
    "n_adverts": 72,
    "buildings": 143,
    "area_km2": 0.169,
-   "n_pts": 15
+   "n_pts": 15,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5841",
@@ -125,7 +141,9 @@
    "n_adverts": 14,
    "buildings": 26,
    "area_km2": 0.263,
-   "n_pts": 15
+   "n_pts": 15,
+   "kind_registry": null,
+   "kind_note": "обект: не е клетка → без вид"
   },
   {
    "raion_num": "6183",
@@ -141,7 +159,9 @@
    "n_adverts": 37,
    "buildings": 354,
    "area_km2": 0.268,
-   "n_pts": 19
+   "n_pts": 19,
+   "kind_registry": null,
+   "kind_note": "обект: не е клетка → без вид"
   },
   {
    "raion_num": "5492",
@@ -157,7 +177,9 @@
    "n_adverts": 902,
    "buildings": 733,
    "area_km2": 0.999,
-   "n_pts": 41
+   "n_pts": 41,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5494",
@@ -173,7 +195,9 @@
    "n_adverts": 85,
    "buildings": 219,
    "area_km2": 0.144,
-   "n_pts": 6
+   "n_pts": 6,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5493",
@@ -189,7 +213,9 @@
    "n_adverts": 1413,
    "buildings": 3475,
    "area_km2": 2.648,
-   "n_pts": 85
+   "n_pts": 85,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5782",
@@ -205,7 +231,9 @@
    "n_adverts": 911,
    "buildings": 474,
    "area_km2": 0.833,
-   "n_pts": 50
+   "n_pts": 50,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "6289",
@@ -221,7 +249,9 @@
    "n_adverts": 108,
    "buildings": 1219,
    "area_km2": 0.982,
-   "n_pts": 61
+   "n_pts": 61,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "5783",
@@ -237,7 +267,9 @@
    "n_adverts": 409,
    "buildings": 360,
    "area_km2": 0.455,
-   "n_pts": 32
+   "n_pts": 32,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "5842",
@@ -253,7 +285,9 @@
    "n_adverts": 107,
    "buildings": 157,
    "area_km2": 0.415,
-   "n_pts": 21
+   "n_pts": 21,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "5843",
@@ -269,7 +303,9 @@
    "n_adverts": 318,
    "buildings": 74,
    "area_km2": 0.209,
-   "n_pts": 15
+   "n_pts": 15,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "5844",
@@ -285,7 +321,9 @@
    "n_adverts": 135,
    "buildings": 183,
    "area_km2": 0.129,
-   "n_pts": 11
+   "n_pts": 11,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "5496",
@@ -301,7 +339,9 @@
    "n_adverts": 383,
    "buildings": 1863,
    "area_km2": 0.951,
-   "n_pts": 25
+   "n_pts": 25,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5847",
@@ -317,7 +357,9 @@
    "n_adverts": 174,
    "buildings": 274,
    "area_km2": 0.202,
-   "n_pts": 13
+   "n_pts": 13,
+   "kind_registry": null,
+   "kind_note": "обект: не е клетка → без вид"
   },
   {
    "raion_num": "5497",
@@ -333,7 +375,9 @@
    "n_adverts": 220,
    "buildings": 821,
    "area_km2": 0.34,
-   "n_pts": 14
+   "n_pts": 14,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5499",
@@ -349,7 +393,9 @@
    "n_adverts": 33,
    "buildings": 218,
    "area_km2": 0.204,
-   "n_pts": 22
+   "n_pts": 22,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5500",
@@ -365,7 +411,9 @@
    "n_adverts": 22,
    "buildings": 293,
    "area_km2": 0.3,
-   "n_pts": 11
+   "n_pts": 11,
+   "kind_registry": "зона",
+   "kind_note": ""
   },
   {
    "raion_num": "5501",
@@ -381,7 +429,9 @@
    "n_adverts": 178,
    "buildings": 1914,
    "area_km2": 5.133,
-   "n_pts": 93
+   "n_pts": 93,
+   "kind_registry": "пз",
+   "kind_note": ""
   },
   {
    "raion_num": "5502",
@@ -397,7 +447,9 @@
    "n_adverts": 86,
    "buildings": 690,
    "area_km2": 0.269,
-   "n_pts": 12
+   "n_pts": 12,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5503",
@@ -413,7 +465,9 @@
    "n_adverts": 436,
    "buildings": 2806,
    "area_km2": 2.926,
-   "n_pts": 38
+   "n_pts": 38,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5504",
@@ -429,7 +483,9 @@
    "n_adverts": 832,
    "buildings": 287,
    "area_km2": 0.48,
-   "n_pts": 21
+   "n_pts": 21,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5505",
@@ -445,7 +501,9 @@
    "n_adverts": 401,
    "buildings": 1129,
    "area_km2": 0.222,
-   "n_pts": 8
+   "n_pts": 8,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5784",
@@ -461,7 +519,9 @@
    "n_adverts": 34,
    "buildings": 336,
    "area_km2": 0.255,
-   "n_pts": 20
+   "n_pts": 20,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5506",
@@ -477,7 +537,9 @@
    "n_adverts": 537,
    "buildings": 446,
    "area_km2": 0.524,
-   "n_pts": 18
+   "n_pts": 18,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "6290",
@@ -493,7 +555,9 @@
    "n_adverts": 161,
    "buildings": 785,
    "area_km2": 0.678,
-   "n_pts": 15
+   "n_pts": 15,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "6134",
@@ -509,7 +573,9 @@
    "n_adverts": 29,
    "buildings": 16,
    "area_km2": 4.73,
-   "n_pts": 41
+   "n_pts": 41,
+   "kind_registry": null,
+   "kind_note": "обект: не е клетка → без вид"
   },
   {
    "raion_num": "5786",
@@ -525,7 +591,9 @@
    "n_adverts": 277,
    "buildings": 1097,
    "area_km2": 0.499,
-   "n_pts": 18
+   "n_pts": 18,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5507",
@@ -541,7 +609,9 @@
    "n_adverts": 3,
    "buildings": 4145,
    "area_km2": 0.654,
-   "n_pts": 31
+   "n_pts": 31,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5849",
@@ -557,7 +627,9 @@
    "n_adverts": 17,
    "buildings": 39,
    "area_km2": 0.41,
-   "n_pts": 19
+   "n_pts": 19,
+   "kind_registry": "зона",
+   "kind_note": ""
   },
   {
    "raion_num": "5787",
@@ -573,7 +645,9 @@
    "n_adverts": 431,
    "buildings": 265,
    "area_km2": 0.376,
-   "n_pts": 25
+   "n_pts": 25,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "5850",
@@ -589,7 +663,9 @@
    "n_adverts": 169,
    "buildings": 384,
    "area_km2": 0.666,
-   "n_pts": 34
+   "n_pts": 34,
+   "kind_registry": "жк",
+   "kind_note": ""
   },
   {
    "raion_num": "5510",
@@ -605,7 +681,9 @@
    "n_adverts": 171,
    "buildings": 438,
    "area_km2": 0.272,
-   "n_pts": 7
+   "n_pts": 7,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "6185",
@@ -621,7 +699,9 @@
    "n_adverts": 84,
    "buildings": 898,
    "area_km2": 0.284,
-   "n_pts": 23
+   "n_pts": 23,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5862",
@@ -637,7 +717,9 @@
    "n_adverts": 8,
    "buildings": 595,
    "area_km2": 1.745,
-   "n_pts": 73
+   "n_pts": 73,
+   "kind_registry": "пз",
+   "kind_note": ""
   },
   {
    "raion_num": "5863",
@@ -653,7 +735,9 @@
    "n_adverts": 6,
    "buildings": 335,
    "area_km2": 0.721,
-   "n_pts": 61
+   "n_pts": 61,
+   "kind_registry": "пз",
+   "kind_note": ""
   },
   {
    "raion_num": "5511",
@@ -669,7 +753,9 @@
    "n_adverts": 145,
    "buildings": 272,
    "area_km2": 0.358,
-   "n_pts": 26
+   "n_pts": 26,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5512",
@@ -685,7 +771,9 @@
    "n_adverts": 357,
    "buildings": 1037,
    "area_km2": 0.229,
-   "n_pts": 13
+   "n_pts": 13,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5864",
@@ -701,7 +789,9 @@
    "n_adverts": 5,
    "buildings": 355,
    "area_km2": 2.276,
-   "n_pts": 231
+   "n_pts": 231,
+   "kind_registry": null,
+   "kind_note": "обект: не е клетка → без вид"
   },
   {
    "raion_num": "6293",
@@ -717,7 +807,9 @@
    "n_adverts": 7,
    "buildings": 0,
    "area_km2": 0.777,
-   "n_pts": 38
+   "n_pts": 38,
+   "kind_registry": "пз",
+   "kind_note": ""
   },
   {
    "raion_num": "5040",
@@ -733,7 +825,9 @@
    "n_adverts": 163,
    "buildings": 2318,
    "area_km2": 1.811,
-   "n_pts": 65
+   "n_pts": 65,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5513",
@@ -749,7 +843,9 @@
    "n_adverts": 59,
    "buildings": 206,
    "area_km2": 0.171,
-   "n_pts": 10
+   "n_pts": 10,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "6291",
@@ -765,7 +861,9 @@
    "n_adverts": 4,
    "buildings": 346,
    "area_km2": 0.235,
-   "n_pts": 14
+   "n_pts": 14,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5514",
@@ -781,7 +879,9 @@
    "n_adverts": 416,
    "buildings": 1841,
    "area_km2": 1.092,
-   "n_pts": 29
+   "n_pts": 29,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "6292",
@@ -797,7 +897,9 @@
    "n_adverts": 42,
    "buildings": 271,
    "area_km2": 0.108,
-   "n_pts": 6
+   "n_pts": 6,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5515",
@@ -813,7 +915,9 @@
    "n_adverts": 57,
    "buildings": 326,
    "area_km2": 0.272,
-   "n_pts": 14
+   "n_pts": 14,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5516",
@@ -829,7 +933,9 @@
    "n_adverts": 83,
    "buildings": 2851,
    "area_km2": 0.531,
-   "n_pts": 18
+   "n_pts": 18,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5517",
@@ -845,7 +951,9 @@
    "n_adverts": 329,
    "buildings": 1241,
    "area_km2": 0.613,
-   "n_pts": 32
+   "n_pts": 32,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "6186",
@@ -861,7 +969,9 @@
    "n_adverts": 115,
    "buildings": 482,
    "area_km2": 0.187,
-   "n_pts": 10
+   "n_pts": 10,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5518",
@@ -877,7 +987,9 @@
    "n_adverts": 823,
    "buildings": 1648,
    "area_km2": 0.837,
-   "n_pts": 14
+   "n_pts": 14,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5519",
@@ -893,7 +1005,9 @@
    "n_adverts": 187,
    "buildings": 279,
    "area_km2": 0.795,
-   "n_pts": 27
+   "n_pts": 27,
+   "kind_registry": "кв",
+   "kind_note": ""
   },
   {
    "raion_num": "5520",
@@ -909,7 +1023,9 @@
    "n_adverts": 108,
    "buildings": 238,
    "area_km2": 0.2,
-   "n_pts": 8
+   "n_pts": 8,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "6295",
@@ -925,7 +1041,9 @@
    "n_adverts": 1,
    "buildings": 294,
    "area_km2": 0.303,
-   "n_pts": 29
+   "n_pts": 29,
+   "kind_registry": "вз",
+   "kind_note": ""
   },
   {
    "raion_num": "6296",
@@ -941,7 +1059,9 @@
    "n_adverts": 10,
    "buildings": 0,
    "area_km2": 0.676,
-   "n_pts": 65
+   "n_pts": 65,
+   "kind_registry": "вз",
+   "kind_note": ""
   },
   {
    "raion_num": "5050",
@@ -957,7 +1077,9 @@
    "n_adverts": 499,
    "buildings": 852,
    "area_km2": 1.947,
-   "n_pts": 87
+   "n_pts": 87,
+   "kind_registry": "кк",
+   "kind_note": ""
   },
   {
    "raion_num": "5051",
@@ -973,7 +1095,9 @@
    "n_adverts": 610,
    "buildings": 671,
    "area_km2": 1.264,
-   "n_pts": 49
+   "n_pts": 49,
+   "kind_registry": "кк",
+   "kind_note": ""
   },
   {
    "raion_num": "5052",
@@ -989,7 +1113,9 @@
    "n_adverts": 111,
    "buildings": 40,
    "area_km2": 0.186,
-   "n_pts": 30
+   "n_pts": 30,
+   "kind_registry": "кк",
+   "kind_note": ""
   },
   {
    "raion_num": "5055",
@@ -1005,7 +1131,9 @@
    "n_adverts": 373,
    "buildings": 1360,
    "area_km2": 1.394,
-   "n_pts": 67
+   "n_pts": 67,
+   "kind_registry": "кк",
+   "kind_note": ""
   },
   {
    "raion_num": "5036",
@@ -1021,7 +1149,9 @@
    "n_adverts": 134,
    "buildings": 946,
    "area_km2": 0.855,
-   "n_pts": 45
+   "n_pts": 45,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5053",
@@ -1037,7 +1167,9 @@
    "n_adverts": 573,
    "buildings": 2309,
    "area_km2": 1.909,
-   "n_pts": 73
+   "n_pts": 73,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5851",
@@ -1053,7 +1185,9 @@
    "n_adverts": 4,
    "buildings": 51,
    "area_km2": 0.614,
-   "n_pts": 28
+   "n_pts": 28,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5852",
@@ -1069,7 +1203,9 @@
    "n_adverts": 20,
    "buildings": 188,
    "area_km2": 0.42,
-   "n_pts": 34
+   "n_pts": 34,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5853",
@@ -1085,7 +1221,9 @@
    "n_adverts": 8,
    "buildings": 29,
    "area_km2": 0.444,
-   "n_pts": 25
+   "n_pts": 25,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5037",
@@ -1101,7 +1239,9 @@
    "n_adverts": 104,
    "buildings": 1972,
    "area_km2": 2.525,
-   "n_pts": 55
+   "n_pts": 55,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6133",
@@ -1117,7 +1257,9 @@
    "n_adverts": 223,
    "buildings": 2796,
    "area_km2": 4.031,
-   "n_pts": 59
+   "n_pts": 59,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6297",
@@ -1133,7 +1275,9 @@
    "n_adverts": 269,
    "buildings": 3617,
    "area_km2": 2.896,
-   "n_pts": 60
+   "n_pts": 60,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5054",
@@ -1149,7 +1293,9 @@
    "n_adverts": 62,
    "buildings": 1184,
    "area_km2": 1.508,
-   "n_pts": 55
+   "n_pts": 55,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5042",
@@ -1165,7 +1311,9 @@
    "n_adverts": 225,
    "buildings": 904,
    "area_km2": 0.761,
-   "n_pts": 37
+   "n_pts": 37,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5038",
@@ -1181,7 +1329,9 @@
    "n_adverts": 163,
    "buildings": 1381,
    "area_km2": 0.864,
-   "n_pts": 39
+   "n_pts": 39,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5039",
@@ -1197,7 +1347,9 @@
    "n_adverts": 109,
    "buildings": 1117,
    "area_km2": 1.03,
-   "n_pts": 36
+   "n_pts": 36,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6298",
@@ -1213,7 +1365,9 @@
    "n_adverts": 18,
    "buildings": 557,
    "area_km2": 0.71,
-   "n_pts": 47
+   "n_pts": 47,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5855",
@@ -1229,7 +1383,9 @@
    "n_adverts": 9,
    "buildings": 483,
    "area_km2": 0.414,
-   "n_pts": 29
+   "n_pts": 29,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6299",
@@ -1245,7 +1401,9 @@
    "n_adverts": 10,
    "buildings": 0,
    "area_km2": 0.888,
-   "n_pts": 64
+   "n_pts": 64,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6300",
@@ -1261,7 +1419,9 @@
    "n_adverts": 7,
    "buildings": 0,
    "area_km2": 1.454,
-   "n_pts": 82
+   "n_pts": 82,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5056",
@@ -1277,7 +1437,9 @@
    "n_adverts": 246,
    "buildings": 3256,
    "area_km2": 4.093,
-   "n_pts": 122
+   "n_pts": 122,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5856",
@@ -1293,7 +1455,9 @@
    "n_adverts": 34,
    "buildings": 832,
    "area_km2": 1.047,
-   "n_pts": 40
+   "n_pts": 40,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6301",
@@ -1309,7 +1473,9 @@
    "n_adverts": 10,
    "buildings": 0,
    "area_km2": 0.356,
-   "n_pts": 37
+   "n_pts": 37,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5057",
@@ -1325,7 +1491,9 @@
    "n_adverts": 88,
    "buildings": 191,
    "area_km2": 0.987,
-   "n_pts": 44
+   "n_pts": 44,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5857",
@@ -1341,7 +1509,9 @@
    "n_adverts": 31,
    "buildings": 186,
    "area_km2": 1.52,
-   "n_pts": 94
+   "n_pts": 94,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5058",
@@ -1357,7 +1527,9 @@
    "n_adverts": 119,
    "buildings": 923,
    "area_km2": 1.094,
-   "n_pts": 57
+   "n_pts": 57,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6302",
@@ -1373,7 +1545,9 @@
    "n_adverts": 4,
    "buildings": 0,
    "area_km2": 0.533,
-   "n_pts": 33
+   "n_pts": 33,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5858",
@@ -1389,7 +1563,9 @@
    "n_adverts": 291,
    "buildings": 774,
    "area_km2": 0.784,
-   "n_pts": 42
+   "n_pts": 42,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5059",
@@ -1405,7 +1581,9 @@
    "n_adverts": 54,
    "buildings": 1120,
    "area_km2": 0.973,
-   "n_pts": 42
+   "n_pts": 42,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5859",
@@ -1421,7 +1599,9 @@
    "n_adverts": 22,
    "buildings": 272,
    "area_km2": 0.856,
-   "n_pts": 42
+   "n_pts": 42,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5041",
@@ -1437,7 +1617,9 @@
    "n_adverts": 76,
    "buildings": 1826,
    "area_km2": 1.858,
-   "n_pts": 57
+   "n_pts": 57,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5860",
@@ -1453,7 +1635,9 @@
    "n_adverts": 35,
    "buildings": 641,
    "area_km2": 0.996,
-   "n_pts": 61
+   "n_pts": 61,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6303",
@@ -1469,7 +1653,9 @@
    "n_adverts": 2,
    "buildings": 205,
    "area_km2": 0.143,
-   "n_pts": 23
+   "n_pts": 23,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "6132",
@@ -1485,7 +1671,9 @@
    "n_adverts": 14,
    "buildings": 368,
    "area_km2": 0.564,
-   "n_pts": 44
+   "n_pts": 44,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "5861",
@@ -1501,7 +1689,9 @@
    "n_adverts": 4,
    "buildings": 528,
    "area_km2": 0.82,
-   "n_pts": 42
+   "n_pts": 42,
+   "kind_registry": "м-т",
+   "kind_note": ""
   },
   {
    "raion_num": "740",
@@ -1517,7 +1707,9 @@
    "n_adverts": 108,
    "buildings": 0,
    "area_km2": 1.453,
-   "n_pts": 48
+   "n_pts": 48,
+   "kind_registry": null,
+   "kind_note": "село: няма вид в KIND_NORM → отложено"
   },
   {
    "raion_num": "751",
@@ -1533,7 +1725,9 @@
    "n_adverts": 14,
    "buildings": 0,
    "area_km2": 0.314,
-   "n_pts": 32
+   "n_pts": 32,
+   "kind_registry": null,
+   "kind_note": "село: няма вид в KIND_NORM → отложено"
   },
   {
    "raion_num": "755",
@@ -1549,7 +1743,9 @@
    "n_adverts": 7,
    "buildings": 0,
    "area_km2": 1.17,
-   "n_pts": 41
+   "n_pts": 41,
+   "kind_registry": null,
+   "kind_note": "село: няма вид в KIND_NORM → отложено"
   },
   {
    "raion_num": "764",
@@ -1565,7 +1761,9 @@
    "n_adverts": 61,
    "buildings": 0,
    "area_km2": 1.578,
-   "n_pts": 82
+   "n_pts": 82,
+   "kind_registry": null,
+   "kind_note": "село: няма вид в KIND_NORM → отложено"
   },
   {
    "raion_num": "821",
@@ -1581,7 +1779,9 @@
    "n_adverts": 185,
    "buildings": 0,
    "area_km2": 1.492,
-   "n_pts": 51
+   "n_pts": 51,
+   "kind_registry": null,
+   "kind_note": "село: няма вид в KIND_NORM → отложено"
   },
   {
    "raion_num": "5848",
@@ -1597,7 +1797,9 @@
    "n_adverts": 0,
    "buildings": null,
    "area_km2": null,
-   "n_pts": 0
+   "n_pts": 0,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "6294",
@@ -1613,7 +1815,9 @@
    "n_adverts": 0,
    "buildings": null,
    "area_km2": null,
-   "n_pts": 0
+   "n_pts": 0,
+   "kind_registry": "кв",
+   "kind_note": "район на imot → „кв“ (класът quarter: думата на всекидневния район е кварталната дума — препоръка; алтернатива „мр“ = микрорайон, но той е клас locality и НЕ пълни quarter)"
   },
   {
    "raion_num": "5866",
@@ -1629,7 +1833,9 @@
    "n_adverts": 0,
    "buildings": null,
    "area_km2": null,
-   "n_pts": 0
+   "n_pts": 0,
+   "kind_registry": "пз",
+   "kind_note": ""
   }
  ]
 }
