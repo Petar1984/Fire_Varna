@@ -70,6 +70,13 @@ def normalise(issues):
             if v:
                 note = v
                 break
+        if not field(b, "report_type"):
+            # Not a field report. #1-#7 were opened when the repo was set up and
+            # their titles are the label names themselves ("report",
+            # "new-hydrant", ...); they carry no body at all. Counting them
+            # inflates the total and shows seven hydrants with no location that
+            # never had one.
+            continue
         rows.append({"n": n, "t": field(b, "report_type"), "who": field(b, "reporter") or "?",
                      "ts": field(b, "timestamp") or i["created_at"], "created": i["created_at"],
                      "note": note, "type": field(b, "type"),
