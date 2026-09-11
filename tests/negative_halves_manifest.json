@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "plan": "docs/plans/ПЛАН_Картата_imot_И-Б1_11.09.md",
+    "what": "Ф14 — the negative halves of Fire_Varna: gate, fixture recipe, argv, exit.",
+    "rule": "len == 16 and the gate set is exactly the fifteen Fire_Varna gates plus the crossed half of ИБ1-Г3; tests/test_negative_halves.py (Ф13) runs every row and demands the declared exit.",
+    "placeholders": "{python} {node} {repo} {clone} {base} {fixture} — substituted by Ф13 at run time; coordinates and cadastral strings are built by the recipe, never written down."
+  },
+  "halves": [
+    {
+      "gate": "ИБ1-Г3",
+      "fixture": "cross_digest_serialization",
+      "argv": ["{python}", "{fixture}/cross_digest.py"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г7",
+      "fixture": "clone_with_staged_geometry",
+      "argv": ["{python}", "{clone}/gates/probe/b3_g11.py", "{base}", "--cached"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г8",
+      "fixture": "quarter_index_one_row_short",
+      "argv": ["{python}", "-m", "unittest", "tests.test_quarter_index_bundle"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г9к",
+      "fixture": "base_slice_with_markers",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.FlagshipRowTest"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г10",
+      "fixture": "clone_with_a_broken_sha_pin",
+      "argv": ["{python}", "{fixture}/both_mirrors.py"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г11",
+      "fixture": "eager_quarter_fetch",
+      "argv": ["{python}", "-m", "unittest", "tests.test_first_load_budget"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г12",
+      "fixture": "kill_switch_left_on",
+      "argv": ["{python}", "-m", "unittest", "tests.test_kill_switch.KillSwitchTest"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г13",
+      "fixture": "tests_copy_with_one_red",
+      "argv": ["{python}", "-m", "unittest", "discover", "-s", "{fixture}/tests"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г14",
+      "fixture": "coverage_without_its_base",
+      "argv": ["{python}", "gates/coverage.py", "--places-base", "{fixture}/ib_nonexistent.json", "--places-candidate", "git:HEAD:data/places.json", "--quiet"],
+      "expected_exit": 4
+    },
+    {
+      "gate": "ИБ1-Г15",
+      "fixture": "coordinate_pair_in_prose",
+      "argv": ["{python}", "gates/probe/ib1_g15.py", "{fixture}/prose.md"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г17",
+      "fixture": "foreign_entries_digest",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.FlagshipRowTest"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г19к",
+      "fixture": "locality_cell_that_speaks",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.WitnessRulesTest"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г20",
+      "fixture": "manifest_without_its_own_row",
+      "argv": ["{python}", "-m", "unittest", "tests.test_negative_halves"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г21",
+      "fixture": "amendment_without_d5",
+      "argv": ["{python}", "-m", "unittest", "tests.test_adr_amendment"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г22",
+      "fixture": "row_cells_all_silenced",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.FourSurfacesTest"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г23",
+      "fixture": "row_cell_one_short",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.GpsRowTest"],
+      "expected_exit": 1
+    }
+  ]
+}

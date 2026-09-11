@@ -167,6 +167,11 @@ SHA_PINS = (
     ("HOTELS_SHA256", "data/hotels.json"),
     ("PLACES2_SHA256", "data/places.json"),
     ("CATS_SHA256", "data/place_categories.json"),
+    # Т14 (под-лот И-Б1) — the third payload of the address search. The two
+    # mirrors carry their OWN triple and `run_gates` does not import this one,
+    # so the row stands in BOTH or проверка 1 judges only three of four pins
+    # (О38).
+    ("ADDRESS_QUARTERS_SHA256", "data/address_quarters.json"),
 )
 QUEUE_DIR = "scratch/places_search"
 QUEUE_GLOB = "ЗА_ПОДПИС_*.md"

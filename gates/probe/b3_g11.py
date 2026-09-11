@@ -43,7 +43,23 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "gates/allow/2026-09-07_b3.json",
                "scratch/places_search/архив/АРХИВ_A_05.09.md",
                "gates/probe/b3_g11.py",
-               "tests/test_b3_gates.py"}
+               "tests/test_b3_gates.py",
+               # Т13 (под-лот И-Б1) — ДВАНАЙСЕТ нови пътя, поименно и затворено:
+               # доставеният квартален индекс, десетте нови тела на К7 (Ф6–Ф15,
+               # вкл. корпусът Ф11) и амандаментът на К4, който се ражда СЛЕД
+               # <БАЗА> и без този ред пали гейта за грешна причина (ИБ1-О23).
+               "data/address_quarters.json",
+               "tests/test_quarter_index_bundle.py",
+               "tests/test_first_load_budget.py",
+               "tests/test_address_quarter_render.py",
+               "tests/address_slice_probe.mjs",
+               "gates/probe/ib1_g15.py",
+               "scratch/places_search/ib_corpus_11.09.json",
+               "tests/test_kill_switch.py",
+               "tests/test_negative_halves.py",
+               "tests/negative_halves_manifest.json",
+               "tests/test_adr_amendment.py",
+               "docs/decisions/011a_амандамент_И-Б1_11.09.md"}
 def git(*args):
     """S30-2: a failed git process is a FAILED gate, never a green one."""
     try:
