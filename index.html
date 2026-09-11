@@ -4832,11 +4832,160 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // vocab are rebuilt client-side (the payload omits them). Folding queries through
   // the SAME skeleton the index builder used means index tokens and queries can
   // never drift. Reuses the IIFE-scoped `map`, `buildNavActions`, `POPUP_AUTOPAN_TL/BR`.
+  // IB1 shared quarter state start
   // =========================================================================
+  // И-Б1 (Т1 – Т5) — THE QUARTER OF AN ADDRESS COMES FROM THE POLYGON.
+  // The block sits BETWEEN `initAddressSearch` and `initPlacesSearch`: state
+  // declared inside the address IIFE is invisible to the places path, and И-Б2
+  // stands on this same block. Nothing here runs on load; the payload is lazy.
+  // Т2 — the third payload of the address search. `SEARCH_CACHE` is shared with
+  // the other two on purpose: `fetchCachedJson` has no cache parameter and is
+  // pinned by D12 (обявена цена, О79).
+  const ADDRESS_QUARTERS_URL = 'data/address_quarters.json';
+  // The pin the two gate mirrors read verbatim (`run_gates.py:123`,
+  // `release.py:1181`): `const`, single quotes, 64 lowercase hex.
+  const ADDRESS_QUARTERS_SHA256 = '7642d3ec334bebbaf563dcf4dbf7c8aef403a49d3559d99a1a5e7354fc885a52';
+  // Р7 — the откат is ONE word: `false` and not one surface reads the file.
+  const ADDRESS_QUARTER_V2 = true;
+  let quarterIndex = null;      // the VALIDATED delivery, or null (fail-closed)
+  let entriesDigest = null;     // FNV-1a over the index entries (Т5)
+  let rowsDigest = null;        // FNV-1a over the address rows (Т5)
+  let addressRowCount = 0;      // how many rows really arrived (Т5)
+
+  // Т3 · §3.Г — fail-closed validation, WHITE list. A document that breaks ONE
+  // invariant is refused whole; a half-trusted index would put a foreign
+  // quarter on a real address. Never throws: the caller must survive a 404, a
+  // truncated file and a stale payload alike.
+  function validateQuarterIndex(doc, idx) {
+    const TOP = 'codes,entry_cell,generated_from,kind,names,parents,row_cell,schema_version';
+    const META = 'address_row_count,address_rows_sha256,entries_digest,entry_count,'
+               + 'quarters_version,rows_digest,search_index_sha256,snapshot_date';
+    const CODE_SHAPE = /^[a-z0-9_]{1,64}$/;
+    // one array of cell indices: as long as the payload it labels, whole
+    // numbers only, every value a real cell or the silence of -1.
+    const cellsOk = function (values, live, declared, cells) {
+      if (!Array.isArray(values)) return false;
+      if (values.length !== live || values.length !== declared) return false;
+      for (let i = 0; i < values.length; i++) {
+        const v = values[i];
+        if (typeof v !== 'number' || !Number.isInteger(v) || v < -1 || v >= cells) return false;
+      }
+      return true;
+    };
+    try {
+      if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return null;
+      if (Object.keys(doc).sort().join(',') !== TOP) return null;
+      if (doc.kind !== 'fire_varna_quarter_index') return null;
+      const meta = doc.generated_from;
+      if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
+      if (Object.keys(meta).sort().join(',') !== META) return null;
+      if (meta.quarters_version !== 2) return null;   // the VALUE, not the shape
+      const codes = doc.codes, names = doc.names, parents = doc.parents;
+      if (!Array.isArray(codes) || !Array.isArray(names) || !Array.isArray(parents)) return null;
+      if (names.length !== codes.length || parents.length !== codes.length) return null;
+      if (codes.length === 0) return null;
+      for (let i = 0; i < codes.length; i++) {
+        if (typeof codes[i] !== 'string' || !CODE_SHAPE.test(codes[i])) return null;
+        if (typeof names[i] !== 'string' || typeof parents[i] !== 'string') return null;
+      }
+      const entries = (idx && Array.isArray(idx.entries)) ? idx.entries : null;
+      if (!entries) return null;
+      if (!cellsOk(doc.entry_cell, entries.length, meta.entry_count, codes.length)) return null;
+      if (!cellsOk(doc.row_cell, addressRowCount, meta.address_row_count, codes.length)) return null;
+      // STOP 17 — the positional join. The digests are computed over the two
+      // payloads THIS session loaded; a re-export of either one without this
+      // file silences the word instead of misnaming a place.
+      if (meta.entries_digest !== entriesDigest) return null;
+      if (meta.rows_digest !== rowsDigest) return null;
+      return doc;
+    } catch (e) {
+      return null;                                  // fail-closed, never upwards
+    }
+  }
+
+  // Т4 · §3.Д — the quarter WORD of a cell, glued to what is left of the label
+  // after the label's OWN written quarter is taken off. The name is copied
+  // VERBATIM from `names[]`: nothing is prepended, nothing is stripped off it.
+  //   `part` undefined -> the finished title, or null when the rule does not
+  //                       apply (клон (в), no cell, the switch off);
+  //   `part === 'written'` -> the witness of D18: the written word the title
+  //                       replaced, and '' when there is nothing to confess.
+  function quarterTitleWord(code, rest, part) {
+    // (а) the closed list of quarter TYPES, dot-blind — the same eleven words
+    // the GPS line meets without dots (§3.Д (д)).
+    const TYPES = ['кв', 'квартал', 'жк', 'кк', 'вз', 'со', 'мт', 'м', 'местност', 'зона', 'пз'];
+    const wantWritten = part === 'written';
+    const nothing = wantWritten ? '' : null;
+    if (!ADDRESS_QUARTER_V2 || quarterIndex === null || !code) return nothing;
+    const cell = quarterIndex.codes.indexOf(code);
+    if (cell < 0) return nothing;
+    const name = quarterIndex.names[cell];
+    const text = String(rest == null ? '' : rest).trim();
+    // dot-blind, case-blind, dash-blind: only WORDS are compared, never bytes.
+    const flat = function (s) {
+      return String(s).toLowerCase().replace(/[.,-]/g, ' ').replace(/\s+/g, ' ').trim();
+    };
+    // a written run is a quarter when it spells a name of v2 — with its type
+    // word ("кв. Чайка") or bare ("Аспарухово"), because 36 of the 90 names
+    // carry no prefix at all (ИБ1-О11).
+    const spellsAName = function (run) {
+      const f = flat(run);
+      if (!f) return false;
+      for (let i = 0; i < quarterIndex.names.length; i++) {
+        const n = flat(quarterIndex.names[i]);
+        if (n === f) return true;
+        const space = n.indexOf(' ');
+        if (space > 0 && TYPES.indexOf(n.slice(0, space)) >= 0 && n.slice(space + 1) === f) return true;
+      }
+      return false;
+    };
+    const flatText = flat(text);
+    // (в) — an address that says only its район, or says nothing, keeps its text.
+    if (flatText.indexOf('гр варна район') === 0 || flatText === 'неизвестна') return nothing;
+    let written = '';
+    let tail = text;
+    const comma = text.indexOf(', ');
+    if (comma > 0) {
+      // (а)/(б) — the leading SEGMENT, up to and including the first ", ".
+      const head = text.slice(0, comma);
+      const remainder = text.slice(comma + 2).trim();
+      const lead = flat(head).split(' ')[0];
+      if (remainder && (TYPES.indexOf(lead) >= 0 || spellsAName(head))) {
+        written = head;
+        tail = remainder;
+      }
+    } else {
+      // (д)/(б) — no comma anywhere (the GPS label never has one, М: 0 of
+      // 80 510): cut by TOKEN, and only as far as the tokens still spell a name.
+      const parts = text.split(/\s+/).filter(Boolean);
+      const lead = parts.length ? flat(parts[0]).split(' ')[0] : '';
+      let run = 0;
+      for (let n = 1; n <= parts.length; n++) {
+        if (spellsAName(parts.slice(0, n).join(' '))) run = n;
+      }
+      if (run > 0 && (TYPES.indexOf(lead) >= 0 || run === parts.length)) {
+        written = parts.slice(0, run).join(' ');
+        tail = parts.slice(run).join(' ');
+      }
+    }
+    // D18 — the witness is confessed only when the two words DISAGREE.
+    if (wantWritten) return (written && flat(written) !== flat(name)) ? written : '';
+    return tail ? (name + ', ' + tail) : name;
+  }
+
+  // Т5 · О78 — the third payload may NEVER reject: the `catch` of
+  // `ensureSearchData` would kill the whole address search on a 404, and a
+  // missing quarter file must cost the word, not the search.
+  function loadQuarterIndex(fetchJson) {
+    if (!ADDRESS_QUARTER_V2) return Promise.resolve(null);
+    return fetchJson(ADDRESS_QUARTERS_URL).catch(function () { return null; });
+  }
+  // IB1 shared quarter state end
   (function initAddressSearch() {
     const inputEl = document.getElementById('addrSearchInput');
     const resultsEl = document.getElementById('addrSearchResults');
     if (!inputEl || !resultsEl) return; // header markup missing -> no-op
+    // IB1 address slice start
 
     // ---- skeleton primitives (verbatim from app/modules/search/skeleton.js) ----
     function norm(s){return (''+(s||'')).toLowerCase().replace(/блок/g,'бл').replace(/вход/g,'вх').replace(/[.№,'"-]/g,' ').replace(/\s+/g,' ').trim();}
@@ -4889,6 +5038,20 @@ window._hydrantDataReady = (async function loadHydrantData() {
       }
       if (hit.d != null && districtNames[hit.d]) return districtNames[hit.d];
       return '(адрес)';
+    }
+    // Т6 — the cell of a RESULT ROW, read by POSITION and by nothing else:
+    // `_ord` is the index the entry had in the payload (`prepareIndex`), and
+    // `entry_cell` is 1:1 with that payload. A row without `_ord`, or a cell of
+    // -1 (outside / locality / a display key spread over several cells), has no
+    // quarter word at all.
+    function quarterOfHit(hit) {
+      if (!ADDRESS_QUARTER_V2 || quarterIndex === null || !hit) return null;
+      const ord = hit._ord;
+      if (typeof ord !== 'number' || ord < 0 || ord >= quarterIndex.entry_cell.length) return null;
+      const cell = quarterIndex.entry_cell[ord];
+      if (cell < 0) return null;
+      return { code: quarterIndex.codes[cell], name: quarterIndex.names[cell],
+               parent_display: quarterIndex.parents[cell] };
     }
     function formatAddressHit(hit){
       const base = baseAddressLabel(hit);
@@ -5001,7 +5164,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
     function nearestAddressTo(lat, lng) {
       if (!Array.isArray(addressRows) || !addrFieldIdx) return null;
       const iA = addrFieldIdx.normalized_address, iLa = addrFieldIdx.lat, iLo = addrFieldIdx.lng;
+      // Т11 — the ROW INDEX travels with the answer: `row_cell` is positional,
+      // and matching the label back to a row by string would capitalize and cut
+      // the very text it looks for (:5023). The two indices are DECLARED — an
+      // undeclared assignment leaks into `globalThis` and nothing ever throws.
       let best = null, bestD = Infinity, street = null, streetD = Infinity;
+      let bestI = -1, streetI = -1;
       for (let i = 0; i < addressRows.length; i++) {
         const row = addressRows[i];
         if (!Array.isArray(row)) continue;
@@ -5011,16 +5179,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const d = coordMetres(lat, lng, la, lo);
         const label = row[iA];
         if (!label) continue;
-        if (d < bestD) { bestD = d; best = label; }
+        if (d < bestD) { bestD = d; best = label; bestI = i; }
         // "streetish" = carries a REAL house number and is not the bare
         // район/квартал line. A trailing " 0" is the payload's placeholder for
         // "street known, number not" (499 rows) — it must not read as №0.
-        if (d < streetD && /\d/.test(label) && !/\s0$/.test(label) && !/^гр\s+варна/.test(label)) { streetD = d; street = label; }
+        if (d < streetD && /\d/.test(label) && !/\s0$/.test(label) && !/^гр\s+варна/.test(label)) { streetD = d; street = label; streetI = i; }
       }
       if (best === null) return null;
       const useStreet = street !== null && streetD <= COORD_NEAR_STREET_MAX_M;
       const label = String(useStreet ? street : best).replace(/\s0$/, '');
-      return { label: label.charAt(0).toUpperCase() + label.slice(1), metres: useStreet ? streetD : bestD };
+      return { label: label.charAt(0).toUpperCase() + label.slice(1), metres: useStreet ? streetD : bestD,
+               rowIndex: useStreet ? streetI : bestI };
     }
 
     function coordTitle(r) { return r.lat.toFixed(5) + ', ' + r.lng.toFixed(5); }
@@ -5028,8 +5197,20 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const bits = [];
       if (r.outside) bits.push('⚠ извън Варна');
       if (r.swapped) bits.push('координатите са разменени');
-      if (r.near) bits.push('≈ ' + r.near.metres + ' м от ' + r.near.label);
-      else if (!r.outside) bits.push('няма адрес наблизо');
+      if (r.near) {
+        // Т10 · §3.Д (д) — the GPS line names the quarter of the ROW the label
+        // came from (`row_cell`), never the quarter written in the address text.
+        // At -1, at a refused delivery or with the switch off the line is exactly
+        // today's.
+        const rows = (ADDRESS_QUARTER_V2 && quarterIndex !== null) ? quarterIndex.row_cell : null;
+        const at = r.near.rowIndex;
+        const cell = (rows && typeof at === 'number' && at >= 0 && at < rows.length) ? rows[at] : -1;
+        const code = cell >= 0 ? quarterIndex.codes[cell] : null;
+        const titled = code ? quarterTitleWord(code, r.near.label) : null;
+        const witness = code ? quarterTitleWord(code, r.near.label, 'written') : '';
+        bits.push('≈ ' + r.near.metres + ' м от ' + (titled || r.near.label));
+        if (witness) bits.push('написано: ' + witness);
+      } else if (!r.outside) bits.push('няма адрес наблизо');
       return bits.join(' · ');
     }
     function buildCoordItem(r, idx) {
@@ -5300,7 +5481,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
           const bareDistrictCount = new Map(); const groupList = [];
           for (const pair of repByGroup) { const key = pair[0], rep = pair[1]; const children = (childrenByGroup.get(key) || []).slice().sort(childSort); groupList.push({ key: key, rep: rep, children: children }); const d = rep.e.d; if (d != null) bareDistrictCount.set(d, (bareDistrictCount.get(d)||0)+1); }
           groupList.sort(function (a, b) { const da = a.rep.e.d == null ? Infinity : a.rep.e.d, db = b.rep.e.d == null ? Infinity : b.rep.e.d; if (da !== db) return da - db; return (a.rep.e._ord||0) - (b.rep.e._ord||0); });
-          const projectRow = function (s, role) { const e = s.e; return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, g: e.g, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy, bareRole: role, block: qBlkDisplay }; };
+          // Т7 — `_ord` travels with the projection: without it `quarterOfHit`
+          // has nothing to read and the lot delivers zero words.
+          const projectRow = function (s, role) { const e = s.e; return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, g: e.g, _ord: e._ord, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy, bareRole: role, block: qBlkDisplay }; };
           const bareOut = [];
           for (const g of groupList) { bareOut.push(projectRow(g.rep, 'parent')); for (const c of g.children) bareOut.push(projectRow(c, 'child')); }
           bareOut.bareBlockHeader = { block: qBlkDisplay, groups: groupList.length, districts: Array.from(bareDistrictCount, function (p) { return { district_enum: p[0], count: p[1] }; }).sort(function (a, b) { return a.district_enum - b.district_enum; }) };
@@ -5310,7 +5493,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
       const out = ranked.slice(0, SEARCH_LIMIT).map(function (s) {
         const e = s.e;
-        return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, g: e.g, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy };
+        return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label, display_id: e.display_id, g: e.g, _ord: e._ord, allTokens: s.all, matched: s.matched, exact: s.exactName + s.exactNum, prefix: s.prefix, fuzzy: s.fuzzy };
       });
       if (blockHeader) out.blockHeader = blockHeader;
       return out;
@@ -5353,14 +5536,47 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (searchDataPromise) return searchDataPromise;
       searchDataPromise = (async function () {
         try {
-          const [idx, rowsPayload] = await Promise.all([
+          // Т5 — THREE payloads now. The third one never rejects (О78), so a
+          // missing quarter file costs the word and not the search.
+          const [idx, rowsPayload, quarterDoc] = await Promise.all([
             fetchCachedJson(SEARCH_INDEX_URL),
             fetchCachedJson(ADDRESS_ROWS_URL),
+            loadQuarterIndex(fetchCachedJson),
           ]);
           addressRows = (rowsPayload && Array.isArray(rowsPayload.rows)) ? rowsPayload.rows : [];
           addrFieldIdx = buildAddressFieldIndex(rowsPayload);
           districtNames = (idx && Array.isArray(idx.district_names)) ? idx.district_names : [];
+          // §3.Г — the two FNV-1a digests of the positional join: over the UTF-8
+          // BYTES (never charCodeAt), separator `|`, coordinates with toFixed(7)
+          // because four of them are whole numbers. Only tokens would let 79,2 %
+          // of the entries and 88,5 % of the rows permute invisibly (ИБ1-О5).
+          const fnv1a = function (payload) {
+            const bytes = new TextEncoder().encode(payload);
+            let hash = 0x811c9dc5;
+            for (let i = 0; i < bytes.length; i++) { hash ^= bytes[i]; hash = Math.imul(hash, 0x01000193) >>> 0; }
+            return ('0000000' + hash.toString(16)).slice(-8);
+          };
+          const seven = function (value) { return Number(value).toFixed(7); };
+          addressRowCount = addressRows.length;
+          const rowParts = [];
+          for (let i = 0; i < addressRows.length; i++) {
+            const row = addressRows[i];
+            rowParts.push(String(row[addrFieldIdx.normalized_address]) + '~' +
+                          seven(row[addrFieldIdx.lat]) + ',' + seven(row[addrFieldIdx.lng]));
+          }
+          rowsDigest = fnv1a(rowParts.join('|'));
           prepareIndex(idx);        // build vocab/inverted/area-vocab + _ord (once)
+          // The EXTRA pass of О102/О136: after `prepareIndex`, before the index is
+          // published, so no racing query can read a half-checked quarter state.
+          const indexEntries = (idx && Array.isArray(idx.entries)) ? idx.entries : [];
+          const entryParts = [];
+          for (let i = 0; i < indexEntries.length; i++) {
+            const pin = indexEntries[i].pin || [0, 0];
+            entryParts.push((indexEntries[i].tk || []).join('|') + '~' +
+                            seven(pin[0]) + ',' + seven(pin[1]));
+          }
+          entriesDigest = fnv1a(entryParts.join('|'));
+          quarterIndex = validateQuarterIndex(quarterDoc, idx);
           searchIndex = idx;        // publish only AFTER fully prepared
           return searchIndex;
         } catch (err) {
@@ -5414,13 +5630,24 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const spec = hitChip(r);
       const chip = document.createElement('span'); chip.className = 'asr-kind ' + spec.cls; chip.textContent = spec.label;
       const body = document.createElement('span'); body.className = 'asr-body';
-      const title = document.createElement('span'); title.className = 'asr-title'; title.textContent = formatAddressHit(r);
+      // Т8 · §3.Д — the polygon writes the title, the written word becomes a
+      // WITNESS on the second line. `formatAddressHit` and the dedup key it
+      // feeds are untouched: what merges with what does not move.
+      const writtenLabel = formatAddressHit(r);
+      const quarter = quarterOfHit(r);
+      const quartered = quarter ? quarterTitleWord(quarter.code, writtenLabel) : null;
+      const title = document.createElement('span'); title.className = 'asr-title'; title.textContent = quartered || writtenLabel;
       body.appendChild(title);
+      const bits = [];
       const raionName = r.d != null && districtNames[r.d] ? districtNames[r.d] : '';
-      if (raionName) { const meta = document.createElement('span'); meta.className = 'asr-meta'; meta.textContent = 'район ' + raionName; body.appendChild(meta); }
+      if (raionName) bits.push('район ' + raionName);
+      const witness = quartered ? quarterTitleWord(quarter.code, writtenLabel, 'written') : '';
+      if (witness) bits.push('написано: ' + witness);
+      if (bits.length) { const meta = document.createElement('span'); meta.className = 'asr-meta'; meta.textContent = bits.join(' · '); body.appendChild(meta); }
       item.appendChild(chip); item.appendChild(body);
       return item;
     }
+    // IB1 address slice core end
     function renderResults(rows) {
       // F2 — display dedup BEFORE the visible-state assignment: currentResults IS
       // the deduped list, so Enter (currentResults[0]) and click (data-idx) select
@@ -5862,18 +6089,25 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // that вход (highlight + detail popup), consistent with a click. Block-level result -> full
       // panel, no auto-selection. The panel title is the block address either way.
       const activeEn = (r.kind === 'mf' && r.en != null) ? String(r.en) : null;
-      const panelLabel = activeEn ? (blockLabel || label) : label;
-      const ctx = { label: panelLabel, blockLabel: blockLabel, lat: lat, lng: lng, activeEn: activeEn };
+      // Т9 — the panel and the popup speak the SAME WORD as the row (STOP 19).
+      // The strings still differ legally: the panel is the block without the
+      // `· вх. N`. `:5858`/`:5859` stay byte-identical, so the popup gets its own
+      // local name instead of a rewritten `label`.
+      const quarter = quarterOfHit(r);
+      const popupLabel = (quarter && quarterTitleWord(quarter.code, label)) || label;
+      const panelBlockLabel = (quarter && quarterTitleWord(quarter.code, blockLabel)) || blockLabel;
+      const panelLabel = activeEn ? (panelBlockLabel || popupLabel) : popupLabel;
+      const ctx = { label: panelLabel, blockLabel: panelBlockLabel, lat: lat, lng: lng, activeEn: activeEn };
       anchorHydrantsAt(lat, lng);   // anchor hydrants + blue dot to the block/search pin
       clearSearchMarker(); // replace any previous result marker + close any open sheet
       searchMarker = L.marker([lat, lng], { icon: searchPinIcon(), zIndexOffset: 1500, keyboard: false }).addTo(map);
       // Re-click re-opens the same surface: the detail sheet for a building (g), else the popup.
-      searchMarker.on('click', function () { if (g) showBuildingDetail(g, ctx); else openSearchPopup(label, lat, lng); });
+      searchMarker.on('click', function () { if (g) showBuildingDetail(g, ctx); else openSearchPopup(popupLabel, lat, lng); });
       map.setView([lat, lng], Math.max(map.getZoom(), 17), { animate: true });
       // After the marker is placed: fetch + show the building detail (fail-soft to the nav
       // popup). Address/parcel rows (no g) keep the existing nav popup.
       if (g) showBuildingDetail(g, ctx);
-      else openSearchPopup(label, lat, lng);
+      else openSearchPopup(popupLabel, lat, lng);
       hideResults();
     }
 
@@ -6196,6 +6430,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       await resolveAndRender(q, index);       // exact first; approx only on zero exact
     }
 
+    // IB1 address slice end
     // ---- events ----
     inputEl.addEventListener('focus', function () { ensureSearchData().catch(function () {}); });
     inputEl.addEventListener('input', function (ev) {
