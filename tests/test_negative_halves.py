@@ -31,6 +31,7 @@ import json
 import os
 import pathlib
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -79,9 +80,19 @@ def git(*args, cwd=None):
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
+def _drop_readonly(func, path, _exc):
+    """ИБ1-О27: on Windows git leaves its pack files read-only, so `rmtree` cannot
+    unlink them. Clear the bit and retry — never swallow the error."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
 def fresh(root):
+    """ИБ1-О27: `ignore_errors=True` left a RUIN behind (the read-only pack files
+    survived), the ruin still carried a `.git` directory and the second call of the
+    same recipe died with `git add -> 128`. A failed wipe must now raise."""
     if root.exists():
-        shutil.rmtree(root, ignore_errors=True)
+        shutil.rmtree(root, onerror=_drop_readonly)
     root.mkdir(parents=True, exist_ok=True)
     return root
 
@@ -104,7 +115,9 @@ def other_digest(value):
 def make_clone(root, name="ib_clone"):
     """The pinned clone command of §1.1 — `--no-local` is a forbidden form here."""
     path = root / name
-    if (path / ".git").exists():
+    # ИБ1-О27: a `.git` directory is not a repository — a ruin left by a half-done
+    # wipe carries one too. Only a clone that answers `rev-parse HEAD` is reused.
+    if (path / ".git").exists() and git("rev-parse", "HEAD", cwd=path).returncode == 0:
         return path
     fresh(path.parent)
     result = git("clone", "--no-hardlinks", "--branch", "main", str(REPO), str(path),
