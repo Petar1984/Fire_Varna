@@ -59,7 +59,9 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "tests/test_negative_halves.py",
                "tests/negative_halves_manifest.json",
                "tests/test_adr_amendment.py",
-               "docs/decisions/011a_амандамент_И-Б1_11.09.md"}
+               "docs/decisions/011a_амандамент_И-Б1_11.09.md",
+               # чужд: модерация #38, 20c1efe
+               "scratch/apply_c38.py"}
 def git(*args):
     """S30-2: a failed git process is a FAILED gate, never a green one."""
     try:
