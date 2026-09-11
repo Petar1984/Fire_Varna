@@ -2122,13 +2122,25 @@ class FreezeAndAnchorTest(unittest.TestCase):
             target.write_text("{}", encoding="utf-8")
             return "written"
 
-        code, written = REF.freeze_writes([u"release-гейтът не е зелен"], [write_it])
+        # The freeze reports its refusal and each write on the console; that
+        # is for a human running the freeze, not for the suite — a suite that
+        # prints „ЗАМРАЗЯВАНЕТО НЕ Е ИЗВЪРШЕНО“ while passing teaches the human
+        # to distrust green (Петър, 11.09). Captured, and asserted on instead.
+        import contextlib
+        import io
+        console = io.StringIO()
+        with contextlib.redirect_stdout(console), contextlib.redirect_stderr(console):
+            code, written = REF.freeze_writes([u"release-гейтът не е зелен"], [write_it])
         self.assertEqual((code, written), (1, []))
+        self.assertIn(u"ЗАМРАЗЯВАНЕТО НЕ Е ИЗВЪРШЕНО", console.getvalue())
         self.assertFalse(target.exists(), u"замразяването е писало при блокер")
         # The other half of the differential: with no blocker the writes happen,
         # in order, and each of them reports itself.
-        code, written = REF.freeze_writes([], [write_it])
+        console = io.StringIO()
+        with contextlib.redirect_stdout(console), contextlib.redirect_stderr(console):
+            code, written = REF.freeze_writes([], [write_it])
         self.assertEqual((code, written), (0, ["written"]))
+        self.assertIn("written", console.getvalue())
         self.assertEqual(target.read_text(encoding="utf-8"), "{}")
 
     # --------------------------------- (б) проверка 7 over an agent's queue --
