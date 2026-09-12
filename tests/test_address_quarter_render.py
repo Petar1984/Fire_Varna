@@ -78,6 +78,12 @@ ADDRESS_ROWS_URL = "data/address_rows.json"
 FLAGSHIP_TOKENS = ["studentska", "bl", "11"]
 FLAGSHIP_QUERY = u"студентска бл 11"
 WITNESS_PREFIX = u"написано: "
+# ИБ1-О57 (думата на Петър, 12.09, със скрийншот) — редът „написано: <дума>“
+# НАПУСКА екрана на четирите повърхности: вторият ред е само „район X“, или го
+# няма. Написаната дума НЕ се трие от данните — тя остава в леджера и в пробите
+# Д5 за одит, а клиентът продължава да я СМЯТА (`quarterTitleWord(…, 'written')`
+# е непокътната); просто не стига до DOM. Връщането на реда е една дума.
+SECOND_ROW = re.compile(u"^район [^·]+$")
 # §3.Д — the row the panel adds when the cell has a parent (ИБ1-О32).
 PARENT_PREFIX = u"част от "
 
@@ -312,6 +318,48 @@ def parent_rows_with_a_tail(doc, rows, want):
     return found
 
 
+def gps_rows_with_a_written_word(test, doc, rows, want, scan=1200):
+    """ИБ1-О57 — редове, за които клиентът ВСЕ ОЩЕ смята свидетел.
+
+    Свидетелят се пита от САМИЯ клиент (`quarterTitleWord(code, label, 'written')`
+    през харнеса), не от правило, преписано тук: така методът доказва точно това,
+    което Петър поиска — написаната дума продължава да се СМЯТА, но не стига до
+    DOM. Кандидатите се стесняват евтино (етикетът започва с дума на v2, гола или
+    с типа си — там живее класът, М: „Боровец юг“ срещу „с.о. Боровец-юг“), а
+    ПРИСЪДАТА кой носи свидетел е на клиента. Етикетът се сглобява както го
+    сглобява `nearestAddressTo`. Връща `(индекс, клетка, написано)`.
+    """
+    words = set()
+    for word in list(doc["names"]) + list(doc["parents"]):
+        if word:
+            words.add(merged(word))
+            words.add(bare_word(word))
+    words = sorted(w for w in words if w)
+    picks = []
+    for index, row in enumerate(rows):
+        if doc["row_cell"][index] < 0 or not row[0]:
+            continue
+        flattened = merged(row[0])
+        if any(flattened == w or flattened.startswith(w + u" ") for w in words):
+            picks.append(index)
+            if len(picks) >= scan:
+                break
+    asks = [{"ask": "ensure"}]
+    for index in picks:
+        label = re.sub(r"\s0$", u"", rows[index][0])
+        asks.append({"ask": "call", "name": "quarterTitleWord",
+                     "args": [doc["codes"][doc["row_cell"][index]],
+                              label[:1].upper() + label[1:], "written"]})
+    answers = ask_client(test, asks)[1:]
+    found = []
+    for index, written in zip(picks, answers):
+        if written:
+            found.append((index, doc["row_cell"][index], written))
+            if len(found) >= want:
+                break
+    return found
+
+
 def require_node(test):
     node = shutil.which("node")
     if not node:
@@ -471,7 +519,7 @@ class CorpusParityTest(unittest.TestCase):
 class FlagshipRowTest(unittest.TestCase):
     """ИБ1-Г9к — the row of the flagship speaks the POLYGON's word."""
 
-    def test_row_title_and_witness(self):
+    def test_row_title_and_the_second_line(self):
         doc = delivered_doc(self)
         entries = search_entries()
         cell = doc["entry_cell"][flagship_index(entries)]
@@ -489,12 +537,14 @@ class FlagshipRowTest(unittest.TestCase):
                          u"номерът стои в заглавието: %r" % new[0]["title"])
         self.assertNotEqual(new[0]["title"], base[0]["title"],
                             u"редът не се е променил спрямо <БАЗА>")
-        self.assertIn(WITNESS_PREFIX, new[0]["meta"] or u"",
-                      u"вторият ред няма свидетел: %r" % new[0]["meta"])
-        self.assertIn(base[0]["title"].split(u",")[0], new[0]["meta"],
-                      u"свидетелят не носи НАПИСАНАТА дума")
-        self.assertTrue((new[0]["meta"] or u"").startswith(u"район "),
-                        u"вторият ред не започва с района: %r" % new[0]["meta"])
+        # ИБ1-О57 — написаното „кв. Чайка“ вече не стои никъде на екрана:
+        # вторият ред на флагмана е ТОЧНО „район Приморски“.
+        self.assertNotIn(WITNESS_PREFIX, new[0]["meta"] or u"",
+                         u"написано стои на екрана: %r" % new[0]["meta"])
+        self.assertNotIn(base[0]["title"].split(u",")[0], new[0]["meta"] or u"",
+                         u"написаната дума стои на втория ред: %r" % new[0]["meta"])
+        self.assertTrue(SECOND_ROW.match(new[0]["meta"] or u""),
+                        u"вторият ред не е само „район X“: %r" % new[0]["meta"])
 
 
 class FourSurfacesTest(unittest.TestCase):
@@ -591,6 +641,94 @@ class WitnessRulesTest(unittest.TestCase):
                              u"locality-клетка пълни дума за %r" % query)
 
 
+class WrittenWordOffScreenTest(unittest.TestCase):
+    """ИБ1-О57 (думата на Петър, 12.09) — написаната дума НАПУСКА екрана.
+
+    Свидетелят на D18 („написано: кв. Чайка“) стоеше като втори ред на реда от
+    падащия списък и на GPS-реда. Петър го видя на живата карта: „това написано
+    кв. чайка не ми харесва… вкарва объркване“ — и редът отпада от ВСИЧКИТЕ
+    ЧЕТИРИ повърхности. Вторият ред е само „район X“ или го няма.
+
+    Написаната дума не се трие от данните (D18/G17 важат за нея): клиентът я
+    смята и занапред, леджерът и пробите Д5 я пазят за одит. Гейтът е точно за
+    границата между „смята се“ и „вижда се“ — обходът е ЦЕЛИЯТ корпус, не един
+    ред, а GPS-случаите се избират по това, че клиентът ВСЕ ОЩЕ смята свидетел.
+    """
+
+    def test_no_row_in_the_corpus_confesses_the_written_word(self):
+        """Първата повърхност: всеки ред на падащия списък, за целия корпус."""
+        corpus = corpus_doc(self)
+        queries = list(corpus["queries"])
+        answers = ask_client(self, [{"ask": "render", "q": q, "limit": 5}
+                                    for q in queries])
+        judged = 0
+        for query, rows in zip(queries, answers):
+            for row in rows:
+                title, meta = row["title"] or u"", row["meta"] or u""
+                self.assertNotIn(WITNESS_PREFIX, title,
+                                 u"написано стои на екрана (заглавие) за %r: %r"
+                                 % (query, title))
+                self.assertNotIn(WITNESS_PREFIX, meta,
+                                 u"написано стои на екрана (ред) за %r: %r"
+                                 % (query, meta))
+                if meta:
+                    self.assertTrue(SECOND_ROW.match(meta),
+                                    u"вторият ред не е само „район X“ за %r: %r"
+                                    % (query, meta))
+                judged += 1
+        self.assertGreaterEqual(judged, len(queries),
+                                u"корпусът не е съден: %d реда" % judged)
+
+    def test_the_panel_and_the_popup_never_show_it(self):
+        """Втората и третата повърхност: панелът и попъпът на всяка заявка."""
+        corpus = corpus_doc(self)
+        queries = list(corpus["queries"])
+        answers = ask_client(self, [{"ask": "panel", "q": q, "pick": 0}
+                                    for q in queries])
+        judged = 0
+        for query, panel in zip(queries, answers):
+            if not isinstance(panel, dict) or panel.get("error"):
+                continue
+            surface = u" ".join(list(panel.get("popups") or [])
+                                + ([panel["sheet"]] if panel.get("sheet") else []))
+            self.assertNotIn(WITNESS_PREFIX, surface,
+                             u"написано стои на екрана (панел/попъп) за %r: %r"
+                             % (query, surface))
+            judged += 1
+        self.assertGreaterEqual(judged, 10,
+                                u"панелът не е съден: %d заявки" % judged)
+
+    def test_the_gps_line_computes_the_word_and_hides_it(self):
+        """Четвъртата повърхност — и доказателството, че думата още се смята."""
+        doc = delivered_doc(self)
+        payload = json.loads(ADDRESS_ROWS.read_text(encoding="utf-8"))["rows"]
+        cases = gps_rows_with_a_written_word(self, doc, payload, 40)
+        self.assertGreaterEqual(len(cases), 40,
+                                u"живият товар не дава редове със смятан свидетел: %r"
+                                % (cases,))
+        answers = ask_client(self, [{"ask": "coord",
+                                     "q": coordinate_query((payload[i][1], payload[i][2]))}
+                                    for i, _cell, _written in cases])
+        judged = 0
+        for (index, _cell, written), answer in zip(cases, answers):
+            self.assertTrue(written, u"ред %d без смятан свидетел" % index)
+            meta, popup = answer["meta"] or u"", answer["popup"] or u""
+            self.assertNotIn(WITNESS_PREFIX, meta,
+                             u"написано стои на екрана (GPS) за ред %d: %r"
+                             % (index, meta))
+            self.assertNotIn(WITNESS_PREFIX, popup,
+                             u"написано стои на екрана (GPS попъп) за ред %d: %r"
+                             % (index, popup))
+            # `nearestAddressTo` може да предпочете друг „уличен“ ред в същите
+            # 250 м; репликата, построена от САМАТА точка, е тази на ≈ 0 м
+            # (прецедент О40) — само тя доказва, че съдим нашия ред.
+            if meta.startswith(ZERO_METRES):
+                judged += 1
+        self.assertGreaterEqual(judged, 3,
+                                u"нито един GPS ред не е построен от своята точка: %d"
+                                % judged)
+
+
 class GpsRowTest(unittest.TestCase):
     """ИБ1-Г23 — `row_cell` carries the GPS line, `rows_digest` guards it."""
 
@@ -638,7 +776,7 @@ class DottedPrefixTest(unittest.TestCase):
         if missing:
             self.fail(u"Ф11 не носи заявките на класа: %s" % u", ".join(missing))
 
-    def test_a_dotted_written_quarter_is_cut_and_confessed(self):
+    def test_a_dotted_written_quarter_is_cut(self):
         self.corpus_carries_the_class()
         doc = delivered_doc(self)
         judged = 0
@@ -666,13 +804,13 @@ class DottedPrefixTest(unittest.TestCase):
                                  % (query, row["title"]))
                 if flat(head) != flat(name):
                     # A DIFFERENT quarter was written: it leaves the title and
-                    # goes to the second row as the witness of D18. (When the two
-                    # agree the title legitimately re-opens with the same word.)
+                    # (ИБ1-О57) does NOT come back on the second line — the
+                    # written word stays in the ledger and in Д5, off the screen.
                     self.assertNotIn(head + u", ", row["title"] or u"",
                                      u"написаният квартал не е отрязан: %r" % row["title"])
-                    self.assertIn(WITNESS_PREFIX + head, row["meta"] or u"",
-                                  u"%r: няма свидетел за %r: %r"
-                                  % (query, head, row["meta"]))
+                    self.assertNotIn(WITNESS_PREFIX, row["meta"] or u"",
+                                     u"%r: написано стои на екрана: %r"
+                                     % (query, row["meta"]))
                 judged += 1
         self.assertGreaterEqual(judged, len(DOTTED_QUERIES),
                                 u"класът не е представен: съдени са %d реда" % judged)
@@ -883,18 +1021,17 @@ class NumberedChildTest(unittest.TestCase):
         self.assertNotIn(doc["names"][cell], title,
                          u"номерът стои в заглавието: %r" % title)
 
-    def test_the_witness_confesses_only_a_real_disagreement(self):
-        """„написано:“ излиза при истинско разминаване СПРЯМО ИЗПИСАНОТО.
+    def test_no_numbered_row_confesses_the_written_word(self):
+        """ИБ1-О57 — „написано:“ не излиза дори при истинско разминаване.
 
-        „студентска бл 11“ носи написано „кв. Чайка“ — друг квартал, свидетелят
-        остава. „студентска бл 7“ носи написано „кв. Левски“, а изписаното е
-        същото „кв. Левски“ — няма какво да се признава. Същото за „ана
-        феликсова 18“ („ж.к. Възраждане“).
+        До К9д свидетелят на D18 стоеше на втория ред, когато написаното е ДРУГ
+        квартал: „студентска бл 11“ носи написано „кв. Чайка“, а полигонът казва
+        „кв. Левски“. Петър го видя на живата карта и го махна — вторият ред е
+        само „район X“. Трите заявки са старите три случая: единият беше със
+        свидетел, другите два — без; след К9д и трите мълчат еднакво.
         """
         doc = delivered_doc(self)
-        for query, wants_witness in ((FLAGSHIP_QUERY, True),
-                                     (PARENT_WRITTEN_QUERY, False),
-                                     (DOTTED_QUERIES[0], False)):
+        for query in (FLAGSHIP_QUERY, PARENT_WRITTEN_QUERY, DOTTED_QUERIES[0]):
             found, rows = ask_client(self, [{"ask": "search", "q": query, "limit": 5},
                                             {"ask": "render", "q": query, "limit": 5}])
             i, cell = first_numbered_row(doc, found, rows)
@@ -904,12 +1041,10 @@ class NumberedChildTest(unittest.TestCase):
                             u"%r: номерът стои в заглавието: %r" % (query, title))
             self.assertNotIn(doc["names"][cell], title,
                              u"%r: номерът стои в заглавието: %r" % (query, title))
-            if wants_witness:
-                self.assertIn(WITNESS_PREFIX, meta,
-                              u"%r: липсва свидетел за друг квартал: %r" % (query, meta))
-            else:
-                self.assertNotIn(WITNESS_PREFIX, meta,
-                                 u"%r: свидетел без разминаване: %r" % (query, meta))
+            self.assertNotIn(WITNESS_PREFIX, meta,
+                             u"%r: написано стои на екрана: %r" % (query, meta))
+            self.assertTrue(not meta or SECOND_ROW.match(meta),
+                            u"%r: вторият ред не е само „район X“: %r" % (query, meta))
 
     def test_the_panel_drops_part_of_for_the_ten(self):
         """Родителят вече е в заглавието — „част от“ там няма какво да добави."""

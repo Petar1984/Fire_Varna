@@ -6,9 +6,9 @@
 Red line 7 of the plan: "a gate that cannot return ≠ 0 is not a gate; every
 negative half MUST have run and MUST have failed". A half that only stands written
 in a report is self-attestation. This module is where the fifteen Fire_Varna gates
-plus the crossed half of ИБ1-Г3 are actually killed — twenty-two rows, each with its
-own recipe, each demanded to exit with the number `tests/negative_halves_manifest.json`
-(Ф14) declares.
+plus the crossed half of ИБ1-Г3 are actually killed — twenty-three rows, each
+with its own recipe, each demanded to exit with the number
+`tests/negative_halves_manifest.json` (Ф14) declares.
 
 Everything happens OUTSIDE the live tree (STOP 10, план §5 правило 5): the fixtures
 live under `%IB_TMP%/ib_fixtures` when that short root is named, otherwise under
@@ -21,7 +21,7 @@ Coordinates and any cadastral-shaped string are ASSEMBLED at run time (О95,
 ИБ1-О21): a tracked file of this repo carries neither.
 
 Червено по конструкция до К8/К9 (ИНТЕРВАЛ А, план §4 стъпка 9): a dozen of the
-twenty-two recipes need the delivered payload (К8) or the markers of Т12 (К9). Until
+twenty-three recipes need the delivered payload (К8) or the markers of Т12 (К9). Until
 both exist the module fails fast with the reason and runs NO half — a red gate may
 not cost ten minutes of somebody's evening.
 
@@ -70,8 +70,10 @@ EXPECTED_GATES = {"ИБ1-Г3", "ИБ1-Г7", "ИБ1-Г8", "ИБ1-Г9к", "ИБ1-�
 # gates; Г19к and Г23 now carry three rows each.
 # ИБ1-О51 (К7ж): twenty-one — Г9к takes a second row for a client that writes the
 # NUMBER in the title. ИБ1-О54 (К7з): twenty-two — Г9к takes a THIRD row for the
-# client whose cut does not know the WRITTEN parent name.
-MANIFEST_LEN = 22
+# client whose cut does not know the WRITTEN parent name. ИБ1-О57 (К7и):
+# twenty-three — Г9к takes a FOURTH row for a client that still pushes the WRITTEN
+# word onto the screen, the surface Петър asked to have taken away.
+MANIFEST_LEN = 23
 ROW_KEYS = {"gate", "fixture", "argv", "expected_exit"}
 
 # Т12 — the marker that says the client of К9 is in the tree.
@@ -366,6 +368,42 @@ class Recipes:
         return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
                 "needle": u"родителят стои два пъти"}
 
+    # ---- ИБ1-Г9к (ИБ1-О57): the client that still writes the word on the screen
+    def client_that_still_writes_the_word(self, root):
+        """К9д маха свидетеля „написано: …“ от реда и от GPS-реда. Половината го
+        ВРЪЩА в КОПИЕ: `bits` пак получава написаната дума, редът и GPS-редът пак
+        я показват и `WrittenWordOffScreenTest` пада по своята причина —
+        „написано стои на екрана“.
+
+        Преди К9д живият клиент Е точно такъв клиент: котвата (редът БЕЗ бутане
+        на свидетеля) още не съществува, копието е дословният HEAD — половината
+        пак пада, по същата причина. Смени ли се котвата, копието става равно на
+        живото дърво, половината минава със 0 и Г20 пада: fail-loud, не fail-open.
+        """
+        text = (REPO / "index.html").read_bytes().decode("utf-8")
+        row_now = (u"      if (raionName) bits.push('район ' + raionName);\n"
+                   u"      if (bits.length) {")
+        row_back = (u"      if (raionName) bits.push('район ' + raionName);\n"
+                    u"      const witness = quartered"
+                    u" ? quarterTitleWord(quarter.code, writtenLabel, 'written') : '';\n"
+                    u"      if (witness) bits.push('написано: ' + witness);\n"
+                    u"      if (bits.length) {")
+        gps_now = (u"        bits.push('≈ ' + r.near.metres + ' м от '"
+                   u" + (titled || r.near.label));\n")
+        gps_back = (gps_now
+                    + u"        const witness = code"
+                    u" ? quarterTitleWord(code, r.near.label, 'written') : '';\n"
+                    u"        if (witness) bits.push('написано: ' + witness);\n")
+        for anchor, instead in ((row_now, row_back), (gps_now, gps_back)):
+            if anchor in text:
+                if text.count(anchor) != 1:
+                    raise AssertionError(u"котвата на К9д е %d пъти" % text.count(anchor))
+                text = text.replace(anchor, instead, 1)
+        path = root / "index.html"
+        path.write_text(text, encoding="utf-8")
+        return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
+                "needle": u"написано стои на екрана"}
+
     # ---- ИБ1-Г11: an eager literal fetch of the third payload
     def eager_quarter_fetch(self, root):
         text = (REPO / "index.html").read_bytes().decode("utf-8")
@@ -455,7 +493,7 @@ class Recipes:
 
 
 class NegativeHalvesTest(unittest.TestCase):
-    """ИБ1-Г20 — twenty-two rows, twenty-two fallen halves, not one exit 0."""
+    """ИБ1-Г20 — twenty-three rows, twenty-three fallen halves, not one exit 0."""
 
     def manifest(self):
         if not MANIFEST.exists():

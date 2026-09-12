@@ -2,7 +2,7 @@
   "_meta": {
     "plan": "docs/plans/ПЛАН_Картата_imot_И-Б1_11.09.md",
     "what": "Ф14 — the negative halves of Fire_Varna: gate, fixture recipe, argv, exit.",
-    "rule": "len == 22 and the gate set is exactly the fifteen Fire_Varna gates plus the crossed half of ИБ1-Г3; ИБ1-Г19к and ИБ1-Г23 carry a second row each for the dotted class (ИБ1-О33, К7в) and a THIRD each for the spaced class (ИБ1-О36/О39, К7г); ИБ1-Г9к carries a second row for the numbered children (ИБ1-О51, К7ж); ИБ1-Г9к carries a THIRD row for the WRITTEN parent name, which the cut did not know (ИБ1-О54, К7з); tests/test_negative_halves.py (Ф13) runs every row and demands the declared exit.",
+    "rule": "len == 23 and the gate set is exactly the fifteen Fire_Varna gates plus the crossed half of ИБ1-Г3; ИБ1-Г19к and ИБ1-Г23 carry a second row each for the dotted class (ИБ1-О33, К7в) and a THIRD each for the spaced class (ИБ1-О36/О39, К7г); ИБ1-Г9к carries a second row for the numbered children (ИБ1-О51, К7ж), a THIRD for the WRITTEN parent name, which the cut did not know (ИБ1-О54, К7з), and a FOURTH for a client that still puts the written word on the screen (ИБ1-О57, К7и); tests/test_negative_halves.py (Ф13) runs every row and demands the declared exit.",
     "placeholders": "{python} {node} {repo} {clone} {base} {fixture} — substituted by Ф13 at run time; coordinates and cadastral strings are built by the recipe, never written down."
   },
   "halves": [
@@ -136,6 +136,12 @@
       "gate": "ИБ1-Г9к",
       "fixture": "client_without_the_parent_cut",
       "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.NumberedChildTest.test_the_written_parent_name_is_cut_too"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г9к",
+      "fixture": "client_that_still_writes_the_word",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.WrittenWordOffScreenTest"],
       "expected_exit": 1
     }
   ]
