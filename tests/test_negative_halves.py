@@ -251,14 +251,24 @@ class Recipes:
         """Undo К9а in a copy: the dot goes back to being replaced by a space and
         the panel forgets the parent row. „ж.к. Възраждане“ then flattens to
         „ж к възраждане“, the lead word is „ж“, no type matches — and the row
-        says the quarter twice. The half falls on THAT, by its message."""
+        says the quarter twice. The half falls on THAT, by its message.
+
+        ИБ1-О49: the undo needs a THIRD anchor. К9б welds the spaced pairs, so
+        „ж к“ became „жк“ again and the О31 defect was no longer born — the half
+        fell on the parent row instead, i.e. for the wrong reason. Emptying
+        `SPACED_PREFIXES` in the same copy puts the client back to К9 exactly."""
         text = (REPO / "index.html").read_bytes().decode("utf-8")
+        pairs = u"    const SPACED_PREFIXES = ["
+        closing = text.find(u"];", text.find(pairs)) if pairs in text else -1
+        if closing < 0:
+            raise AssertionError(u"третата котва (SPACED_PREFIXES) липсва — К9б")
         undo = ((u"replace(/\\./g, '').replace(/[,-]/g, ' ')",
                  u"replace(/[.,-]/g, ' ')"),
-                (u"(' · част от ' + quarter.parent_display)", u"('')"))
+                (u"(' · част от ' + quarter.parent_display)", u"('')"),
+                (text[text.find(pairs):closing], pairs))
         for anchor, instead in undo:
             if text.count(anchor) != 1:
-                raise AssertionError(u"котвата на К9а липсва (%d попадения): %s"
+                raise AssertionError(u"котвата на К9а/К9б липсва (%d попадения): %s"
                                      % (text.count(anchor), anchor))
             text = text.replace(anchor, instead, 1)
         path = root / "index.html"
