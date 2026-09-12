@@ -2,7 +2,7 @@
   "_meta": {
     "plan": "docs/plans/ПЛАН_Картата_imot_И-Б1_11.09.md",
     "what": "Ф14 — the negative halves of Fire_Varna: gate, fixture recipe, argv, exit.",
-    "rule": "len == 16 and the gate set is exactly the fifteen Fire_Varna gates plus the crossed half of ИБ1-Г3; tests/test_negative_halves.py (Ф13) runs every row and demands the declared exit.",
+    "rule": "len == 18 and the gate set is exactly the fifteen Fire_Varna gates plus the crossed half of ИБ1-Г3; ИБ1-Г19к and ИБ1-Г23 carry a second row each for the dotted class (ИБ1-О33, К7в); tests/test_negative_halves.py (Ф13) runs every row and demands the declared exit.",
     "placeholders": "{python} {node} {repo} {clone} {base} {fixture} — substituted by Ф13 at run time; coordinates and cadastral strings are built by the recipe, never written down."
   },
   "halves": [
@@ -33,7 +33,7 @@
     {
       "gate": "ИБ1-Г10",
       "fixture": "clone_with_a_broken_sha_pin",
-      "argv": ["{python}", "{fixture}/both_mirrors.py"],
+      "argv": ["{python}", "-m", "gates.run_gates"],
       "expected_exit": 1
     },
     {
@@ -79,6 +79,12 @@
       "expected_exit": 1
     },
     {
+      "gate": "ИБ1-Г19к",
+      "fixture": "client_before_the_dotted_fix",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.DottedPrefixTest"],
+      "expected_exit": 1
+    },
+    {
       "gate": "ИБ1-Г20",
       "fixture": "manifest_without_its_own_row",
       "argv": ["{python}", "-m", "unittest", "tests.test_negative_halves"],
@@ -100,6 +106,12 @@
       "gate": "ИБ1-Г23",
       "fixture": "row_cell_one_short",
       "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.GpsRowTest"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г23",
+      "fixture": "client_without_the_dotless_token_list",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.DottedPrefixTest.test_the_gps_line_cuts_the_dotless_token"],
       "expected_exit": 1
     }
   ]

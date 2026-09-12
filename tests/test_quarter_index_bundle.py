@@ -105,11 +105,15 @@ FORBIDDEN_KEYS = {"coordinates", "geometry", "geometries", "centroid", "centroid
 
 # The corpus Ф11 (О98) — two top-level keys, three keys per entry, and nothing
 # else: no `pin`, no `label`, no `d`, no `qtk`.
-CORPUS_SHA256 = "67a65f07e5887b2d964645ce1a61d12a02f6f0fb48b00584ce754d265b41b974"
-CORPUS_BYTES = 9175
+# ИБ1-О33 (К7в): the twenty kill-switch queries grew by the SIX of the dotted
+# class („ж.к.“/„в.з.“/„с.о.“ written, and „жк“/„кк“ dot-less against a dotted
+# name). The `entries` array did not move — it is the projection of the 145
+# `studentska` records that ИБ1-Г9 compares byte for byte in varna_3d.
+CORPUS_SHA256 = "a0bac54f8504a163e35fb607498ab8a05efd402d38edbed1ba98c0c3986c132d"
+CORPUS_BYTES = 9340
 CORPUS_TOP_KEYS = {"queries", "entries"}
 CORPUS_ENTRY_KEYS = {"tk", "kind", "cell"}
-CORPUS_QUERIES = 20
+CORPUS_QUERIES = 26
 CORPUS_ENTRIES = 145
 
 

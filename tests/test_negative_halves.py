@@ -60,7 +60,11 @@ FIXTURES = (pathlib.Path(SHORT_ROOT) / "ib_fixtures" if SHORT_ROOT
 EXPECTED_GATES = {"ИБ1-Г3", "ИБ1-Г7", "ИБ1-Г8", "ИБ1-Г9к", "ИБ1-Г10", "ИБ1-Г11",
                   "ИБ1-Г12", "ИБ1-Г13", "ИБ1-Г14", "ИБ1-Г15", "ИБ1-Г17",
                   "ИБ1-Г19к", "ИБ1-Г20", "ИБ1-Г21", "ИБ1-Г22", "ИБ1-Г23"}
-MANIFEST_LEN = 16
+# ИБ1-О33 (К7в): sixteen + the TWO halves of the dotted class — Г19к on the
+# client that still normalizes dot-blind, Г23 on the one whose dot-less token
+# list is empty. The gate SET does not grow; two of its members now carry two
+# rows each.
+MANIFEST_LEN = 18
 ROW_KEYS = {"gate", "fixture", "argv", "expected_exit"}
 
 # Т12 — the marker that says the client of К9 is in the tree.
@@ -218,8 +222,13 @@ class Recipes:
         path.write_text("\n".join(lines), encoding="utf-8")
         return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)}, "needle": "FAILED"}
 
-    # ---- ИБ1-Г10: one changed digit in the pin, judged by BOTH mirrors
+    # ---- ИБ1-Г10: one changed digit in the pin, judged BY ITS REASON
     def clone_with_a_broken_sha_pin(self, root):
+        """ИБ1-О29: the first shape of this recipe ran `gates/run_gates.py` as a
+        SCRIPT, and both mirrors died on `from gates import coverage` — exit 1
+        without ever reaching the pin, i.e. a half that fell for the wrong reason.
+        The module form runs the gate, and the needle demands the pin's own line,
+        so an import error can never be mistaken for a verdict again."""
         clone = make_clone(root)
         index = clone / "index.html"
         text = index.read_text(encoding="utf-8")
@@ -230,22 +239,46 @@ class Recipes:
         pinned = match.group(1)
         broken = ("0" if pinned[0] != "0" else "1") + pinned[1:]
         index.write_text(text.replace(pinned, broken, 1), encoding="utf-8")
-        runner = root / "both_mirrors.py"
-        runner.write_text(
-            "# -*- coding: utf-8 -*-\n"
-            "import subprocess, sys\n"
-            "CLONE = r'%s'\n" % str(clone) +
-            "def run(args):\n"
-            "    out = subprocess.run([sys.executable] + args, cwd=CLONE,\n"
-            "                         capture_output=True)\n"
-            "    return out.returncode\n"
-            "gates = run(['gates/run_gates.py'])\n"
-            "release = run(['gates/release.py'])\n"
-            "print('run_gates %d release %d' % (gates, release))\n"
-            "# The half has fallen only when BOTH mirrors fired: if one stayed green\n"
-            "# the second table of pins was never touched (О38).\n"
-            "sys.exit(1 if (gates != 0 and release != 0) else 0)\n", encoding="utf-8")
-        return {"cwd": root, "clone": clone, "needle": "run_gates "}
+        return {"cwd": clone, "clone": clone,
+                "needle": u"ADDRESS_QUARTERS_SHA256: пин"}
+
+    # ---- ИБ1-Г19к (ИБ1-О31): the client that normalizes DOT-BLIND again
+    def client_before_the_dotted_fix(self, root):
+        """Undo К9а in a copy: the dot goes back to being replaced by a space and
+        the panel forgets the parent row. „ж.к. Възраждане“ then flattens to
+        „ж к възраждане“, the lead word is „ж“, no type matches — and the row
+        says the quarter twice. The half falls on THAT, by its message."""
+        text = (REPO / "index.html").read_bytes().decode("utf-8")
+        undo = ((u"replace(/\\./g, '').replace(/[,-]/g, ' ')",
+                 u"replace(/[.,-]/g, ' ')"),
+                (u"(' · част от ' + quarter.parent_display)", u"('')"))
+        for anchor, instead in undo:
+            if text.count(anchor) != 1:
+                raise AssertionError(u"котвата на К9а липсва (%d попадения): %s"
+                                     % (text.count(anchor), anchor))
+            text = text.replace(anchor, instead, 1)
+        path = root / "index.html"
+        path.write_text(text, encoding="utf-8")
+        return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
+                "needle": u"заглавието не е"}
+
+    # ---- ИБ1-Г23 (§3.Д (д)): the client whose DOT-LESS token list is empty
+    def client_without_the_dotless_token_list(self, root):
+        """With `TOKEN_TYPES` empty the GPS branch cuts only when the WHOLE label
+        spells the name, so „жк бриз 2“ keeps its written run and the line says
+        „ж.к. Бриз, Жк бриз 2“ — the quarter twice."""
+        text = (REPO / "index.html").read_bytes().decode("utf-8")
+        start = text.find(u"    const TOKEN_TYPES = [")
+        if start < 0:
+            raise AssertionError(u"TOKEN_TYPES липсва (§3.Д (д) се ражда в К9а)")
+        end = text.find(u"];", start)
+        if end < 0:
+            raise AssertionError(u"TOKEN_TYPES не е затворен масив")
+        text = text[:start] + u"    const TOKEN_TYPES = [" + text[end:]
+        path = root / "index.html"
+        path.write_text(text, encoding="utf-8")
+        return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
+                "needle": u"два пъти"}
 
     # ---- ИБ1-Г11: an eager literal fetch of the third payload
     def eager_quarter_fetch(self, root):

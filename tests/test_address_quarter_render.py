@@ -30,6 +30,7 @@ Run: python -m unittest discover -s tests
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import tempfile
@@ -77,6 +78,67 @@ ADDRESS_ROWS_URL = "data/address_rows.json"
 FLAGSHIP_TOKENS = ["studentska", "bl", "11"]
 FLAGSHIP_QUERY = u"студентска бл 11"
 WITNESS_PREFIX = u"написано: "
+# §3.Д — the row the panel adds when the cell has a parent (ИБ1-О32).
+PARENT_PREFIX = u"част от "
+
+# ИБ1-О31/О33 — the class the dot-blind normalizer doubled: a written quarter
+# that carries DOTS („ж.к. Възраждане“, „в.з. Варна“, „с.о. Ален Мак“) and, on
+# the GPS surface, a DOT-LESS token run against a dotted name („жк бриз“ against
+# „ж.к. Бриз“). Measured on the delivery: 597 records with a cell used to read
+# their quarter twice without a witness, 3 484 GPS rows the same.
+DOTTED_HEADS = (u"ж.к.", u"в.з.", u"с.о.", u"к.к.")
+# The six queries К7в put into Ф11. They are named here as well ON PURPOSE: the
+# first assertion of every method below is that the corpus still carries them,
+# so a corpus that drifts away from the gate fails loudly instead of silently
+# testing nothing.
+DOTTED_QUERIES = (u"ана феликсова 18", u"бул народни будители 11",
+                  u"22 ра 15", u"зл пясъци бл ф")
+DOTLESS_QUERIES = (u"жк бриз", u"кк златни пясъци")
+# §3.Д (д) — the closed DOT-LESS list the GPS label meets.
+TOKEN_TYPES = (u"кв", u"жк", u"кк", u"вз", u"со", u"м", u"мт", u"местност",
+               u"зона", u"пз", u"квартал")
+
+
+def flat(text):
+    """The client's `flat` after К9а: the dot is CUT, never replaced by a space.
+
+    Replacing it was ИБ1-О31: „ж.к.“ became „ж к“, the lead word became „ж“ and
+    no type ever matched. The test carries the same rule so it can count quarter
+    words dot-blind — „ж.к. Бриз“ and „жк бриз“ are ONE word, said twice.
+    """
+    lowered = (text or u"").lower().replace(u".", u"")
+    return re.sub(r"\s+", u" ", re.sub(r"[,-]", u" ", lowered)).strip()
+
+
+def dotless_gps_rows(doc, rows, want):
+    """Rows of §3.Д (д), found in the live payload — never written down here.
+
+    A row qualifies when its cell's name carries dots, the label opens with a
+    dot-less type token, the run spells that same name, and the label is
+    „streetish“ enough for `nearestAddressTo` to prefer it (a digit, no trailing
+    „ 0“). Each quarter is taken once, so the cases are not three copies of one.
+    """
+    found = []
+    for index, row in enumerate(rows):
+        cell = doc["row_cell"][index]
+        if cell < 0:
+            continue
+        name = doc["names"][cell]
+        if u"." not in name or name in [n for _, n in found]:
+            continue
+        label = row[0] or u""
+        parts = label.split()
+        if len(parts) < 2 or parts[0].lower() not in TOKEN_TYPES:
+            continue
+        if not re.search(r"\d", label) or re.search(r"\s0$", label):
+            continue
+        run = len(flat(name).split(u" "))
+        if flat(u" ".join(parts[:run])) != flat(name):
+            continue
+        found.append((index, name))
+        if len(found) >= want:
+            break
+    return found
 
 
 def require_node(test):
@@ -348,6 +410,99 @@ class GpsRowTest(unittest.TestCase):
             silenced = ask_client(self, [{"ask": "coord", "q": query}], quarters_path=path)[0]
         self.assertEqual(silenced["meta"], base["meta"],
                          u"думата оцеля на GPS при разминал се rows_digest")
+
+
+class DottedPrefixTest(unittest.TestCase):
+    """ИБ1-О31/О32/О33 — the DOTTED prefixes: cut, confessed, and the parent row.
+
+    Until К9а the closed list of §3.Д (а) was carried without its dots while the
+    normalizer replaced every dot with a space: „ж.к. Възраждане“ flattened to
+    „ж к възраждане“, the lead word was „ж“, no type matched and the row read
+    „ж.к. Възраждане 1, ж.к. Възраждане, Ана Феликсова 18“ — the quarter twice,
+    and no „написано:“ to confess it. These three methods are the gate for that
+    class; they were RED on К9 and green on К9а.
+    """
+
+    def corpus_carries_the_class(self):
+        corpus = corpus_doc(self)
+        missing = [q for q in DOTTED_QUERIES + DOTLESS_QUERIES
+                   if q not in corpus["queries"]]
+        if missing:
+            self.fail(u"Ф11 не носи заявките на класа: %s" % u", ".join(missing))
+
+    def test_a_dotted_written_quarter_is_cut_and_confessed(self):
+        self.corpus_carries_the_class()
+        doc = delivered_doc(self)
+        judged = 0
+        for query in DOTTED_QUERIES:
+            base = ask_base(self, [{"ask": "render", "q": query, "limit": 5}])[0]
+            found, rows = ask_client(self, [{"ask": "search", "q": query, "limit": 5},
+                                            {"ask": "render", "q": query, "limit": 5}])
+            for i, row in enumerate(rows):
+                if i >= len(base):
+                    break
+                written = base[i]["title"] or u""
+                head = written.split(u", ")[0]
+                if not head.startswith(DOTTED_HEADS):
+                    continue
+                position = found["rows"][i]["ord"]
+                if position is None:
+                    continue
+                cell = doc["entry_cell"][position]
+                if cell < 0:
+                    continue
+                name = doc["names"][cell]
+                tail = written[len(head) + 2:]
+                self.assertEqual(row["title"], name + u", " + tail,
+                                 u"%r: заглавието не е „име + остатък“: %r"
+                                 % (query, row["title"]))
+                if flat(head) != flat(name):
+                    # A DIFFERENT quarter was written: it leaves the title and
+                    # goes to the second row as the witness of D18. (When the two
+                    # agree the title legitimately re-opens with the same word.)
+                    self.assertNotIn(head + u", ", row["title"] or u"",
+                                     u"написаният квартал не е отрязан: %r" % row["title"])
+                    self.assertIn(WITNESS_PREFIX + head, row["meta"] or u"",
+                                  u"%r: няма свидетел за %r: %r"
+                                  % (query, head, row["meta"]))
+                judged += 1
+        self.assertGreaterEqual(judged, len(DOTTED_QUERIES),
+                                u"класът не е представен: съдени са %d реда" % judged)
+
+    def test_the_gps_line_cuts_the_dotless_token(self):
+        """§3.Д (д) — „жк бриз 2“ in „ж.к. Бриз“ says the quarter ONCE."""
+        self.corpus_carries_the_class()
+        doc = delivered_doc(self)
+        rows = json.loads(ADDRESS_ROWS.read_text(encoding="utf-8"))["rows"]
+        cases = dotless_gps_rows(doc, rows, 3)
+        self.assertGreaterEqual(len(cases), 3,
+                                u"живият товар няма редове от клас (д): %r" % cases)
+        for index, name in cases:
+            query = coordinate_query((rows[index][1], rows[index][2]))
+            base = ask_base(self, [{"ask": "coord", "q": query}])[0]
+            new = ask_client(self, [{"ask": "coord", "q": query}])[0]
+            meta = new["meta"] or u""
+            self.assertNotEqual(meta, base["meta"],
+                                u"GPS-редът не е пипнат от row_cell: %r" % meta)
+            present = [n for n in doc["names"] if n and n in meta]
+            self.assertEqual(len(present), 1,
+                             u"GPS-редът носи %d квартални думи: %r" % (len(present), meta))
+            self.assertEqual(flat(meta).count(flat(name)), 1,
+                             u"GPS-редът казва %r два пъти: %r" % (name, meta))
+
+    def test_the_panel_says_what_the_quarter_is_part_of(self):
+        """ИБ1-О32 · §3.Д — `parents[i]` непразно -> „част от <parent_display>“."""
+        doc = delivered_doc(self)
+        entries = search_entries()
+        cell = doc["entry_cell"][flagship_index(entries)]
+        self.assertNotEqual(cell, -1, u"флагманът е угасен в доставката")
+        parent = doc["parents"][cell]
+        if not parent:
+            self.fail(u"клетката на флагмана няма родител — фикстурата е мръднала")
+        panel = ask_client(self, [{"ask": "panel", "q": FLAGSHIP_QUERY, "pick": 0}])[0]
+        surface = u" ".join(panel["popups"] + ([panel["sheet"]] if panel["sheet"] else []))
+        self.assertIn(PARENT_PREFIX + parent, surface,
+                      u"панелът не казва на кой квартал е част: %r" % surface)
 
 
 if __name__ == "__main__":
