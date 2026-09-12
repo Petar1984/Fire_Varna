@@ -32,15 +32,15 @@ The 8 resort conflicts (ДАЛИЯ ГАРДЪН · Фрегата · МАГНО�
 
 | Какво | Стойност | Команда |
 |---|---|---|
-| commits on `main` | 327 | `git rev-list --count main` |
-| commits ahead of `origin/main` (Petar alone pushes) | 46 | `git rev-list --count origin/main..main` |
+| commits on `main` | 608 | `git rev-list --count main` |
+| commits ahead of `origin/main` (Petar alone pushes) | 0 (published c92224c, 12.09) | `git rev-list --count origin/main..main` |
 | commits on `origin/main` not on `main` | 0 | `git rev-list --count main..origin/main` |
 | last pushed commit | 6da5d9a 2026-09-04 | `git log -1 --format='%h %cs' origin/main` |
 | records in `data/hydrants.json` | 7407 | `PYTHONIOENCODING=utf-8 python -c "import json;print(len(json.load(open('data/hydrants.json',encoding='utf-8'))))"` |
 | records per origin | [('vik', 3524), ('national', 2329), ('etr_varna', 763), ('etr_provadia', 244), ('etr_dolni_chiflik', 219), ('field_report', 151), ('pozarna_gz', 99), ('etr_devnya', 78)] | `PYTHONIOENCODING=utf-8 python -c "import json,collections;print(collections.Counter(x.get('origin') for x in json.load(open('data/hydrants.json',encoding='utf-8'))).most_common())"` |
-| `index.html` bytes (557270 before F12; 560365 after F12-з) | 560855 | `wc -c < index.html` |
+| `index.html` bytes (557270 before F12; 560365 after F12-з) | 579399 (после И-Б1: 560855 + адресният квартал по полигон) | `wc -c < index.html` |
 | `data/hydrants.json` bytes | 1315276 | `wc -c < data/hydrants.json` |
-| first load (`index.html` + `data/hydrants.json`), hard cap 5 MB | 1876131 B = 1,79 MB | `python -c "import os;print(os.path.getsize('index.html')+os.path.getsize('data/hydrants.json'))"` |
+| first load (`index.html` + `data/hydrants.json`), hard cap 5 MB | 1901463 B = 1,81 MB (address_quarters.json 493305 B е ленив, извън първото зареждане) | `python -c "import os;print(os.path.getsize('index.html')+os.path.getsize('data/hydrants.json'))"` |
 | `data/hotels.json` (225 rows × 17 keys; 142543 B before F12) | 148685 B · sha `46a44ce82f15…` | `wc -c < data/hotels.json` · `git show HEAD:data/hotels.json \| sha256sum` |
 | `data/places.json` (150 rows × 13 keys; 121621 B before F12) | 122089 B · sha `329310f577e8…` | `wc -c < data/places.json` · `git show HEAD:data/places.json \| sha256sum` |
 | `data/place_categories.json` (64831 B before F12) | 75818 B · sha `874e33cd00e2…` | `wc -c < data/place_categories.json` · `git show HEAD:data/place_categories.json \| sha256sum` |
