@@ -5255,15 +5255,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
         // Т10 · §3.Д (д) — the GPS line names the quarter of the ROW the label
         // came from (`row_cell`), never the quarter written in the address text.
         // At -1, at a refused delivery or with the switch off the line is exactly
-        // today's.
+        // today's. ИБ1-О57 — написаната дума не се признава и тук: вторият бит
+        // на реда отпадна заедно с този на падащия списък.
         const rows = (ADDRESS_QUARTER_V2 && quarterIndex !== null) ? quarterIndex.row_cell : null;
         const at = r.near.rowIndex;
         const cell = (rows && typeof at === 'number' && at >= 0 && at < rows.length) ? rows[at] : -1;
         const code = cell >= 0 ? quarterIndex.codes[cell] : null;
         const titled = code ? quarterTitleWord(code, r.near.label) : null;
-        const witness = code ? quarterTitleWord(code, r.near.label, 'written') : '';
         bits.push('≈ ' + r.near.metres + ' м от ' + (titled || r.near.label));
-        if (witness) bits.push('написано: ' + witness);
       } else if (!r.outside) bits.push('няма адрес наблизо');
       return bits.join(' · ');
     }
@@ -5684,9 +5683,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const spec = hitChip(r);
       const chip = document.createElement('span'); chip.className = 'asr-kind ' + spec.cls; chip.textContent = spec.label;
       const body = document.createElement('span'); body.className = 'asr-body';
-      // Т8 · §3.Д — the polygon writes the title, the written word becomes a
-      // WITNESS on the second line. `formatAddressHit` and the dedup key it
-      // feeds are untouched: what merges with what does not move.
+      // Т8 · §3.Д — the polygon writes the title. ИБ1-О57 (думата на Петър,
+      // 12.09, със скрийншот): написаната дума НЕ се връща на втория ред — той е
+      // само „район X“. Тя не се трие от данните (леджерът и пробите Д5 я пазят)
+      // и се смята и тук при нужда, но до DOM не стига. `formatAddressHit` and
+      // the dedup key it feeds are untouched: what merges with what does not move.
       const writtenLabel = formatAddressHit(r);
       const quarter = quarterOfHit(r);
       const quartered = quarter ? quarterTitleWord(quarter.code, writtenLabel) : null;
@@ -5695,8 +5696,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const bits = [];
       const raionName = r.d != null && districtNames[r.d] ? districtNames[r.d] : '';
       if (raionName) bits.push('район ' + raionName);
-      const witness = quartered ? quarterTitleWord(quarter.code, writtenLabel, 'written') : '';
-      if (witness) bits.push('написано: ' + witness);
       if (bits.length) { const meta = document.createElement('span'); meta.className = 'asr-meta'; meta.textContent = bits.join(' · '); body.appendChild(meta); }
       item.appendChild(chip); item.appendChild(body);
       return item;
