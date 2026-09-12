@@ -4956,14 +4956,28 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // a written run is a quarter when it spells a name of v2 — with its type
     // word ("кв. Чайка") or bare ("Аспарухово"), because 36 of the 90 names
     // carry no prefix at all (ИБ1-О11).
+    const sameWord = function (n, f) {
+      if (n === f) return true;
+      const space = n.indexOf(' ');
+      return space > 0 && FLAT_TYPES.indexOf(n.slice(0, space)) >= 0 && n.slice(space + 1) === f;
+    };
+    // ИБ1-О54 — К9в put the PARENT's name in the title, but the cut still knew
+    // only `names[]`: „възраждане“ spelled nothing there (the cells are
+    // „Възраждане 1…4“), nothing was taken off and the row read „ж.к.
+    // Възраждане, възраждане“ — 174 записа и 124 GPS реда. The written word of
+    // THIS cell is now a candidate too, and only it: `parents[cell]`, never the
+    // parent of some other quarter.
+    const parentName = quarterIndex.parents[cell] || '';
+    const spellsTheParent = function (run) {
+      const f = flat(run);
+      return !!f && !!parentName && sameWord(flat(parentName), f);
+    };
     const spellsAName = function (run) {
       const f = flat(run);
       if (!f) return false;
+      if (spellsTheParent(run)) return true;
       for (let i = 0; i < quarterIndex.names.length; i++) {
-        const n = flat(quarterIndex.names[i]);
-        if (n === f) return true;
-        const space = n.indexOf(' ');
-        if (space > 0 && FLAT_TYPES.indexOf(n.slice(0, space)) >= 0 && n.slice(space + 1) === f) return true;
+        if (sameWord(flat(quarterIndex.names[i]), f)) return true;
       }
       return false;
     };
@@ -4991,7 +5005,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       for (let n = 1; n <= parts.length; n++) {
         if (spellsAName(parts.slice(0, n).join(' '))) run = n;
       }
-      if (run > 0 && (isTokenType(lead) || run === parts.length)) {
+      // ИБ1-О54 — the run may also spell the WRITTEN PARENT name („младост бл
+      // 115“ in `ж.к. Младост 1`): then the title is about to say that very word
+      // and the tail may not repeat it. A bare name that is NOT this cell's own
+      // written word still needs its type token or the whole label (a street may
+      // carry a quarter's name — that guard stays).
+      if (run > 0 && (isTokenType(lead) || run === parts.length
+                      || spellsTheParent(parts.slice(0, run).join(' ')))) {
         written = parts.slice(0, run).join(' ');
         tail = parts.slice(run).join(' ');
       }
