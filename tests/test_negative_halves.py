@@ -6,7 +6,7 @@
 Red line 7 of the plan: "a gate that cannot return ≠ 0 is not a gate; every
 negative half MUST have run and MUST have failed". A half that only stands written
 in a report is self-attestation. This module is where the fifteen Fire_Varna gates
-plus the crossed half of ИБ1-Г3 are actually killed — twenty rows, each with its
+plus the crossed half of ИБ1-Г3 are actually killed — twenty-two rows, each with its
 own recipe, each demanded to exit with the number `tests/negative_halves_manifest.json`
 (Ф14) declares.
 
@@ -21,7 +21,7 @@ Coordinates and any cadastral-shaped string are ASSEMBLED at run time (О95,
 ИБ1-О21): a tracked file of this repo carries neither.
 
 Червено по конструкция до К8/К9 (ИНТЕРВАЛ А, план §4 стъпка 9): a dozen of the
-twenty recipes need the delivered payload (К8) or the markers of Т12 (К9). Until
+twenty-two recipes need the delivered payload (К8) or the markers of Т12 (К9). Until
 both exist the module fails fast with the reason and runs NO half — a red gate may
 not cost ten minutes of somebody's evening.
 
@@ -68,7 +68,10 @@ EXPECTED_GATES = {"ИБ1-Г3", "ИБ1-Г7", "ИБ1-Г8", "ИБ1-Г9к", "ИБ1-�
 # dropdown row and Г23 on the GPS line of a client whose `SPACED_PREFIXES` is
 # empty, i.e. which welds nothing and says the quarter twice. Still fifteen
 # gates; Г19к and Г23 now carry three rows each.
-MANIFEST_LEN = 21
+# ИБ1-О51 (К7ж): twenty-one — Г9к takes a second row for a client that writes the
+# NUMBER in the title. ИБ1-О54 (К7з): twenty-two — Г9к takes a THIRD row for the
+# client whose cut does not know the WRITTEN parent name.
+MANIFEST_LEN = 22
 ROW_KEYS = {"gate", "fixture", "argv", "expected_exit"}
 
 # Т12 — the marker that says the client of К9 is in the tree.
@@ -341,6 +344,28 @@ class Recipes:
         return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
                 "needle": u"номерът стои в заглавието"}
 
+    # ---- ИБ1-Г9к (ИБ1-О54): the client whose cut does not know the PARENT name
+    def client_without_the_parent_cut(self, root):
+        """К9г дава на рязането и `parents[cell]`. Половината му го отнема в
+        КОПИЕ: `parentName` става празен низ, тоест „възраждане“ пак не спелува
+        нищо и редът чете „ж.к. Възраждане, възраждане“ — родителят два пъти.
+
+        Преди К9г живият клиент Е точно такъв: котвата още не съществува и
+        копието е дословният HEAD — половината пак пада, по същата причина.
+        Преименува ли се котвата, копието става равно на живото дърво, половината
+        минава със 0 и Г20 пада: fail-loud, не fail-open.
+        """
+        text = (REPO / "index.html").read_bytes().decode("utf-8")
+        anchor = u"    const parentName = quarterIndex.parents[cell] || '';"
+        if anchor in text:
+            if text.count(anchor) != 1:
+                raise AssertionError(u"котвата на К9г е %d пъти" % text.count(anchor))
+            text = text.replace(anchor, u"    const parentName = '';", 1)
+        path = root / "index.html"
+        path.write_text(text, encoding="utf-8")
+        return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
+                "needle": u"родителят стои два пъти"}
+
     # ---- ИБ1-Г11: an eager literal fetch of the third payload
     def eager_quarter_fetch(self, root):
         text = (REPO / "index.html").read_bytes().decode("utf-8")
@@ -430,7 +455,7 @@ class Recipes:
 
 
 class NegativeHalvesTest(unittest.TestCase):
-    """ИБ1-Г20 — twenty rows, twenty fallen halves, not one exit 0."""
+    """ИБ1-Г20 — twenty-two rows, twenty-two fallen halves, not one exit 0."""
 
     def manifest(self):
         if not MANIFEST.exists():

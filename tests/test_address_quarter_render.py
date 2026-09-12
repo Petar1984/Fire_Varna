@@ -158,6 +158,39 @@ def merged(text):
                   lambda m: m.group(1) + m.group(2)[0] + m.group(2)[2], flat(text))
 
 
+# §3.Д (а) — затвореният списък типови думи, сплескан както го сплесква клиентът.
+FLAT_TYPES = tuple(flat(t) for t in (u"кв.", u"кв", u"квартал", u"ж.к.", u"жк",
+                                     u"ж.к", u"жк.", u"к.к.", u"в.з.", u"с.о.",
+                                     u"м-т", u"м.", u"местност", u"ПЗ"))
+
+
+def bare_word(name):
+    """Името без типовата си дума: „ж.к. Възраждане“ -> „възраждане“."""
+    flattened = flat(name)
+    head, _, rest = flattened.partition(u" ")
+    return rest if rest and head in FLAT_TYPES else flattened
+
+
+def says_twice(text, word):
+    """Текстът изписва думата и веднага след нея я ПОВТАРЯ.
+
+    ИБ1-О54 — класът, за който старият обход беше сляп: повторението не е
+    байтово („ж.к. Възраждане“ срещу „възраждане“), затова сравнението е сляпо
+    за точка, за запетая и за типовата представка. Гледа се само опашката ВЕДНАГА
+    след изписаната дума — свидетелят „написано: …“ в края на втория ред е друга
+    повърхност и не се брои за повторение.
+    """
+    flattened, written = flat(text), flat(word)
+    at = flattened.find(written)
+    if at < 0:
+        return False
+    tail = flattened[at + len(written):].strip()
+    for needle in (written, bare_word(word)):
+        if needle and (tail == needle or tail.startswith(needle + u" ")):
+            return True
+    return False
+
+
 def display_names(doc):
     """ИБ1-О51 — думата, с която всяка клетка се ИЗПИСВА.
 
@@ -246,6 +279,32 @@ def dotless_gps_rows(doc, rows, want):
             continue
         run = len(flat(name).split(u" "))
         if flat(u" ".join(parts[:run])) != flat(name):
+            continue
+        found.append((index, cell))
+        if len(found) >= want:
+            break
+    return found
+
+
+def parent_rows_with_a_tail(doc, rows, want):
+    """ИБ1-О54 — редове, чийто ЕТИКЕТ започва с РОДИТЕЛСКОТО име без типовата му
+    дума и продължава нататък („младост бл 115“ в клетка `ж.к. Младост 1`).
+
+    Намират се в ЖИВИЯ товар, никога не се изписват тук. Клетката е една от
+    десетте номерирани, етикетът носи цифра и не завършва на „ 0“, за да го
+    предпочете `nearestAddressTo`; по един ред на клетка.
+    """
+    ten = set(numbered_cells(doc))
+    found = []
+    for index, row in enumerate(rows):
+        cell = doc["row_cell"][index]
+        if cell not in ten or cell in [c for _, c in found]:
+            continue
+        head = bare_word(doc["parents"][cell])
+        label = row[0] or u""
+        if not head or not flat(label).startswith(head + u" "):
+            continue
+        if not re.search(r"\d", label) or re.search(r"\s0$", label):
             continue
         found.append((index, cell))
         if len(found) >= want:
@@ -496,16 +555,28 @@ class WitnessRulesTest(unittest.TestCase):
                              u"клон (в) е нарушен за %r" % query)
 
     def test_a_bare_name_is_never_written_twice(self):
+        """ИБ1-О54 — обходът е по `names` И по `parents`.
+
+        Докато вървеше само по `names[]`, тестът беше СЛЯП за класа, който К9в
+        отвори: изписаната дума на десетте е РОДИТЕЛСКАТА и точно нея опашката
+        повтаряше („ж.к. Възраждане, възраждане“). Байтовото броене не го хваща —
+        повторението е без типовата представка и с малка буква, — затова родител-
+        ските думи се съдят и по `says_twice`.
+        """
         corpus = corpus_doc(self)
         doc = delivered_doc(self)
-        names = set(doc["names"])
+        words = [w for w in list(doc["names"]) + list(doc["parents"]) if w]
+        parents = {doc["parents"][cell] for cell in numbered_cells(doc)}
         for query in corpus["queries"]:
             new = ask_client(self, [{"ask": "render", "q": query, "limit": 3}])[0]
             for row in new:
                 title = row["title"] or u""
-                for name in names:
-                    if name and title.count(name) > 1:
-                        self.fail(u"името %r се повтаря в %r" % (name, title))
+                for word in words:
+                    if title.count(word) > 1:
+                        self.fail(u"името %r се повтаря в %r" % (word, title))
+                for word in parents:
+                    if says_twice(title, word):
+                        self.fail(u"родителят стои два пъти: %r в %r" % (word, title))
 
     def test_a_locality_cell_never_fills_the_word(self):
         """D6 (`010:48`) — a полигон-местност never fills `quarter`; the build
@@ -855,6 +926,72 @@ class NumberedChildTest(unittest.TestCase):
         self.assertNotIn(doc["names"][cell], surface,
                          u"номерът стои в заглавието на панела: %r" % surface)
 
+    def test_the_written_parent_name_is_cut_too(self):
+        """ИБ1-О54 — написаното РОДИТЕЛСКО име се реже като всяко друго.
+
+        К9в сложи родителя в заглавието, но рязането познаваше само `names[]`:
+        „възраждане“ ставаше „ж.к. Възраждане, възраждане“, а етикетът „младост
+        бл 115“ — „ж.к. Младост, младост бл 115“. Класът се съди на ДВЕТЕ
+        повърхности: реда на падащия списък и GPS-реда; заявката и координатата
+        идват от ЖИВИЯ товар, не от низ, изписан тук.
+        """
+        corpus = corpus_doc(self)
+        doc = delivered_doc(self)
+        self.assertIn(BARE_NAME_QUERY, corpus["queries"],
+                      u"Ф11 не носи заявката за голото име")
+        # (1) редът: голото родителско име, написано САМО за себе си.
+        found, rows = ask_client(self, [{"ask": "search", "q": BARE_NAME_QUERY, "limit": 3},
+                                        {"ask": "render", "q": BARE_NAME_QUERY, "limit": 3}])
+        self.assertTrue(rows, u"нула редове за %r" % BARE_NAME_QUERY)
+        judged = 0
+        for i, row in enumerate(rows):
+            if i >= len(found["rows"]):
+                break
+            position = found["rows"][i]["ord"]
+            if position is None or doc["entry_cell"][position] not in numbered_cells(doc):
+                continue
+            parent = doc["parents"][doc["entry_cell"][position]]
+            title = row["title"] or u""
+            self.assertFalse(says_twice(title, parent),
+                             u"родителят стои два пъти: %r в %r" % (parent, title))
+            judged += 1
+        self.assertGreaterEqual(judged, 1,
+                                u"класът не е представен на реда: съдени са %d" % judged)
+
+        # (2) същото име, но с ОПАШКА след него — етикетът идва от товара.
+        payload = json.loads(ADDRESS_ROWS.read_text(encoding="utf-8"))["rows"]
+        cases = parent_rows_with_a_tail(doc, payload, 3)
+        self.assertGreaterEqual(len(cases), 2,
+                                u"живият товар няма редове от класа: %r" % cases)
+        for index, cell in cases:
+            parent = doc["parents"][cell]
+            label = payload[index][0]
+            found, rows = ask_client(self, [{"ask": "search", "q": label, "limit": 5},
+                                            {"ask": "render", "q": label, "limit": 5}])
+            for i, row in enumerate(rows):
+                if i >= len(found["rows"]):
+                    break
+                position = found["rows"][i]["ord"]
+                if position is None or doc["entry_cell"][position] not in numbered_cells(doc):
+                    continue
+                written = doc["parents"][doc["entry_cell"][position]]
+                title = row["title"] or u""
+                self.assertFalse(says_twice(title, written),
+                                 u"родителят стои два пъти: %r в %r" % (written, title))
+                judged += 1
+            # GPS-редът на СЪЩАТА точка — четвъртата повърхност.
+            query = coordinate_query((payload[index][1], payload[index][2]))
+            meta = ask_client(self, [{"ask": "coord", "q": query}])[0]["meta"] or u""
+            if not meta.startswith(ZERO_METRES) or parent not in meta:
+                # `nearestAddressTo` предпочете друг „уличен“ ред в същите 250 м;
+                # съдим само репликата, построена от ТАЗИ точка (прецедент О40).
+                continue
+            self.assertFalse(says_twice(meta, parent),
+                             u"родителят стои два пъти: %r в %r" % (parent, meta))
+            judged += 1
+        self.assertGreaterEqual(judged, 3,
+                                u"класът не е представен: съдени са %d реда" % judged)
+
     def test_the_gps_line_of_a_numbered_cell_wears_the_parent_name(self):
         """Четвъртата повърхност: GPS-редът на флагмана говори същата дума."""
         doc = delivered_doc(self)
@@ -879,7 +1016,16 @@ class AcceptedClassesTest(unittest.TestCase):
     да не се сменят мълком; рязането „по стебло“ е дълг ИБ2-4.
     """
 
-    def test_a_bare_name_against_a_numbered_cell_reads_by_branch_g(self):
+    def test_a_bare_name_against_a_numbered_cell_is_cut_after_o54(self):
+        """ИБ1-О54 — този клас ИЗЛЕЗЕ от приетите, с ред в §2.
+
+        До К9в „възраждане“ беше клон (г): голото име не спелуваше нито едно име
+        от `names[]` (там стоят номерираните „Възраждане 1…4“), оставаше дословно
+        и редът четеше „ж.к. Възраждане, възраждане“ — думата два пъти. К9г дава
+        на рязането и `parents[cell]`: голото име вече спелува ИЗПИСАНАТА дума,
+        реже се и остава „ж.к. Възраждане“, казано веднъж. Латиницата остава клон
+        (г) — методът под този.
+        """
         corpus = corpus_doc(self)
         self.assertIn(BARE_NAME_QUERY, corpus["queries"],
                       u"Ф11 не носи заявката за голото име")
@@ -891,10 +1037,15 @@ class AcceptedClassesTest(unittest.TestCase):
         position = found["rows"][0]["ord"]
         self.assertIsNotNone(position, u"редът няма `_ord`")
         cell = doc["entry_cell"][position]
-        self.assertGreaterEqual(cell, 0, u"клетката на голото име е угасена")
+        self.assertIn(cell, numbered_cells(doc),
+                      u"заявката вече не пада в номерирана клетка: %r"
+                      % doc["names"][cell])
         name = display_name(doc, cell)
-        self.assertEqual(rows[0]["title"], name + u", " + base[0]["title"],
-                         u"голото име вече не е клон (г): %r" % rows[0]["title"])
+        self.assertEqual(flat(base[0]["title"] or u""), bare_word(name),
+                         u"написаното вече не е голото родителско име: %r"
+                         % base[0]["title"])
+        self.assertEqual(rows[0]["title"], name,
+                         u"родителят стои два пъти: %r" % rows[0]["title"])
 
     def test_a_latin_label_reads_by_branch_g(self):
         corpus = corpus_doc(self)
