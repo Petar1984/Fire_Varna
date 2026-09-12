@@ -109,12 +109,18 @@ FORBIDDEN_KEYS = {"coordinates", "geometry", "geometries", "centroid", "centroid
 # class („ж.к.“/„в.з.“/„с.о.“ written, and „жк“/„кк“ dot-less against a dotted
 # name). The `entries` array did not move — it is the projection of the 145
 # `studentska` records that ИБ1-Г9 compares byte for byte in varna_3d.
-CORPUS_SHA256 = "a0bac54f8504a163e35fb607498ab8a05efd402d38edbed1ba98c0c3986c132d"
-CORPUS_BYTES = 9340
+# ИБ1-О36/О38 (К7г): FOUR more queries (the SPACED prefix, live and dark, the
+# bare name and the latin form) and SIX more records — the first that are not
+# `studentska`: the spaced class with a live cell and with a dark one, the bare
+# name against a numbered cell, the latin label, and one `-1` for EACH of the
+# two reasons the 145 never carried („вън от 90-те“ and a cell of class
+# `locality`). Every one of them is a PROJECTION of the live index.
+CORPUS_SHA256 = "f534d4942acb2c55d416ff5dbb7300d0c457f1ccc2517a315d679d24b87117a5"
+CORPUS_BYTES = 9782
 CORPUS_TOP_KEYS = {"queries", "entries"}
 CORPUS_ENTRY_KEYS = {"tk", "kind", "cell"}
-CORPUS_QUERIES = 26
-CORPUS_ENTRIES = 145
+CORPUS_QUERIES = 30
+CORPUS_ENTRIES = 151
 
 
 def git_bytes(*args):

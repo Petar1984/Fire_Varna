@@ -98,6 +98,26 @@ DOTLESS_QUERIES = (u"жк бриз", u"кк златни пясъци")
 TOKEN_TYPES = (u"кв", u"жк", u"кк", u"вз", u"со", u"м", u"мт", u"местност",
                u"зона", u"пз", u"квартал")
 
+# ИБ1-О36/О39 (К7г) — the SPACED prefix: „к к Чайка“ is „к.к. Чайка“ written with
+# a SPACE between the two letters. К9а cut the dot on both sides („кк чайка“), the
+# written form stayed apart and the title said the quarter TWICE without a witness.
+# Измерено през среза, индекс по индекс: 133 записа и 167 GPS реда ВЛОШЕНИ спрямо
+# К9 (обхват 1 917 / 241). Тези четири двойки и нищо друго се слепва.
+SPACED_PAIRS = (u"к к", u"ж к", u"в з", u"с о")
+ZERO_METRES = u"≈ 0 м от "                             # GPS-редът от САМАТА координата
+SPACED_QUERY = u"к к чайка"                            # жива клетка (к.к. Чайка)
+SPACED_DARK_QUERY = u"к к св св константин и елена"    # угасена (многоклетъчен ключ)
+# ИБ1-О38 — приетите класове: голо име срещу НОМЕРИРАНА клетка и латиница. И двата
+# остават клон (г) по буквата на §3.Д; дългът е ИБ2-4.
+BARE_NAME_QUERY = u"възраждане"
+LATIN_QUERY = u"zhk chaika 98"
+LATIN_RECORD = {"tk": ["zhk", "chaika", "98"], "kind": "parcel"}
+# ИБ1-О38(5) — по един запис с `-1` за всяка от двете причини, които 145-те
+# `studentska` записа нямат. Причината живее в Д6 и в леджера на varna_3d;
+# доставката носи само числото, затова тестът съди числото.
+DARK_OUTSIDE = {"tk": ["aladzha", "manastir"], "kind": "address"}   # вън от 90-те
+DARK_LOCALITY = {"tk": ["akatsia", "0"], "kind": "address"}         # клетка клас locality
+
 
 def flat(text):
     """The client's `flat` after К9а: the dot is CUT, never replaced by a space.
@@ -108,6 +128,47 @@ def flat(text):
     """
     lowered = (text or u"").lower().replace(u".", u"")
     return re.sub(r"\s+", u" ", re.sub(r"[,-]", u" ", lowered)).strip()
+
+
+def merged(text):
+    """`flat` ПЛЮС слепването на К9б: разредената двойка е ЕДНА дума.
+
+    Огледало на клиентското правило, за да може тестът да брои кварталните думи
+    независимо от това дали представката е написана „к.к.“, „кк“ или „к к“.
+    """
+    return re.sub(r"(^|\s)(%s)(?=\s|$)" % u"|".join(SPACED_PAIRS),
+                  lambda m: m.group(1) + m.group(2)[0] + m.group(2)[2], flat(text))
+
+
+def spaced_gps_rows(doc, rows, want):
+    """Редове от класа на ИБ1-О36 в ЖИВИЯ товар — никога изписани тук.
+
+    Ред влиза, когато клетката му е жива, етикетът започва с разредена двойка и
+    ЦЕЛИЯТ етикет спелува името на клетката (след слепването). Имената с ТИРЕ се
+    пропускат: тирето е отделен въпрос (ИБ1-О37/О44) и не бива да решава този
+    гейт. Взимат се най-много по шест на квартал, за да не са шест копия на един
+    и същи ред.
+    """
+    found, per = [], {}
+    for index, row in enumerate(rows):
+        cell = doc["row_cell"][index]
+        if cell < 0:
+            continue
+        name = doc["names"][cell]
+        label = row[0] or u""
+        if u"-" in name:
+            continue
+        if not any(label.lower().startswith(pair + u" ") for pair in SPACED_PAIRS):
+            continue
+        if merged(label) != merged(name):
+            continue
+        if per.get(name, 0) >= 6:
+            continue
+        per[name] = per.get(name, 0) + 1
+        found.append((index, name))
+        if len(found) >= want:
+            break
+    return found
 
 
 def dotless_gps_rows(doc, rows, want):
@@ -272,9 +333,29 @@ class CorpusParityTest(unittest.TestCase):
         entries = search_entries()
         mine = [{"tk": e["tk"], "kind": e["kind"], "cell": doc["entry_cell"][i]}
                 for i, e in enumerate(entries) if "studentska" in (e.get("tk") or [])]
-        self.assertEqual(len(mine), len(corpus["entries"]))
-        self.assertEqual(mine, corpus["entries"],
+        # ИБ1-О38 (К7г): корпусът вече носи и записи ИЗВЪН `studentska`; частта
+        # `studentska` обаче остава дословната проекция, ред по ред.
+        theirs = [r for r in corpus["entries"] if "studentska" in r["tk"]]
+        self.assertEqual(len(mine), len(theirs))
+        self.assertEqual(mine, theirs,
                          u"корпусът и доставката се разминават по клетка или по ред")
+
+    def test_every_corpus_record_is_a_live_projection(self):
+        """ИБ1-О38 (К7г) — и шестте нови записа са ПРОЕКЦИЯ: за всеки има жив
+        индекс с тези `tk`/`kind`, чиято ДОСТАВЕНА клетка е записаната."""
+        doc = delivered_doc(self)
+        corpus = corpus_doc(self)
+        entries = search_entries()
+        seen = {}
+        for i, entry in enumerate(entries):
+            key = (tuple(entry.get("tk") or []), entry.get("kind"))
+            seen.setdefault(key, set()).add(doc["entry_cell"][i])
+        for record in corpus["entries"]:
+            key = (tuple(record["tk"]), record["kind"])
+            self.assertIn(key, seen, u"корпусен запис без жив индекс: %r" % (record,))
+            self.assertIn(record["cell"], seen[key],
+                          u"корпусът дава клетка %d, доставката — %r: %r"
+                          % (record["cell"], sorted(seen[key]), record))
 
 
 class FlagshipRowTest(unittest.TestCase):
@@ -503,6 +584,161 @@ class DottedPrefixTest(unittest.TestCase):
         surface = u" ".join(panel["popups"] + ([panel["sheet"]] if panel["sheet"] else []))
         self.assertIn(PARENT_PREFIX + parent, surface,
                       u"панелът не казва на кой квартал е част: %r" % surface)
+
+
+class SpacedPrefixTest(unittest.TestCase):
+    """ИБ1-О36/О39 — РАЗРЕДЕНАТА представка: една квартална дума, не две.
+
+    „к к чайка“ е „к.к. Чайка“, написана с интервал между двете букви. След К9а
+    точката се РЕЖЕ, тоест името се сплеска на „кк чайка“, а написаното остана
+    „к к чайка“ — `spellsAName` не ги равнява, нищо не се отрязва и редът казва
+    квартала ДВА пъти, без „написано:“. Измерено индекс по индекс срещу К9: 133
+    записа и 167 GPS реда влошени (обхват 1 917 / 241). Двата метода долу са
+    гейтът на този клас; те са ЧЕРВЕНИ на К9а и зелени на К9б.
+    """
+
+    def corpus_carries_the_class(self):
+        corpus = corpus_doc(self)
+        missing = [q for q in (SPACED_QUERY, SPACED_DARK_QUERY)
+                   if q not in corpus["queries"]]
+        if missing:
+            self.fail(u"Ф11 не носи заявките на класа: %s" % u", ".join(missing))
+
+    def test_a_spaced_prefix_says_the_quarter_once(self):
+        self.corpus_carries_the_class()
+        doc = delivered_doc(self)
+        found, rows = ask_client(self, [{"ask": "search", "q": SPACED_QUERY, "limit": 5},
+                                        {"ask": "render", "q": SPACED_QUERY, "limit": 5}])
+        self.assertTrue(rows, u"нула редове за %r" % SPACED_QUERY)
+        judged = 0
+        for i, row in enumerate(rows):
+            if i >= len(found["rows"]):
+                break
+            position = found["rows"][i]["ord"]
+            if position is None:
+                continue
+            cell = doc["entry_cell"][position]
+            if cell < 0:
+                continue
+            name = doc["names"][cell]
+            title = row["title"] or u""
+            self.assertIn(name, title,
+                          u"%r: редът не носи думата на полигона: %r" % (SPACED_QUERY, title))
+            self.assertEqual(merged(title).count(merged(name)), 1,
+                             u"%r: редът казва ДВЕ квартални думи за %r: %r"
+                             % (SPACED_QUERY, name, title))
+            judged += 1
+        self.assertGreaterEqual(judged, 1,
+                                u"класът не е представен: съдени са %d реда" % judged)
+
+    def test_the_gps_line_merges_the_spaced_prefix(self):
+        """§3.Д (д) — „с о Кочмар“ в „с.о. Кочмар“ казва квартала ВЕДНЪЖ."""
+        self.corpus_carries_the_class()
+        doc = delivered_doc(self)
+        rows = json.loads(ADDRESS_ROWS.read_text(encoding="utf-8"))["rows"]
+        cases = spaced_gps_rows(doc, rows, 42)
+        self.assertGreaterEqual(len(cases), 12,
+                                u"живият товар няма редове от класа: %r" % cases)
+        answers = ask_client(self, [{"ask": "coord",
+                                     "q": coordinate_query((rows[index][1], rows[index][2]))}
+                                    for index, _ in cases])
+        judged = 0
+        for (index, name), answer in zip(cases, answers):
+            meta = answer["meta"] or u""
+            if not meta.startswith(ZERO_METRES) or name not in meta:
+                # `nearestAddressTo` предпочита „уличен“ ред в същите 250 м: тогава
+                # редът НЕ е този, който подадохме, а опашката му носи номер и
+                # остава в ПРИЕТИЯ клас на ИБ1-О40 („с.о. Ментеше, С о ментеше
+                # 453“ — рязане по стебло, дълг ИБ2-4). Съдим само репликата,
+                # която клиентът е построил от ТАЗИ координата, на нула метра.
+                continue
+            self.assertEqual(merged(meta).count(merged(name)), 1,
+                             u"GPS-редът казва ДВЕ квартални думи за %r: %r" % (name, meta))
+            judged += 1
+        self.assertGreaterEqual(judged, 2,
+                                u"нито един ред от класа не е достижим през coord (%d)" % judged)
+
+    def test_the_dark_spaced_class_keeps_todays_row(self):
+        """Същата представка, но УГАСЕНА клетка (многоклетъчен ключ): редът е
+        точно днешният — слепването не пали дума там, където доставката мълчи."""
+        self.corpus_carries_the_class()
+        base = ask_base(self, [{"ask": "render", "q": SPACED_DARK_QUERY, "limit": 3}])[0]
+        new = ask_client(self, [{"ask": "render", "q": SPACED_DARK_QUERY, "limit": 3}])[0]
+        self.assertEqual([r["title"] for r in new], [r["title"] for r in base],
+                         u"угасеният разреден клас е пипнат")
+
+
+class AcceptedClassesTest(unittest.TestCase):
+    """ИБ1-О38/О40 — класовете, които лотът ПРИЕМА поименно вместо да ги мълчи.
+
+    Те не са дефект, който К9б поправя: §3.Д (б) реже само ДОСЛОВНО име, а
+    латиницата не спелува име на v2 — и в двата случая остава клон (г), с
+    името на полигона отпред и дословния остатък отзад. Тестът ги ЗАКОВАВА, за
+    да не се сменят мълком; рязането „по стебло“ е дълг ИБ2-4.
+    """
+
+    def test_a_bare_name_against_a_numbered_cell_reads_by_branch_g(self):
+        corpus = corpus_doc(self)
+        self.assertIn(BARE_NAME_QUERY, corpus["queries"],
+                      u"Ф11 не носи заявката за голото име")
+        doc = delivered_doc(self)
+        found, rows = ask_client(self, [{"ask": "search", "q": BARE_NAME_QUERY, "limit": 1},
+                                        {"ask": "render", "q": BARE_NAME_QUERY, "limit": 1}])
+        base = ask_base(self, [{"ask": "render", "q": BARE_NAME_QUERY, "limit": 1}])[0]
+        self.assertTrue(rows and base, u"нула редове за %r" % BARE_NAME_QUERY)
+        position = found["rows"][0]["ord"]
+        self.assertIsNotNone(position, u"редът няма `_ord`")
+        cell = doc["entry_cell"][position]
+        self.assertGreaterEqual(cell, 0, u"клетката на голото име е угасена")
+        name = doc["names"][cell]
+        self.assertEqual(rows[0]["title"], name + u", " + base[0]["title"],
+                         u"голото име вече не е клон (г): %r" % rows[0]["title"])
+
+    def test_a_latin_label_reads_by_branch_g(self):
+        corpus = corpus_doc(self)
+        self.assertIn(LATIN_QUERY, corpus["queries"], u"Ф11 не носи латинската заявка")
+        doc = delivered_doc(self)
+        entries = search_entries()
+        found, rows = ask_client(self, [{"ask": "search", "q": LATIN_QUERY, "limit": 5},
+                                        {"ask": "render", "q": LATIN_QUERY, "limit": 5}])
+        base = ask_base(self, [{"ask": "render", "q": LATIN_QUERY, "limit": 5}])[0]
+        judged = 0
+        for i, row in enumerate(rows):
+            if i >= len(found["rows"]) or i >= len(base):
+                break
+            position = found["rows"][i]["ord"]
+            if position is None:
+                continue
+            entry = entries[position]
+            if entry.get("tk") != LATIN_RECORD["tk"] or entry.get("kind") != LATIN_RECORD["kind"]:
+                continue
+            cell = doc["entry_cell"][position]
+            self.assertGreaterEqual(cell, 0, u"латинският запис е угасен")
+            name = doc["names"][cell]
+            self.assertEqual(row["title"], name + u", " + base[i]["title"],
+                             u"латиницата вече не е клон (г): %r" % row["title"])
+            judged += 1
+        self.assertEqual(judged, 1, u"латинският запис не е съден (%d)" % judged)
+
+    def test_the_two_dark_reasons_are_in_the_corpus_and_silent(self):
+        """ИБ1-О38(5) — 145-те `studentska` записа гаснат САМО по многоклетъчен
+        ключ. Корпусът носи и по един `-1` за другите две причини: ВЪН от 90-те
+        и клетка клас `locality`. Доставката носи числото, причината е в Д6."""
+        corpus = corpus_doc(self)
+        doc = delivered_doc(self)
+        entries = search_entries()
+        for record in (DARK_OUTSIDE, DARK_LOCALITY):
+            mine = [r for r in corpus["entries"]
+                    if r["tk"] == record["tk"] and r["kind"] == record["kind"]]
+            self.assertTrue(mine, u"корпусът няма записа %r" % (record,))
+            self.assertEqual([r["cell"] for r in mine], [-1],
+                             u"тъмният запис %r не е угасен в корпуса" % (record,))
+            live = [i for i, e in enumerate(entries)
+                    if e.get("tk") == record["tk"] and e.get("kind") == record["kind"]]
+            self.assertTrue(live, u"няма жив индекс за %r" % (record,))
+            for i in live:
+                self.assertEqual(doc["entry_cell"][i], -1,
+                                 u"доставката пали дума за %r (индекс %d)" % (record, i))
 
 
 if __name__ == "__main__":

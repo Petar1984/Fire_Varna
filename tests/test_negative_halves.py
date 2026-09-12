@@ -6,7 +6,7 @@
 Red line 7 of the plan: "a gate that cannot return ≠ 0 is not a gate; every
 negative half MUST have run and MUST have failed". A half that only stands written
 in a report is self-attestation. This module is where the fifteen Fire_Varna gates
-plus the crossed half of ИБ1-Г3 are actually killed — sixteen rows, each with its
+plus the crossed half of ИБ1-Г3 are actually killed — twenty rows, each with its
 own recipe, each demanded to exit with the number `tests/negative_halves_manifest.json`
 (Ф14) declares.
 
@@ -21,7 +21,7 @@ Coordinates and any cadastral-shaped string are ASSEMBLED at run time (О95,
 ИБ1-О21): a tracked file of this repo carries neither.
 
 Червено по конструкция до К8/К9 (ИНТЕРВАЛ А, план §4 стъпка 9): a dozen of the
-sixteen recipes need the delivered payload (К8) or the markers of Т12 (К9). Until
+twenty recipes need the delivered payload (К8) or the markers of Т12 (К9). Until
 both exist the module fails fast with the reason and runs NO half — a red gate may
 not cost ten minutes of somebody's evening.
 
@@ -56,7 +56,7 @@ SHORT_ROOT = os.environ.get("IB_TMP")
 FIXTURES = (pathlib.Path(SHORT_ROOT) / "ib_fixtures" if SHORT_ROOT
             else pathlib.Path(tempfile.gettempdir()) / "ib1_fixtures_fv")
 
-# план §3.А Ф14 — the closed set. Sixteen rows, sixteen gates, no repetition.
+# план §3.А Ф14 — the closed set: fifteen gates, no gate outside it.
 EXPECTED_GATES = {"ИБ1-Г3", "ИБ1-Г7", "ИБ1-Г8", "ИБ1-Г9к", "ИБ1-Г10", "ИБ1-Г11",
                   "ИБ1-Г12", "ИБ1-Г13", "ИБ1-Г14", "ИБ1-Г15", "ИБ1-Г17",
                   "ИБ1-Г19к", "ИБ1-Г20", "ИБ1-Г21", "ИБ1-Г22", "ИБ1-Г23"}
@@ -64,7 +64,11 @@ EXPECTED_GATES = {"ИБ1-Г3", "ИБ1-Г7", "ИБ1-Г8", "ИБ1-Г9к", "ИБ1-�
 # client that still normalizes dot-blind, Г23 on the one whose dot-less token
 # list is empty. The gate SET does not grow; two of its members now carry two
 # rows each.
-MANIFEST_LEN = 18
+# ИБ1-О36/О39 (К7г): eighteen + the TWO halves of the SPACED class — Г19к on the
+# dropdown row and Г23 on the GPS line of a client whose `SPACED_PREFIXES` is
+# empty, i.e. which welds nothing and says the quarter twice. Still fifteen
+# gates; Г19к and Г23 now carry three rows each.
+MANIFEST_LEN = 20
 ROW_KEYS = {"gate", "fixture", "argv", "expected_exit"}
 
 # Т12 — the marker that says the client of К9 is in the tree.
@@ -280,6 +284,30 @@ class Recipes:
         return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
                 "needle": u"два пъти"}
 
+    # ---- ИБ1-Г19к/Г23 (ИБ1-О36/О39): the client that welds NO spaced pair
+    def client_without_the_spaced_pairs(self, root):
+        """With `SPACED_PREFIXES` empty „к к чайка“ stays apart from „кк чайка“,
+        `spellsAName` never matches, nothing is cut and the row says the quarter
+        TWICE without a witness — exactly the state К9а left behind (133 записа /
+        167 GPS реда влошени спрямо К9). The half falls on THAT message."""
+        text = (REPO / "index.html").read_bytes().decode("utf-8")
+        start = text.find(u"    const SPACED_PREFIXES = [")
+        if start < 0:
+            raise AssertionError(u"SPACED_PREFIXES липсва (§3.Д, ражда се в К9б)")
+        end = text.find(u"];", start)
+        if end < 0:
+            raise AssertionError(u"SPACED_PREFIXES не е затворен масив")
+        text = text[:start] + u"    const SPACED_PREFIXES = [" + text[end:]
+        path = root / "index.html"
+        path.write_text(text, encoding="utf-8")
+        return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
+                "needle": u"ДВЕ квартални думи"}
+
+    def client_without_the_spaced_pairs_gps(self, root):
+        """Същият дефект, съден на GPS-повърхността (Г23) — своя фикстура, свой
+        прогон, за да не делят двете половини едно и също дърво."""
+        return self.client_without_the_spaced_pairs(root)
+
     # ---- ИБ1-Г11: an eager literal fetch of the third payload
     def eager_quarter_fetch(self, root):
         text = (REPO / "index.html").read_bytes().decode("utf-8")
@@ -369,7 +397,7 @@ class Recipes:
 
 
 class NegativeHalvesTest(unittest.TestCase):
-    """ИБ1-Г20 — sixteen rows, sixteen fallen halves, not one exit 0."""
+    """ИБ1-Г20 — twenty rows, twenty fallen halves, not one exit 0."""
 
     def manifest(self):
         if not MANIFEST.exists():
