@@ -62,8 +62,9 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "docs/decisions/011a_амандамент_И-Б1_11.09.md",
                # чужд: модерация #38, 20c1efe
                "scratch/apply_c38.py",
-               # запис на Архитекта: Кими К45 (О46)
-               "scratch/places_search/tiles_kimi_K45_12.09.md"}
+               # запис на Архитекта: Кими К45 (О46), Кими К46 (О52)
+               "scratch/places_search/tiles_kimi_K45_12.09.md",
+               "scratch/places_search/tiles_kimi_K46_12.09.md"}
 def git(*args):
     """S30-2: a failed git process is a FAILED gate, never a green one."""
     try:

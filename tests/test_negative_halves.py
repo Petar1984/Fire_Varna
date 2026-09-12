@@ -68,7 +68,7 @@ EXPECTED_GATES = {"ИБ1-Г3", "ИБ1-Г7", "ИБ1-Г8", "ИБ1-Г9к", "ИБ1-�
 # dropdown row and Г23 on the GPS line of a client whose `SPACED_PREFIXES` is
 # empty, i.e. which welds nothing and says the quarter twice. Still fifteen
 # gates; Г19к and Г23 now carry three rows each.
-MANIFEST_LEN = 20
+MANIFEST_LEN = 21
 ROW_KEYS = {"gate", "fixture", "argv", "expected_exit"}
 
 # Т12 — the marker that says the client of К9 is in the tree.
@@ -317,6 +317,29 @@ class Recipes:
         """Същият дефект, съден на GPS-повърхността (Г23) — своя фикстура, свой
         прогон, за да не делят двете половини едно и също дърво."""
         return self.client_without_the_spaced_pairs(root)
+
+    # ---- ИБ1-Г9к (ИБ1-О51): the client that writes the NUMBER in the title
+    def client_without_the_parent_name(self, root):
+        """К9в изписва десетте номерирани деца с името на родителя им. Половината
+        връща стария клон в КОПИЕ: заглавието пак казва „Левски 1, бл. 11“ и
+        `NumberedChildTest` пада по своята причина — „номерът стои в заглавието“.
+
+        Преди К9в живият клиент Е точно такъв клиент: котвата още не съществува
+        и копието е дословният HEAD — половината пак пада, по същата причина.
+        Ако котвата някога се преименува, копието става равно на живото дърво,
+        половината минава със 0 и Г20 пада: fail-loud, не fail-open.
+        """
+        text = (REPO / "index.html").read_bytes().decode("utf-8")
+        anchor = (u"    const name = (NUMBERED_TAIL.test(bare) && quarterIndex.parents[cell])"
+                  u"\n                 ? quarterIndex.parents[cell] : bare;")
+        if anchor in text:
+            if text.count(anchor) != 1:
+                raise AssertionError(u"котвата на К9в е %d пъти" % text.count(anchor))
+            text = text.replace(anchor, u"    const name = bare;", 1)
+        path = root / "index.html"
+        path.write_text(text, encoding="utf-8")
+        return {"env": {"FIRE_VARNA_INDEX_HTML_PATH": str(path)},
+                "needle": u"номерът стои в заглавието"}
 
     # ---- ИБ1-Г11: an eager literal fetch of the third payload
     def eager_quarter_fetch(self, root):

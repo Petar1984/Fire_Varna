@@ -2,7 +2,7 @@
   "_meta": {
     "plan": "docs/plans/ПЛАН_Картата_imot_И-Б1_11.09.md",
     "what": "Ф14 — the negative halves of Fire_Varna: gate, fixture recipe, argv, exit.",
-    "rule": "len == 20 and the gate set is exactly the fifteen Fire_Varna gates plus the crossed half of ИБ1-Г3; ИБ1-Г19к and ИБ1-Г23 carry a second row each for the dotted class (ИБ1-О33, К7в) and a THIRD each for the spaced class (ИБ1-О36/О39, К7г); tests/test_negative_halves.py (Ф13) runs every row and demands the declared exit.",
+    "rule": "len == 21 and the gate set is exactly the fifteen Fire_Varna gates plus the crossed half of ИБ1-Г3; ИБ1-Г19к and ИБ1-Г23 carry a second row each for the dotted class (ИБ1-О33, К7в) and a THIRD each for the spaced class (ИБ1-О36/О39, К7г); ИБ1-Г9к carries a second row for the numbered children (ИБ1-О51, К7ж); tests/test_negative_halves.py (Ф13) runs every row and demands the declared exit.",
     "placeholders": "{python} {node} {repo} {clone} {base} {fixture} — substituted by Ф13 at run time; coordinates and cadastral strings are built by the recipe, never written down."
   },
   "halves": [
@@ -124,6 +124,12 @@
       "gate": "ИБ1-Г23",
       "fixture": "client_without_the_spaced_pairs_gps",
       "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.SpacedPrefixTest.test_the_gps_line_merges_the_spaced_prefix"],
+      "expected_exit": 1
+    },
+    {
+      "gate": "ИБ1-Г9к",
+      "fixture": "client_without_the_parent_name",
+      "argv": ["{python}", "-m", "unittest", "tests.test_address_quarter_render.NumberedChildTest"],
       "expected_exit": 1
     }
   ]

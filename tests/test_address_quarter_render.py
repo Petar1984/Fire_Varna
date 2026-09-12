@@ -81,6 +81,24 @@ WITNESS_PREFIX = u"написано: "
 # §3.Д — the row the panel adds when the cell has a parent (ИБ1-О32).
 PARENT_PREFIX = u"част от "
 
+# ИБ1-О51 (думата на Петър, 12.09) — дете, чието име завършва с НОМЕР и което
+# има родител, се ИЗПИСВА с името на родителя си: „кв. Левски, бл. 11“, не
+# „Левски 1, бл. 11“. Десетте са levski1/2, mladost1/2, vazrazhdane1–4,
+# vladislav_varnenchik1/2; номерът остава в данните (`entry_cell`, леджерът) и
+# може да излезе в картончето на 3D картата — в търсачката го няма.
+NUMBERED_TAIL = re.compile(r"\d$")
+E_NUMBERED_CELLS = 10
+# Написаното съвпада с ИЗПИСАНОТО -> няма какво да се признава.
+PARENT_WRITTEN_QUERY = u"студентска бл 7"          # написано „кв. Левски“
+# Дете със СОБСТВЕНО име: то остава каквото е и панелът пази „част от“.
+NAMED_CHILD_QUERY = u"акация 2"                    # Базар Левски (кв. Левски)
+# ИБ1-О52 (Кими К46) — корпусът нямаше разредени „ж к“/„в з“/„с о“ заявки:
+# слепването се доказваше само с „к к“. Трите долу носят ЖИВИ записи.
+SPACED_LIVE_QUERIES = (u"ж к бриз бл в", u"в з варна", u"с о боровец север")
+# Единствената от трите, чийто ЖИВ етикет е самото име, написано разредено
+# (М: живи записи с разреден етикет — „к к“ 55, „с о“ 101, „ж к“ 0, „в з“ 0).
+SPACED_MERGED_QUERY = u"с о боровец север"
+
 # ИБ1-О31/О33 — the class the dot-blind normalizer doubled: a written quarter
 # that carries DOTS („ж.к. Възраждане“, „в.з. Варна“, „с.о. Ален Мак“) and, on
 # the GPS surface, a DOT-LESS token run against a dotted name („жк бриз“ against
@@ -140,6 +158,39 @@ def merged(text):
                   lambda m: m.group(1) + m.group(2)[0] + m.group(2)[2], flat(text))
 
 
+def display_names(doc):
+    """ИБ1-О51 — думата, с която всяка клетка се ИЗПИСВА.
+
+    Десетте номерирани деца носят името на родителя си; всички останали — своето
+    собствено. Правилото е по ФОРМА (име, завършващо с цифра, плюс непразен
+    `parents[i]`), не по списък от кодове: така не зависи от преброяване.
+    """
+    return [doc["parents"][i] if NUMBERED_TAIL.search(name or u"") and doc["parents"][i]
+            else name for i, name in enumerate(doc["names"])]
+
+
+def display_name(doc, cell):
+    return display_names(doc)[cell]
+
+
+def numbered_cells(doc):
+    return [i for i, name in enumerate(doc["names"])
+            if NUMBERED_TAIL.search(name or u"") and doc["parents"][i]]
+
+
+def first_numbered_row(doc, found, rows):
+    """Първият изписан ред, чиято клетка е една от десетте — (индекс, клетка)."""
+    ten = set(numbered_cells(doc))
+    for i in range(min(len(rows), len(found["rows"]))):
+        position = found["rows"][i]["ord"]
+        if position is None:
+            continue
+        cell = doc["entry_cell"][position]
+        if cell in ten:
+            return i, cell
+    return None, None
+
+
 def spaced_gps_rows(doc, rows, want):
     """Редове от класа на ИБ1-О36 в ЖИВИЯ товар — никога изписани тук.
 
@@ -165,7 +216,7 @@ def spaced_gps_rows(doc, rows, want):
         if per.get(name, 0) >= 6:
             continue
         per[name] = per.get(name, 0) + 1
-        found.append((index, name))
+        found.append((index, cell))
         if len(found) >= want:
             break
     return found
@@ -185,7 +236,7 @@ def dotless_gps_rows(doc, rows, want):
         if cell < 0:
             continue
         name = doc["names"][cell]
-        if u"." not in name or name in [n for _, n in found]:
+        if u"." not in name or cell in [c for _, c in found]:
             continue
         label = row[0] or u""
         parts = label.split()
@@ -196,7 +247,7 @@ def dotless_gps_rows(doc, rows, want):
         run = len(flat(name).split(u" "))
         if flat(u" ".join(parts[:run])) != flat(name):
             continue
-        found.append((index, name))
+        found.append((index, cell))
         if len(found) >= want:
             break
     return found
@@ -366,7 +417,7 @@ class FlagshipRowTest(unittest.TestCase):
         entries = search_entries()
         cell = doc["entry_cell"][flagship_index(entries)]
         self.assertNotEqual(cell, -1, u"флагманът е угасен в доставката")
-        name = doc["names"][cell]
+        name = display_name(doc, cell)
 
         base = ask_base(self, [{"ask": "render", "q": FLAGSHIP_QUERY, "limit": 1}])[0]
         new = ask_client(self, [{"ask": "render", "q": FLAGSHIP_QUERY, "limit": 1}])[0]
@@ -374,6 +425,9 @@ class FlagshipRowTest(unittest.TestCase):
 
         self.assertIn(name, new[0]["title"],
                       u"редът не носи думата на полигона: %r" % new[0]["title"])
+        # ИБ1-О51 — на реда стои РОДИТЕЛЯТ, не номерираното дете.
+        self.assertNotIn(doc["names"][cell], new[0]["title"],
+                         u"номерът стои в заглавието: %r" % new[0]["title"])
         self.assertNotEqual(new[0]["title"], base[0]["title"],
                             u"редът не се е променил спрямо <БАЗА>")
         self.assertIn(WITNESS_PREFIX, new[0]["meta"] or u"",
@@ -392,7 +446,7 @@ class FourSurfacesTest(unittest.TestCase):
         entries = search_entries()
         i = flagship_index(entries)
         cell = doc["entry_cell"][i]
-        name = doc["names"][cell]
+        name = display_name(doc, cell)
         pin = entries[i]["pin"]
 
         answers = ask_client(self, [
@@ -479,7 +533,9 @@ class GpsRowTest(unittest.TestCase):
         new = ask_client(self, [{"ask": "coord", "q": query}])[0]
         self.assertNotEqual(new["meta"], base["meta"],
                             u"GPS-редът не е пипнат от row_cell")
-        names = [n for n in doc["names"] if n and n in (new["meta"] or u"")]
+        # ИБ1-О51: десетте носят ЕДНА и съща родителска дума (четирите Възраждане —
+        # едно „ж.к. Възраждане“), затова се броят РАЗЛИЧНИТЕ думи, не клетките.
+        names = sorted({n for n in display_names(doc) if n and n in (new["meta"] or u"")})
         self.assertEqual(len(names), 1,
                          u"GPS-редът носи %d квартални думи: %r" % (len(names), new["meta"]))
         self.assertEqual((new["meta"] or u"").count(names[0]), 1,
@@ -532,7 +588,7 @@ class DottedPrefixTest(unittest.TestCase):
                 cell = doc["entry_cell"][position]
                 if cell < 0:
                     continue
-                name = doc["names"][cell]
+                name = display_name(doc, cell)
                 tail = written[len(head) + 2:]
                 self.assertEqual(row["title"], name + u", " + tail,
                                  u"%r: заглавието не е „име + остатък“: %r"
@@ -558,29 +614,39 @@ class DottedPrefixTest(unittest.TestCase):
         cases = dotless_gps_rows(doc, rows, 3)
         self.assertGreaterEqual(len(cases), 3,
                                 u"живият товар няма редове от клас (д): %r" % cases)
-        for index, name in cases:
+        for index, cell in cases:
+            name = display_name(doc, cell)
             query = coordinate_query((rows[index][1], rows[index][2]))
             base = ask_base(self, [{"ask": "coord", "q": query}])[0]
             new = ask_client(self, [{"ask": "coord", "q": query}])[0]
             meta = new["meta"] or u""
             self.assertNotEqual(meta, base["meta"],
                                 u"GPS-редът не е пипнат от row_cell: %r" % meta)
-            present = [n for n in doc["names"] if n and n in meta]
+            present = sorted({n for n in display_names(doc) if n and n in meta})
             self.assertEqual(len(present), 1,
                              u"GPS-редът носи %d квартални думи: %r" % (len(present), meta))
             self.assertEqual(flat(meta).count(flat(name)), 1,
                              u"GPS-редът казва %r два пъти: %r" % (name, meta))
 
     def test_the_panel_says_what_the_quarter_is_part_of(self):
-        """ИБ1-О32 · §3.Д — `parents[i]` непразно -> „част от <parent_display>“."""
+        """ИБ1-О32 · §3.Д — `parents[i]` непразно -> „част от <parent_display>“.
+
+        ИБ1-О51 премести флагмана: неговата клетка е една от ДЕСЕТТЕ номерирани и
+        родителят ѝ стои в самото заглавие, тоест „част от“ там няма смисъл.
+        Редът остава за децата със СОБСТВЕНО име — тук Базар Левски.
+        """
         doc = delivered_doc(self)
-        entries = search_entries()
-        cell = doc["entry_cell"][flagship_index(entries)]
-        self.assertNotEqual(cell, -1, u"флагманът е угасен в доставката")
+        found, _ = ask_client(self, [{"ask": "search", "q": NAMED_CHILD_QUERY, "limit": 1},
+                                     {"ask": "render", "q": NAMED_CHILD_QUERY, "limit": 1}])
+        position = found["rows"][0]["ord"]
+        self.assertIsNotNone(position, u"редът на %r няма `_ord`" % NAMED_CHILD_QUERY)
+        cell = doc["entry_cell"][position]
+        self.assertGreaterEqual(cell, 0, u"клетката на %r е угасена" % NAMED_CHILD_QUERY)
         parent = doc["parents"][cell]
-        if not parent:
-            self.fail(u"клетката на флагмана няма родител — фикстурата е мръднала")
-        panel = ask_client(self, [{"ask": "panel", "q": FLAGSHIP_QUERY, "pick": 0}])[0]
+        if not parent or cell in numbered_cells(doc):
+            self.fail(u"фикстурата мръдна: %r вече не е дете със собствено име"
+                      % doc["names"][cell])
+        panel = ask_client(self, [{"ask": "panel", "q": NAMED_CHILD_QUERY, "pick": 0}])[0]
         surface = u" ".join(panel["popups"] + ([panel["sheet"]] if panel["sheet"] else []))
         self.assertIn(PARENT_PREFIX + parent, surface,
                       u"панелът не казва на кой квартал е част: %r" % surface)
@@ -599,10 +665,40 @@ class SpacedPrefixTest(unittest.TestCase):
 
     def corpus_carries_the_class(self):
         corpus = corpus_doc(self)
-        missing = [q for q in (SPACED_QUERY, SPACED_DARK_QUERY)
+        missing = [q for q in (SPACED_QUERY, SPACED_DARK_QUERY) + SPACED_LIVE_QUERIES
                    if q not in corpus["queries"]]
         if missing:
             self.fail(u"Ф11 не носи заявките на класа: %s" % u", ".join(missing))
+
+    def test_the_other_spaced_pairs_are_in_the_corpus_and_alive(self):
+        """ИБ1-О52 (Кими К46) — слепването се доказваше само с „к к“.
+
+        Трите заявки долу носят другите двойки. За всяка има ЖИВ запис в
+        доставката; за „с о“ живият етикет е самото име, написано разредено, и
+        затова там думата се съди — една, не две. (М: живи записи с разреден
+        етикет — „к к“ 55, „с о“ 101, „ж к“ 0, „в з“ 0; за двете нули класът
+        няма как да се роди от данните и заявката стои като пазач.)
+        """
+        self.corpus_carries_the_class()
+        doc = delivered_doc(self)
+        for query in SPACED_LIVE_QUERIES:
+            found, rows = ask_client(self, [{"ask": "search", "q": query, "limit": 5},
+                                            {"ask": "render", "q": query, "limit": 5}])
+            alive = [i for i in range(min(len(rows), len(found["rows"])))
+                     if found["rows"][i]["ord"] is not None
+                     and doc["entry_cell"][found["rows"][i]["ord"]] >= 0]
+            self.assertTrue(alive, u"%r не връща нито един жив запис" % query)
+            if query != SPACED_MERGED_QUERY:
+                continue
+            i = alive[0]
+            cell = doc["entry_cell"][found["rows"][i]["ord"]]
+            name = display_name(doc, cell)
+            title = rows[i]["title"] or u""
+            self.assertIn(name, title,
+                          u"%r: редът не носи думата на полигона: %r" % (query, title))
+            self.assertEqual(merged(title).count(merged(name)), 1,
+                             u"%r: редът казва ДВЕ квартални думи за %r: %r"
+                             % (query, name, title))
 
     def test_a_spaced_prefix_says_the_quarter_once(self):
         self.corpus_carries_the_class()
@@ -620,7 +716,7 @@ class SpacedPrefixTest(unittest.TestCase):
             cell = doc["entry_cell"][position]
             if cell < 0:
                 continue
-            name = doc["names"][cell]
+            name = display_name(doc, cell)
             title = row["title"] or u""
             self.assertIn(name, title,
                           u"%r: редът не носи думата на полигона: %r" % (SPACED_QUERY, title))
@@ -643,7 +739,8 @@ class SpacedPrefixTest(unittest.TestCase):
                                      "q": coordinate_query((rows[index][1], rows[index][2]))}
                                     for index, _ in cases])
         judged = 0
-        for (index, name), answer in zip(cases, answers):
+        for (index, cell), answer in zip(cases, answers):
+            name = display_name(doc, cell)
             meta = answer["meta"] or u""
             if not meta.startswith(ZERO_METRES) or name not in meta:
                 # `nearestAddressTo` предпочита „уличен“ ред в същите 250 м: тогава
@@ -668,6 +765,111 @@ class SpacedPrefixTest(unittest.TestCase):
                          u"угасеният разреден клас е пипнат")
 
 
+class NumberedChildTest(unittest.TestCase):
+    """ИБ1-О51 — десетте номерирани деца се ИЗПИСВАТ с името на родителя си.
+
+    Думата на Петър (12.09, след като видя живата карта): „вече е в левски но
+    това левски 2 левски 1 не искам да го има - обърква се човек ... нека в
+    търсачките да не вкарваме номерата“. Номерът живее в данните (`entry_cell`
+    и леджерът го пазят) и може да излезе в картончето на 3D картата; на
+    четирите адресни повърхности се вижда `parents[i]`.
+
+    Децата със СОБСТВЕНО име (Базар Левски, Цветен квартал, Кайсиева градина,
+    Боклук тарла, ПЗ Планова, Конфуто) остават каквито са и пазят „част от“.
+
+    Червено на HEAD преди К9в: заглавието още носи номера.
+    """
+
+    def test_the_ten_are_exactly_the_numbered_children(self):
+        """Правилото е по форма; тук се мери, че формата хваща точно десетте."""
+        doc = delivered_doc(self)
+        ten = numbered_cells(doc)
+        self.assertEqual(len(ten), E_NUMBERED_CELLS,
+                         u"номерираните деца са %d: %r"
+                         % (len(ten), [doc["names"][c] for c in ten]))
+        for cell in ten:
+            self.assertTrue(doc["parents"][cell], doc["names"][cell])
+            self.assertEqual(display_name(doc, cell), doc["parents"][cell])
+            self.assertNotEqual(display_name(doc, cell), doc["names"][cell])
+        for cell, name in enumerate(doc["names"]):
+            if cell in ten:
+                continue
+            self.assertEqual(display_name(doc, cell), name,
+                             u"дете със собствено име е преименувано: %r" % name)
+
+    def test_the_row_of_a_numbered_cell_wears_the_parent_name(self):
+        """Флагманът: „кв. Левски, бл. 11“, а не „Левски 1, бл. 11“."""
+        doc = delivered_doc(self)
+        entries = search_entries()
+        cell = doc["entry_cell"][flagship_index(entries)]
+        self.assertIn(cell, numbered_cells(doc),
+                      u"флагманът вече не е в номерирана клетка")
+        new = ask_client(self, [{"ask": "render", "q": FLAGSHIP_QUERY, "limit": 1}])[0]
+        self.assertTrue(new, u"нула редове за флагмана")
+        title = new[0]["title"] or u""
+        self.assertTrue(title.startswith(doc["parents"][cell] + u", "),
+                        u"редът не започва с името на родителя: %r" % title)
+        self.assertNotIn(doc["names"][cell], title,
+                         u"номерът стои в заглавието: %r" % title)
+
+    def test_the_witness_confesses_only_a_real_disagreement(self):
+        """„написано:“ излиза при истинско разминаване СПРЯМО ИЗПИСАНОТО.
+
+        „студентска бл 11“ носи написано „кв. Чайка“ — друг квартал, свидетелят
+        остава. „студентска бл 7“ носи написано „кв. Левски“, а изписаното е
+        същото „кв. Левски“ — няма какво да се признава. Същото за „ана
+        феликсова 18“ („ж.к. Възраждане“).
+        """
+        doc = delivered_doc(self)
+        for query, wants_witness in ((FLAGSHIP_QUERY, True),
+                                     (PARENT_WRITTEN_QUERY, False),
+                                     (DOTTED_QUERIES[0], False)):
+            found, rows = ask_client(self, [{"ask": "search", "q": query, "limit": 5},
+                                            {"ask": "render", "q": query, "limit": 5}])
+            i, cell = first_numbered_row(doc, found, rows)
+            self.assertIsNotNone(i, u"%r не връща ред в номерирана клетка" % query)
+            title, meta = rows[i]["title"] or u"", rows[i]["meta"] or u""
+            self.assertTrue(title.startswith(doc["parents"][cell] + u", "),
+                            u"%r: номерът стои в заглавието: %r" % (query, title))
+            self.assertNotIn(doc["names"][cell], title,
+                             u"%r: номерът стои в заглавието: %r" % (query, title))
+            if wants_witness:
+                self.assertIn(WITNESS_PREFIX, meta,
+                              u"%r: липсва свидетел за друг квартал: %r" % (query, meta))
+            else:
+                self.assertNotIn(WITNESS_PREFIX, meta,
+                                 u"%r: свидетел без разминаване: %r" % (query, meta))
+
+    def test_the_panel_drops_part_of_for_the_ten(self):
+        """Родителят вече е в заглавието — „част от“ там няма какво да добави."""
+        doc = delivered_doc(self)
+        entries = search_entries()
+        cell = doc["entry_cell"][flagship_index(entries)]
+        self.assertIn(cell, numbered_cells(doc))
+        panel = ask_client(self, [{"ask": "panel", "q": FLAGSHIP_QUERY, "pick": 0}])[0]
+        surface = u" ".join(panel["popups"] + ([panel["sheet"]] if panel["sheet"] else []))
+        self.assertIn(doc["parents"][cell], surface,
+                      u"панелът не носи думата на родителя: %r" % surface)
+        self.assertNotIn(PARENT_PREFIX, surface,
+                         u"панелът още казва „част от“ за номерирана клетка: %r" % surface)
+        self.assertNotIn(doc["names"][cell], surface,
+                         u"номерът стои в заглавието на панела: %r" % surface)
+
+    def test_the_gps_line_of_a_numbered_cell_wears_the_parent_name(self):
+        """Четвъртата повърхност: GPS-редът на флагмана говори същата дума."""
+        doc = delivered_doc(self)
+        entries = search_entries()
+        i = flagship_index(entries)
+        cell = doc["entry_cell"][i]
+        coord = ask_client(self, [{"ask": "coord",
+                                   "q": coordinate_query(entries[i]["pin"])}])[0]
+        meta = coord["meta"] or u""
+        self.assertIn(doc["parents"][cell], meta,
+                      u"GPS-редът не носи думата на родителя: %r" % meta)
+        self.assertNotIn(doc["names"][cell], meta,
+                         u"номерът стои в заглавието на GPS-реда: %r" % meta)
+
+
 class AcceptedClassesTest(unittest.TestCase):
     """ИБ1-О38/О40 — класовете, които лотът ПРИЕМА поименно вместо да ги мълчи.
 
@@ -690,7 +892,7 @@ class AcceptedClassesTest(unittest.TestCase):
         self.assertIsNotNone(position, u"редът няма `_ord`")
         cell = doc["entry_cell"][position]
         self.assertGreaterEqual(cell, 0, u"клетката на голото име е угасена")
-        name = doc["names"][cell]
+        name = display_name(doc, cell)
         self.assertEqual(rows[0]["title"], name + u", " + base[0]["title"],
                          u"голото име вече не е клон (г): %r" % rows[0]["title"])
 
@@ -714,7 +916,7 @@ class AcceptedClassesTest(unittest.TestCase):
                 continue
             cell = doc["entry_cell"][position]
             self.assertGreaterEqual(cell, 0, u"латинският запис е угасен")
-            name = doc["names"][cell]
+            name = display_name(doc, cell)
             self.assertEqual(row["title"], name + u", " + base[i]["title"],
                              u"латиницата вече не е клон (г): %r" % row["title"])
             judged += 1

@@ -115,12 +115,15 @@ FORBIDDEN_KEYS = {"coordinates", "geometry", "geometries", "centroid", "centroid
 # name against a numbered cell, the latin label, and one `-1` for EACH of the
 # two reasons the 145 never carried („вън от 90-те“ and a cell of class
 # `locality`). Every one of them is a PROJECTION of the live index.
-CORPUS_SHA256 = "f534d4942acb2c55d416ff5dbb7300d0c457f1ccc2517a315d679d24b87117a5"
-CORPUS_BYTES = 9782
+# ИБ1-О52 (К7ж): THREE more queries and three more records — the spaced
+# prefixes „ж к“, „в з“ and „с о“, which the corpus did not exercise at all
+# (only „к к“ did). Each one is a projection of a LIVE entry of the delivery.
+CORPUS_SHA256 = "abd41669befbfc1cc668f680c7825b737bbbdf0ec28349ae5e74628103b8be79"
+CORPUS_BYTES = 10059
 CORPUS_TOP_KEYS = {"queries", "entries"}
 CORPUS_ENTRY_KEYS = {"tk", "kind", "cell"}
-CORPUS_QUERIES = 30
-CORPUS_ENTRIES = 151
+CORPUS_QUERIES = 33
+CORPUS_ENTRIES = 154
 
 
 def git_bytes(*args):
