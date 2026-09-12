@@ -4930,8 +4930,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // dot-blind, case-blind, dash-blind: only WORDS are compared, never bytes.
     // The dot is CUT, never replaced (ИБ1-О31): replacing it split “ж.к.” into
     // “ж” + “к”, the lead word became “ж” and no type ever matched.
+    const SPACED_PREFIXES = ['к к', 'ж к', 'в з', 'с о'];
+    const PAIR_RE = new RegExp('(^|\\s)(' + SPACED_PREFIXES.join('|') + ')(?=\\s|$)', 'g');
     const flat = function (s) {
-      return String(s).toLowerCase().replace(/\./g, '').replace(/[,-]/g, ' ').replace(/\s+/g, ' ').trim();
+      const bare = String(s).toLowerCase().replace(/\./g, '').replace(/[,-]/g, ' ')
+                            .replace(/\s+/g, ' ').trim();
+      return bare.replace(PAIR_RE, function (m, lead, pair) {
+        return lead + pair.charAt(0) + pair.charAt(2);
+      });
     };
     const FLAT_TYPES = TYPES.map(flat);
     const FLAT_TOKEN_TYPES = TOKEN_TYPES.map(flat);
@@ -6106,8 +6112,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // `· вх. N`. `:5858`/`:5859` stay byte-identical, so the popup gets its own
       // local name instead of a rewritten `label`.
       const quarter = quarterOfHit(r);
-      const popupLabel = (quarter && quarterTitleWord(quarter.code, label)) || label;
-      const panelBlockLabel = (quarter && quarterTitleWord(quarter.code, blockLabel)) || blockLabel;
+      const popupLabel = (quarter && label && quarterTitleWord(quarter.code, label)) || label;
+      const panelBlockLabel = (quarter && blockLabel && quarterTitleWord(quarter.code, blockLabel)) || blockLabel;
       // §3.Д — a non-empty `parents[i]` puts “част от <parent_display>” in the PANEL
       // (ИБ1-О32; 17 cells, 7 819 entries). The popup title keeps the word alone.
       const parentRow = (quarter && quarter.parent_display) ? (' · част от ' + quarter.parent_display) : '';
