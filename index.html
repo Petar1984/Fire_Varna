@@ -4847,6 +4847,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
   const ADDRESS_QUARTERS_SHA256 = '7642d3ec334bebbaf563dcf4dbf7c8aef403a49d3559d99a1a5e7354fc885a52';
   // Р7 — the откат is ONE word: `false` and not one surface reads the file.
   const ADDRESS_QUARTER_V2 = true;
+  // ИБ1-О51 — a NUMBERED child: its name ends in a digit and it has a parent
+  // (levski1/2, mladost1/2, vazrazhdane1–4, vladislav_varnenchik1/2). The ten
+  // are WRITTEN with the parent's name; the number stays in the data.
+  const NUMBERED_TAIL = /\d$/;
   let quarterIndex = null;      // the VALIDATED delivery, or null (fail-closed)
   let entriesDigest = null;     // FNV-1a over the index entries (Т5)
   let rowsDigest = null;        // FNV-1a over the address rows (Т5)
@@ -4925,7 +4929,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!ADDRESS_QUARTER_V2 || quarterIndex === null || !code) return nothing;
     const cell = quarterIndex.codes.indexOf(code);
     if (cell < 0) return nothing;
-    const name = quarterIndex.names[cell];
+    // ИБ1-О51 (думата на Петър, 12.09) — „нека в търсачките да не вкарваме
+    // номерата“: a numbered child is written with its PARENT's name, so the row
+    // reads „кв. Левски, бл. 11“, never „Левски 1, бл. 11“. The cell itself does
+    // not move — `entry_cell`, the ledger and the 3D card keep the number.
+    const bare = quarterIndex.names[cell];
+    const name = (NUMBERED_TAIL.test(bare) && quarterIndex.parents[cell])
+                 ? quarterIndex.parents[cell] : bare;
     const text = String(rest == null ? '' : rest).trim();
     // dot-blind, case-blind, dash-blind: only WORDS are compared, never bytes.
     // The dot is CUT, never replaced (ИБ1-О31): replacing it split “ж.к.” into
@@ -4987,7 +4997,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       }
     }
     // D18 — the witness is confessed only when the two words DISAGREE.
-    if (wantWritten) return (written && flat(written) !== flat(name)) ? written : '';
+    // ИБ1-О51: „ж.к. Възраждане 1“ written on a record whose cell IS
+    // `vazrazhdane1` is NO disagreement — it is the same quarter with its number,
+    // and the number must not walk back into the search through the witness.
+    // A witness fires only for a word that is neither what is WRITTEN OUT nor
+    // the cell's own name (М: 708 записа и 448 реда пишат самия номер).
+    if (wantWritten) return (written && flat(written) !== flat(name)
+                             && flat(written) !== flat(bare)) ? written : '';
     return tail ? (name + ', ' + tail) : name;
   }
 
@@ -6116,7 +6132,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const panelBlockLabel = (quarter && blockLabel && quarterTitleWord(quarter.code, blockLabel)) || blockLabel;
       // §3.Д — a non-empty `parents[i]` puts “част от <parent_display>” in the PANEL
       // (ИБ1-О32; 17 cells, 7 819 entries). The popup title keeps the word alone.
-      const parentRow = (quarter && quarter.parent_display) ? (' · част от ' + quarter.parent_display) : '';
+      // ИБ1-О51 — but NOT for the ten numbered children: their parent is already
+      // the title, and „кв. Левски, бл. 11 · част от кв. Левски“ says it twice.
+      const numbered = !!(quarter && quarter.parent_display && NUMBERED_TAIL.test(quarter.name));
+      const parentRow = (quarter && quarter.parent_display && !numbered) ? (' · част от ' + quarter.parent_display) : '';
       const panelLabel = (activeEn ? (panelBlockLabel || popupLabel) : popupLabel) + parentRow;
       const ctx = { label: panelLabel, blockLabel: panelBlockLabel, lat: lat, lng: lng, activeEn: activeEn };
       anchorHydrantsAt(lat, lng);   // anchor hydrants + blue dot to the block/search pin
