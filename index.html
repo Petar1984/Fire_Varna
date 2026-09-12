@@ -4911,9 +4911,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
   //   `part === 'written'` -> the witness of D18: the written word the title
   //                       replaced, and '' when there is nothing to confess.
   function quarterTitleWord(code, rest, part) {
-    // (а) the closed list of quarter TYPES, dot-blind — the same eleven words
-    // the GPS line meets without dots (§3.Д (д)).
-    const TYPES = ['кв', 'квартал', 'жк', 'кк', 'вз', 'со', 'мт', 'м', 'местност', 'зона', 'пз'];
+    // (а) §3.Д — the closed list of quarter TYPES, VERBATIM, dots and all.
+    // ИБ1-О31: `flat` CUTS the dot instead of replacing it with a space, so
+    // “ж.к.” flattens to “жк” and BOTH sides of every comparison are dot-less.
+    const TYPES = ['кв.', 'кв', 'квартал', 'ж.к.', 'жк', 'ж.к', 'жк.', 'к.к.',
+                   'в.з.', 'с.о.', 'м-т', 'м.', 'местност', 'ПЗ'];
+    // (д) §3.Д — the GPS label meets the same types WITHOUT dots; this list is
+    // the plan's, verbatim, and the comparison is flat against flat.
+    const TOKEN_TYPES = ['кв', 'жк', 'кк', 'вз', 'со', 'м', 'мт', 'местност',
+                         'зона', 'пз', 'квартал'];
     const wantWritten = part === 'written';
     const nothing = wantWritten ? '' : null;
     if (!ADDRESS_QUARTER_V2 || quarterIndex === null || !code) return nothing;
@@ -4922,9 +4928,15 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const name = quarterIndex.names[cell];
     const text = String(rest == null ? '' : rest).trim();
     // dot-blind, case-blind, dash-blind: only WORDS are compared, never bytes.
+    // The dot is CUT, never replaced (ИБ1-О31): replacing it split “ж.к.” into
+    // “ж” + “к”, the lead word became “ж” and no type ever matched.
     const flat = function (s) {
-      return String(s).toLowerCase().replace(/[.,-]/g, ' ').replace(/\s+/g, ' ').trim();
+      return String(s).toLowerCase().replace(/\./g, '').replace(/[,-]/g, ' ').replace(/\s+/g, ' ').trim();
     };
+    const FLAT_TYPES = TYPES.map(flat);
+    const FLAT_TOKEN_TYPES = TOKEN_TYPES.map(flat);
+    const isType = function (word) { return FLAT_TYPES.indexOf(flat(word)) >= 0; };
+    const isTokenType = function (word) { return FLAT_TOKEN_TYPES.indexOf(flat(word)) >= 0; };
     // a written run is a quarter when it spells a name of v2 — with its type
     // word ("кв. Чайка") or bare ("Аспарухово"), because 36 of the 90 names
     // carry no prefix at all (ИБ1-О11).
@@ -4935,7 +4947,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         const n = flat(quarterIndex.names[i]);
         if (n === f) return true;
         const space = n.indexOf(' ');
-        if (space > 0 && TYPES.indexOf(n.slice(0, space)) >= 0 && n.slice(space + 1) === f) return true;
+        if (space > 0 && FLAT_TYPES.indexOf(n.slice(0, space)) >= 0 && n.slice(space + 1) === f) return true;
       }
       return false;
     };
@@ -4950,7 +4962,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const head = text.slice(0, comma);
       const remainder = text.slice(comma + 2).trim();
       const lead = flat(head).split(' ')[0];
-      if (remainder && (TYPES.indexOf(lead) >= 0 || spellsAName(head))) {
+      if (remainder && (isType(lead) || spellsAName(head))) {
         written = head;
         tail = remainder;
       }
@@ -4963,7 +4975,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       for (let n = 1; n <= parts.length; n++) {
         if (spellsAName(parts.slice(0, n).join(' '))) run = n;
       }
-      if (run > 0 && (TYPES.indexOf(lead) >= 0 || run === parts.length)) {
+      if (run > 0 && (isTokenType(lead) || run === parts.length)) {
         written = parts.slice(0, run).join(' ');
         tail = parts.slice(run).join(' ');
       }
@@ -6096,7 +6108,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const quarter = quarterOfHit(r);
       const popupLabel = (quarter && quarterTitleWord(quarter.code, label)) || label;
       const panelBlockLabel = (quarter && quarterTitleWord(quarter.code, blockLabel)) || blockLabel;
-      const panelLabel = activeEn ? (panelBlockLabel || popupLabel) : popupLabel;
+      // §3.Д — a non-empty `parents[i]` puts “част от <parent_display>” in the PANEL
+      // (ИБ1-О32; 17 cells, 7 819 entries). The popup title keeps the word alone.
+      const parentRow = (quarter && quarter.parent_display) ? (' · част от ' + quarter.parent_display) : '';
+      const panelLabel = (activeEn ? (panelBlockLabel || popupLabel) : popupLabel) + parentRow;
       const ctx = { label: panelLabel, blockLabel: panelBlockLabel, lat: lat, lng: lng, activeEn: activeEn };
       anchorHydrantsAt(lat, lng);   // anchor hydrants + blue dot to the block/search pin
       clearSearchMarker(); // replace any previous result marker + close any open sheet
