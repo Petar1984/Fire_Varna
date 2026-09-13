@@ -23,7 +23,7 @@ How this gate works, so no reader has to guess:
     fails loud.
   * Nothing is read at module level and no git runs there: ИБ1-Г13 copies `tests/`
     into a bare tree and runs `discover`, and a failure there has to be a NAMED one.
-  * The four negative halves run the gate against DOCTORED copies of `index.html`
+  * The three negative halves run the gate against DOCTORED copies of `index.html`
     under the temp root - never inside the repository - and demand exit 1 plus the
     gate's own reason in the output.
 
@@ -69,13 +69,6 @@ ANCHORS = (
 # construction, and only there is their absence allowed.
 BASE_OPTIONAL = ("const AT_HYDRANT_TYPES =", "function hydrantPickersHTML(d) {")
 
-# The regions the lot is allowed to move; everything else is byte-compared.
-CHANGED_BLOCKS = (
-    "function showReportModal(",
-    "function onSubmitClicked(",
-    "function buildReportObject(",
-    "function reportTypeToSemanticPatch(",
-)
 # The functions the plan pins as untouched (план §5 "Нула промяна другаде").
 PINNED_BLOCKS = (
     "function locationFieldHTML(t, placedCoord) {",
@@ -93,7 +86,6 @@ SIGNED_GATE = "if (AT_HYDRANT_TYPES.has(reportType) || reportType === 'new_hydra
 PAYLOAD_CONDITION = "(AT_HYDRANT_TYPES.has(reportType) || reportType === 'new_hydrant')"
 OPERATIONAL_ROW = u"radioRowHTML('operational', ['да','не','не съм проверявал'], d.operational) +"
 MISSING_BRANCH_BYTE = u"би трябвало да е тук?"
-TAIL_LINE = "function refreshMarkerIconsForHydrant(h) {"
 
 # Ingest fixtures - the coordinate is BUILT out of these two numbers at run time.
 TIMESTAMP = "2026-09-13T00:00:00+03:00"
@@ -153,15 +145,6 @@ def block(test, text, anchor, required=True):
     if found is None:
         return None
     return "\n".join(text.split("\n")[found[0]:found[1] + 1])
-
-
-def first_difference(left, right):
-    """Where two texts part - the LINE NUMBER only, never the line itself."""
-    a, b = left.split("\n"), right.split("\n")
-    for i in range(min(len(a), len(b))):
-        if a[i] != b[i]:
-            return u"първата разлика е на ред %d" % (i + 1)
-    return u"различна дължина: %d срещу %d реда" % (len(a), len(b))
 
 
 # --------------------------------------------------------------------------
@@ -403,26 +386,10 @@ class OperationalPickerTest(unittest.TestCase):
 
 class PerimeterTest(unittest.TestCase):
 
-    def remainder(self, text):
-        """Everything OUTSIDE the regions the lot is allowed to move."""
-        lines = text.split("\n")
-        killed = set()
-        note_end = span(self, text, "const NOTE_HINT_HTML =")[1]
-        fields_end = span(self, text, "function typeFieldsHTML(t, d) {")[1]
-        if fields_end <= note_end:
-            self.fail(u"областта на формите е обърната")
-        killed.update(range(note_end + 1, fields_end + 1))
-        for anchor in CHANGED_BLOCKS:
-            first, last = span(self, text, anchor)
-            killed.update(range(first, last + 1))
-        return "\n".join(line for n, line in enumerate(lines) if n not in killed)
-
-    def test_everything_outside_the_changed_regions_is_byte_equal_to_the_base(self):
-        candidate = self.remainder(index_text(self))
-        reference = self.remainder(base_text(self))
-        self.assertTrue(candidate == reference,
-                        u"извън променените области нещо е мръднало срещу %s (%s)"
-                        % (BASE, first_difference(reference, candidate)))
+    # The whole-file "nothing else moved" is a DELIVERY probe now, not a permanent
+    # test: gates/probe/lot_perimeter.py (lot 4b, 13.09.2026). A permanent whole-file
+    # pin froze index.html against 8512ab6 and went red on the very next lot; the
+    # pins of the untouched functions below stay, because they stay true.
 
     def test_the_pinned_functions_are_byte_equal_to_the_base(self):
         text = index_text(self)
@@ -544,7 +511,7 @@ class IngestTest(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------
-# Г4-Г8 · the four negative halves - each RUNS and each FALLS
+# Г4-Г8 · the three negative halves - each RUNS and each FALLS
 # --------------------------------------------------------------------------
 
 def replace_once(test, text, needle, value):
@@ -605,14 +572,6 @@ class NegativeHalfTest(unittest.TestCase):
         self.run_half(path, MODULE + ".OperationalPickerTest."
                       "test_the_untouched_branches_and_the_status_less_case_are_byte_equal_to_the_base",
                       u"не е байт за байт равен на базата")
-
-    def test_a_byte_in_the_tail_segment_turns_the_perimeter_gate_red(self):
-        text = replace_once(self, index_text(self), TAIL_LINE,
-                            TAIL_LINE.replace(") {", ")  {"))
-        path = self.doctored("tail_segment_byte", text)
-        self.run_half(path, MODULE + ".PerimeterTest."
-                      "test_everything_outside_the_changed_regions_is_byte_equal_to_the_base",
-                      u"извън променените области нещо е мръднало")
 
 
 if __name__ == "__main__":

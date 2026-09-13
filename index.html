@@ -5379,6 +5379,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return index;
     }
 
+    // A class word names a CATEGORY, not an address; the places branch owns it (ADR 006a).
+    const CLASS_WORD_TOKENS = new Set(['hotel','hotela','hoteli','hotelite','hotelat','aparthotel','apartamenten','semen','semeini','semeinite','semeiniat','apart','aparthoteli','aparthotela','aparthotelite','apartamentna','apartamentni','motel','moteli']);
     function runGeocoderSearch(query, index){
       if (!index || !Array.isArray(index.entries)) return [];
       const qn = norm(query);
@@ -5386,6 +5388,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const rawToks = qn.split(/\s+/).filter(Boolean);
       const toks = rawToks.map(skel);
       if (toks.length === 0) return [];
+      if (toks.every(function (t) { return CLASS_WORD_TOKENS.has(t); })) return [];
 
       const blIdx = toks.indexOf('bl');
       const qBlk = blIdx >= 0 && blIdx+1 < toks.length ? toks[blIdx+1] : null;
@@ -5423,6 +5426,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const scoreEntry = function (e) {
         if (!e) return;
         let matched = 0, exactName = 0, exactNum = 0, prefix = 0, fuzzy = 0, matchedCore = 0, matchedViaDtk = 0, matchedViaStk = 0;
+        let matchedOutsideClass = 0;
         let qBlkMatched = false, all = true;
         const tk = e.tk || [], qtk = e.qtk || null, atk = e.alias_tk || null, dtk = e.dtk || null, stk = e.stk || null;
         for (let qi = 0; qi < toks.length; qi++) {
@@ -5435,9 +5439,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
           if (stk && best < 3) { for (let ti = 0; ti < stk.length; ti++) { const k = m[stk[ti]]||0; if (k > best) { best = k; matchedViaStk += 1; if (best === 3) break; } } }
           if (best === 0) { all = false; continue; }
           matched += 1;
+          if (!CLASS_WORD_TOKENS.has(toks[qi])) matchedOutsideClass += 1;
           if (blockTyped && toks[qi] === qBlk) qBlkMatched = true;
           if (best === 3) { if (numericTok[qi]) exactNum += 1; else exactName += 1; } else if (best === 2) prefix += 1; else fuzzy += 1;
         }
+        if (matched > 0 && matchedOutsideClass === 0) return;
         if (matched > 0) {
           const dem = e.quarter_assignment_trust === 'conflicted' && matchedCore === 0 ? 1 : 0;
           const ddem = matchedCore === 0 && matchedViaDtk > 0 ? 1 : 0;

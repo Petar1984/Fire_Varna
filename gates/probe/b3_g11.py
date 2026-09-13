@@ -66,6 +66,13 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "tests/test_report_form_operational.py",
                "docs/plans/ПЛАН_Проблемите_лот1_Ф-а_13.09.md",
                "docs/audits/амандамент_подаване_13.09.md",
+               # Лот 4б „Проблемите“ (класовата дума в адресния клон): гейтът и
+               # пробата на периметъра при доставката (К3), планът (К1) и
+               # амандаментът 006a на ADR 006 D12 (К2).
+               "tests/test_address_search_class_words.py",
+               "gates/probe/lot_perimeter.py",
+               "docs/plans/ПЛАН_Проблемите_лот4б_хотел_13.09.md",
+               "docs/decisions/006a_амандамент_4б_13.09.md",
                # чужд: модерация #38, 20c1efe
                "scratch/apply_c38.py",
                # запис на Архитекта: Кими К45 (О46), Кими К46 (О52)
