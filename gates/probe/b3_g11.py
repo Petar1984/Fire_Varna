@@ -60,6 +60,12 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "tests/negative_halves_manifest.json",
                "tests/test_adr_amendment.py",
                "docs/decisions/011a_амандамент_И-Б1_11.09.md",
+               # Лот 1 „Проблемите“ (един стандарт за всяка форма при хидрант) —
+               # ТРИ нови пътя: гейтът на формите (К3), планът (К1) и амандаментът
+               # на договора от 09.05 (К2). Всички се раждат СЛЕД базата 8512ab6.
+               "tests/test_report_form_operational.py",
+               "docs/plans/ПЛАН_Проблемите_лот1_Ф-а_13.09.md",
+               "docs/audits/амандамент_подаване_13.09.md",
                # чужд: модерация #38, 20c1efe
                "scratch/apply_c38.py",
                # запис на Архитекта: Кими К45 (О46), Кими К46 (О52)

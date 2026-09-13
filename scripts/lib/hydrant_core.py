@@ -468,6 +468,11 @@ def apply_damaged(state, report, timestamp, approver_id):
     # review_status='reported' (which left damaged hydrants stuck yellow forever,
     # since no resolution flow was ever built to clear it).
     diff_set(rec, "existence_status", "verified", changes, old_values)
+    # One standard for every form made at a hydrant (13.09): the report may
+    # carry a confirmed/corrected type as well as the operational answer.
+    rtype = report.get("type")
+    if rtype in CANONICAL_TYPES:
+        diff_set(rec, "type", rtype, changes, old_values)
     rop = report.get("operational_status")
     if rop in CANONICAL_OPERATIONAL:
         diff_set(rec, "operational_status", rop, changes, old_values)
@@ -533,6 +538,15 @@ def apply_wrong_location(state, report, timestamp, approver_id):
         state["provenance"][new_id] = state["provenance"].pop(old_id, {"source_refs": []})
         state["alias"][new_id] = rec
     diff_set(rec, "existence_status", "verified", changes, old_values)
+    # One standard for every form made at a hydrant (13.09): a wrong_location
+    # report carries the same type / operational answers as exists_confirmed.
+    # Applied AFTER the re-key above, so the provenance lands under the new id.
+    rtype = report.get("type")
+    if rtype in CANONICAL_TYPES:
+        diff_set(rec, "type", rtype, changes, old_values)
+    rop = report.get("operational_status")
+    if rop in CANONICAL_OPERATIONAL:
+        diff_set(rec, "operational_status", rop, changes, old_values)
     note = report_note(report)
     if note:
         diff_set(rec, "verifier_note", note, changes, old_values)

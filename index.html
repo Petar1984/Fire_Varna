@@ -2859,28 +2859,40 @@ window._hydrantDataReady = (async function loadHydrantData() {
     '<div class="hint">Полезното за екипа на място — състояние, достъп, ориентир. ' +
     'Преглеждаме бележките и полезните оставаме на хидранта.</div>';
 
-  function typeFieldsHTML(t, d) {
-    if (t === 'exists_confirmed') {
-      // The type picker is ALWAYS shown: many imported (still-grey) hydrants
-      // already carry a type from the source data, and an on-site verifier must
-      // be able to confirm or correct it. The current value is pre-selected in
-      // showReportModal, so confirming is one tap. The operational picker keeps
-      // the original "hide when already populated" behavior.
-      const h = d.hydrant;
-      const showOpPicker = !(h && h.operational_status);
-      let html = '';
-      html += '<div class="field" id="fld_hydrant_type">' +
+  // The report types made AT an existing hydrant. They share one block of
+  // pickers (hydrantPickersHTML), one validation rule and one payload shape -
+  // one standard for every form (Petar, 13.09; issue #769: "on this one, and
+  // before moving the location, it would not let me mark whether it works").
+  const AT_HYDRANT_TYPES = new Set(['exists_confirmed', 'wrong_location', 'damaged']);
+
+  // The type picker is pre-selected from the record, because the record stores
+  // the picker's own vocabulary (надземен/подземен), so confirming is one tap.
+  // The operational picker is NEVER pre-selected: the record stores
+  // works/not_working/not_tested while the picker offers three Bulgarian
+  // answers, and a status is a dated observation, not a property. The stored
+  // status is shown as a readable label above the row instead. Both answers
+  // are required; "не съм проверявал" is a valid answer, so nobody is forced
+  // to invent a test result.
+  function hydrantPickersHTML(d) {
+    const h = d.hydrant;
+    const hasOp   = !!(h && h.operational_status);
+    const knownOp = hasOp ? (OPERATIONAL_LABELS[h.operational_status] || h.operational_status) : '';
+    return '<div class="field" id="fld_hydrant_type">' +
         '<label>Тип хидрант <span class="req">*</span> (потвърди или поправи)</label>' +
         radioRowHTML('hydrant_type', ['надземен','подземен'], d.hydrant_type) +
         '<div class="err">Моля избери тип.</div>' +
+      '</div>' +
+      '<div class="field" id="fld_operational">' +
+        '<label>Работи ли? <span class="req">*</span></label>' +
+        (hasOp ? '<div class="hint">сега: ' + escapeHtml(knownOp) + '</div>' : '') +
+        radioRowHTML('operational', ['да','не','не съм проверявал'], d.operational) +
+        '<div class="err">Моля избери дали работи.</div>' +
       '</div>';
-      if (showOpPicker) {
-        html += '<div class="field" id="fld_operational">' +
-          '<label>Работи ли? <span class="req">*</span></label>' +
-          radioRowHTML('operational', ['да','не','не съм проверявал'], d.operational) +
-          '<div class="err">Моля избери дали работи.</div>' +
-        '</div>';
-      }
+  }
+
+  function typeFieldsHTML(t, d) {
+    if (t === 'exists_confirmed') {
+      let html = hydrantPickersHTML(d);
       html += '<div class="field">' +
         '<label>Бележка за хидранта (по желание)</label>' +
         NOTE_HINT_HTML +
@@ -2919,7 +2931,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       '</div>';
     }
     if (t === 'wrong_location') {
-      return '<div class="field" id="fld_description">' +
+      return hydrantPickersHTML(d) +
+        '<div class="field" id="fld_description">' +
         '<label>Описание <span class="req">*</span></label>' +
         NOTE_HINT_HTML +
         '<textarea data-field="description" maxlength="2000" placeholder="Защо локацията в базата е грешна; къде всъщност е хидрантът">' + escapeHtml(d.description) + '</textarea>' +
@@ -2927,15 +2940,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
       '</div>';
     }
     if (t === 'damaged') {
-      return '<div class="field" id="fld_damage">' +
+      return hydrantPickersHTML(d) +
+        '<div class="field" id="fld_damage">' +
         '<label>Описание на повредата <span class="req">*</span></label>' +
         NOTE_HINT_HTML +
         '<textarea data-field="damage_description" maxlength="2000" placeholder="Какво точно е повредено">' + escapeHtml(d.damage_description) + '</textarea>' +
         '<div class="err">Моля опиши повредата.</div>' +
-      '</div>' +
-      '<div class="field">' +
-        '<label>Работи ли?</label>' +
-        radioRowHTML('operational', ['да','не','не съм проверявал'], d.operational) +
       '</div>';
     }
     return '';
@@ -2966,19 +2976,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
       description: draft.description || '',
       terrain_description: draft.terrain_description || '',
       damage_description: draft.damage_description || '',
-      // hydrant_type and operational require explicit selection in
-      // exists_confirmed (when visible) and new_hydrant. Default to empty so
-      // no chip is pre-selected and submit validation forces a choice. The
-      // damaged and missing flows keep their existing default selections.
-      // Exception: exists_confirmed on a hydrant that already carries a type
-      // pre-selects that value, so an on-site verifier confirms it in one tap
-      // (or corrects it). The picker is now always shown — see typeFieldsHTML.
+      // hydrant_type and operational require explicit selection in every form
+      // made at a hydrant (AT_HYDRANT_TYPES) and in new_hydrant. Default to
+      // empty so no chip is pre-selected and submit validation forces a choice.
+      // Exception: a hydrant that already carries a type pre-selects it, so an
+      // on-site verifier confirms it in one tap (or corrects it) - see
+      // hydrantPickersHTML. The stored operational status is never pre-selected.
       hydrant_type: draft.hydrant_type != null ? draft.hydrant_type
-        : ((reportType === 'exists_confirmed' && hydrant && hydrant.type) ? hydrant.type : ''),
+        : ((AT_HYDRANT_TYPES.has(reportType) && hydrant && hydrant.type) ? hydrant.type : ''),
       hydrant_type_at_location: draft.hydrant_type_at_location || 'не знам',
-      operational: draft.operational != null
-        ? draft.operational
-        : (reportType === 'damaged' ? 'не съм проверявал' : ''),
+      operational: draft.operational != null ? draft.operational : '',
       placedCoord: draft.placedCoord || null,
     };
 
@@ -3077,31 +3084,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const f = document.getElementById('fld_location'); if (f) f.classList.add('invalid');
       invalid = true;
     }
-    // new_hydrant always requires explicit type and operational selection.
-    if (reportType === 'new_hydrant') {
+    // Every form made at a hydrant (AT_HYDRANT_TYPES) and new_hydrant carry the
+    // same two pickers, and both are required - one standard for every form
+    // (Petar, 13.09). Opt-out values ("не съм проверявал") are valid choices;
+    // the stored type, pre-selected, satisfies the type picker in one tap.
+    if (AT_HYDRANT_TYPES.has(reportType) || reportType === 'new_hydrant') {
       if (!reportDraft.hydrant_type) {
         const f = document.getElementById('fld_hydrant_type'); if (f) f.classList.add('invalid');
         invalid = true;
       }
       if (!reportDraft.operational) {
-        const f = document.getElementById('fld_operational'); if (f) f.classList.add('invalid');
-        invalid = true;
-      }
-    }
-    // exists_confirmed: validation applies only to whichever pickers are
-    // visible (which is decided by whether the target hydrant already has
-    // those fields populated). Opt-out picker values are valid choices.
-    if (reportType === 'exists_confirmed') {
-      const h = reportDraft.hydrant;
-      // Type picker is always shown now (see typeFieldsHTML), so it is always
-      // required; pre-selection from the existing type satisfies it in one tap.
-      const typeVisible = true;
-      const opVisible   = !(h && h.operational_status);
-      if (typeVisible && !reportDraft.hydrant_type) {
-        const f = document.getElementById('fld_hydrant_type'); if (f) f.classList.add('invalid');
-        invalid = true;
-      }
-      if (opVisible && !reportDraft.operational) {
         const f = document.getElementById('fld_operational'); if (f) f.classList.add('invalid');
         invalid = true;
       }
@@ -3163,11 +3155,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // — the Worker still accepts them on inbound parsing for backward
       // compat with old issues, but new submissions are canonical-only.
       type:
-        (reportType === 'exists_confirmed' || reportType === 'new_hydrant')
+        (AT_HYDRANT_TYPES.has(reportType) || reportType === 'new_hydrant')
           ? canonicalTypeFromPicker(d.hydrant_type)
           : null,
       operational_status:
-        (reportType === 'exists_confirmed' || reportType === 'new_hydrant' || reportType === 'damaged')
+        (AT_HYDRANT_TYPES.has(reportType) || reportType === 'new_hydrant')
           ? canonicalOperationalFromPicker(d.operational)
           : null,
     };
@@ -3895,10 +3887,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     } else {
       return null;
     }
-    if (t === 'exists_confirmed' && report.type) {
+    if (AT_HYDRANT_TYPES.has(t) && report.type) {
       patch.type = report.type;
     }
-    if ((t === 'exists_confirmed' || t === 'damaged') && report.operational_status) {
+    if (AT_HYDRANT_TYPES.has(t) && report.operational_status) {
       patch.operational_status = report.operational_status;
     }
     return patch;
