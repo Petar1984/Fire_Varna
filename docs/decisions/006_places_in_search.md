@@ -162,6 +162,8 @@ the C4 diff contains no line of theirs (`git diff -U0 | grep -c '^-' ≤ 2`, bot
 the HTML/CSS wrapper only), and the address-search probe corpus is byte-identical
 before and after (G3).
 
+> **Amended 2026-09-13 (006a)** — see [`006a_амандамент_4б_13.09.md`](006a_амандамент_4б_13.09.md): one declared exception to D12 for the address branch — `runGeocoderSearch` and one constant next to it (a class word alone is not an address); every other function of `initAddressSearch` stays untouchable.
+
 **Matching — "the KEY" (plan §3, as amended by §10 and §11).** A form from the
 category dictionary is a *key* only if its class has at least one loaded record;
 the leftmost key names the class, further key words are treated as name words.
