@@ -5418,6 +5418,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
       const ms = toks.map(function (t) { return matchKindSet(t, vocab); });
       const numericTok = toks.map(function (t) { return /^[0-9]+$/.test(t); });
+      // A query token is class-like when every vocabulary word it can reach names a CATEGORY too (ADR 006b).
+      const classLike = toks.map(function (t, qi) { if (CLASS_WORD_TOKENS.has(t)) return false; let seen = false, near = false, far = true; for (const v in ms[qi]) { const isClass = CLASS_WORD_TOKENS.has(v); seen = true; if (ms[qi][v] >= 2) { if (!isClass) return false; near = true; } else if (!isClass) { far = false; } } return seen && (near || far); });
 
       let candidateIds = null;
       if (inverted) { candidateIds = new Set(); for (const m of ms) { for (const vt in m) { const ids = inverted[vt]; if (ids) for (let i = 0; i < ids.length; i++) candidateIds.add(ids[i]); } } }
@@ -5441,6 +5443,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
           matched += 1;
           if (!CLASS_WORD_TOKENS.has(toks[qi])) matchedOutsideClass += 1;
           if (blockTyped && toks[qi] === qBlk) qBlkMatched = true;
+          if (classLike[qi]) matchedOutsideClass -= 1;
           if (best === 3) { if (numericTok[qi]) exactNum += 1; else exactName += 1; } else if (best === 2) prefix += 1; else fuzzy += 1;
         }
         if (matched > 0 && matchedOutsideClass === 0) return;

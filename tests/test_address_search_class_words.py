@@ -133,9 +133,10 @@ UNCHANGED_MIXED = (u"парк хотел одесос", u"хотел мак")
 MAK_ROW = u"хотел мак"
 BRIZ_ROW = u"хотел бриз"
 BRIZ_THIRD_WORD = u"бриз"
+# "хостел" left this tuple for the class-like gate of ADR 006b - pinned at zero rows.
 ORDINARY_QUERIES = (u"бриз", u"парк", u"комплекс", flagship.FLAGSHIP_QUERY, u"акация 2",
                     u"ж к бриз бл в", u"с о боровец север", u"бл 307 вх 9",
-                    u"левски бл 11", u"11", u"хостел")
+                    u"левски бл 11", u"11")
 
 # `norm` turns each of these characters into a space before the query is split.
 NORM_SEPARATORS = re.compile(u"[.№,'\"-]")
@@ -332,8 +333,8 @@ class PerimeterTest(unittest.TestCase):
             self.assertEqual(candidate.count(pair), 1,
                              u"двойката котва + вмъкнат ред стои %d пъти, не веднъж: %r"
                              % (candidate.count(pair), pair[:60]))
-        self.assertEqual(candidate.count(u"CLASS_WORD_TOKENS"), 3,
-                         u"константата се споменава %d пъти, не три"
+        self.assertEqual(candidate.count(u"CLASS_WORD_TOKENS"), 5,
+                         u"константата се споменава %d пъти, не пет"
                          % candidate.count(u"CLASS_WORD_TOKENS"))
         declared = tuple(re.findall(r"'([a-z]+)'", CONST_LINE))
         self.assertEqual(declared, DERIVED_TOKENS,
