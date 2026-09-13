@@ -46,6 +46,8 @@ Decision ledger:
 | Hide completed pickers in `exists_confirmed` | Petar amendment | Reduces friction when fields already populated | UI-only revert | Ratified |
 | Extract Worker before contract change | Repo constraint | Worker source external, parser unconfirmable | Reorder commits | Ratified |
 
+> **Amended 2026-09-13** — see [`амандамент_подаване_13.09.md`](амандамент_подаване_13.09.md): the row „Hide completed pickers in `exists_confirmed`“, the two „Hide … picker“ UI rules, the `wrong_location` rule „no type or operational fields“ and the related acceptance/summary rows are superseded by one standard for every report made at a hydrant. The table above is kept as ratified.
+
 Approval-gate check: Section A is a data edit requiring Petar approval and one commit. Section B changes UI wording, Worker contract, Worker repo layout, and ingest behavior; it requires a multi-session approved sprint. No runtime/build dependency is proposed.
 
 ## Section A: Backfill Investigation
