@@ -5376,6 +5376,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return index;
     }
 
+    // Type prefixes and bare numbers of a polygon name are not searchable words (ADR 006c).
+    const POLY_STOP_TOKENS = new Set(['kv','kvartal','zhk','zh','k','kk','v','z','vz','s','o','so','m','mt','t','pz','zona','mestnost']);
     // A class word names a CATEGORY, not an address; the places branch owns it (ADR 006a).
     const CLASS_WORD_TOKENS = new Set(['hotel','hotela','hoteli','hotelite','hotelat','aparthotel','apartamenten','semen','semeini','semeinite','semeiniat','apart','aparthoteli','aparthotela','aparthotelite','apartamentna','apartamentni','motel','moteli']);
     function runGeocoderSearch(query, index){
@@ -5417,6 +5419,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const numericTok = toks.map(function (t) { return /^[0-9]+$/.test(t); });
       // A query token is class-like when every vocabulary word it can reach names a CATEGORY too (ADR 006b).
       const classLike = toks.map(function (t, qi) { if (CLASS_WORD_TOKENS.has(t)) return false; let seen = false, near = false, far = true; for (const v in ms[qi]) { const isClass = CLASS_WORD_TOKENS.has(v); seen = true; if (ms[qi][v] >= 2) { if (!isClass) return false; near = true; } else if (!isClass) { far = false; } } return seen && (near || far); });
+      // The polygon quarter the row already displays becomes searchable for an explicit "бл N" query (ADR 006c).
+      const polyCell = (quarterIndex && quarterIndex.entry_cell && qBlk !== null && !bareBlockTyped) ? quarterIndex.entry_cell : null;
+      if (polyCell && !index._polyToks) { index._polyToks = quarterIndex.names.map(function (n, ci) { const s = new Set(); norm(n + ' ' + (quarterIndex.parents[ci] || '')).split(/\s+/).forEach(function (w) { const t = skel(w); if (t && !/^[0-9]+$/.test(t) && !POLY_STOP_TOKENS.has(t)) s.add(t); }); return s; }); }
+      const polyToksByCell = polyCell ? index._polyToks : null;
 
       let candidateIds = null;
       if (inverted) { candidateIds = new Set(); for (const m of ms) { for (const vt in m) { const ids = inverted[vt]; if (ids) for (let i = 0; i < ids.length; i++) candidateIds.add(ids[i]); } } }
@@ -5428,6 +5434,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         let matchedOutsideClass = 0;
         let qBlkMatched = false, all = true;
         const tk = e.tk || [], qtk = e.qtk || null, atk = e.alias_tk || null, dtk = e.dtk || null, stk = e.stk || null;
+        const polyToks = (polyToksByCell !== null && typeof e._ord === 'number' && polyCell[e._ord] >= 0) ? polyToksByCell[polyCell[e._ord]] : null;
         for (let qi = 0; qi < toks.length; qi++) {
           const m = ms[qi]; let best = 0;
           for (let ti = 0; ti < tk.length; ti++) { const k = m[tk[ti]]||0; if (k > best) { best = k; if (best === 3) break; } }
@@ -5436,6 +5443,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
           if (qtk && best < 3) { for (let ti = 0; ti < qtk.length; ti++) { const k = m[qtk[ti]]||0; if (k > best) { best = k; if (best === 3) break; } } }
           if (dtk && best < 3) { for (let ti = 0; ti < dtk.length; ti++) { const k = m[dtk[ti]]||0; if (k > best) { best = k; matchedViaDtk += 1; if (best === 3) break; } } }
           if (stk && best < 3) { for (let ti = 0; ti < stk.length; ti++) { const k = m[stk[ti]]||0; if (k > best) { best = k; matchedViaStk += 1; if (best === 3) break; } } }
+          if (best === 0 && polyToks !== null && polyToks.has(toks[qi])) best = 3;
           if (best === 0) { all = false; continue; }
           matched += 1;
           if (!CLASS_WORD_TOKENS.has(toks[qi])) matchedOutsideClass += 1;

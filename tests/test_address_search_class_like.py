@@ -125,7 +125,7 @@ MIXED_QUERIES = ((YALTA_QUERY, YALTA_AT_BASE), (BENDITA_QUERY, BENDITA_AT_BASE),
                  (BRIZ_MIXED_QUERY, BRIZ_MIXED_AT_BASE))
 # The four mixed queries with a WHOLE class word: the behaviour of lot 4b, untouched.
 UNCHANGED_MIXED = (lot4b.BRIZ_QUERY, lot4b.SHIPKA_QUERY) + lot4b.UNCHANGED_MIXED
-ORDINARY_AFTER_THE_RESET = 10
+ORDINARY_AFTER_THE_RESET = 9
 # The exact set of lot 4b keeps its own words - a regression pin, green at the base.
 EXACT_QUERIES = (u"мотел", u"мотела", u"семеен", u"апарт")
 
@@ -231,7 +231,7 @@ class ClassLikeTest(unittest.TestCase):
         nothing outside the declared price moved."""
         self.assertEqual(len(lot4b.ORDINARY_QUERIES), ORDINARY_AFTER_THE_RESET,
                          u"обикновените заявки на 4б са %d, не %d — пренастройката на "
-                         u"006b е разместена" % (len(lot4b.ORDINARY_QUERIES),
+                         u"006c е разместена" % (len(lot4b.ORDINARY_QUERIES),
                                                  ORDINARY_AFTER_THE_RESET))
         queries = tuple(lot4b.ORDINARY_QUERIES) + UNCHANGED_MIXED
         asks = [lot4b.render(query) for query in queries]

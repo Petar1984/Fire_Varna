@@ -134,9 +134,10 @@ MAK_ROW = u"хотел мак"
 BRIZ_ROW = u"хотел бриз"
 BRIZ_THIRD_WORD = u"бриз"
 # "хостел" left this tuple for the class-like gate of ADR 006b - pinned at zero rows.
+# "левски бл 11" left it for the polygon-quarter gate of ADR 006c (ord 49241 enters).
 ORDINARY_QUERIES = (u"бриз", u"парк", u"комплекс", flagship.FLAGSHIP_QUERY, u"акация 2",
                     u"ж к бриз бл в", u"с о боровец север", u"бл 307 вх 9",
-                    u"левски бл 11", u"11")
+                    u"11")
 
 # `norm` turns each of these characters into a space before the query is split.
 NORM_SEPARATORS = re.compile(u"[.№,'\"-]")
