@@ -334,8 +334,8 @@ class PerimeterTest(unittest.TestCase):
             self.assertEqual(candidate.count(pair), 1,
                              u"двойката котва + вмъкнат ред стои %d пъти, не веднъж: %r"
                              % (candidate.count(pair), pair[:60]))
-        self.assertEqual(candidate.count(u"CLASS_WORD_TOKENS"), 5,
-                         u"константата се споменава %d пъти, не пет"
+        self.assertEqual(candidate.count(u"CLASS_WORD_TOKENS"), 6,
+                         u"константата се споменава %d пъти, не шест"
                          % candidate.count(u"CLASS_WORD_TOKENS"))
         declared = tuple(re.findall(r"'([a-z]+)'", CONST_LINE))
         self.assertEqual(declared, DERIVED_TOKENS,

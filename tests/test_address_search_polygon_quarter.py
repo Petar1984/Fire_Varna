@@ -46,7 +46,7 @@ How this gate works, so that no reader has to guess:
     of the assertion that had to fail, never the name of the method: a method name
     also stands in the traceback of an error raised BEFORE the assertion.
 
-Nine methods: six on the queries, one on the anchors of the eight inserted lines,
+Ten methods: six on the queries, one on the anchors of the eight inserted lines,
 three negative halves.
 
 No coordinate, no cadastral number and no reporter name stands in this file: a
@@ -78,8 +78,8 @@ MODULE = "tests.test_address_search_polygon_quarter"
 # The eight inserted lines and their anchors - the perimeter of the lot
 # --------------------------------------------------------------------------
 
-STOP_COMMENT_LINE = (u"    // Type prefixes and bare numbers of a polygon name are not "
-                     u"searchable words (ADR 006c).\n")
+STOP_COMMENT_LINE = (u"    // Type prefixes, bare numbers and the signed class "
+                     u"words of a polygon name are not searchable words (ADR 006c).\n")
 STOP_SET_LINE = (u"    const POLY_STOP_TOKENS = new Set(['kv','kvartal','zhk','zh','k',"
                  u"'kk','v','z','vz','s','o','so','m','mt','t','pz','zona','mestnost']);\n")
 POLY_COMMENT_LINE = (u"      // The polygon quarter the row already displays becomes "
@@ -90,7 +90,8 @@ LAZY_LINE = (u"      if (polyCell && !index._polyToks) { index._polyToks = "
              u"quarterIndex.names.map(function (n, ci) { const s = new Set(); "
              u"norm(n + ' ' + (quarterIndex.parents[ci] || '')).split(/\\s+/)"
              u".forEach(function (w) { const t = skel(w); if (t && "
-             u"!/^[0-9]+$/.test(t) && !POLY_STOP_TOKENS.has(t)) s.add(t); }); "
+             u"!/^[0-9]+$/.test(t) && !POLY_STOP_TOKENS.has(t) && "
+             u"!CLASS_WORD_TOKENS.has(t)) s.add(t); }); "
              u"return s; }); }\n")
 BY_CELL_LINE = u"      const polyToksByCell = polyCell ? index._polyToks : null;\n"
 POLY_TOKS_LINE = (u"        const polyToks = (polyToksByCell !== null && "
@@ -122,10 +123,11 @@ ANCHORED_PAIRS = (STOP_COMMENT_LINE + STOP_SET_LINE + lot4b.COMMENT_LINE,
 # `polyToks` stands in the three code lines that use it and inside `polyToksByCell` and
 # `index._polyToks` - measured on the delivered file, never guessed.
 POLYTOKS_MENTIONS = 9
-# The two names the inserted lines must NOT carry: lot 4б pins `CLASS_WORD_TOKENS` at
-# five mentions and lot 4в pins `classLike` at two, and ADR 006c 4в-Б-D2 keeps the class
-# set out of the polygon rule on purpose.
-FOREIGN_NAMES = (u"CLASS_WORD_TOKENS", u"classLike")
+# The name the inserted lines must NOT carry: lot 4в pins `classLike` at two mentions.
+# `CLASS_WORD_TOKENS` left this tuple with the knowledge of the signature (план v1.2):
+# the lazy builder names it on purpose, because ADR 006c 4в-Б-D2 keeps the class words
+# OUT of the polygon tokens - the pin of lot 4б counts six mentions now, not five.
+FOREIGN_NAMES = (u"classLike",)
 
 # --------------------------------------------------------------------------
 # The queries, pinned by measurement at the base (план §1, ADR 006c 4в-Б-D4)
@@ -170,6 +172,30 @@ SIGNED_DELTAS = (
     (u"гара бл 1",
      u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (ЖП Гара) става търсима "
      u"за блокова заявка"),
+    (u"болница бл 1",
+     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Окръжна болница-Генерали) "
+     u"става търсима за блокова заявка"),
+    (u"мол бл 1",
+     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Гранд Мол) става търсима "
+     u"за блокова заявка"),
+    (u"кино бл 1",
+     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Зимно кино Тракия) става "
+     u"търсима за блокова заявка"),
+    (u"площад бл 1",
+     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (ВИНС-Червен площад) става "
+     u"търсима за блокова заявка"),
+    (u"пристанище бл 1",
+     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Пристанище Варна) става "
+     u"търсима за блокова заявка"),
+    (u"стадион бл 1",
+     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Стадион Спартак) става "
+     u"търсима за блокова заявка"),
+    (u"бизнес бл 5",
+     u"цената по 4в-Б-D4 (в): клетката Бизнес хотел влиза през РОДОВАТА си дума "
+     u"(бизнес), не през класовата - класовата е изключена от полигонните токени"),
+    (u"левски 1 бл 11",
+     u"цената: Цветен квартал, бл. 11 минава пред кв. Левски, бл. 11 - Цветен квартал "
+     u"е подклетка с родител кв. Левски"),
 )
 # The corpus of thirty-three queries: ZERO deltas measured. A query that moves without
 # standing here is exactly what план §7 STOP-11 forbids.
@@ -182,8 +208,13 @@ FAMILY = ((u"левски бл 11", 49241), (u"левски бл 12", 49243), (u
           (u"левски бл 9", 33015), (u"левски бл 10", 32948))
 
 # Lots 4б and 4в keep their words: the rows each query draws, measured on both sides.
+# The last two are the Auditor's finding of 14.09: before v1.2 a class word plus a
+# block number returned six addresses of the "Бизнес хотел" cell, because the lot 4б
+# guard fires only for an ALL-class query. With the class set out of the polygon
+# tokens they are byte-equal to the base again - measured, not assumed.
 CLASS_WORD_ROWS = ((u"хотел", 0), (u"хотели", 0), (u"хот", 0), (u"хоте", 0),
-                   (u"хостел", 0), (u"апар", 0), (u"бизнес", 1))
+                   (u"хостел", 0), (u"апар", 0), (u"бизнес", 1),
+                   (u"хотел бл 5", 8), (u"хотел бл 11", 7))
 # 4в-Б-D5: "левски бл 11" leaves the ordinary queries of lot 4б and is pinned above.
 ORDINARY_AFTER_THE_RESET = 9
 
@@ -332,7 +363,8 @@ class PolygonQuarterTest(unittest.TestCase):
 
     def test_the_class_words_still_own_their_words(self):
         """A regression pin, green at the base as well (план §4 К3.2, метод 6): the
-        polygon rule never mentions the class set, so 4б and 4в keep their numbers."""
+        polygon rule REFUSES the class set when it derives its tokens (4в-Б-D2), so 4б
+        and 4в keep their numbers and a class word with a block number stays put."""
         asks = [lot4b.render(query) for query, _ in CLASS_WORD_ROWS]
         reference = ask_pinned_base(self, asks)
         candidate = flagship.ask_client(self, asks)

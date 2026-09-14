@@ -5376,7 +5376,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return index;
     }
 
-    // Type prefixes and bare numbers of a polygon name are not searchable words (ADR 006c).
+    // Type prefixes, bare numbers and the signed class words of a polygon name are not searchable words (ADR 006c).
     const POLY_STOP_TOKENS = new Set(['kv','kvartal','zhk','zh','k','kk','v','z','vz','s','o','so','m','mt','t','pz','zona','mestnost']);
     // A class word names a CATEGORY, not an address; the places branch owns it (ADR 006a).
     const CLASS_WORD_TOKENS = new Set(['hotel','hotela','hoteli','hotelite','hotelat','aparthotel','apartamenten','semen','semeini','semeinite','semeiniat','apart','aparthoteli','aparthotela','aparthotelite','apartamentna','apartamentni','motel','moteli']);
@@ -5421,7 +5421,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const classLike = toks.map(function (t, qi) { if (CLASS_WORD_TOKENS.has(t)) return false; let seen = false, near = false, far = true; for (const v in ms[qi]) { const isClass = CLASS_WORD_TOKENS.has(v); seen = true; if (ms[qi][v] >= 2) { if (!isClass) return false; near = true; } else if (!isClass) { far = false; } } return seen && (near || far); });
       // The polygon quarter the row already displays becomes searchable for an explicit "бл N" query (ADR 006c).
       const polyCell = (quarterIndex && quarterIndex.entry_cell && qBlk !== null && !bareBlockTyped) ? quarterIndex.entry_cell : null;
-      if (polyCell && !index._polyToks) { index._polyToks = quarterIndex.names.map(function (n, ci) { const s = new Set(); norm(n + ' ' + (quarterIndex.parents[ci] || '')).split(/\s+/).forEach(function (w) { const t = skel(w); if (t && !/^[0-9]+$/.test(t) && !POLY_STOP_TOKENS.has(t)) s.add(t); }); return s; }); }
+      if (polyCell && !index._polyToks) { index._polyToks = quarterIndex.names.map(function (n, ci) { const s = new Set(); norm(n + ' ' + (quarterIndex.parents[ci] || '')).split(/\s+/).forEach(function (w) { const t = skel(w); if (t && !/^[0-9]+$/.test(t) && !POLY_STOP_TOKENS.has(t) && !CLASS_WORD_TOKENS.has(t)) s.add(t); }); return s; }); }
       const polyToksByCell = polyCell ? index._polyToks : null;
 
       let candidateIds = null;
