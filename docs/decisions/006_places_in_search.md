@@ -166,6 +166,8 @@ before and after (G3).
 
 > **Amended 2026-09-13 (006b)** — see [`006b_амандамент_4в_13.09.md`](006b_амандамент_4в_13.09.md): the same exception widened for the same function — `runGeocoderSearch` gains a derived class-like predicate over the match kinds it already computes plus one compensating decrement (a class-like token is not an address either); still no other function of `initAddressSearch` is touched.
 
+> **Amended 2026-09-14 (006c)** — see [`006c_амандамент_4в-Б_14.09.md`](006c_амандамент_4в-Б_14.09.md): the same exception widened a third time for the same function — `runGeocoderSearch` (with `scoreEntry`) lets a query token that names the polygon quarter the row already displays count as an exact match for an explicit "бл N" query, plus one constant next to it; still no other function of `initAddressSearch` is touched.
+
 **Matching — "the KEY" (plan §3, as amended by §10 and §11).** A form from the
 category dictionary is a *key* only if its class has at least one loaded record;
 the leftmost key names the class, further key words are treated as name words.
