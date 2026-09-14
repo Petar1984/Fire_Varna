@@ -90,6 +90,12 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "tests/test_address_search_polygon_quarter.py",
                "docs/plans/ПЛАН_Проблемите_лот4в-Б_бл11_14.09.md",
                "docs/decisions/006c_амандамент_4в-Б_14.09.md",
+               # Лот 5 „Проблемите“ (входовете под сградата): новият гейт с трите
+               # отрицателни половини (К3b), планът (К1) и ADR 012, който урежда
+               # лентата под адресния ред (К2). И трите се раждат СЛЕД базата 134039c.
+               "tests/test_address_entrances_under_building.py",
+               "docs/plans/ПЛАН_Проблемите_лот5_входовете_14.09.md",
+               "docs/decisions/012_entrances_under_the_building.md",
                # чужд: модерация #38, 20c1efe
                "scratch/apply_c38.py",
                # запис на Архитекта: Кими К45 (О46), Кими К46 (О52)

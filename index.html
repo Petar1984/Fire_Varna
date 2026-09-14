@@ -1085,6 +1085,58 @@ svg.leaflet-image-layer.leaflet-interactive path {
     background: #eef2f7; border-bottom: 1px solid #e2e8f0;
   }
   .asr-status { padding: 10px 12px; color: #777; font-size: 13px; }
+  /* --- Lot 5 / ADR 012: a building is ONE row with an entrance counter;
+     tapping the counter opens its entrances as chips on ONE horizontally
+     scrollable strip directly under the row. Badge, chips and the two scroll
+     arrows are native <button>s, so the reset below is what keeps them looking
+     like chips. A phone swipes the strip; a MOUSE cannot drag an overflow-x box,
+     so the strip also carries the arrows, a wheel handler and a drag handler. */
+  .asr-ent-badge {
+    margin-left: auto; align-self: center; flex: none; min-height: 44px;
+    display: inline-flex; align-items: center; padding: 0 10px;
+    border: 0; border-radius: 12px;
+    font-family: inherit; font-size: 11.5px; font-weight: 700;
+    color: #2e7d32; background: #e6f4ea; cursor: pointer; white-space: nowrap;
+    -webkit-appearance: none; appearance: none;
+  }
+  .asr-ent-badge.open { background: #2e7d32; color: #fff; }
+  .asr-ent-strip {
+    position: relative; display: flex; gap: 6px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity; overscroll-behavior-x: contain;
+    padding: 6px 12px 8px 44px; background: #f4f7fb;
+    border-bottom: 1px solid #f0f0f0; scrollbar-width: thin;
+    -webkit-user-select: none; user-select: none;
+  }
+  .asr-ent-chip {
+    flex: none; min-height: 44px; min-width: 64px;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 12px; border: 1px solid #2e7d32; border-radius: 14px;
+    background: #fff; color: #2e7d32;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    scroll-snap-align: start; cursor: pointer; white-space: nowrap;
+    -webkit-appearance: none; appearance: none;
+  }
+  /* The two scroll arrows. They stick to the scrollport edges and are pulled back
+     over the chips by a negative margin, so they never move a chip. */
+  .asr-ent-arrow {
+    position: sticky; z-index: 1; flex: none;
+    align-self: stretch; width: 34px; min-width: 34px; min-height: 44px;
+    border: 0; padding: 0; display: flex; align-items: center;
+    font-family: inherit; font-size: 18px; line-height: 1;
+    color: #3a4a5c; cursor: pointer; pointer-events: auto;
+    -webkit-appearance: none; appearance: none;
+  }
+  /* `display:flex` above outranks the UA `[hidden]` rule, so say it here. */
+  .asr-ent-arrow[hidden] { display: none; }
+  .asr-ent-arrow-left {
+    left: 0; margin-right: -34px; justify-content: flex-start;
+    background: linear-gradient(270deg, rgba(244,247,251,0), #f4f7fb 70%);
+  }
+  .asr-ent-arrow-right {
+    right: 0; margin-left: -34px; justify-content: flex-end;
+    background: linear-gradient(90deg, rgba(244,247,251,0), #f4f7fb 70%);
+  }
   /* Result marker (one at a time) — teal dot, distinct from the red/numbered
      hydrant pins and the blue user dot. className replaces leaflet-div-icon so
      no default white box; the override below is belt-and-suspenders. */
@@ -5648,6 +5700,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     // ---- dropdown rendering (textContent only; never innerHTML) ----
     let currentResults = [];
+    // Lot 5 / ADR 012 D5 - `query` is the text the DRAWN list was built from, `open`
+    // the one group whose entrance strip is showing (null = none). A toggle reads
+    // THIS, never the live input box, so a keystroke that has not been rendered yet
+    // can never flip the guard under a tap.
+    let foldState = { query: null, open: null };
     function hideResults() { resultsEl.classList.remove('visible'); resultsEl.replaceChildren(); currentResults = []; }
     function showStatus(text) {
       const d = document.createElement('div'); d.className = 'asr-status'; d.textContent = text;
@@ -5707,6 +5764,239 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return item;
     }
     // IB1 address slice core end
+    // ===================================================================
+    // Lot 5 / ADR 012 - entrance folding. Everything here is ADDITIVE:
+    // `buildExactItem`, `dedupeDisplayRows`, `appendExactHeader`, `selectResult`
+    // and `runGeocoderSearch` are untouched, so ranking and row html cannot move.
+    // Nothing on this path calls `.closest(` or `querySelector` - the headless DOM
+    // stub has neither; attaching a listener is fine (there it is a no-op), and
+    // every scrollBy / setPointerCapture / requestAnimationFrame call is guarded.
+    // ===================================================================
+    // Above this many chips the strip gets its two scroll arrows. Measured at 375 px
+    // (plan F0.9): the strip is 354 px wide, a chip 64 px plus a 6 px gap - five fit.
+    const ENT_STRIP_ARROWS_AFTER = 5;
+
+    // An EXPLICITLY typed entrance query ("bl 408 vh 12") is never folded: the
+    // crew asked for a single entrance, so that entrance stays a row of its own.
+    // The text is always the ARGUMENT - never a live read of the input box.
+    function typedEntranceQuery(queryText) {
+      return norm(queryText).split(/\s+/).map(skel).includes('vh');
+    }
+
+    // g -> [ord, ...] for every entrance entry of that building, built ONCE per
+    // loaded index (cached on the index itself). Order: numeric entrances first in
+    // numeric order, then the lettered ones; duplicates by `en` keep the first ord.
+    function entrancesByGroup(index) {
+      if (!index || !Array.isArray(index.entries)) return new Map();
+      if (index._entByG) return index._entByG;
+      const entries = index.entries;
+      const byG = new Map();
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        if (!e || e.en == null || e.g == null) continue;
+        const key = String(e.g);
+        if (!byG.has(key)) byG.set(key, []);
+        byG.get(key).push(typeof e._ord === 'number' ? e._ord : i);
+      }
+      const enOf = function (ord) { const e = entries[ord]; return e && e.en != null ? String(e.en) : ''; };
+      const cmp = function (a, b) {
+        const ea = enOf(a), eb = enOf(b);
+        const na = /^[0-9]+$/.test(ea) ? parseInt(ea, 10) : NaN;
+        const nb = /^[0-9]+$/.test(eb) ? parseInt(eb, 10) : NaN;
+        const an = !Number.isNaN(na), bn = !Number.isNaN(nb);
+        if (an && bn && na !== nb) return na - nb;   // both numeric -> number order
+        if (an !== bn) return an ? -1 : 1;           // numeric before non-numeric
+        if (ea !== eb) return ea.localeCompare(eb, 'bg');
+        return a - b;                                // stable tie-break
+      };
+      byG.forEach(function (ords, key) {
+        ords.sort(cmp);
+        const seen = new Set(); const out = [];
+        for (let i = 0; i < ords.length; i++) {
+          const en = enOf(ords[i]);
+          if (seen.has(en)) continue;
+          seen.add(en); out.push(ords[i]);
+        }
+        byG.set(key, out);
+      });
+      index._entByG = byG;
+      return byG;
+    }
+
+    // One index entry -> EXACTLY the eight fields `runGeocoderSearch`'s projection
+    // hands to `selectResult`: kind, en, pin, d, label, display_id, g, _ord. `_ord`
+    // is a Number (the quarter word is read by position). The ranking-only fields
+    // (allTokens/matched/exact/prefix/fuzzy/bareRole/block) are read by no display
+    // or selection path, so they are absent on purpose.
+    function entranceRow(index, ord) {
+      const n = Number(ord);
+      if (!Number.isFinite(n)) return null;
+      const entries = (index && Array.isArray(index.entries)) ? index.entries : null;
+      const e = entries ? entries[n] : null;
+      if (!e) return null;
+      return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label,
+               display_id: e.display_id, g: e.g, _ord: n };
+    }
+
+    // The horizontally scrollable strip of entrance chips for one building group.
+    // It lists EVERY entrance the index knows for `g` - including one that was
+    // already drawn as a row of its own above. Everything a MOUSE needs to move it
+    // (arrows, wheel, drag) is wired here, on the strip itself.
+    function buildEntranceStrip(index, g) {
+      const strip = document.createElement('div');
+      strip.className = 'asr-ent-strip';
+      const entries = (index && Array.isArray(index.entries)) ? index.entries : [];
+      const ords = entrancesByGroup(index).get(String(g)) || [];
+      // ---- how far one arrow press moves the strip, and how to move it -------
+      const pageStep = function () { return Math.round((strip.clientWidth || 0) * 0.8); };
+      const scrollByX = function (dx) {
+        if (typeof strip.scrollBy === 'function') strip.scrollBy({ left: dx, behavior: 'smooth' });
+        else strip.scrollLeft = (strip.scrollLeft || 0) + dx;   // headless / no smooth scroll
+      };
+      const maxScroll = function () { return (strip.scrollWidth || 0) - (strip.clientWidth || 0); };
+      const makeArrow = function (side, glyph, label) {
+        const b = document.createElement('button');
+        b.setAttribute('type', 'button');
+        b.className = 'asr-ent-arrow asr-ent-arrow-' + side;
+        b.setAttribute('aria-label', label);
+        b.textContent = glyph;
+        return b;
+      };
+      // The arrows are appended around the chips, so DOM order IS visual order:
+      // left first (sticky to the left edge), right last (sticky to the right).
+      // "\u043f\u0440\u0435\u0434\u0438\u0448\u043d\u0438 \u0432\u0445\u043e\u0434\u043e\u0432\u0435" / "\u043e\u0449\u0435 \u0432\u0445\u043e\u0434\u043e\u0432\u0435"
+      const withArrows = ords.length > ENT_STRIP_ARROWS_AFTER;
+      const leftArrow = withArrows ? makeArrow('left', '\u2039',
+        '\u043f\u0440\u0435\u0434\u0438\u0448\u043d\u0438 \u0432\u0445\u043e\u0434\u043e\u0432\u0435') : null;
+      const rightArrow = withArrows ? makeArrow('right', '\u203a',
+        '\u043e\u0449\u0435 \u0432\u0445\u043e\u0434\u043e\u0432\u0435') : null;
+      if (leftArrow) strip.appendChild(leftArrow);
+      for (let i = 0; i < ords.length; i++) {
+        const e = entries[ords[i]];
+        if (!e) continue;
+        const chip = document.createElement('button');
+        chip.setAttribute('type', 'button');
+        chip.className = 'asr-ent-chip';
+        chip.dataset.ord = String(ords[i]);
+        chip.textContent = '\u0432\u0445. ' + e.en;
+        strip.appendChild(chip);
+      }
+      if (rightArrow) {
+        strip.appendChild(rightArrow);
+        const updateArrows = function () {
+          const sl = strip.scrollLeft || 0;
+          leftArrow.hidden = (sl <= 0);
+          rightArrow.hidden = (sl + (strip.clientWidth || 0) >= (strip.scrollWidth || 0) - 1);
+        };
+        leftArrow.addEventListener('click', function (ev) {
+          ev.stopPropagation(); scrollByX(-pageStep());
+        });
+        rightArrow.addEventListener('click', function (ev) {
+          ev.stopPropagation(); scrollByX(pageStep());
+        });
+        strip.addEventListener('scroll', updateArrows, { passive: true });
+        // the first state needs a LAID-OUT strip: after insertion, not before
+        if (typeof requestAnimationFrame === 'function') requestAnimationFrame(updateArrows);
+        else updateArrows();
+      }
+      // ---- the wheel: a vertical wheel over the strip moves it SIDEWAYS ------
+      strip.addEventListener('wheel', function (ev) {
+        if (Math.abs(ev.deltaY) <= Math.abs(ev.deltaX)) return;   // a real sideways wheel: let it be
+        const sl = strip.scrollLeft || 0;
+        if (ev.deltaY < 0 && sl <= 0) return;                     // already hard left
+        if (ev.deltaY > 0 && sl >= maxScroll()) return;            // already hard right
+        strip.scrollLeft = sl + ev.deltaY;
+        ev.preventDefault();                                       // else the dropdown scrolls instead
+      }, { passive: false });
+      // ---- mouse drag-to-scroll. Touch is left to the browser ---------------
+      let dragging = false, dragged = false, startX = 0, startLeft = 0;
+      strip.addEventListener('pointerdown', function (ev) {
+        if (ev.pointerType !== 'mouse' || ev.button !== 0) return;
+        dragging = true; dragged = false;
+        startX = ev.clientX; startLeft = strip.scrollLeft || 0;
+      });
+      strip.addEventListener('pointermove', function (ev) {
+        if (!dragging) return;
+        const dx = ev.clientX - startX;
+        if (!dragged && Math.abs(dx) > 6) {
+          dragged = true;
+          if (typeof strip.setPointerCapture === 'function') strip.setPointerCapture(ev.pointerId);
+        }
+        strip.scrollLeft = startLeft - dx;
+      });
+      const endDrag = function () { dragging = false; };
+      strip.addEventListener('pointerup', endDrag);
+      strip.addEventListener('pointercancel', endDrag);
+      // A drag must never pick a chip: swallow its trailing click in the CAPTURE
+      // phase, before the delegated listener on the dropdown can see it.
+      strip.addEventListener('click', function (ev) {
+        if (!dragged) return;
+        ev.stopPropagation(); ev.preventDefault();
+        dragged = false;
+      }, true);
+      return strip;
+    }
+
+    // The WHOLE folded dropdown list (header + rows + the one open strip) for
+    // `rows` under `queryText`, or null when there is nothing to fold - the caller
+    // then keeps its old loop and the render stays byte-identical to the delivered
+    // one. Called from `renderResults` with the fresh input text and from a badge
+    // tap with the STORED `foldState.query`, so both draw the very same list.
+    function drawFoldedList(rows, queryText) {
+      if (!Array.isArray(rows) || rows.length === 0) return null;
+      if (typedEntranceQuery(queryText)) return null;   // an explicit entrance query is never folded
+      const index = searchIndex;
+      if (!index || !Array.isArray(index.entries)) return null;
+      const byG = entrancesByGroup(index);
+      // Pass 1 - the plan. A top-level row counts toward RESULT_LIMIT; a folded
+      // entrance does not. `i` stays the row's index in `currentResults`: nothing is
+      // reordered and `data-idx` keeps resolving through the delivered listeners.
+      // An entrance that PRECEDES its own parent is NOT folded - it stays the drawn
+      // row the ranking put first; the parent's strip lists it again below.
+      const drawnGroups = new Set();
+      const plan = [];
+      let foldable = false;
+      for (let i = 0; i < rows.length && plan.length < RESULT_LIMIT; i++) {
+        const r = rows[i];
+        if (!r) continue;
+        const g = (r.g != null) ? String(r.g) : null;
+        const isEntrance = (r.kind === 'mf' && r.en != null);
+        if (isEntrance && g !== null && drawnGroups.has(g)) continue;   // folded under its parent
+        const isFoldableBuilding = (!isEntrance && r.kind === 'mf' && g !== null &&
+                                    (byG.get(g) || []).length > 0);
+        if (isFoldableBuilding) { drawnGroups.add(g); foldable = true; }
+        plan.push({ i: i, g: isFoldableBuilding ? g : null });
+      }
+      if (!foldable) return null;                  // nothing to fold -> the old loop
+      // Pass 2 - the DOM.
+      const frag = document.createDocumentFragment();
+      appendExactHeader(frag, rows);
+      for (let k = 0; k < plan.length; k++) {
+        const step = plan[k];
+        const item = buildExactItem(rows[step.i], step.i);
+        if (step.g === null) { frag.appendChild(item); continue; }
+        const g = step.g;
+        const n = (byG.get(g) || []).length;
+        const open = (g === foldState.open);
+        const badge = document.createElement('button');
+        badge.setAttribute('type', 'button');
+        badge.className = 'asr-ent-badge' + (open ? ' open' : '');
+        badge.setAttribute('aria-expanded', open ? 'true' : 'false');
+        badge.textContent = (n === 1) ? '1 \u0432\u0445\u043e\u0434' : (n + ' \u0432\u0445\u043e\u0434\u0430');
+        badge.addEventListener('click', function (ev) {
+          ev.stopPropagation();                    // never select the row underneath
+          foldState.open = (foldState.open === g) ? null : g;
+          // Redraw under the STORED query, not the live box, and without touching
+          // `currentResults` (no re-dedup, no re-ranking) - only the strip moves.
+          const next = drawFoldedList(currentResults, foldState.query);
+          if (next) { resultsEl.replaceChildren(next); resultsEl.classList.add('visible'); }
+        });
+        item.appendChild(badge);
+        frag.appendChild(item);
+        if (open) frag.appendChild(buildEntranceStrip(index, g));
+      }
+      return frag;
+    }
     function renderResults(rows) {
       // F2 — display dedup BEFORE the visible-state assignment: currentResults IS
       // the deduped list, so Enter (currentResults[0]) and click (data-idx) select
@@ -5716,6 +6006,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       if (!rows.length) { showStatus('Няма съвпадения'); return; }
       const frag = document.createDocumentFragment();
       appendExactHeader(frag, rows);
+      // Lot 5 / ADR 012 D2 - a building draws as ONE row plus (when open) its strip.
+      // A NEW query text closes any open strip; a re-draw of the same text keeps it.
+      if (foldState.query !== inputEl.value) { foldState.query = inputEl.value; foldState.open = null; }
+      const foldedFrag = drawFoldedList(rows, foldState.query);
+      if (foldedFrag) { resultsEl.replaceChildren(foldedFrag); resultsEl.classList.add('visible'); return; }
       // runGeocoderSearch caps a normal query at 8; a bare-block surface can return
       // many rows, so the dropdown render is bounded by RESULT_LIMIT (data-idx stays
       // aligned to currentResults for click resolution).
@@ -6523,6 +6818,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
         await resolveAndRender(q, index);            // exact first; approx only on zero exact
         if (currentResults[0]) selectResult(currentResults[0]);
       }
+    });
+    // Lot 5 / ADR 012 D5 - an entrance chip lives OUTSIDE `.asr-item` (its strip is
+    // a SIBLING of the row), so the row listener below never resolves one. This
+    // listener turns a chip back into an index row and flies to that entrance.
+    // `.closest` is allowed here: this block is OUTSIDE the T12 slice. A click
+    // that ended a drag never arrives - the strip swallows it in capture.
+    resultsEl.addEventListener('click', function (ev) {
+      const chip = ev.target.closest('.asr-ent-chip');
+      if (!chip) return;
+      const ord = parseInt(chip.dataset.ord, 10);
+      if (!Number.isFinite(ord)) return;
+      selectResult(entranceRow(searchIndex, ord));
+      return;
     });
     resultsEl.addEventListener('click', function (ev) {
       const item = ev.target.closest('.asr-item');
