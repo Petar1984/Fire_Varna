@@ -42,10 +42,25 @@
 //   {ask:"ensure"}                         -> {ok, entries, rows, quarter, error}
 //   {ask:"search", q}                      -> {n, deduped, rows:[{kind,en,d,_ord}…]}
 //   {ask:"render", q, limit}               -> [{title, meta, html}] — the dropdown ROW
+//   {ask:"renderList", q, limit, open}   -> {header, rows:[{cls, title, meta,
+//                                            badge, open, chips, html}…]}
 //   {ask:"panel", q, pick}                 -> {panel, popup, sheet} — the panel + popup
 //   {ask:"coord", q}                       -> {title, meta, popup} — the GPS row
 //   {ask:"collisions", queries:[…]}        -> [{q, ranked, shown, merged}]
 //   {ask:"digests"}                        -> {entries_digest, rows_digest}
+//
+// `renderList` (lot 5, ADR 012 D7) is the only ask that drives `renderResults`
+// itself, because every other one renders through `buildExactItem` directly and a
+// change in what the dropdown DRAWS would be invisible to the whole suite. It puts
+// `q` into `inputEl.value` — the fold guard judges the REMEMBERED query text, so
+// the box has to carry it — hands `renderResults` the ranked rows (it dedupes them
+// itself) and reads the TOP-LEVEL children of `resultsEl` back. `open: g` asks for
+// one group's entrance strip drawn open: the first draw stores the query in
+// `foldState`, the second draw of the SAME text keeps it and opens that one group
+// — the stub cannot fire the badge's own click. It needs `renderResults`, `inputEl`,
+// `resultsEl` and (only for `open`) `foldState` in `exports`. The stub has neither
+// `closest` nor `getAttribute`, so the readers below walk `children` and read the
+// node's own `attributes` array.
 //
 // Exit code: 0 when the run itself succeeded (an ask may still answer "false"),
 // 1 when the slice could not be raised or an ask threw — the message travels in
@@ -345,6 +360,19 @@ async function run(input) {
         });
       });
       answers.push(out);
+    } else if (ask.ask === 'renderList') {
+      // Lot 5 / ADR 012 D7 — the dropdown as the eye sees it: `renderResults` runs for
+      // real and THIS reads back what it drew. `dedupeDisplayRows` is NOT called here:
+      // `renderResults` does it itself, and deduping twice would hide a regression.
+      const index = await ensure();
+      const ranked = value('runGeocoderSearch')(ask.q, index);
+      env.values.inputEl.value = ask.q;
+      value('renderResults')(ranked);
+      if (ask.open !== undefined && ask.open !== null) {
+        value('foldState').open = String(ask.open);
+        value('renderResults')(ranked);
+      }
+      answers.push(readDropdown(env.values.resultsEl, ask.limit));
     } else if (ask.ask === 'panel') {
       const r = await rowsFor(ask.q);
       const row = r.shown[ask.pick || 0];
@@ -402,6 +430,72 @@ function findByClass(node, cls) {
     if (hit) return hit;
   }
   return null;
+}
+
+// ---- lot 5: reading the DRAWN dropdown back off the stub -------------------
+// The stub sets a class either through `className` or through `classList`, so a class
+// is looked up as a WORD in both - `.asr-ent-badge open` must still answer to
+// `asr-ent-badge`. `closest` and `getAttribute` do not exist here on purpose.
+function classWords(node) {
+  const own = String((node && node.className) || '').split(/\s+/).filter(Boolean);
+  const set = (node && node.classList && node.classList._set) ? Array.from(node.classList._set) : [];
+  return own.concat(set);
+}
+
+function hasClassWord(node, cls) {
+  return classWords(node).indexOf(cls) >= 0;
+}
+
+// The LAST value set for `name` - what a real `setAttribute` would leave behind.
+function attrOf(node, name) {
+  const pairs = (node && node.attributes) || [];
+  for (let i = pairs.length - 1; i >= 0; i--) if (pairs[i][0] === name) return pairs[i][1];
+  return null;
+}
+
+function findByClassWord(node, cls) {
+  if (!node) return null;
+  if (hasClassWord(node, cls)) return node;
+  for (const child of (node.children || [])) {
+    const hit = findByClassWord(child, cls);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+// The group header, the top-level rows and the chips of the one open strip. A strip is
+// a SIBLING of its row (ADR 012 D5), so it is attached to the row drawn just before it.
+function readDropdown(container, limit) {
+  const out = { header: null, rows: [] };
+  for (const child of ((container && container.children) || [])) {
+    if (hasClassWord(child, 'asr-group-header')) {
+      out.header = child.text ? child.text() : null;
+      continue;
+    }
+    if (hasClassWord(child, 'asr-ent-strip')) {
+      const chips = [];
+      for (const node of (child.children || [])) {
+        if (!hasClassWord(node, 'asr-ent-chip')) continue;
+        chips.push({ text: node.textContent || '', ord: node.dataset ? node.dataset.ord : null });
+      }
+      if (out.rows.length) out.rows[out.rows.length - 1].chips = chips;
+      continue;
+    }
+    const title = findByClassWord(child, 'asr-title');
+    const meta = findByClassWord(child, 'asr-meta');
+    const badge = findByClassWord(child, 'asr-ent-badge');
+    out.rows.push({
+      cls: classWords(child).join(' '),
+      title: title ? title.text() : null,
+      meta: meta ? meta.text() : null,
+      badge: badge ? badge.text() : null,
+      open: badge ? (attrOf(badge, 'aria-expanded') === 'true') : false,
+      chips: [],
+      html: child.outerHTML
+    });
+  }
+  if (limit !== undefined && limit !== null) out.rows = out.rows.slice(0, limit);
+  return out;
 }
 
 const raw = await readStdin();
