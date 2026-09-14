@@ -43,7 +43,7 @@
 //   {ask:"search", q}                      -> {n, deduped, rows:[{kind,en,d,_ord}…]}
 //   {ask:"render", q, limit}               -> [{title, meta, html}] — the dropdown ROW
 //   {ask:"renderList", q, limit, open}   -> {header, rows:[{cls, title, meta,
-//                                            badge, open, chips, html}…]}
+//                                            badge, open, chips, arrows, html}…]}
 //   {ask:"panel", q, pick}                 -> {panel, popup, sheet} — the panel + popup
 //   {ask:"coord", q}                       -> {title, meta, popup} — the GPS row
 //   {ask:"collisions", queries:[…]}        -> [{q, ranked, shown, merged}]
@@ -55,10 +55,13 @@
 // `q` into `inputEl.value` — the fold guard judges the REMEMBERED query text, so
 // the box has to carry it — hands `renderResults` the ranked rows (it dedupes them
 // itself) and reads the TOP-LEVEL children of `resultsEl` back. `open: g` asks for
-// one group's entrance strip drawn open: the first draw stores the query in
-// `foldState`, the second draw of the SAME text keeps it and opens that one group
-// — the stub cannot fire the badge's own click. It needs `renderResults`, `inputEl`,
-// `resultsEl` and (only for `open`) `foldState` in `exports`. The stub has neither
+// one group's entrance strip drawn open: the stub cannot fire the badge's own click,
+// so the branch walks the badge's OWN path instead — it sets `foldState.open`, calls
+// `drawFoldedList(currentResults, foldState.query)` and puts the fragment back into
+// the container; `renderResults` is never called a second time, exactly as a tap
+// never calls it. It needs `renderResults` and (only for `open`) `foldState`,
+// `drawFoldedList` and `currentResults` in `exports`; `inputEl` and `resultsEl` are
+// the probe's own parameters, not exports. The stub has neither
 // `closest` nor `getAttribute`, so the readers below walk `children` and read the
 // node's own `attributes` array.
 //
@@ -369,8 +372,15 @@ async function run(input) {
       env.values.inputEl.value = ask.q;
       value('renderResults')(ranked);
       if (ask.open !== undefined && ask.open !== null) {
+        // the badge's own path, step for step: no second `renderResults`, so nothing is
+        // re-deduped and nothing is re-ranked - only the strip appears.
         value('foldState').open = String(ask.open);
-        value('renderResults')(ranked);
+        const next = value('drawFoldedList')(value('currentResults'),
+                                             value('foldState').query);
+        if (next) {
+          env.values.resultsEl.replaceChildren(next);
+          env.values.resultsEl.classList.add('visible');
+        }
       }
       answers.push(readDropdown(env.values.resultsEl, ask.limit));
     } else if (ask.ask === 'panel') {
@@ -474,11 +484,16 @@ function readDropdown(container, limit) {
     }
     if (hasClassWord(child, 'asr-ent-strip')) {
       const chips = [];
+      let arrows = 0;
       for (const node of (child.children || [])) {
+        if (hasClassWord(node, 'asr-ent-arrow')) { arrows += 1; continue; }
         if (!hasClassWord(node, 'asr-ent-chip')) continue;
         chips.push({ text: node.textContent || '', ord: node.dataset ? node.dataset.ord : null });
       }
-      if (out.rows.length) out.rows[out.rows.length - 1].chips = chips;
+      if (out.rows.length) {
+        out.rows[out.rows.length - 1].chips = chips;
+        out.rows[out.rows.length - 1].arrows = arrows;
+      }
       continue;
     }
     const title = findByClassWord(child, 'asr-title');
@@ -491,6 +506,7 @@ function readDropdown(container, limit) {
       badge: badge ? badge.text() : null,
       open: badge ? (attrOf(badge, 'aria-expanded') === 'true') : false,
       chips: [],
+      arrows: 0,
       html: child.outerHTML
     });
   }

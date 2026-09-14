@@ -1121,7 +1121,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
      over the chips by a negative margin, so they never move a chip. */
   .asr-ent-arrow {
     position: sticky; z-index: 1; flex: none;
-    align-self: stretch; width: 34px; min-width: 34px; min-height: 44px;
+    align-self: stretch; width: 44px; min-width: 44px; min-height: 44px;
     border: 0; padding: 0; display: flex; align-items: center;
     font-family: inherit; font-size: 18px; line-height: 1;
     color: #3a4a5c; cursor: pointer; pointer-events: auto;
@@ -1130,11 +1130,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* `display:flex` above outranks the UA `[hidden]` rule, so say it here. */
   .asr-ent-arrow[hidden] { display: none; }
   .asr-ent-arrow-left {
-    left: 0; margin-right: -34px; justify-content: flex-start;
+    left: 0; margin-right: -44px; justify-content: flex-start;
     background: linear-gradient(270deg, rgba(244,247,251,0), #f4f7fb 70%);
   }
   .asr-ent-arrow-right {
-    right: 0; margin-left: -34px; justify-content: flex-end;
+    right: 0; margin-left: -44px; justify-content: flex-end;
     background: linear-gradient(90deg, rgba(244,247,251,0), #f4f7fb 70%);
   }
   /* Result marker (one at a time) — teal dot, distinct from the red/numbered
@@ -5772,9 +5772,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // stub has neither; attaching a listener is fine (there it is a no-op), and
     // every scrollBy / setPointerCapture / requestAnimationFrame call is guarded.
     // ===================================================================
-    // Above this many chips the strip gets its two scroll arrows. Measured at 375 px
-    // (plan F0.9): the strip is 354 px wide, a chip 64 px plus a 6 px gap - five fit.
-    const ENT_STRIP_ARROWS_AFTER = 5;
+    // Above this many chips the strip gets its two scroll arrows. Measured at 375 px:
+    // the strip is 354 px wide and a chip is 64 px plus a 6 px gap, so FOUR fit and a
+    // fifth is already cut off (5 x 64 + 4 x 6 = 344 px of chips plus the 44 px arrow
+    // needs 400 px). Above four the crew gets the arrows instead of a hidden chip.
+    const ENT_STRIP_ARROWS_AFTER = 4;
 
     // An EXPLICITLY typed entrance query ("bl 408 vh 12") is never folded: the
     // crew asked for a single entrance, so that entrance stays a row of its own.
@@ -5783,9 +5785,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return norm(queryText).split(/\s+/).map(skel).includes('vh');
     }
 
-    // g -> [ord, ...] for every entrance entry of that building, built ONCE per
-    // loaded index (cached on the index itself). Order: numeric entrances first in
-    // numeric order, then the lettered ones; duplicates by `en` keep the first ord.
+    // g -> [ord, ...] for EVERY entrance entry of that building, built ONCE per loaded
+    // index (cached on the index itself). Nothing is de-duplicated by the letter: a
+    // corner building carries two entrances with the SAME letter on two different
+    // streets (measured: forty-two such pairs, up to ~145 m apart), so folding them
+    // lost a real entrance and sent its chip to the neighbouring address. The order is
+    // the natural one: a number with a letter glued to it follows its OWN number, and
+    // the purely lettered entrances come after every numbered one.
     function entrancesByGroup(index) {
       if (!index || !Array.isArray(index.entries)) return new Map();
       if (index._entByG) return index._entByG;
@@ -5799,26 +5805,24 @@ window._hydrantDataReady = (async function loadHydrantData() {
         byG.get(key).push(typeof e._ord === 'number' ? e._ord : i);
       }
       const enOf = function (ord) { const e = entries[ord]; return e && e.en != null ? String(e.en) : ''; };
+      // A number with a letter glued to it belongs to that number, not to the lettered
+      // run: it sorts right after its own number and long before ten, which a plain
+      // string sort gets wrong.
+      const NUMBER_AND_SUFFIX = /^([0-9]+)([^0-9]*)$/;
       const cmp = function (a, b) {
         const ea = enOf(a), eb = enOf(b);
-        const na = /^[0-9]+$/.test(ea) ? parseInt(ea, 10) : NaN;
-        const nb = /^[0-9]+$/.test(eb) ? parseInt(eb, 10) : NaN;
-        const an = !Number.isNaN(na), bn = !Number.isNaN(nb);
-        if (an && bn && na !== nb) return na - nb;   // both numeric -> number order
-        if (an !== bn) return an ? -1 : 1;           // numeric before non-numeric
+        const ma = NUMBER_AND_SUFFIX.exec(ea), mb = NUMBER_AND_SUFFIX.exec(eb);
+        if (ma && mb) {
+          const na = parseInt(ma[1], 10), nb = parseInt(mb[1], 10);
+          if (na !== nb) return na - nb;                                // the number first
+          if (ma[2] !== mb[2]) return ma[2].localeCompare(mb[2], 'bg'); // "" before "А"
+          return a - b;
+        }
+        if (ma || mb) return ma ? -1 : 1;            // numbered before purely lettered
         if (ea !== eb) return ea.localeCompare(eb, 'bg');
         return a - b;                                // stable tie-break
       };
-      byG.forEach(function (ords, key) {
-        ords.sort(cmp);
-        const seen = new Set(); const out = [];
-        for (let i = 0; i < ords.length; i++) {
-          const en = enOf(ords[i]);
-          if (seen.has(en)) continue;
-          seen.add(en); out.push(ords[i]);
-        }
-        byG.set(key, out);
-      });
+      byG.forEach(function (ords) { ords.sort(cmp); });
       index._entByG = byG;
       return byG;
     }
@@ -5834,6 +5838,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const entries = (index && Array.isArray(index.entries)) ? index.entries : null;
       const e = entries ? entries[n] : null;
       if (!e) return null;
+      if (e.en == null) return null;   // the ord of a BUILDING row is not an entrance
       return { kind: e.kind, en: e.en, pin: e.pin, d: e.d, label: e.label,
                display_id: e.display_id, g: e.g, _ord: n };
     }
@@ -5898,6 +5903,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
         // the first state needs a LAID-OUT strip: after insertion, not before
         if (typeof requestAnimationFrame === 'function') requestAnimationFrame(updateArrows);
         else updateArrows();
+        // a web font swaps in AFTER that first layout and changes every chip's width,
+        // so the arrows are asked once more when the fonts have settled
+        if (typeof document !== 'undefined' && document.fonts && document.fonts.ready &&
+            typeof document.fonts.ready.then === 'function') {
+          document.fonts.ready.then(updateArrows);
+        }
       }
       // ---- the wheel: a vertical wheel over the strip moves it SIDEWAYS ------
       strip.addEventListener('wheel', function (ev) {
@@ -5911,8 +5922,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
       // ---- mouse drag-to-scroll. Touch is left to the browser ---------------
       let dragging = false, dragged = false, startX = 0, startLeft = 0;
       strip.addEventListener('pointerdown', function (ev) {
+        dragged = false;                 // a finger or a second button clears the flag too
         if (ev.pointerType !== 'mouse' || ev.button !== 0) return;
-        dragging = true; dragged = false;
+        dragging = true;
         startX = ev.clientX; startLeft = strip.scrollLeft || 0;
       });
       strip.addEventListener('pointermove', function (ev) {
@@ -5924,11 +5936,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
         }
         strip.scrollLeft = startLeft - dx;
       });
-      const endDrag = function () { dragging = false; };
-      strip.addEventListener('pointerup', endDrag);
-      strip.addEventListener('pointercancel', endDrag);
+      // `pointerup` arrives BEFORE the click it produced, so the flag has to outlive it
+      // by one tick; a CANCELLED drag has no click to swallow and clears it at once,
+      // otherwise the next honest tap on a chip would be eaten.
+      strip.addEventListener('pointerup', function () {
+        dragging = false;
+        if (typeof setTimeout === 'function') setTimeout(function () { dragged = false; }, 0);
+      });
+      strip.addEventListener('pointercancel', function () { dragging = false; dragged = false; });
       // A drag must never pick a chip: swallow its trailing click in the CAPTURE
-      // phase, before the delegated listener on the dropdown can see it.
+      // phase, before the delegated listener on the dropdown can see it, and clear the
+      // flag there and then - the timer above is only the backstop for a drag whose
+      // click never comes.
       strip.addEventListener('click', function (ev) {
         if (!dragged) return;
         ev.stopPropagation(); ev.preventDefault();
@@ -6007,8 +6026,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const frag = document.createDocumentFragment();
       appendExactHeader(frag, rows);
       // Lot 5 / ADR 012 D2 - a building draws as ONE row plus (when open) its strip.
-      // A NEW query text closes any open strip; a re-draw of the same text keeps it.
-      if (foldState.query !== inputEl.value) { foldState.query = inputEl.value; foldState.open = null; }
+      // A NEW query text closes any open strip, and so does a list that was HIDDEN in
+      // between: otherwise the same query typed again would come back already open,
+      // without anybody having tapped the badge.
+      if (foldState.query !== inputEl.value || !resultsEl.classList.contains('visible')) {
+        foldState.query = inputEl.value; foldState.open = null;
+      }
       const foldedFrag = drawFoldedList(rows, foldState.query);
       if (foldedFrag) { resultsEl.replaceChildren(foldedFrag); resultsEl.classList.add('visible'); return; }
       // runGeocoderSearch caps a normal query at 8; a bare-block surface can return

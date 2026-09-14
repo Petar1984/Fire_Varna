@@ -65,7 +65,7 @@ import test_address_search_class_words as lot4b         # noqa: E402  (one sourc
 import test_address_search_class_like as lot4v          # noqa: E402  (one source of truth)
 import test_address_search_polygon_quarter as lot4vb    # noqa: E402  (one source of truth)
 
-# The base is a LITERAL with the name of THIS lot (план §0.11).
+# The base is a LITERAL with the name of THIS lot (plan §0.11).
 BASE = os.environ.get("FIRE_VARNA_LOT5_BASE") or "134039c"
 
 # The doctored copies of the negative halves live here - never in the tree.
@@ -73,16 +73,18 @@ FIXTURES = pathlib.Path(tempfile.gettempdir()) / "fv_lot5" / "fixtures"
 
 MODULE = "tests.test_address_entrances_under_building"
 
-# `renderResults` is the function under test and `foldState` is how the probe opens
-# one strip without a click the stub cannot fire (ADR 012 D7).
-EXPORTS = flagship.EXPORTS_QUARTER + ["renderResults", "foldState"]
+# `renderResults` is the function under test; `foldState`, `drawFoldedList` and
+# `currentResults` are how the probe opens one strip along the badge's own path,
+# without a click the stub cannot fire (ADR 012 D7).
+EXPORTS = flagship.EXPORTS_QUARTER + ["renderResults", "foldState",
+                                      "drawFoldedList", "currentResults"]
 
 SEARCH_LIMIT = 20
 RENDER_LIMIT = 10
 LIST_LIMIT = 30
 
 # --------------------------------------------------------------------------
-# The five inserted blocks and their anchors - the perimeter of the lot (Р9)
+# The five inserted blocks and their anchors - the perimeter of the lot (plan R9)
 # --------------------------------------------------------------------------
 
 # Each pair is the untouched ANCHOR line plus the first inserted line as ONE string:
@@ -114,23 +116,32 @@ NEW_SIGNATURES = (u"function typedEntranceQuery", u"function entrancesByGroup",
 # The functions of ADR 012 D8 that stay untouched - each still declared exactly once.
 UNTOUCHED_SIGNATURES = (u"function dedupeDisplayRows", u"function buildExactItem",
                         u"function renderResults(rows) {")
-# The new selector family, counted on the delivered file (план §5 Г2б).
+# The new selector family, counted on the delivered file (plan §5, gate G2b).
 ENT_MENTIONS = 14
-# The two declared deviations from the prototype (план §4 котва 1): the constant
-# carries the name of the Ф0.9 measurement and the dead `.active` rule never shipped.
+# The two declared deviations from the specimen (plan §4, anchor 1): the constant
+# carries the name of the F0.9 measurement and the dead `.active` rule never shipped.
 ARROWS_CONST = u"ENT_STRIP_ARROWS_AFTER"
 ARROWS_MENTIONS = 2
-BANNED_TEXT = (u"ENT_STRIP_FADE_AFTER", u".asr-ent-chip.active", u"Variant A1")
+# Absent from the WHOLE file: neither name nor rule ever shipped.
+BANNED_IN_FILE = (u"ENT_STRIP_FADE_AFTER", u".asr-ent-chip.active")
+# Absent from the lot's OWN inserted lines. The whole file cannot be judged here: the
+# two vendored minified bundles carry "prototype" of their own, and they stand in the
+# base as well - an added line is one that the base does not carry at all.
+BANNED_IN_ADDED = (u"prototype", u"Variant A1")
 
 # --------------------------------------------------------------------------
-# The three lines the negative halves doctor (each measured red in Ф0.7)
+# The three lines the negative halves doctor (each measured red in F0.7)
 # --------------------------------------------------------------------------
 
 HOOK_LINES = (
     u"      // Lot 5 / ADR 012 D2 - a building draws as ONE row plus (when open) its strip.\n"
-    u"      // A NEW query text closes any open strip; a re-draw of the same text keeps it.\n"
-    u"      if (foldState.query !== inputEl.value) { foldState.query = inputEl.value; "
-    u"foldState.open = null; }\n"
+    u"      // A NEW query text closes any open strip, and so does a list that was HIDDEN in\n"
+    u"      // between: otherwise the same query typed again would come back already open,\n"
+    u"      // without anybody having tapped the badge.\n"
+    u"      if (foldState.query !== inputEl.value || "
+    u"!resultsEl.classList.contains('visible')) {\n"
+    u"        foldState.query = inputEl.value; foldState.open = null;\n"
+    u"      }\n"
     u"      const foldedFrag = drawFoldedList(rows, foldState.query);\n"
     u"      if (foldedFrag) { resultsEl.replaceChildren(foldedFrag); "
     u"resultsEl.classList.add('visible'); return; }\n")
@@ -147,31 +158,40 @@ NEEDLE_COUNTER = u"броячът каза"
 NEEDLE_TYPED = u"заявката с изписан вход се сгъна"
 
 # --------------------------------------------------------------------------
-# The queries, pinned by measurement at the base (план §1, Ф0.2, Ф0.7)
+# The queries, pinned by measurement at the base (plan §1, F0.2, F0.7)
 # --------------------------------------------------------------------------
 
-# "бл 408" - the maximum: one building and twenty-three entrances. The base draws ten
-# rows, of which nine are entrances; the candidate draws ONE row with a counter.
+# BLOCK_QUERY - the maximum: one building and twenty-three entrances. The base draws
+# ten rows, of which nine are entrances; the candidate draws ONE row with a counter.
 BLOCK_QUERY = u"бл 408"
 BLOCK_ORD = 37332
 BLOCK_ENTRANCES = 23
 BLOCK_ROWS_AT_BASE = 10
 BLOCK_ENTRANCE_ROWS_AT_BASE = 9
+# Its strip, measured chip by chip: twenty-three numbered entrances, 1 to 23.
+BLOCK_CHIPS = tuple(u"вх. %d" % number for number in range(1, BLOCK_ENTRANCES + 1))
+# Above four chips the strip carries its two arrows: at 375 px a fifth chip is already
+# cut off (5 x 64 px + 4 x 6 px + a 44 px arrow needs 400 px, the strip is 354 px).
+ARROWS_THRESHOLD = 4
+ARROWS_WHEN_SCROLLABLE = 2
 
 # The counter comes from the INDEX, never from the drawn rows (ADR 012 D4): these two
 # are the measured witnesses of the lie - five drawn against ten, six against nine.
 COUNTER_QUERY, COUNTER_ORD, COUNTER_DRAWN_AT_BASE = u"студентска бл 14", 49248, 5
 SECOND_COUNTER_QUERY, SECOND_COUNTER_ORD, SECOND_DRAWN_AT_BASE = u"студентска бл 3", 49260, 6
-# A group with exactly one entrance: the badge says "1 вход", singular.
+# A group with exactly one entrance: the badge takes the singular form below.
 SINGULAR_QUERY, SINGULAR_ORD = u"долина бл 3", 2346
 SINGULAR_BADGE = u"1 вход"
-# A group whose index rows carry the same `en` twice (29 such groups, Кими т.5): the
-# strip folds the duplicate, so the badge and the chips stay ONE number.
-DUPLICATE_QUERY, DUPLICATE_ORD = u"1 бл 113", 34326
+# A CORNER building: two of its entrances carry the same letter on two different
+# streets (forty-two such pairs, up to ~145 m apart). Every indexed entrance gets its
+# own chip - folding them by the letter lost a real entrance and sent its chip to the
+# neighbouring number, which is what audit pass 1 measured.
+CORNER_QUERY, CORNER_ORD = u"генерал колев 16", 56617
+CORNER_REPEATED_LETTER, CORNER_REPEATS = u"А", 2
 
 # A query that spells an entrance is never folded and never gets a badge (rule 4).
-# "бл 307 вх 9" is the only one of the three that CAN fold - the other two draw
-# entrances alone, with no building row to fold them under (R1 находка 2).
+# TYPED_WITNESS is the only one of the three that CAN fold - the other two draw
+# entrances alone, with no building row to fold them under (R1 finding 2).
 TYPED_QUERIES = (u"бл 408 вх 12", u"студентска бл 14 вх а", u"бл 307 вх 9")
 TYPED_WITNESS = u"бл 307 вх 9"
 
@@ -179,17 +199,22 @@ TYPED_WITNESS = u"бл 307 вх 9"
 # query does NOT (the honest price of ADR 012 D2, pinned so it cannot move silently).
 BARE_QUERY, BARE_TOP_LEVEL_ROWS = u"бл 11", 10
 PRICE_QUERY, PRICE_ROWS, PRICE_ROWS_AT_BASE = u"погреби бл 5", 2, 7
+PRICE_ORD = 2452
 PRICE_FIRST_BADGE = u"5 входа"
 
 # An entrance whose parent is NOT on the list keeps its own row (rule 3). Both are
-# NON-typed queries with an orphan among foldable rows (R2 находка 3).
+# NON-typed queries with an orphan among foldable rows (R2 finding 3).
 ORPHAN_QUERIES = ((u"бриз бл 5", 32616, 8, 8), (u"гара бл 1", 39824, 6, 7))
 
 # An entrance drawn BEFORE its parent keeps its row and the parent's strip repeats it
-# (rule 2, the measured case of Astra т.4).
+# (rule 2, the measured case of Astra point 4).
 BEFORE_QUERY = u"10 бл 104"
 BEFORE_ENTRANCE_ORD, BEFORE_PARENT_ORD = 34209, 34208
 BEFORE_BADGE, BEFORE_CHIP = u"12 входа", u"вх. 10"
+# The natural order of that strip, measured: a suffixed number follows its own number
+# and not the whole run of numbers, which is what a plain string sort would do.
+BEFORE_CHIPS = (u"вх. 1", u"вх. 1А", u"вх. 2", u"вх. 3", u"вх. 4", u"вх. 5", u"вх. 6",
+                u"вх. 7", u"вх. 7А", u"вх. 8", u"вх. 9", u"вх. 10")
 
 # The rows of an entrance carry this class in the kind chip - how a drawn row says
 # "I am an entrance" without a coordinate or a cadastral number.
@@ -288,29 +313,28 @@ def idx_of(row):
     return int(hit.group(1)) if hit else None
 
 
+def added_lines(candidate, base):
+    """The lines the lot inserted: every line of the candidate that the base does not
+    carry at all. Coarse on purpose - it needs no diff and it cannot miss a new line."""
+    known = set(base.split(u"\n"))
+    return [line for line in candidate.split(u"\n") if line not in known]
+
+
 def counted(entries, group):
-    """The entrances of `group` as the strip shows them: the duplicates by `en` folded,
-    numbers before letters - the same rule the client's `entrancesByGroup` applies."""
-    rows = [(i, e) for i, e in enumerate(entries)
-            if e.get("en") is not None and e.get("g") is not None and str(e["g"]) == str(group)]
+    """The ords of EVERY entrance the index knows for `group`, in index order.
 
-    def key(pair):
-        en = u"%s" % pair[1]["en"]
-        return (0 if en.isdigit() else 1, int(en) if en.isdigit() else 0,
-                u"" if en.isdigit() else en, pair[0])
-
-    seen, out = set(), []
-    for i, entry in sorted(rows, key=key):
-        en = u"%s" % entry["en"]
-        if en in seen:
-            continue
-        seen.add(en)
-        out.append(i)
-    return out, len(rows)
+    Nothing is de-duplicated here either: a corner building carries two entrances with
+    the same letter and both belong on the strip. The ORDER the strip draws is not
+    recomputed in this file - a second copy of the comparator would only ever agree
+    with itself; the order is pinned by measurement instead.
+    """
+    return [i for i, e in enumerate(entries)
+            if e.get("en") is not None and e.get("g") is not None
+            and str(e["g"]) == str(group)]
 
 
 # --------------------------------------------------------------------------
-# Г1 · what the dropdown DRAWS (eight bodies)
+# G1 - what the dropdown DRAWS (eight bodies)
 # --------------------------------------------------------------------------
 
 class EntranceFoldTest(unittest.TestCase):
@@ -319,7 +343,7 @@ class EntranceFoldTest(unittest.TestCase):
         """"бл 408": one row, "23 входа", and twenty-three chips when it is open."""
         entries = flagship.search_entries()
         group = entries[BLOCK_ORD]["g"]
-        ords, _ = counted(entries, group)
+        ords = counted(entries, group)
         self.assertEqual(len(ords), BLOCK_ENTRANCES,
                          u"индексът вече не носи %d входа за ord %d, а %d — пинът е мъртъв"
                          % (BLOCK_ENTRANCES, BLOCK_ORD, len(ords)))
@@ -347,9 +371,24 @@ class EntranceFoldTest(unittest.TestCase):
         self.assertEqual(len(chips), BLOCK_ENTRANCES,
                          u"отворената лента носи %d бутона, не %d"
                          % (len(chips), BLOCK_ENTRANCES))
-        self.assertEqual([chip["text"] for chip in chips],
-                         [CHIP_PREFIX + u"%s" % entries[o]["en"] for o in ords],
-                         u"бутоните не са входовете на индекса по неговия ред")
+        self.assertEqual([chip["text"] for chip in chips], list(BLOCK_CHIPS),
+                         u"бутоните не са двайсет и трите входа по реда си")
+        self.assertEqual(sorted(int(chip["ord"]) for chip in chips), sorted(ords),
+                         u"бутоните не сочат входовете, които индексът дава за групата")
+        # the arrows: above four chips they are drawn, at four or fewer they are not
+        self.assertEqual(now["rows"][0]["arrows"], ARROWS_WHEN_SCROLLABLE,
+                         u"лента с %d бутона носи %d стрелки, не %d"
+                         % (len(chips), now["rows"][0]["arrows"], ARROWS_WHEN_SCROLLABLE))
+        short = ask_candidate(self, [drawn(PRICE_QUERY, entries[PRICE_ORD]["g"]),
+                                     drawn(SINGULAR_QUERY, entries[SINGULAR_ORD]["g"])])
+        priced, single = short[0]["rows"][0], short[1]["rows"][0]
+        self.assertEqual((len(priced["chips"]), priced["arrows"]),
+                         (5, ARROWS_WHEN_SCROLLABLE),
+                         u"лента с 5 бутона трябва да носи стрелки: %d бутона, %d стрелки"
+                         % (len(priced["chips"]), priced["arrows"]))
+        self.assertEqual((len(single["chips"]), single["arrows"]), (1, 0),
+                         u"лента под прага носи стрелки: %d бутона, %d стрелки"
+                         % (len(single["chips"]), single["arrows"]))
 
     def test_the_counter_and_the_strip_come_from_the_index(self):
         """The rows lie: five children drawn against ten in the index (ADR 012 D4)."""
@@ -358,14 +397,13 @@ class EntranceFoldTest(unittest.TestCase):
         cases = [(COUNTER_QUERY, COUNTER_ORD, COUNTER_DRAWN_AT_BASE, None),
                  (SECOND_COUNTER_QUERY, SECOND_COUNTER_ORD, SECOND_DRAWN_AT_BASE, None),
                  (SINGULAR_QUERY, SINGULAR_ORD, None, SINGULAR_BADGE),
-                 (DUPLICATE_QUERY, DUPLICATE_ORD, None, None)]
-        groups, folded, raws = [], [], []
+                 (CORNER_QUERY, CORNER_ORD, None, None)]
+        groups, folded = [], []
         for query, ord_, drawn_at_base, _ in cases:
             group = entries[ord_]["g"]
-            ords, raw = counted(entries, group)
+            ords = counted(entries, group)
             groups.append(group)
             folded.append(ords)
-            raws.append(raw)
             if drawn_at_base is not None:
                 was = ask_pinned_base(self, [drawn(query)])[0]
                 self.assertEqual(len(entrance_rows(was)), drawn_at_base,
@@ -373,9 +411,10 @@ class EntranceFoldTest(unittest.TestCase):
                                  % (BASE, len(entrance_rows(was)), query, drawn_at_base))
         self.assertEqual(len(folded[2]), 1,
                          u"ord %d вече не е група с един вход — пинът е мъртъв" % SINGULAR_ORD)
-        self.assertGreater(raws[3], len(folded[3]),
-                           u"ord %d вече няма повторен вход в индекса — пинът е мъртъв"
-                           % DUPLICATE_ORD)
+        letters = [u"%s" % entries[o]["en"] for o in folded[3]]
+        self.assertEqual(letters.count(CORNER_REPEATED_LETTER), CORNER_REPEATS,
+                         u"ord %d вече не е ъглова сграда с два входа %r — "
+                         u"пинът е мъртъв" % (CORNER_ORD, CORNER_REPEATED_LETTER))
         # the CLOSED draws first, in their own call: the badge alone already answers
         # "does the counter come from the index", and a slice without the lot has no
         # `foldState` for the probe to open.
@@ -394,6 +433,15 @@ class EntranceFoldTest(unittest.TestCase):
             self.assertEqual(len(chips[0]), len(ords),
                              u"%s %s при %d бутона за %r — значката и лентата се разминаха"
                              % (NEEDLE_COUNTER, badges(answer), len(chips[0]), query))
+        # the corner building: the repeated letter keeps BOTH of its chips
+        corner = [chip["text"] for chip in opened[3]["rows"][0]["chips"]]
+        wanted = CHIP_PREFIX + CORNER_REPEATED_LETTER
+        self.assertEqual(corner.count(wanted), CORNER_REPEATS,
+                         u"ъгловата сграда показва %d пъти %r, не %d — един вход изчезна"
+                         % (corner.count(wanted), wanted, CORNER_REPEATS))
+        self.assertEqual(len(set(chip["ord"] for chip in opened[3]["rows"][0]["chips"])),
+                         len(corner),
+                         u"два бутона на ъгловата сграда сочат един и същ ord")
 
     def test_a_typed_entrance_is_never_folded(self):
         """Rule 4: a query that spells an entrance keeps every row it draws today."""
@@ -493,14 +541,17 @@ class EntranceFoldTest(unittest.TestCase):
                          u"родителят носи значка %r, не %r" % (second["badge"], BEFORE_BADGE))
         # the strip is asked for in its OWN call, after the row shape is already judged
         opened = ask_candidate(self, [drawn(BEFORE_QUERY, group)])[0]
-        self.assertIn(BEFORE_CHIP, [chip["text"] for chip in opened["rows"][1]["chips"]],
+        chips = [chip["text"] for chip in opened["rows"][1]["chips"]]
+        self.assertIn(BEFORE_CHIP, chips,
                       u"лентата на родителя не повтаря %r" % BEFORE_CHIP)
+        self.assertEqual(chips, list(BEFORE_CHIPS),
+                         u"редът на бутоните не е естественият: %s" % chips)
 
     def test_every_chip_resolves_to_its_entrance(self):
         """Each chip carries the numeric `ord` of an entrance of the OPEN group."""
         entries = flagship.search_entries()
         cases = ((BLOCK_QUERY, BLOCK_ORD), (COUNTER_QUERY, COUNTER_ORD),
-                 (BEFORE_QUERY, BEFORE_PARENT_ORD), (DUPLICATE_QUERY, DUPLICATE_ORD))
+                 (BEFORE_QUERY, BEFORE_PARENT_ORD), (CORNER_QUERY, CORNER_ORD))
         # a badge has to exist before a strip can be opened: judged in its own call, so
         # a slice without the lot fails here and not inside the probe.
         closed = ask_candidate(self, [drawn(query) for query, _ in cases])
@@ -593,7 +644,7 @@ def pinned_queries(test):
 
 
 # --------------------------------------------------------------------------
-# Г2б · the perimeter: five anchors, only insertion
+# G2b - the perimeter: five anchors, only insertion
 # --------------------------------------------------------------------------
 
 class PerimeterTest(unittest.TestCase):
@@ -618,10 +669,16 @@ class PerimeterTest(unittest.TestCase):
         self.assertEqual(candidate.count(ARROWS_CONST), ARROWS_MENTIONS,
                          u"%r стои %d пъти, не %d"
                          % (ARROWS_CONST, candidate.count(ARROWS_CONST), ARROWS_MENTIONS))
-        for text in BANNED_TEXT:
+        for text in BANNED_IN_FILE:
             self.assertEqual(candidate.count(text), 0,
                              u"доставеният файл още носи %r — обявеното отклонение не е "
                              u"направено" % text)
+        added = added_lines(candidate, base)
+        self.assertTrue(added, u"нула вмъкнати реда спрямо базата %s" % BASE)
+        for text in BANNED_IN_ADDED:
+            guilty = [line for line in added if text in line]
+            self.assertEqual(guilty, [],
+                             u"вмъкнат ред още носи %r: %r" % (text, guilty[:1]))
         # the three lines the halves doctor stand exactly once each
         for line in (HOOK_LINES, COUNTER_LINE, GUARD_LINE):
             self.assertEqual(candidate.count(line), 1,
@@ -638,7 +695,7 @@ class PerimeterTest(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------
-# Г3 · the three negative halves - each RUNS and each FALLS
+# G3 - the three negative halves - each RUNS and each FALLS
 # --------------------------------------------------------------------------
 
 class NegativeHalfTest(unittest.TestCase):
