@@ -34,7 +34,12 @@ How this gate works, so that no reader has to guess:
   * The declared price of ADR 006c 4в-Б-D4 is pinned here query by query, with the
     reason of each one: the corpus of thirty-three queries does not move by a byte,
     the street queries and the bare-block surface are byte-equal, and every query
-    that DOES move is named with its reason and asserted to move.
+    that DOES move is named with its reason and asserted to move. Since v1.1 of the
+    amendment that price is a RULE and not a list: a polygon word plus "бл N" may
+    only pull in entries of that cell carrying block N in `btk`. The rule is pinned
+    here by the nine queries that move, by the twelve the narrowing stopped, and at
+    the delivery by the sweep of 118 polygon words × {1, 5, 11} - zero queries
+    lose a row that reads both the word and "бл. N".
   * Nothing is read at module level and no git runs there.
   * "Nothing else moved" is NOT a method here. The whole-file comparison is the
     DELIVERY probe `gates/probe/lot_perimeter.py`, run by hand at the gate with the
@@ -95,16 +100,23 @@ LAZY_LINE = (u"      if (polyCell && !index._polyToks) { index._polyToks = "
              u"return s; }); }\n")
 BY_CELL_LINE = u"      const polyToksByCell = polyCell ? index._polyToks : null;\n"
 POLY_TOKS_LINE = (u"        const polyToks = (polyToksByCell !== null && "
-                  u"typeof e._ord === 'number' && polyCell[e._ord] >= 0) ? "
-                  u"polyToksByCell[polyCell[e._ord]] : null;\n")
+                  u"typeof e._ord === 'number' && polyCell[e._ord] >= 0 && "
+                  u"(e.btk || []).includes(qBlk)) ? "
+                  u"(polyToksByCell[polyCell[e._ord]] || null) : null;\n")
 VIRTUAL_MATCH_LINE = (u"          if (best === 0 && polyToks !== null && "
                       u"polyToks.has(toks[qi])) best = 3;\n")
 INSERTED_LINES = (STOP_COMMENT_LINE, STOP_SET_LINE, POLY_COMMENT_LINE, POLY_CELL_LINE,
                   LAZY_LINE, BY_CELL_LINE, POLY_TOKS_LINE, VIRTUAL_MATCH_LINE)
 
-# 4в-Б-D3 - the restrictor: the virtual match fires only for an explicit "бл N" query
-# carrying at least one more word. Negative half 2 removes exactly this expression.
-RESTRICTOR = u" && qBlk !== null && !bareBlockTyped"
+# 4в-Б-D3 (v1.1) - the entry condition: the polygon tokens reach only an entry whose
+# `btk` carries the typed block. Negative half 2 removes exactly this expression. The
+# restrictor of D3 ("бл N" typed, plus one more word) stays in the code as the cheap
+# early exit - it keeps a query without a block from building `index._polyToks` at all -
+# but under the entry condition it no longer shows in the output (409 queries measured,
+# not one differs without it), so it cannot carry a half. The expression also stands in
+# the untouched `bmatch` line of the comparator, so the half doctors the inserted line
+# through its own anchor, never the bare expression.
+BLOCK_CONDITION = u" && (e.btk || []).includes(qBlk)"
 
 ANCHOR_FIELDS = (u"        const tk = e.tk || [], qtk = e.qtk || null, atk = e.alias_tk "
                  u"|| null, dtk = e.dtk || null, stk = e.stk || null;\n")
@@ -150,8 +162,18 @@ STREET_QUERIES = (u"студентска 11", u"бл 11 студентска", f
 # queries whose polygon word already stands in an indexed field.
 UNMOVED_QUERIES = (u"чайка бл 11", u"левски", u"чайка", u"младост бл 100", u"левски 11")
 
+# 4в-Б-D4 (v1.1) - the queries the narrowing of K3c stopped: seven "deltas" of plan
+# v1.2 that no longer happen because the cell holds no such block, and the Auditor's
+# own price queries, where K3b traded block rows for street numbers. Byte-equal now.
+NARROWED_QUERIES = (u"бриз бл 5", u"аспарухово бл 11", u"изгрев бл 7", u"гара бл 1",
+                    u"болница бл 1", u"мол бл 1", u"площад бл 1", u"погреби бл 1",
+                    u"погреби бл 5", u"гранд бл 5", u"махала бл 5", u"автогара бл 5")
+
 # 4в-Б-D4 - the signed list of deltas, query by query with its reason. Every query below
-# is asserted to MOVE: a price that stops being paid is a dead pin too.
+# is asserted to MOVE: a price that stops being paid is a dead pin too. Since v1.1 of the
+# amendment the price is a RULE, not a list: a polygon word plus "бл N" may only pull in
+# entries of that cell that carry block N in `btk`. These nine are a SAMPLE of the rule -
+# the sweep of every polygon word at delivery judges the rule itself.
 SIGNED_DELTAS = (
     (FINDER_QUERY,
      u"печалбата: блокът на ул. Студентска (ord 49241) влиза на първо място"),
@@ -163,26 +185,8 @@ SIGNED_DELTAS = (
     (u"левски бл 3",
      u"цената: блокове от подклетки с родител кв. Левски (Базар Левски, Цветен "
      u"квартал) влизат в опашката"),
-    (u"бриз бл 5",
-     u"цената: един ред в опашката се сменя с адрес от същия полигон"),
-    (u"аспарухово бл 11",
-     u"цената: един ред в опашката се сменя с адрес от същия полигон"),
-    (u"изгрев бл 7",
-     u"цената: един ред в опашката се сменя с адрес от същия полигон"),
-    (u"гара бл 1",
-     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (ЖП Гара) става търсима "
-     u"за блокова заявка"),
-    (u"болница бл 1",
-     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Окръжна болница-Генерали) "
-     u"става търсима за блокова заявка"),
-    (u"мол бл 1",
-     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Гранд Мол) става търсима "
-     u"за блокова заявка"),
     (u"кино бл 1",
      u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Зимно кино Тракия) става "
-     u"търсима за блокова заявка"),
-    (u"площад бл 1",
-     u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (ВИНС-Червен площад) става "
      u"търсима за блокова заявка"),
     (u"пристанище бл 1",
      u"цената по 4в-Б-D4 (в): родовата дума в име на клетка (Пристанище Варна) става "
@@ -220,7 +224,7 @@ ORDINARY_AFTER_THE_RESET = 9
 
 # The needles of the negative halves: the REASON TEXT of the assertion that must fail.
 NEEDLE_FINDER = u"още не носи ord"
-NEEDLE_CORPUS = u"а не е в подписания списък"
+NEEDLE_NARROWED = u"заявката без полигонна печалба"
 
 
 # --------------------------------------------------------------------------
@@ -289,7 +293,8 @@ class PolygonQuarterTest(unittest.TestCase):
                       % (TWIN_ORD, FINDER_QUERY))
 
     def test_the_street_queries_are_byte_equal(self):
-        queries = tuple(STREET_QUERIES) + tuple(UNMOVED_QUERIES)
+        queries = (tuple(STREET_QUERIES) + tuple(UNMOVED_QUERIES)
+                   + tuple(NARROWED_QUERIES))
         asks = [lot4b.render(query) for query in queries]
         reference = ask_pinned_base(self, asks)
         candidate = flagship.ask_client(self, asks)
@@ -462,13 +467,15 @@ class NegativeHalfTest(unittest.TestCase):
         self.run_half(path, MODULE + ".PolygonQuarterTest."
                       "test_the_polygon_quarter_finds_the_block", NEEDLE_FINDER)
 
-    def test_removing_the_restrictor_turns_the_corpus_method_red(self):
-        """Without the restrictor of 4в-Б-D3 the virtual match fires for every query and
-        three corpus queries stop being byte-equal - measured, not assumed."""
-        text = lot4b.replace_once(self, lot4b.index_text(self), RESTRICTOR, u"")
-        path = self.doctored("restrictor_gone", text)
+    def test_removing_the_block_condition_turns_the_byte_equal_method_red(self):
+        """Without the entry condition the polygon tokens reach every entry of the cell
+        and the narrowed queries move again ("погреби бл 5" trades its block rows for
+        street numbers) - the behaviour of K3b, measured."""
+        text = lot4b.replace_once(self, lot4b.index_text(self), POLY_TOKS_LINE,
+                                  POLY_TOKS_LINE.replace(BLOCK_CONDITION, u""))
+        path = self.doctored("block_condition_gone", text)
         self.run_half(path, MODULE + ".PolygonQuarterTest."
-                      "test_the_corpus_deltas_are_the_signed_list", NEEDLE_CORPUS)
+                      "test_the_street_queries_are_byte_equal", NEEDLE_NARROWED)
 
     def test_a_byte_in_an_untouched_function_turns_the_delivery_probe_red(self):
         """The half of the DELIVERY probe: one byte in a function this lot never touches

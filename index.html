@@ -5434,7 +5434,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
         let matchedOutsideClass = 0;
         let qBlkMatched = false, all = true;
         const tk = e.tk || [], qtk = e.qtk || null, atk = e.alias_tk || null, dtk = e.dtk || null, stk = e.stk || null;
-        const polyToks = (polyToksByCell !== null && typeof e._ord === 'number' && polyCell[e._ord] >= 0) ? polyToksByCell[polyCell[e._ord]] : null;
+        const polyToks = (polyToksByCell !== null && typeof e._ord === 'number' && polyCell[e._ord] >= 0 && (e.btk || []).includes(qBlk)) ? (polyToksByCell[polyCell[e._ord]] || null) : null;
         for (let qi = 0; qi < toks.length; qi++) {
           const m = ms[qi]; let best = 0;
           for (let ti = 0; ti < tk.length; ti++) { const k = m[tk[ti]]||0; if (k > best) { best = k; if (best === 3) break; } }
