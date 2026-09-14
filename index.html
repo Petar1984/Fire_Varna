@@ -2931,12 +2931,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
       '</div>';
     }
     if (t === 'wrong_location') {
+      // The corrected coordinate IS the report; the note is the extra, not the
+      // requirement (Petar, 14.09). An empty note already travels to the issue as null.
       return hydrantPickersHTML(d) +
-        '<div class="field" id="fld_description">' +
-        '<label>Описание <span class="req">*</span></label>' +
+        '<div class="field">' +
+        '<label>Описание (по желание)</label>' +
         NOTE_HINT_HTML +
         '<textarea data-field="description" maxlength="2000" placeholder="Защо локацията в базата е грешна; къде всъщност е хидрантът">' + escapeHtml(d.description) + '</textarea>' +
-        '<div class="err">Моля въведи описание.</div>' +
       '</div>';
     }
     if (t === 'damaged') {
@@ -3070,10 +3071,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const r = reportDraft.reporter;
     if (!r || r.length < MIN_NAME_LEN || r.length > MAX_NAME_LEN) {
       const f = document.getElementById('fld_reporter'); if (f) f.classList.add('invalid');
-      invalid = true;
-    }
-    if (reportType === 'wrong_location' && !reportDraft.description) {
-      const f = document.getElementById('fld_description'); if (f) f.classList.add('invalid');
       invalid = true;
     }
     if (reportType === 'damaged' && !reportDraft.damage_description) {
