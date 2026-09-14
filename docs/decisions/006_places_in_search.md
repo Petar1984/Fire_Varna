@@ -166,6 +166,8 @@ before and after (G3).
 
 > **Amended 2026-09-13 (006b)** — see [`006b_амандамент_4в_13.09.md`](006b_амандамент_4в_13.09.md): the same exception widened for the same function — `runGeocoderSearch` gains a derived class-like predicate over the match kinds it already computes plus one compensating decrement (a class-like token is not an address either); still no other function of `initAddressSearch` is touched.
 
+> **Pointer 2026-09-14 (ADR 012)** — see [`012_entrances_under_the_building.md`](012_entrances_under_the_building.md): NOT a fourth widening of the same exception — a separate decision for the DRAWING of the address dropdown (`renderResults` gains one early return, two listeners are added, and a new selector family `asr-ent-*` is created: the building draws as one row with an entrance counter and a horizontal strip of entrance buttons under it). The ranked rows, `dedupeDisplayRows`, `buildExactItem`, `runGeocoderSearch` and every other `asr-*` / `search-pin*` selector stay under D12 as before.
+
 > **Amended 2026-09-14 (006c)** — see [`006c_амандамент_4в-Б_14.09.md`](006c_амандамент_4в-Б_14.09.md): the same exception widened a third time for the same function — `runGeocoderSearch` (with `scoreEntry`) lets a query token that names the polygon quarter the row already displays count as an exact match for an explicit "бл N" query, and only for an entry whose `btk` carries that block (K3c, 006c D3 v1.1), plus one constant next to it; still no other function of `initAddressSearch` is touched.
 
 **Matching — "the KEY" (plan §3, as amended by §10 and §11).** A form from the
