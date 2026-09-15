@@ -46,6 +46,15 @@ deleted `feedbackOption +` line) each have a pin and a half; and the fourth cons
 of the issue stream, `scripts/build_reports_dashboard.py`, keeps the five hydrant
 types only.
 
+К6 (the re-audit of К5) closes the last door the mask left open and three edges
+around it: `parseCoordQuery` accepts FOUR and SIX bare numbers as well (degrees
+and minutes, with and without seconds, written without one symbol), and a single
+word in front of them stopped the parser — no GPS row, no lock — while the empty
+render still recorded the numbers; the lock now reads every drawn row, not the
+first; ONE function reads a 422 for both the live submit and the queue, so only a
+LABEL error parks a feedback report; and the error line loses a query string only
+where a query string can live, on a URL-like token, never at a bare „?“.
+
 No coordinate stands in this file in any shape: every coordinate-looking string the
 mask is measured against is built out of repeated digits.
 """
@@ -115,6 +124,7 @@ ANCHORS = (
     "const FB_CTX_LABELS = {",
     "function renderFeedbackContext(kind, env) {",
     "function feedbackErrorLine(message, filename, lineno) {",
+    "function isLabelError(json) {",
     "function typeFieldsHTML(t, d) {",
     "function dedupHash(report) {",
     "function labelsForType(",
@@ -135,12 +145,13 @@ BASE_OPTIONAL = ("const FEEDBACK_KINDS = [",
                  "function buildFeedbackContext(kind, env) {",
                  "const FB_CTX_LABELS = {",
                  "function renderFeedbackContext(kind, env) {",
-                 "function feedbackErrorLine(message, filename, lineno) {")
+                 "function feedbackErrorLine(message, filename, lineno) {",
+                 "function isLabelError(json) {")
 
 EXPORTS = ["typeFieldsHTML", "FEEDBACK_KINDS", "feedbackKind", "maskFeedbackQuery",
            "buildFeedbackContext", "renderFeedbackContext", "dedupHash",
            "labelsForType", "buildIssueTitle", "buildReportYAML", "buildIssueBody",
-           "feedbackErrorLine"]
+           "feedbackErrorLine", "isLabelError"]
 
 # The source lines this lot pins by hand, with the shape the base carries.
 FEEDBACK_OPTION_HEAD = u"const feedbackOption = hydrant ? '' :"
@@ -197,6 +208,16 @@ QUEUE_422 = u"res.status === 422 && item.report"
 QUEUE_FLASH = u"Докладът за приложението чака етикетите в GitHub — пази се локално"
 SKIPPED_LINE = u"прескочени (не са доклади за хидрант): %d"
 
+# К6 — the source lines of the re-audit's fixes.
+BARE_RULE_LINE = u"    if (bare) return COORD_MARK;"
+ANY_COORD_ROW = u"    const anyCoordRow = (rows) => Array.from(rows).some(isCoordRow);"
+ANY_COORD_USE = u"query: anyCoordRow(rows) ? COORD_MARK :"
+FIRST_ROW_ONLY = u"isCoordRow(rows[0])"
+LABEL_ERROR_FN = u"function isLabelError(json) {"
+LABEL_ERROR_CALL = u"isLabelError(res.json)"
+QUEUE_LABEL_ONLY = u"                   && isLabelError(res.json)) {"
+PROMISE_PREFIX = u"    window.__fvLastError = ('promise: ' +"
+
 # What the halves hunt for: the text of the assertion, never a method name.
 NEEDLE_LABELS = u"етикетите на обратната връзка"
 NEEDLE_MASK = u"маската на заявката"
@@ -212,6 +233,9 @@ NEEDLE_422 = u"етикетната грешка в errors[]"
 NEEDLE_QUEUE = u"опашката изхвърля обратната връзка"
 NEEDLE_LOCATION = u"location_method"
 NEEDLE_DASHBOARD = u"дневникът брои"
+NEEDLE_BARE = u"правилото за четири голи числа"
+NEEDLE_EVERY_ROW = u"ключалката гледа само първия ред"
+NEEDLE_ONE_READING = u"четенето на 422"
 
 
 # --------------------------------------------------------------------------
@@ -310,6 +334,16 @@ COORD_SHAPE_QUERIES = (
     GPS_ROW_TITLE,                                         # what the GPS row SHOWS
 )
 PLAIN_QUERIES = (PLAIN_QUERY, u"бл 5 аспарухово", u"ул. Струга 12")
+# К6 (а) — the BARE degrees-minutes(-seconds) `parseCoordQuery` takes as well,
+# built out of repeated digits like every other coordinate-looking string here.
+BARE_NUMBER_QUERIES = (
+    A + u" 12 50.8 " + B + u" 54 52.9",          # six numbers, two with a fraction
+    A + u" 12.846 " + B + u" 54.882",            # four numbers, two with a fraction
+    A + u" 12 51 " + B + u" 54 53",              # six whole numbers
+    u"Варна " + A + u" 12 50.8 " + B + u" 54 52.9",   # a word in front stops the parser
+)
+# What a colleague really types: three numbers, and four whole ones.
+ADDRESS_QUERIES = (u"ул. Струга 12 вх. 2 ет. 3", u"бл 5 вх 2 ап 12 ет 4")
 # A value that carries two decimal numbers is a position whatever its key is.
 COORD_VALUE_RE = r"\d[.,]\d[\s\S]*?\d[.,]\d"
 
@@ -682,6 +716,70 @@ class AppFeedbackFormTest(unittest.TestCase):
             self.assertEqual(got, q,
                              u"%s изяде обикновен адрес %r: %r" % (NEEDLE_MASK, q, got))
 
+    def test_four_and_six_bare_numbers_are_masked(self):
+        u"""К6 (а) — Б-1 на повторния одит: `parseCoordQuery` accepts FOUR and SIX
+        bare numbers too (degrees and minutes, with and without seconds, written
+        without one symbol), while the mask knew pairs only; and one word in front
+        of them stopped the PARSER, not the leak — no GPS row is drawn, the empty
+        render records the query, and ~30 m of accuracy went into a public issue.
+        Four numbers with a fraction among them, or six numbers at all, are the
+        whole marker now; an address with three of them, or with four whole ones,
+        stays exactly as it was typed."""
+        text = lot1.index_text(self)
+        asks = [call("maskFeedbackQuery", [q])
+                for q in BARE_NUMBER_QUERIES + ADDRESS_QUERIES]
+        answers = ask(self, text, asks)
+        for q, got in zip(BARE_NUMBER_QUERIES, answers):
+            self.assertEqual(got, COORD_MARK,
+                             u"%s пропуска %r: %r" % (NEEDLE_BARE, q, got))
+        for q, got in zip(ADDRESS_QUERIES, answers[len(BARE_NUMBER_QUERIES):]):
+            self.assertEqual(got, q,
+                             u"%s изяде адрес %r: %r" % (NEEDLE_BARE, q, got))
+
+    def test_one_reading_of_the_422_serves_both_paths(self):
+        u"""К6 (в) — дефект 1 на повторния одит: the queue kept an `app_feedback`
+        report on ANY 422 and promised labels for it, so a broken body or title
+        parked the record forever under a message that was not true. ONE function
+        reads the answer — the same one `handleSubmitResult` reads it with — and
+        only a LABEL error waits; every other 422 falls into the drop the five old
+        types have always fallen into."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        self.assertEqual(base.count(LABEL_ERROR_FN), 0,
+                         u"мъртъв пин: базата %s вече има %s" % (BASE, NEEDLE_ONE_READING))
+        self.assertEqual(text.count(LABEL_ERROR_FN), 1,
+                         u"%s не стои на едно място" % NEEDLE_ONE_READING)
+        shared = lot1.block(self, text, LABEL_ERROR_FN)
+        self.assertIn(u"er.field || er.resource || er.code", shared,
+                      u"%s не чете %s" % (NEEDLE_ONE_READING, NEEDLE_422))
+        self.assertIn(u"/label/i.test(msg)", shared,
+                      u"%s не чете съобщението" % NEEDLE_ONE_READING)
+        for anchor in ("function handleSubmitResult(", "function retryQueuedReports() {"):
+            self.assertIn(LABEL_ERROR_CALL, lot1.block(self, text, anchor),
+                          u"%s не минава през %s" % (anchor[:34], NEEDLE_ONE_READING))
+        queue = lot1.block(self, text, "function retryQueuedReports() {")
+        self.assertIn(QUEUE_LABEL_ONLY, queue,
+                      u"опашката пази обратната връзка при ВСЕКИ 422, не само етикетен")
+        # Both answers GitHub really sends, through the probe.
+        asks = [call("isLabelError", [{"message": u"Validation Failed",
+                                       "errors": [{"field": "labels"}]}]),
+                call("isLabelError", [{"message": u"Validation Failed",
+                                       "errors": [{"field": "body"}]}]),
+                call("isLabelError", [{"message": u"Label does not exist"}]),
+                call("isLabelError", [{"message": u"Validation Failed"}]),
+                call("isLabelError", [None])]
+        labels, body, in_message, generic, nothing = ask(self, text, asks)
+        self.assertTrue(labels, u"%s: етикетна грешка в errors[] не се познава"
+                        % NEEDLE_ONE_READING)
+        self.assertFalse(body, u"%s: грешка за тялото минава за етикетна"
+                         % NEEDLE_ONE_READING)
+        self.assertTrue(in_message, u"%s: етикет в съобщението не се познава"
+                        % NEEDLE_ONE_READING)
+        self.assertFalse(generic, u"%s: голото „Validation Failed“ минава за етикетна"
+                         % NEEDLE_ONE_READING)
+        self.assertFalse(nothing, u"%s: празен отговор минава за етикетна"
+                         % NEEDLE_ONE_READING)
+
     def test_the_422_branch_reads_the_errors_array(self):
         u"""К5 (г) — GitHub answers an unknown label with the generic „Validation
         Failed“ and names the label only in `errors[]`, so the message alone let
@@ -695,7 +793,12 @@ class AppFeedbackFormTest(unittest.TestCase):
                          u"мъртъв пин: базата %s вече чете errors[]" % BASE)
         self.assertEqual(block.count(u"const labelError ="), 1,
                          u"422 не разпознава %s" % NEEDLE_422)
-        self.assertIn(u"er.field || er.resource || er.code", block,
+        # К6 (в) — the reading itself moved into `isLabelError`, which the queue
+        # shares; the branch has to hang on THAT function and on nothing else.
+        self.assertIn(u"const labelError = isLabelError(res.json);", block,
+                      u"422 не чете %s през общата функция" % NEEDLE_422)
+        self.assertIn(u"er.field || er.resource || er.code",
+                      lot1.block(self, text, LABEL_ERROR_FN),
                       u"422 не чете %s" % NEEDLE_422)
         self.assertEqual(block.count(u"if (labelError) {"), 1,
                          u"клонът на етикетите не виси на labelError")
@@ -883,7 +986,7 @@ class RecorderTest(unittest.TestCase):
         self.assertIn(GPS_MARKER, block,
                       u"записвачът не разпознава %s" % NEEDLE_GPS_ROW)
         for needed in (u"const markOf = (row) => (isCoordRow(row) ? COORD_MARK : titleOf(row));",
-                       u"query: isCoordRow(rows[0]) ? COORD_MARK :",
+                       ANY_COORD_USE,
                        u"first_row: markOf(rows[0])",
                        u"window.__fvLastSearch.selected_row = markOf(row);"):
             self.assertIn(needed, block,
@@ -895,6 +998,23 @@ class RecorderTest(unittest.TestCase):
             self.assertIn(u"ctx.%s = search.%s ? maskFeedbackQuery(search.%s) : null;"
                           % (key, key, key), builder,
                           u"%s: %s не минава през маската" % (NEEDLE_MASK, key))
+
+    def test_the_gps_lock_looks_at_every_row(self):
+        u"""К6 (б) — дефект 5 на повторния одит: the lock asked `rows[0]` only, so
+        a GPS row drawn anywhere but first would have left the raw query in the
+        record. Every drawn row is asked now, through the ONE marker the drawing
+        code paints."""
+        text = lot1.index_text(self)
+        block = lot1.block(self, text, WATCHER)
+        self.assertIn(ANY_COORD_ROW, block,
+                      u"%s: няма проверка по всички редове" % NEEDLE_EVERY_ROW)
+        self.assertIn(ANY_COORD_USE, block,
+                      u"%s: заявката виси на друга проверка" % NEEDLE_EVERY_ROW)
+        self.assertEqual(block.count(FIRST_ROW_ONLY), 0,
+                         u"%s (%s стои още)" % (NEEDLE_EVERY_ROW, FIRST_ROW_ONLY))
+        self.assertEqual(block.count(GPS_MARKER), 1,
+                         u"%s: маркерът на %s стои %d пъти в записвача, не веднъж"
+                         % (NEEDLE_EVERY_ROW, NEEDLE_GPS_ROW, block.count(GPS_MARKER)))
 
     def test_an_empty_render_is_recorded_with_zero_rows(self):
         u"""К5 (б) — Д5 на одита: a search that found nothing was never recorded,
@@ -933,8 +1053,10 @@ class RecorderTest(unittest.TestCase):
         base = base_text(self)
         self.assertEqual(base.count(ERROR_LINE_FN), 0,
                          u"мъртъв пин: базата %s вече строи %s" % (BASE, NEEDLE_ERRLINE))
+        # К6 (г) — the query string is cut where a query string can live: on the
+        # URL in the message and on the file, never at a bare „?“ of a sentence.
         asks = [call("feedbackErrorLine", [u"първи ред\nвтори ред\nтрети", u"index.html", 12]),
-                call("feedbackErrorLine", [u"boom ?token=CANARY&lat=" + COORD_LOOKING_QUERY,
+                call("feedbackErrorLine", [u"boom https://example.org/a.js?token=CANARY",
                                            u"https://example.org/app.js?token=CANARY", 7]),
                 call("feedbackErrorLine", [u"при " + COORD_LOOKING_QUERY, u"index.html", 3]),
                 call("feedbackErrorLine", [u"A" * 300, u"index.html", 1])]
@@ -943,7 +1065,7 @@ class RecorderTest(unittest.TestCase):
                          u"%s носи повече от първия ред: %r" % (NEEDLE_ERRLINE, one))
         self.assertNotIn(u"CANARY", token,
                          u"%s носи query string: %r" % (NEEDLE_ERRLINE, token))
-        self.assertEqual(token, u"boom @app.js:7",
+        self.assertEqual(token, u"boom https://example.org/a.js @app.js:7",
                          u"%s: %r" % (NEEDLE_ERRLINE, token))
         self.assertEqual(coord, COORD_MARK + u" @index.html:3",
                          u"%s носи координата: %r" % (NEEDLE_ERRLINE, coord))
@@ -953,6 +1075,42 @@ class RecorderTest(unittest.TestCase):
         for anchor in ERROR_LISTENERS:
             self.assertIn(u"feedbackErrorLine(", lot1.block(self, text, anchor),
                           u"слушателят не минава през %s" % NEEDLE_ERRLINE)
+
+    def test_the_error_line_cuts_only_url_tokens(self):
+        u"""К6 (г) — дефекти 2 и 3 на повторния одит: the line was cut at the
+        FIRST „?“ of the whole text, so „Защо? няма връзка“ reached the issue as
+        „Защо“, and the file never went through the mask, so a `#lat=…` fragment
+        survived on it. A query string and a fragment live on a URL: they are cut
+        from URL-like tokens in the message and from the file token, and the file
+        goes through the mask like the message."""
+        text = lot1.index_text(self)
+        fragment = u"#lat=" + A + u"." + u"1" * 5
+        url = u"https://x.example/app.js" + fragment
+        asks = [call("feedbackErrorLine", [u"Защо? няма връзка", u"index.html", 4]),
+                call("feedbackErrorLine", [u"boom @" + url, u"index.html", 3]),
+                call("feedbackErrorLine", [u"boom", url, 3]),
+                call("feedbackErrorLine", [u"boom", u"app.js?token=CANARY", 9]),
+                call("feedbackErrorLine", [u"грешка",
+                                           u"https://x.example/" + GPS_ROW_TITLE + u".js", 2])]
+        question, in_message, in_file, token, coord_file = ask(self, text, asks)
+        self.assertEqual(question, u"Защо? няма връзка @index.html:4",
+                         u"%s е отрязан на гол въпросителен знак: %r"
+                         % (NEEDLE_ERRLINE, question))
+        for got in (in_message, in_file):
+            self.assertNotIn(u"lat=", got,
+                             u"%s носи фрагмент: %r" % (NEEDLE_ERRLINE, got))
+            self.assertNotIn(A + u"." + u"1" * 5, got,
+                             u"%s носи координата от фрагмент: %r" % (NEEDLE_ERRLINE, got))
+        self.assertEqual(in_file, u"boom @app.js:3",
+                         u"%s: файлът не се чисти: %r" % (NEEDLE_ERRLINE, in_file))
+        self.assertNotIn(u"CANARY", token,
+                         u"%s: голото име на файл пази query string: %r"
+                         % (NEEDLE_ERRLINE, token))
+        self.assertEqual(coord_file, u"грешка @" + COORD_MARK + u":2",
+                         u"%s: файлът не минава през маската: %r"
+                         % (NEEDLE_MASK, coord_file))
+        self.assertEqual(text.count(PROMISE_PREFIX), 1,
+                         u"%s губи представката на отказаното обещание" % NEEDLE_ERRLINE)
 
     def test_the_search_recorder_watches_the_container_from_outside(self):
         u"""Н5 — the observer hangs on the CONTAINER, never on a function of
@@ -1075,6 +1233,15 @@ class NegativeHalfTest(unittest.TestCase):
         path = self.doctored("no_mask", text)
         self.run_half(path, MODULE + ".AppFeedbackFormTest."
                       "test_a_coordinate_looking_query_is_masked", NEEDLE_MASK)
+
+    def test_removing_the_four_number_rule_turns_the_gate_red(self):
+        u"""К6 (е): the shapes stay, the count of bare numbers goes — exactly the
+        mask К5 delivered, and exactly the door Б-1 walked through."""
+        text = lot1.replace_once(self, lot1.index_text(self),
+                                 BARE_RULE_LINE + "\n", u"")
+        path = self.doctored("no_bare_number_rule", text)
+        self.run_half(path, MODULE + ".AppFeedbackFormTest."
+                      "test_four_and_six_bare_numbers_are_masked", NEEDLE_BARE)
 
     def test_removing_the_allowlist_turns_the_gate_red(self):
         text = lot1.replace_once(self, lot1.index_text(self), APPLY_GUARD + "\n", u"")

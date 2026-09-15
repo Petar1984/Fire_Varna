@@ -2802,13 +2802,17 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // The search query is the only free text the app collects by itself, and a
   // colleague can paste a coordinate into the search box.
   const COORD_MARK = '[координати]';
-  // К5 (а) — the mask has to accept everything `parseCoordQuery` accepts, or it
-  // is weaker than the parser that drew the GPS row (Gate 2, Б2): a pair with a
-  // single decimal, the Bulgarian comma pair, degrees-minutes-seconds, a geo:
-  // URI and a map link all went through it byte for byte. Such a text IS a
-  // position whatever else stands beside it, so the WHOLE query becomes the
-  // marker; a lone high-precision number keeps the narrower, in-place rule,
-  // which leaves an address carrying a dotted number readable.
+  // К5 (а) + К6 (а) — the mask has to accept everything `parseCoordQuery`
+  // accepts, or it is weaker than the parser that drew the GPS row (Gate 2, Б2
+  // and Б-1). It covers TWO families and nothing is left over: the SHAPES below
+  // — a pair with a single decimal, the Bulgarian comma pair,
+  // degrees-minutes-seconds, a geo: URI, a map link — and the BARE numbers the
+  // parser takes just as happily, four or six of them (degrees-minutes with or
+  // without seconds, written without a single symbol), which the count after the
+  // shapes catches with or without words standing beside them. Such a text IS a
+  // position, so the WHOLE query becomes the marker; a lone high-precision
+  // number keeps the narrower, in-place rule, which leaves an address carrying a
+  // dotted number readable.
   const COORD_SHAPES = [
     /[-+]?\d{1,3}[.,]\d+\s*[,;]?\s*[-+]?\d{1,3}[.,]\d+/,   // 11.11, 22.22 · 11,11 22,22
     /\d\s*[°º'′"″]/,                                        // degrees-minutes-seconds
@@ -2822,6 +2826,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
     for (let i = 0; i < COORD_SHAPES.length; i++) {
       if (COORD_SHAPES[i].test(s)) return COORD_MARK;
     }
+    // Four numbers with a fraction among them, or six numbers, name a position
+    // and nothing an address needs: „ул. Струга 12 вх. 2 ет. 3“ carries three,
+    // „бл 5 вх 2 ап 12 ет 4“ four whole ones, and both stay as they were typed.
+    const nums = s.match(/[-+]?\d+(?:[.,]\d+)?/g) || [];
+    const bare = nums.length >= 6 ||
+      (nums.length >= 4 && nums.some(n => /[.,]/.test(n)));
+    if (bare) return COORD_MARK;
     return s.replace(/[-+]?\d{1,3}[.,]\d{3,}/g, COORD_MARK);
   }
   // Н7 — the ONLY place of the lot that touches the browser, and the reason the
@@ -2945,13 +2956,21 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // reads these issues, so it is never kept.
   // К5 (в) — the line is built by ONE pure function, so a gate can drive it
   // headless: the FIRST line only (a multi-line message drags the page's own
-  // text into a public issue), no query string in the message or in the file (a
-  // token and a coordinate ride there), the coordinate mask on top of that, and
-  // 200 characters at most.
+  // text into a public issue), no query string where one can live (a token and a
+  // coordinate ride there), the coordinate mask on top of that, and 200
+  // characters at most.
+  // К6 (г) — a query string and a fragment ride on a URL, so only a URL-LIKE
+  // token loses its tail; the message itself keeps its own punctuation, because
+  // cutting at the first bare „?“ turned „Защо? няма връзка“ into „Защо“ (Gate
+  // 2, дефект 2). The file is a basename or a whole URL, and it goes through the
+  // mask as well — `#lat=…` used to survive on it (дефект 3).
   function feedbackErrorLine(message, filename, lineno) {
-    const first = String(message || 'error').split('\n')[0];
-    const file = String(filename == null ? '' : filename).split('?')[0].split('/').pop();
-    const line = maskFeedbackQuery(first.split('?')[0]) +
+    const stripTail = (token) => token.split('?')[0].split('#')[0];
+    const first = String(message || 'error').split('\n')[0]
+      .replace(/https?:\/\/\S+/gi, stripTail);
+    const file = maskFeedbackQuery(
+      stripTail(String(filename == null ? '' : filename).split('/').pop()));
+    const line = maskFeedbackQuery(first) +
       (file ? ' @' + file + ':' + (lineno || 0) : '');
     return line.slice(0, 200);
   }
@@ -2979,6 +2998,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // is drawn, so neither the title nor the query that produced it ever enters
     // the record raw (Gate 2, Б1).
     const isCoordRow = (row) => !!(row.querySelector && row.querySelector('.asr-kind.gps'));
+    // К6 (б) — EVERY drawn row, not only the first: the GPS row is the first one
+    // today, but a list that carries it anywhere carries the coordinate anyway.
+    const anyCoordRow = (rows) => Array.from(rows).some(isCoordRow);
     const markOf = (row) => (isCoordRow(row) ? COORD_MARK : titleOf(row));
     new MutationObserver(function () {
       const rows = results.querySelectorAll('.asr-item');
@@ -2995,7 +3017,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
                                   first_row: null, selected_row: null };
         return;
       }
-      window.__fvLastSearch = { query: isCoordRow(rows[0]) ? COORD_MARK : maskFeedbackQuery(input.value),
+      window.__fvLastSearch = { query: anyCoordRow(rows) ? COORD_MARK : maskFeedbackQuery(input.value),
                                 rows_shown: rows.length, first_row: markOf(rows[0]) };
     }).observe(results, { childList: true, subtree: true });
     results.addEventListener('click', function (ev) {
@@ -3686,6 +3708,18 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
     postIssue(url, payload, false).then(res => handleSubmitResult(res, report, url, payload));
   }
+  // К6 (в) — ONE reading of a 422, shared by the live submit and by the queue:
+  // GitHub answers a label it does not know with the generic „Validation Failed“
+  // and names the label only in `errors[]`. Any OTHER 422 is a broken body, and
+  // the queue has to treat it as it treats every type — the two paths disagreed
+  // and a body error parked a feedback report forever (Gate 2, дефект 1).
+  function isLabelError(json) {
+    const msg = json && (json.message || (json.errors && JSON.stringify(json.errors)));
+    const errors = (json && Array.isArray(json.errors)) ? json.errors : [];
+    return !!((msg && /label/i.test(msg)) || errors.some(function (er) {
+      return er && /label/i.test(String(er.field || er.resource || er.code || ''));
+    }));
+  }
   function handleSubmitResult(res, report, url, payload) {
     if (res.status === 201) {
       const num = res.json && res.json.number;
@@ -3713,13 +3747,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (res.status === 422) {
       const msg = res.json && (res.json.message || (res.json.errors && JSON.stringify(res.json.errors)));
       console.warn('[report] 422', msg);
-      // К5 (г) — GitHub answers a label it does not know with the generic
-      // „Validation Failed“ and names the label only in errors[], so the message
-      // alone let the feedback fall through to the general 422 line (Gate 2, г).
-      const errors = (res.json && Array.isArray(res.json.errors)) ? res.json.errors : [];
-      const labelError = (msg && /label/i.test(msg)) || errors.some(function (er) {
-        return er && /label/i.test(String(er.field || er.resource || er.code || ''));
-      });
+      // К5 (г) — the message alone let the feedback fall through to the general
+      // 422 line, so `errors[]` is read too (Gate 2, г); К6 (в) — through the
+      // one function the queue reads it with.
+      const labelError = isLabelError(res.json);
       if (labelError) {
         if (report.report_type === 'app_feedback') {
           // Н4 — the labels ARE the channel: an unlabelled feedback issue would
@@ -3795,10 +3826,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
         } else if (res.status === 0 || res.status === 503 || res.status === 403) {
           remaining.push(item);
         } else if (res.status === 422 && item.report
-                   && item.report.report_type === 'app_feedback') {
+                   && item.report.report_type === 'app_feedback'
+                   && isLabelError(res.json)) {
           // К5 (г) — the labels ARE the channel of this type, and they are a
           // precondition Petar creates by hand: until they exist the report
           // WAITS. It used to die here with a console line (Gate 2, Д4).
+          // К6 (в) — only a LABEL 422 waits; any other one is a broken report
+          // and falls into the drop below, as it does for the five old types.
           remaining.push(item);
           if (!labelsPending) {
             labelsPending = true;
