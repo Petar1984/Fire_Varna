@@ -20,7 +20,13 @@ the repo (`reporters_private.md` is gitignored for the same reason). The page is
 generated on demand and published as a private artifact instead.
 """
 from __future__ import annotations
-import argparse, collections, datetime, io, json, re, sys, urllib.request
+import argparse, collections, datetime, io, json, os, re, sys, urllib.request
+
+# The five hydrant types come from the ingest's own vocabulary, so the dashboard
+# and the ingest can never disagree about what a report is. `scripts/lib` is made
+# importable whether this file is run directly or imported by the suite.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib.hydrant_core import KNOWN_REPORT_TYPES  # noqa: E402
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -61,7 +67,16 @@ def field(body, key):
 
 
 def normalise(issues):
+    """The rows of the dashboard, plus how many bodies were skipped.
+
+    The fetch above asks for every issue without a label filter, so a report
+    ABOUT THE APP (`app_feedback`, лот О) carries a `report_type` too and used to
+    inflate the totals, the type split and the roster of reporters with a "?".
+    Only the five hydrant types are reports here; the rest are counted and said
+    out loud rather than dropped in silence.
+    """
     rows = []
+    skipped = 0
     for n, i in sorted(issues.items()):
         b = i.get("body") or ""
         note = None
@@ -70,18 +85,22 @@ def normalise(issues):
             if v:
                 note = v
                 break
-        if not field(b, "report_type"):
+        rtype = field(b, "report_type")
+        if not rtype:
             # Not a field report. #1-#7 were opened when the repo was set up and
             # their titles are the label names themselves ("report",
             # "new-hydrant", ...); they carry no body at all. Counting them
             # inflates the total and shows seven hydrants with no location that
             # never had one.
             continue
+        if rtype not in KNOWN_REPORT_TYPES:
+            skipped += 1
+            continue
         rows.append({"n": n, "t": field(b, "report_type"), "who": field(b, "reporter") or "?",
                      "ts": field(b, "timestamp") or i["created_at"], "created": i["created_at"],
                      "note": note, "type": field(b, "type"),
                      "op": field(b, "operational_status"), "ref": field(b, "hydrant_ref")})
-    return rows
+    return rows, skipped
 
 
 TYPE_BG = {
@@ -456,7 +475,7 @@ def main():
     args = ap.parse_args()
 
     global rows, compact, days, first, last, by_rep, by_type, notes, data
-    rows = normalise(fetch_issues())
+    rows, skipped = normalise(fetch_issues())
 
     compact = []
     for r in rows:
@@ -482,6 +501,7 @@ def main():
     print("reports %d | reporters %d | with notes %d | %s .. %s"
           % (len(compact), len(reps), sum(1 for c in compact if c[5]), days[0], days[-1]))
     print("by type: %s" % dict(types.most_common()))
+    print("прескочени (не са доклади за хидрант): %d" % skipped)
     print("wrote %s" % args.out)
 
 

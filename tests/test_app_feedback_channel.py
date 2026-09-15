@@ -31,15 +31,28 @@ How this gate works, so no reader has to guess:
     which other gates move for their own reasons. A base whose blob equals the working
     file is a dead reference and fails loud.
   * Nothing is read at module level and no git runs there.
-  * The four negative halves doctor COPIES of `index.html` under the temp root — never
+  * The negative halves doctor COPIES of `index.html` under the temp root — never
     inside the repository — and demand exit 1 plus the text of the assertion they break.
 
-No coordinate stands in this file in any shape: the one coordinate-looking string the
+К5 (Gate 2, 15.09) adds the pins the audit found missing: the GPS row of the dropdown
+carries the coordinate IN ITS TITLE, so the recorder marks that row while it is drawn
+(the chip `.asr-kind.gps` is its marker) and the mask now accepts every shape the
+app's own `parseCoordQuery` accepts; a render that found nothing is recorded too; the
+error line is one masked, capped line built by a pure function; the 422 answer is read
+out of `errors[]` as well and the offline queue keeps a feedback report instead of
+dropping it; the feedback form has its own cooldown stamp; `location_method` travels
+as null; the two gate holes the audit opened (a deleted `APPLY_TYPES` definition, a
+deleted `feedbackOption +` line) each have a pin and a half; and the fourth consumer
+of the issue stream, `scripts/build_reports_dashboard.py`, keeps the five hydrant
+types only.
+
+No coordinate stands in this file in any shape: every coordinate-looking string the
 mask is measured against is built out of repeated digits.
 """
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -94,11 +107,14 @@ ANCHORS = (
     "function hydrantPickersHTML(d) {",
     "const FEEDBACK_KINDS = [",
     "function feedbackKind(id) {",
+    "const COORD_MARK = '[координати]';",
+    "const COORD_SHAPES = [",
     "function maskFeedbackQuery(q) {",
     "function feedbackEnvSnapshot() {",
     "function buildFeedbackContext(kind, env) {",
     "const FB_CTX_LABELS = {",
     "function renderFeedbackContext(kind, env) {",
+    "function feedbackErrorLine(message, filename, lineno) {",
     "function typeFieldsHTML(t, d) {",
     "function dedupHash(report) {",
     "function labelsForType(",
@@ -112,15 +128,19 @@ ANCHORS = (
 # only there is their absence allowed.
 BASE_OPTIONAL = ("const FEEDBACK_KINDS = [",
                  "function feedbackKind(id) {",
+                 "const COORD_MARK = '[координати]';",
+                 "const COORD_SHAPES = [",
                  "function maskFeedbackQuery(q) {",
                  "function feedbackEnvSnapshot() {",
                  "function buildFeedbackContext(kind, env) {",
                  "const FB_CTX_LABELS = {",
-                 "function renderFeedbackContext(kind, env) {")
+                 "function renderFeedbackContext(kind, env) {",
+                 "function feedbackErrorLine(message, filename, lineno) {")
 
 EXPORTS = ["typeFieldsHTML", "FEEDBACK_KINDS", "feedbackKind", "maskFeedbackQuery",
            "buildFeedbackContext", "renderFeedbackContext", "dedupHash",
-           "labelsForType", "buildIssueTitle", "buildReportYAML", "buildIssueBody"]
+           "labelsForType", "buildIssueTitle", "buildReportYAML", "buildIssueBody",
+           "feedbackErrorLine"]
 
 # The source lines this lot pins by hand, with the shape the base carries.
 FEEDBACK_OPTION_HEAD = u"const feedbackOption = hydrant ? '' :"
@@ -154,11 +174,44 @@ TYPE_NAME = u"Проблем или идея за приложението"
 LAST_REPORT_TYPE = u"__fvLastReportType = t"
 PICKER_RECORDER = u"        if (t !== 'app_feedback') window.__fvLastReportType = t;"
 
-# What the four halves hunt for: the text of the assertion, never a method name.
+# К5 — the source lines of the Gate 2 fixes.
+APPLY_DEF = u"const APPLY_TYPES = new Set(["
+FEEDBACK_OPTION_USE = u"          feedbackOption +"
+THROTTLE_STAMP = u"  let lastFeedbackSubmitTs = 0;"
+THROTTLE_ARM = u"    if (isFeedback) lastFeedbackSubmitTs = now; else lastSubmitTs = now;"
+THROTTLE_ARM_OLD = u"    lastSubmitTs = now;"
+LOCATION_METHOD_OLD = (u"    const location_method = (reportType === 'new_hydrant' "
+                       u"|| reportType === 'wrong_location')")
+LOCATION_METHOD_NEW = u"    const location_method = reportType === 'app_feedback' ? null"
+GPS_CHIP = u"'asr-kind gps'"
+GPS_MARKER = u"querySelector('.asr-kind.gps')"
+COORD_ITEM = u"function buildCoordItem(r, idx) {"
+COORD_TITLE_LINE = u"title.textContent = coordTitle(r)"
+SHOW_STATUS_LINE = (u"      const d = document.createElement('div'); "
+                    u"d.className = 'asr-status'; d.textContent = text;")
+HIDE_RESULTS_LINE = (u"    function hideResults() { resultsEl.classList.remove('visible'); "
+                     u"resultsEl.replaceChildren(); currentResults = []; }")
+ERROR_LINE_FN = u"function feedbackErrorLine(message, filename, lineno) {"
+GENERAL_422 = u"      flashStatus('Системна грешка 422."
+QUEUE_422 = u"res.status === 422 && item.report"
+QUEUE_FLASH = u"Докладът за приложението чака етикетите в GitHub — пази се локално"
+SKIPPED_LINE = u"прескочени (не са доклади за хидрант): %d"
+
+# What the halves hunt for: the text of the assertion, never a method name.
 NEEDLE_LABELS = u"етикетите на обратната връзка"
 NEEDLE_MASK = u"маската на заявката"
 NEEDLE_APPLY = u"APPLY_TYPES"
 NEEDLE_CONTEXT = u"feedback_context"
+NEEDLE_APPLY_DEF = u"дефиницията на APPLY_TYPES"
+NEEDLE_PICKER_USE = u"шестият бутон не влиза в менюто"
+NEEDLE_THROTTLE = u"собствен дросел"
+NEEDLE_GPS_ROW = u"GPS редът"
+NEEDLE_EMPTY = u"празното изчертаване"
+NEEDLE_ERRLINE = u"редът на грешката"
+NEEDLE_422 = u"етикетната грешка в errors[]"
+NEEDLE_QUEUE = u"опашката изхвърля обратната връзка"
+NEEDLE_LOCATION = u"location_method"
+NEEDLE_DASHBOARD = u"дневникът брои"
 
 
 # --------------------------------------------------------------------------
@@ -242,6 +295,24 @@ def fb_draft(kind=u"", description=u"", worked_before=u""):
 COORD_LOOKING_QUERY = (u"1" * 2 + u"." + u"1" * 6 + u", " + u"2" * 2 + u"." + u"2" * 6)
 PLAIN_QUERY = u"бл. 5 Аспарухово"
 
+# К5 (а) — every shape the app's own `parseCoordQuery` accepts, built the same way.
+A, B = u"1" * 2, u"2" * 2
+COORD_MARK = u"[координати]"
+# The title of the GPS row: `coordTitle` prints five decimals (index.html).
+GPS_ROW_TITLE = A + u"." + u"1" * 5 + u", " + B + u"." + u"2" * 5
+COORD_SHAPE_QUERIES = (
+    COORD_LOOKING_QUERY,                                   # the six-decimal pair
+    A + u"." + A + u", " + B + u"." + B,                   # a pair with two decimals
+    A + u"," + A + u" " + B + u"," + B,                    # the Bulgarian comma pair
+    A + u"°12'50.8\"N " + B + u"°54'52.9\"E",   # degrees-minutes-seconds
+    u"geo:" + A + u"." + A + u"," + B + u"." + B,          # the geo: URI of a phone
+    u"https://maps.google.com/?q=" + A + u"." + A + u"," + B + u"." + B,
+    GPS_ROW_TITLE,                                         # what the GPS row SHOWS
+)
+PLAIN_QUERIES = (PLAIN_QUERY, u"бл 5 аспарухово", u"ул. Струга 12")
+# A value that carries two decimal numbers is a position whatever its key is.
+COORD_VALUE_RE = r"\d[.,]\d[\s\S]*?\d[.,]\d"
+
 
 def env_fixture(query=PLAIN_QUERY, **over):
     u"""A synthetic environment: what `feedbackEnvSnapshot()` would hand the builder."""
@@ -281,7 +352,8 @@ def feedback_report(kind="address", description=u"Търсенето дава д
         "hydrant_ref": None,
         "expected_coord": None,
         "reported_coord": None,
-        "location_method": "hydrant_ref",
+        # К5 (е) — this type carries no location at all (амандамент §1 v1.1).
+        "location_method": None,
         "app_version": "merged-2026-05-05",
         "free_text": None,
         "terrain_description": None,
@@ -292,6 +364,31 @@ def feedback_report(kind="address", description=u"Търсенето дава д
         "hydrant_type_at_location": None,
         "type": None,
         "operational_status": None,
+    }
+
+
+def hydrant_report(report_type="damaged"):
+    u"""A report of one of the FIVE old types, in the shape `buildReportObject`
+    emits it — the other half of the dashboard's pair (К5 (з))."""
+    return {
+        "report_id": "00000000-0000-4000-8000-000000000001",
+        "report_type": report_type,
+        "timestamp": "2026-09-15T12:05:00+03:00",
+        "reporter": u"Петър",
+        "hydrant_ref": "vik_0001",
+        "expected_coord": None,
+        "reported_coord": None,
+        "location_method": "hydrant_ref",
+        "app_version": "merged-2026-05-05",
+        "free_text": None,
+        "terrain_description": None,
+        "description": None,
+        "feedback_kind": None,
+        "feedback_context": None,
+        "damage_description": u"Капачката липсва.",
+        "hydrant_type_at_location": None,
+        "type": u"надземен",
+        "operational_status": "not_working",
     }
 
 
@@ -388,6 +485,14 @@ class AppFeedbackFormTest(unittest.TestCase):
         line = one_line(self, text, FEEDBACK_DATA_TYPE, u"шестият бутон")
         self.assertIn(FEEDBACK_OPTION_HEAD, line,
                       u"шестият бутон не виси на `hydrant ? '' :` — виждат го и при хидрант")
+        # К5 (ж) — Д2 на одита: a declared button that nothing concatenates
+        # disappears from the rendered menu with every test still green.
+        self.assertEqual(text.count(FEEDBACK_OPTION_HEAD), 1,
+                         u"декларацията на шестия бутон стои %d пъти, не веднъж"
+                         % text.count(FEEDBACK_OPTION_HEAD))
+        self.assertEqual(text.count(FEEDBACK_OPTION_USE), 1,
+                         u"%s: редът `feedbackOption +` стои %d пъти, не веднъж"
+                         % (NEEDLE_PICKER_USE, text.count(FEEDBACK_OPTION_USE)))
         for old in OLD_TYPES:
             marker = u'data-type="%s"' % old
             self.assertEqual(one_line(self, text, marker, u"бутон %s" % old),
@@ -433,7 +538,7 @@ class AppFeedbackFormTest(unittest.TestCase):
         head = dict(rows)
         self.assertEqual(head["reporter"], "null", u"главата носи подател (Р1)")
         for key in ("hydrant_ref", "expected_coord", "reported_coord",
-                    "type", "operational_status"):
+                    "location_method", "type", "operational_status"):
             self.assertEqual(head[key], "null",
                              u"главата носи %s за доклад, който не е за хидрант" % key)
         self.assertEqual(head["feedback_kind"], '"address"', u"главата не носи вида")
@@ -446,6 +551,17 @@ class AppFeedbackFormTest(unittest.TestCase):
             self.assertNotIn(forbidden, context,
                              u"%s носи ключ %s — координата в контекста"
                              % (NEEDLE_CONTEXT, forbidden))
+        # К5 (а) — Б1 на одита: the gate read the NAMES of the keys and was green
+        # over a payload whose VALUES carried the coordinate. Now the values are
+        # judged too, over a context built from a search that WAS a coordinate.
+        rows = {"query": GPS_ROW_TITLE, "rows_shown": 1,
+                "first_row": GPS_ROW_TITLE, "selected_row": GPS_ROW_TITLE}
+        leaky = ask(self, text, [call("buildFeedbackContext",
+                                      ["address", env_fixture(last_search=rows)])])[0]
+        for key, value in leaky.items():
+            self.assertIsNone(re.search(COORD_VALUE_RE, u"%s" % (value,)),
+                              u"%s носи стойност с две десетични числа: %s = %r"
+                              % (NEEDLE_CONTEXT, key, value))
         markdown = markdown_of(body)
         self.assertEqual(markdown.count(sentence), 1,
                          u"текстът на подателя стои %d пъти в markdown-а"
@@ -515,6 +631,20 @@ class AppFeedbackFormTest(unittest.TestCase):
                         u"%s стои преди проверката за вид" % NEEDLE_APPLY)
         self.assertLess(block.index(APPLY_GUARD), block.index(NOTE_CALL),
                         u"%s стои СЛЕД писането на бележката" % NEEDLE_APPLY)
+        # К5 (ж) — Д1 на одита: the guard alone was pinned, so deleting the
+        # DEFINITION left thirteen green tests and a ReferenceError on the first
+        # poll of the live map.
+        self.assertEqual(base.count(APPLY_DEF), 0,
+                         u"мъртъв пин: базата %s вече носи %s" % (BASE, APPLY_DEF))
+        self.assertEqual(text.count(APPLY_DEF), 1,
+                         u"%s стои %d пъти, не веднъж"
+                         % (NEEDLE_APPLY_DEF, text.count(APPLY_DEF)))
+        definition = one_line(self, text, APPLY_DEF, NEEDLE_APPLY_DEF)
+        for old in OLD_TYPES:
+            self.assertIn(u"'%s'" % old, definition,
+                          u"%s губи %s" % (NEEDLE_APPLY_DEF, old))
+        self.assertNotIn(TYPE, definition,
+                         u"%s пуска и обратната връзка до бележката" % NEEDLE_APPLY_DEF)
 
     def test_the_422_branch_queues_instead_of_dropping_the_labels(self):
         u"""Г-О9 — Н4: the labels are the channel, so they are never stripped."""
@@ -534,6 +664,124 @@ class AppFeedbackFormTest(unittest.TestCase):
         self.assertIn(u"queueReport(report);", block[block.index(guard):
                                                      block.index(RETRY_WITHOUT_LABELS)],
                       u"422 изхвърля доклада вместо да го запази локално")
+
+    def test_every_shape_the_parser_accepts_is_masked(self):
+        u"""К5 (а) — Б2 на одита: the mask was measured against ONE six-decimal
+        pair while `parseCoordQuery` accepts a pair with a single decimal, the
+        Bulgarian comma pair, degrees-minutes-seconds, a `geo:` URI and a map
+        link. Each of them, and the title the GPS row shows, is the whole query
+        now; a normal address goes through untouched."""
+        text = lot1.index_text(self)
+        asks = [call("maskFeedbackQuery", [q])
+                for q in COORD_SHAPE_QUERIES + PLAIN_QUERIES]
+        answers = ask(self, text, asks)
+        for q, got in zip(COORD_SHAPE_QUERIES, answers):
+            self.assertEqual(got, COORD_MARK,
+                             u"%s пропуска %r: %r" % (NEEDLE_MASK, q, got))
+        for q, got in zip(PLAIN_QUERIES, answers[len(COORD_SHAPE_QUERIES):]):
+            self.assertEqual(got, q,
+                             u"%s изяде обикновен адрес %r: %r" % (NEEDLE_MASK, q, got))
+
+    def test_the_422_branch_reads_the_errors_array(self):
+        u"""К5 (г) — GitHub answers an unknown label with the generic „Validation
+        Failed“ and names the label only in `errors[]`, so the message alone let
+        the feedback fall through to the general 422 line. The five old types keep
+        their branch byte for byte."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        block = lot1.block(self, text, "function handleSubmitResult(")
+        reference = lot1.block(self, base, "function handleSubmitResult(")
+        self.assertEqual(reference.count(u"const labelError ="), 0,
+                         u"мъртъв пин: базата %s вече чете errors[]" % BASE)
+        self.assertEqual(block.count(u"const labelError ="), 1,
+                         u"422 не разпознава %s" % NEEDLE_422)
+        self.assertIn(u"er.field || er.resource || er.code", block,
+                      u"422 не чете %s" % NEEDLE_422)
+        self.assertEqual(block.count(u"if (labelError) {"), 1,
+                         u"клонът на етикетите не виси на labelError")
+        self.assertEqual(block.count(u"if (msg && /label/i.test(msg)) {"), 0,
+                         u"старото условие само по съобщението стои още")
+        # The old path — the retry without labels and everything after it —
+        # is byte-equal to the base.
+        tail = reference[reference.index(RETRY_WITHOUT_LABELS):
+                         reference.index(GENERAL_422)]
+        self.assertIn(tail, block,
+                      u"клонът на петте стари вида при 422 не е байт-равен на базата %s"
+                      % BASE)
+
+    def test_the_queue_keeps_a_feedback_report_on_422(self):
+        u"""К5 (г) — Д4 на одита: `retryQueuedReports` sent the same labels again
+        and threw the record away on 422 with a console line, while the modal had
+        promised the opposite. It waits now, and the colleague is told once."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        block = lot1.block(self, text, "function retryQueuedReports() {")
+        reference = lot1.block(self, base, "function retryQueuedReports() {")
+        self.assertNotIn(TYPE, reference,
+                         u"мъртъв пин: базата %s вече познава вида в опашката" % BASE)
+        self.assertEqual(block.count(QUEUE_422), 1,
+                         u"%s при 422" % NEEDLE_QUEUE)
+        self.assertEqual(block.count(u"remaining.push(item);"), 2,
+                         u"%s: записът не остава в опашката" % NEEDLE_QUEUE)
+        self.assertEqual(block.count(QUEUE_FLASH), 1,
+                         u"%s мълчи пред колегата" % NEEDLE_QUEUE)
+        self.assertEqual(block.count(u"let labelsPending = false;"), 1,
+                         u"съобщението няма ключ, за да се каже веднъж на обиколка")
+        self.assertEqual(block.count(u"if (!labelsPending) {"), 1,
+                         u"съобщението се казва на всеки запис, не веднъж на обиколка")
+        # The three old outcomes stand byte for byte as the base wrote them.
+        old = reference[reference.index(u"        if (res.status === 201) {"):
+                        reference.index(u"        } else {")]
+        self.assertIn(old, block,
+                      u"старите изходи на опашката не са байт-равни на базата %s" % BASE)
+        self.assertIn(u"console.warn('[report] queue drop', res.status, item);", block,
+                      u"старите видове вече не падат в „queue drop“")
+
+    def test_feedback_has_its_own_cooldown(self):
+        u"""К5 (д) — the largest risk to the crew the audit named: feedback armed
+        the shared 30 s throttle, so a real hydrant report filed right after it was
+        refused with „Изчакай 30 сек“. The two stamps never cross."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        self.assertEqual(base.count(u"lastFeedbackSubmitTs"), 0,
+                         u"мъртъв пин: базата %s вече носи %s"
+                         % (BASE, u"lastFeedbackSubmitTs"))
+        self.assertEqual(text.count(THROTTLE_STAMP), 1,
+                         u"обратната връзка няма %s" % NEEDLE_THROTTLE)
+        submit = lot1.block(self, text, "function onSubmitClicked(reportType) {")
+        lines = [line for line in submit.split("\n") if u"lastSubmitTs" in line]
+        self.assertEqual(len(lines), 2,
+                         u"%s: редовете с времеви печат в onSubmitClicked са %d, не два\n%s"
+                         % (NEEDLE_THROTTLE, len(lines), u"\n".join(lines)))
+        for line in lines:
+            self.assertIn(u"isFeedback", line,
+                          u"%s: общият печат се чете или въоръжава безусловно: %r"
+                          % (NEEDLE_THROTTLE, line))
+        self.assertEqual(submit.count(THROTTLE_ARM), 1,
+                         u"%s: въоръжаването не е разделено" % NEEDLE_THROTTLE)
+        base_submit = lot1.block(self, base, "function onSubmitClicked(reportType) {")
+        self.assertEqual(base_submit.count(THROTTLE_ARM_OLD), 1,
+                         u"мъртъв пин: базата %s няма безусловното въоръжаване" % BASE)
+        painter = lot1.block(self, text, "function remainingCooldownMs() {")
+        self.assertIn(u"reportDraft.type === 'app_feedback'", painter,
+                      u"%s: обратният брояч рисува чуждото чакане" % NEEDLE_THROTTLE)
+
+    def test_location_method_is_null_for_this_type(self):
+        u"""К5 (е) — the head said `location_method: "hydrant_ref"` beside a null
+        `hydrant_ref`; the amendment says null. The old expression is untouched."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        self.assertEqual(base.count(LOCATION_METHOD_OLD), 1,
+                         u"мъртъв пин: старият израз за %s не стои веднъж в базата %s"
+                         % (NEEDLE_LOCATION, BASE))
+        self.assertEqual(text.count(LOCATION_METHOD_NEW), 1,
+                         u"%s не е условен за този вид" % NEEDLE_LOCATION)
+        self.assertEqual(text.count(LOCATION_METHOD_OLD), 0,
+                         u"%s стои и в стария си безусловен вид" % NEEDLE_LOCATION)
+        for line in (u"      ? 'manual_placement'", u"      : 'hydrant_ref';"):
+            self.assertEqual(text.count(line), base.count(line),
+                             u"клонът %r на %s се е променил срещу базата %s"
+                             % (line.strip(), NEEDLE_LOCATION, BASE))
 
     def test_no_name_is_asked_and_none_is_sent(self):
         u"""Р1 — the name field, the 2..50 check and the payload, all three at once."""
@@ -613,6 +861,99 @@ class RecorderTest(unittest.TestCase):
                 self.assertNotIn(forbidden, block,
                                  u"записвачът на грешки носи стек — %r" % forbidden)
 
+    def test_the_recorder_marks_the_gps_row_as_it_is_drawn(self):
+        u"""К5 (а) — Б1 на одита: a coordinate query draws a GPS row whose title IS
+        the coordinate, and the context sent that title as `first_row` /
+        `selected_row` unmasked. The marker of the row is the chip
+        `.asr-kind.gps` — the one place the class is drawn — so the row is known
+        while it is drawn and the raw value never enters `__fvLastSearch`."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        # The marker is measured in the code that DRAWS the row, and that code is
+        # byte-equal to the base: the lot does not touch the search (ADR 006 D12).
+        drawn = lot1.block(self, text, COORD_ITEM)
+        self.assertEqual(drawn, lot1.block(self, base, COORD_ITEM),
+                         u"%s се рисува другояче от базата %s" % (NEEDLE_GPS_ROW, BASE))
+        self.assertEqual(text.count(GPS_CHIP), 1,
+                         u"%s: чипът %s стои %d пъти, не веднъж"
+                         % (NEEDLE_GPS_ROW, GPS_CHIP, text.count(GPS_CHIP)))
+        self.assertIn(COORD_TITLE_LINE, drawn,
+                      u"%s вече не носи координатата в заглавието си" % NEEDLE_GPS_ROW)
+        block = lot1.block(self, text, WATCHER)
+        self.assertIn(GPS_MARKER, block,
+                      u"записвачът не разпознава %s" % NEEDLE_GPS_ROW)
+        for needed in (u"const markOf = (row) => (isCoordRow(row) ? COORD_MARK : titleOf(row));",
+                       u"query: isCoordRow(rows[0]) ? COORD_MARK :",
+                       u"first_row: markOf(rows[0])",
+                       u"window.__fvLastSearch.selected_row = markOf(row);"):
+            self.assertIn(needed, block,
+                          u"%s: %r не се маркира при изчертаването"
+                          % (NEEDLE_GPS_ROW, needed[:44]))
+        # The builder masks the two titles as well - the second lock, on the value.
+        builder = lot1.block(self, text, "function buildFeedbackContext(kind, env) {")
+        for key in ("first_row", "selected_row"):
+            self.assertIn(u"ctx.%s = search.%s ? maskFeedbackQuery(search.%s) : null;"
+                          % (key, key, key), builder,
+                          u"%s: %s не минава през маската" % (NEEDLE_MASK, key))
+
+    def test_an_empty_render_is_recorded_with_zero_rows(self):
+        u"""К5 (б) — Д5 на одита: a search that found nothing was never recorded,
+        so the feedback described an EARLIER, successful query. Hiding the list
+        still records nothing: `hideResults` empties the container and takes the
+        `visible` class off, while `showStatus` leaves one `.asr-status` in it."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        # Both lines are the search's own and byte-equal to the base: the guard is
+        # measured against the code it guards, not against a retyped idea of it.
+        for line in (SHOW_STATUS_LINE, HIDE_RESULTS_LINE):
+            self.assertEqual(text.count(line), 1,
+                             u"%s: редът %r стои %d пъти, не веднъж"
+                             % (NEEDLE_EMPTY, line.strip()[:40], text.count(line)))
+            self.assertEqual(base.count(line), 1,
+                             u"мъртъв пин: базата %s не носи реда %r"
+                             % (BASE, line.strip()[:40]))
+        self.assertEqual(text.count(u"showStatus('Няма съвпадения')"),
+                         base.count(u"showStatus('Няма съвпадения')"),
+                         u"%s: изчертаването „Няма съвпадения“ се е променило" % NEEDLE_EMPTY)
+        block = lot1.block(self, text, WATCHER)
+        self.assertIn(u"results.querySelector('.asr-status')", block,
+                      u"%s не се разпознава" % NEEDLE_EMPTY)
+        self.assertIn(u"results.classList.contains('visible')", block,
+                      u"%s: скритият списък също би записал" % NEEDLE_EMPTY)
+        self.assertIn(u"rows_shown: 0", block,
+                      u"%s не се записва с нула реда" % NEEDLE_EMPTY)
+        self.assertIn(u"first_row: null, selected_row: null", block,
+                      u"%s носи редове, каквито не е имало" % NEEDLE_EMPTY)
+
+    def test_the_error_line_is_one_line_masked_and_capped(self):
+        u"""К5 (в) — the recorder kept a multi-line message, a URL with its query
+        string and numbers that look like a position. One pure function builds the
+        line now, and both listeners call it."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        self.assertEqual(base.count(ERROR_LINE_FN), 0,
+                         u"мъртъв пин: базата %s вече строи %s" % (BASE, NEEDLE_ERRLINE))
+        asks = [call("feedbackErrorLine", [u"първи ред\nвтори ред\nтрети", u"index.html", 12]),
+                call("feedbackErrorLine", [u"boom ?token=CANARY&lat=" + COORD_LOOKING_QUERY,
+                                           u"https://example.org/app.js?token=CANARY", 7]),
+                call("feedbackErrorLine", [u"при " + COORD_LOOKING_QUERY, u"index.html", 3]),
+                call("feedbackErrorLine", [u"A" * 300, u"index.html", 1])]
+        one, token, coord, long_line = ask(self, text, asks)
+        self.assertEqual(one, u"първи ред @index.html:12",
+                         u"%s носи повече от първия ред: %r" % (NEEDLE_ERRLINE, one))
+        self.assertNotIn(u"CANARY", token,
+                         u"%s носи query string: %r" % (NEEDLE_ERRLINE, token))
+        self.assertEqual(token, u"boom @app.js:7",
+                         u"%s: %r" % (NEEDLE_ERRLINE, token))
+        self.assertEqual(coord, COORD_MARK + u" @index.html:3",
+                         u"%s носи координата: %r" % (NEEDLE_ERRLINE, coord))
+        self.assertEqual(len(long_line), 200,
+                         u"%s не е ограничен на 200 знака (%d)"
+                         % (NEEDLE_ERRLINE, len(long_line)))
+        for anchor in ERROR_LISTENERS:
+            self.assertIn(u"feedbackErrorLine(", lot1.block(self, text, anchor),
+                          u"слушателят не минава през %s" % NEEDLE_ERRLINE)
+
     def test_the_search_recorder_watches_the_container_from_outside(self):
         u"""Н5 — the observer hangs on the CONTAINER, never on a function of
         initAddressSearch (ADR 006 D12)."""
@@ -644,7 +985,46 @@ class RecorderTest(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------
-# The four negative halves - each RUNS and each FALLS with its own needle
+# К5 (з) · the fourth consumer of the issue stream
+# --------------------------------------------------------------------------
+
+class DashboardTest(unittest.TestCase):
+
+    def test_the_dashboard_keeps_the_five_hydrant_types_only(self):
+        u"""Д3 на одита: `scripts/build_reports_dashboard.py` fetches every issue
+        without a label filter and counted any body carrying a `report_type`, so a
+        feedback issue would have inflated the totals, the type split and the
+        roster of reporters. It keeps the five hydrant types now and says how many
+        bodies it skipped instead of dropping them silently."""
+        scripts = str(REPO / "scripts")
+        if scripts not in sys.path:
+            sys.path.insert(0, scripts)
+        import build_reports_dashboard as dash   # noqa: E402 - never at import time
+        self.assertEqual(set(dash.KNOWN_REPORT_TYPES), set(OLD_TYPES),
+                         u"%s друг набор от видове, не петте на hydrant_core"
+                         % NEEDLE_DASHBOARD)
+        text = lot1.index_text(self)
+        # The two bodies are the ones the client REALLY emits, not retyped heads.
+        feedback_body, hydrant_body = ask(self, text, [
+            call("buildIssueBody", [feedback_report()]),
+            call("buildIssueBody", [hydrant_report()])])
+        issues = {101: {"body": feedback_body, "created_at": "2026-09-15T09:00:00Z"},
+                  102: {"body": hydrant_body, "created_at": "2026-09-15T09:05:00Z"}}
+        rows, skipped = dash.normalise(issues)
+        self.assertEqual([r["n"] for r in rows], [102],
+                         u"%s и обратната връзка: %r" % (NEEDLE_DASHBOARD, rows))
+        self.assertEqual(rows[0]["t"], "damaged",
+                         u"%s друг вид: %r" % (NEEDLE_DASHBOARD, rows[0]["t"]))
+        self.assertEqual(skipped, 1,
+                         u"%s: прескочените са %d, не един" % (NEEDLE_DASHBOARD, skipped))
+        source = (REPO / "scripts" / "build_reports_dashboard.py").read_bytes().decode("utf-8")
+        self.assertEqual(source.count(SKIPPED_LINE), 1,
+                         u"%s: редът с прескочените не се отпечатва точно веднъж"
+                         % NEEDLE_DASHBOARD)
+
+
+# --------------------------------------------------------------------------
+# The negative halves - each RUNS and each FALLS with its own needle
 # --------------------------------------------------------------------------
 
 class NegativeHalfTest(unittest.TestCase):
@@ -701,6 +1081,33 @@ class NegativeHalfTest(unittest.TestCase):
         path = self.doctored("no_apply_types", text)
         self.run_half(path, MODULE + ".AppFeedbackFormTest."
                       "test_apply_reports_refuses_a_type_outside_the_allowlist", NEEDLE_APPLY)
+
+    def test_deleting_the_allowlist_definition_turns_the_gate_red(self):
+        u"""К5 (ж) — Д1: the guard stays, the definition goes."""
+        text = lot1.index_text(self)
+        line = one_line(self, text, APPLY_DEF, NEEDLE_APPLY_DEF)
+        text = lot1.replace_once(self, text, line + "\n", u"")
+        path = self.doctored("no_apply_definition", text)
+        self.run_half(path, MODULE + ".AppFeedbackFormTest."
+                      "test_apply_reports_refuses_a_type_outside_the_allowlist",
+                      NEEDLE_APPLY_DEF)
+
+    def test_deleting_the_sixth_button_from_the_menu_turns_the_gate_red(self):
+        u"""К5 (ж) — Д2: the declaration stays, the concatenation goes."""
+        text = lot1.replace_once(self, lot1.index_text(self),
+                                 FEEDBACK_OPTION_USE + "\n", u"")
+        path = self.doctored("no_feedback_option_use", text)
+        self.run_half(path, MODULE + ".AppFeedbackFormTest."
+                      "test_the_sixth_button_stands_once_and_only_without_a_hydrant",
+                      NEEDLE_PICKER_USE)
+
+    def test_arming_the_shared_cooldown_turns_the_gate_red(self):
+        u"""К5 (д): feedback arms the shared stamp again."""
+        text = lot1.replace_once(self, lot1.index_text(self),
+                                 THROTTLE_ARM, THROTTLE_ARM_OLD)
+        path = self.doctored("shared_cooldown", text)
+        self.run_half(path, MODULE + ".AppFeedbackFormTest."
+                      "test_feedback_has_its_own_cooldown", NEEDLE_THROTTLE)
 
     def test_dropping_the_context_from_the_head_turns_the_gate_red(self):
         text = lot1.replace_once(

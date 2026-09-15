@@ -2673,6 +2673,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
   let reportDraft = null;
   let lastSubmitTs = 0;
+  // К5 (д) — the feedback form carries its OWN cooldown stamp. Until now it armed
+  // the shared one, so a real hydrant report filed right after a feedback was
+  // refused with „Изчакай 30 сек“ (Gate 2, Astra д). Neither family reads or arms
+  // the other's stamp.
+  let lastFeedbackSubmitTs = 0;
   const dedupMap = new Map();
 
   function openModal(title) {
@@ -2699,7 +2704,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
   let cooldownTimer = null;
 
   function remainingCooldownMs() {
-    const left = SUBMIT_THROTTLE_MS - (Date.now() - lastSubmitTs);
+    // К5 (д) — the countdown is painted for the form that is OPEN. Reading the
+    // shared stamp here would disable the feedback button because a hydrant
+    // report went out a minute ago, which is the same wait by another door.
+    const stamp = (reportDraft && reportDraft.type === 'app_feedback')
+      ? lastFeedbackSubmitTs : lastSubmitTs;
+    const left = SUBMIT_THROTTLE_MS - (Date.now() - stamp);
     return left > 0 ? left : 0;
   }
 
@@ -2790,14 +2800,29 @@ window._hydrantDataReady = (async function loadHydrantData() {
   ];
   function feedbackKind(id) { return FEEDBACK_KINDS.find(k => k.id === id) || null; }
   // The search query is the only free text the app collects by itself, and a
-  // colleague can paste a coordinate into the search box. A PAIR collapses into
-  // one marker first, so "lon, lat" does not become two, then any lone
-  // high-precision decimal follows it.
+  // colleague can paste a coordinate into the search box.
+  const COORD_MARK = '[координати]';
+  // К5 (а) — the mask has to accept everything `parseCoordQuery` accepts, or it
+  // is weaker than the parser that drew the GPS row (Gate 2, Б2): a pair with a
+  // single decimal, the Bulgarian comma pair, degrees-minutes-seconds, a geo:
+  // URI and a map link all went through it byte for byte. Such a text IS a
+  // position whatever else stands beside it, so the WHOLE query becomes the
+  // marker; a lone high-precision number keeps the narrower, in-place rule,
+  // which leaves an address carrying a dotted number readable.
+  const COORD_SHAPES = [
+    /[-+]?\d{1,3}[.,]\d+\s*[,;]?\s*[-+]?\d{1,3}[.,]\d+/,   // 11.11, 22.22 · 11,11 22,22
+    /\d\s*[°º'′"″]/,                                        // degrees-minutes-seconds
+    /\d\s*[NSEWnsew](?![\wА-Яа-я])/,                        // hemisphere letters
+    /^\s*geo:/i,                                            // the geo: URI a phone hands over
+    /https?:\/\/\S*\d/i                                     // a map link with numbers in it
+  ];
   function maskFeedbackQuery(q) {
     const s = String(q == null ? '' : q).trim();
     if (!s) return '';
-    return s.replace(/[-+]?\d{1,3}[.,]\d{3,}\s*[,;]?\s*[-+]?\d{1,3}[.,]\d{3,}/g, '[координати]')
-            .replace(/[-+]?\d{1,3}[.,]\d{3,}/g, '[координати]');
+    for (let i = 0; i < COORD_SHAPES.length; i++) {
+      if (COORD_SHAPES[i].test(s)) return COORD_MARK;
+    }
+    return s.replace(/[-+]?\d{1,3}[.,]\d{3,}/g, COORD_MARK);
   }
   // Н7 — the ONLY place of the lot that touches the browser, and the reason the
   // builder below is pure: the gate raises a slice with no navigator and with a
@@ -2861,8 +2886,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const search = e.last_search || {};
       ctx.query = maskFeedbackQuery(search.query);
       ctx.rows_shown = (typeof search.rows_shown === 'number') ? search.rows_shown : null;
-      ctx.first_row = search.first_row || null;
-      ctx.selected_row = search.selected_row || null;
+      // К5 (а) — the title of the GPS row IS the coordinate (`coordTitle`), so
+      // both titles go through the same mask as the query. The recorder already
+      // marks that row while it is drawn; this is the second lock, on the value.
+      ctx.first_row = search.first_row ? maskFeedbackQuery(search.first_row) : null;
+      ctx.selected_row = search.selected_row ? maskFeedbackQuery(search.selected_row) : null;
     }
     if (kind === 'report') {
       ctx.last_report_type = e.last_report_type || null;
@@ -2915,15 +2943,25 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // The only part of the lot that costs anything when nobody opens the form.
   // ONE line and only the LAST one: a stack carries paths and helps nobody who
   // reads these issues, so it is never kept.
+  // К5 (в) — the line is built by ONE pure function, so a gate can drive it
+  // headless: the FIRST line only (a multi-line message drags the page's own
+  // text into a public issue), no query string in the message or in the file (a
+  // token and a coordinate ride there), the coordinate mask on top of that, and
+  // 200 characters at most.
+  function feedbackErrorLine(message, filename, lineno) {
+    const first = String(message || 'error').split('\n')[0];
+    const file = String(filename == null ? '' : filename).split('?')[0].split('/').pop();
+    const line = maskFeedbackQuery(first.split('?')[0]) +
+      (file ? ' @' + file + ':' + (lineno || 0) : '');
+    return line.slice(0, 200);
+  }
   window.addEventListener('error', function (e) {
-    const file = String((e && e.filename) || '').split('/').pop();
-    window.__fvLastError = String((e && e.message) || 'error') +
-      (file ? ' @' + file + ':' + ((e && e.lineno) || 0) : '');
+    window.__fvLastError = feedbackErrorLine(e && e.message, e && e.filename, e && e.lineno);
   });
   window.addEventListener('unhandledrejection', function (e) {
     const reason = e && e.reason;
-    window.__fvLastError = 'promise: ' +
-      String((reason && reason.message) || reason || '').slice(0, 200);
+    window.__fvLastError = ('promise: ' +
+      feedbackErrorLine((reason && reason.message) || reason, null, 0)).slice(0, 200);
   });
   // The dropdown is gone by the time the report form opens, so the last search is
   // remembered AS IT IS DRAWN. ADR 006 D12 makes every function inside
@@ -2935,16 +2973,35 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const input = document.getElementById('addrSearchInput');
     if (!results || !input || typeof MutationObserver === 'undefined') return;
     const titleOf = (row) => ((row.querySelector('.asr-title') || row).textContent || '').trim();
+    // К5 (а) — the GPS row IS a coordinate: `buildCoordItem` paints the chip
+    // `.asr-kind.gps` (the only place that class is drawn) and puts `coordTitle`
+    // — the pair itself — into its `.asr-title`. The row is recognised WHILE it
+    // is drawn, so neither the title nor the query that produced it ever enters
+    // the record raw (Gate 2, Б1).
+    const isCoordRow = (row) => !!(row.querySelector && row.querySelector('.asr-kind.gps'));
+    const markOf = (row) => (isCoordRow(row) ? COORD_MARK : titleOf(row));
     new MutationObserver(function () {
       const rows = results.querySelectorAll('.asr-item');
-      if (!rows.length) return;
-      window.__fvLastSearch = { query: input.value, rows_shown: rows.length,
-                                first_row: titleOf(rows[0]) };
+      if (!rows.length) {
+        // К5 (б) — a render that found nothing IS a render: `showStatus` leaves
+        // exactly one `.asr-status` in the visible list, while `hideResults`
+        // empties the container and takes the `visible` class off. Without this
+        // the record kept an EARLIER, successful query and the issue described
+        // that one instead (Gate 2, Д5).
+        const status = results.querySelector('.asr-status');
+        if (!status || !(status.textContent || '').trim()) return;
+        if (!results.classList.contains('visible')) return;
+        window.__fvLastSearch = { query: maskFeedbackQuery(input.value), rows_shown: 0,
+                                  first_row: null, selected_row: null };
+        return;
+      }
+      window.__fvLastSearch = { query: isCoordRow(rows[0]) ? COORD_MARK : maskFeedbackQuery(input.value),
+                                rows_shown: rows.length, first_row: markOf(rows[0]) };
     }).observe(results, { childList: true, subtree: true });
     results.addEventListener('click', function (ev) {
       const row = (ev.target && ev.target.closest) ? ev.target.closest('.asr-item') : null;
       if (!row || !window.__fvLastSearch) return;
-      window.__fvLastSearch.selected_row = titleOf(row);
+      window.__fvLastSearch.selected_row = markOf(row);
     });
   }
   // Registered whether or not the document has already been parsed.
@@ -3413,8 +3470,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     const now = Date.now();
-    if (now - lastSubmitTs < SUBMIT_THROTTLE_MS) {
-      const sec = Math.ceil((SUBMIT_THROTTLE_MS - (now - lastSubmitTs)) / 1000);
+    // К5 (д) — each family waits on its own stamp only.
+    const isFeedback = reportType === 'app_feedback';
+    const since = now - (isFeedback ? lastFeedbackSubmitTs : lastSubmitTs);
+    if (since < SUBMIT_THROTTLE_MS) {
+      const sec = Math.ceil((SUBMIT_THROTTLE_MS - since) / 1000);
       flashStatus('Изчакай ' + sec + ' сек преди следващ доклад', 3000);
       startCooldownUi();   // the tap already happened — leave the countdown on screen
       return;
@@ -3428,7 +3488,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }
 
     setReporterName(report.reporter);
-    lastSubmitTs = now;
+    if (isFeedback) lastFeedbackSubmitTs = now; else lastSubmitTs = now;
     dedupMap.set(hash, now);
     submitReport(report);
   }
@@ -3440,7 +3500,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const placed = d.placedCoord
       ? [Number(d.placedCoord[0].toFixed(6)), Number(d.placedCoord[1].toFixed(6))]
       : null;
-    const location_method = (reportType === 'new_hydrant' || reportType === 'wrong_location')
+    // К5 (е) — this type has no location at all (амандамент 15.09 §1): it said
+    // 'hydrant_ref' beside a null hydrant_ref. The old expression stands as it
+    // was for the five hydrant types.
+    const location_method = reportType === 'app_feedback' ? null
+      : (reportType === 'new_hydrant' || reportType === 'wrong_location')
       ? 'manual_placement'
       : 'hydrant_ref';
     return {
@@ -3649,7 +3713,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (res.status === 422) {
       const msg = res.json && (res.json.message || (res.json.errors && JSON.stringify(res.json.errors)));
       console.warn('[report] 422', msg);
-      if (msg && /label/i.test(msg)) {
+      // К5 (г) — GitHub answers a label it does not know with the generic
+      // „Validation Failed“ and names the label only in errors[], so the message
+      // alone let the feedback fall through to the general 422 line (Gate 2, г).
+      const errors = (res.json && Array.isArray(res.json.errors)) ? res.json.errors : [];
+      const labelError = (msg && /label/i.test(msg)) || errors.some(function (er) {
+        return er && /label/i.test(String(er.field || er.resource || er.code || ''));
+      });
+      if (labelError) {
         if (report.report_type === 'app_feedback') {
           // Н4 — the labels ARE the channel: an unlabelled feedback issue would
           // land in the map's pipe. The report waits locally instead.
@@ -3702,6 +3773,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     if (!arr.length) return;
     const remaining = [];
     let processed = 0;
+    // К5 (г) — said ONCE per pass, not once per report.
+    let labelsPending = false;
     function next(i) {
       if (i >= arr.length) {
         lsSet(LS_PENDING, remaining);
@@ -3721,6 +3794,16 @@ window._hydrantDataReady = (async function loadHydrantData() {
           storeRecentReport(item.report, res.json && res.json.number);
         } else if (res.status === 0 || res.status === 503 || res.status === 403) {
           remaining.push(item);
+        } else if (res.status === 422 && item.report
+                   && item.report.report_type === 'app_feedback') {
+          // К5 (г) — the labels ARE the channel of this type, and they are a
+          // precondition Petar creates by hand: until they exist the report
+          // WAITS. It used to die here with a console line (Gate 2, Д4).
+          remaining.push(item);
+          if (!labelsPending) {
+            labelsPending = true;
+            flashStatus('Докладът за приложението чака етикетите в GitHub — пази се локално', 6000);
+          }
         } else {
           console.warn('[report] queue drop', res.status, item);
         }
