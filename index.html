@@ -2987,7 +2987,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       b.addEventListener('click', () => {
         const t = b.dataset.type;
         // The context of the „Доклад за хидрант“ kind: which form was opened last.
-        window.__fvLastReportType = t;
+        if (t !== 'app_feedback') window.__fvLastReportType = t;
         if (hydrant) {
           if (t === 'wrong_location') {
             closeReportModal();
@@ -3507,6 +3507,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       return '[new_hydrant] @' +
         report.reported_coord[1].toFixed(6) + ',' + report.reported_coord[0].toFixed(6);
     }
+    if (report.report_type === 'app_feedback') { const k = feedbackKind(report.feedback_kind); return '[app_feedback] ' + (k ? k.label : '?'); }
     return '[' + report.report_type + '] ' + (report.hydrant_ref || 'unknown');
   }
   function yamlValue(v) {
@@ -3538,6 +3539,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       wrong_location: 'Грешна локация',
       damaged: 'Повреден',
       new_hydrant: 'Нов хидрант',
+      app_feedback: 'Проблем или идея за приложението',
     };
     const md = [];
     md.push('## Доклад');

@@ -103,6 +103,7 @@ ANCHORS = (
     "function dedupHash(report) {",
     "function labelsForType(",
     "function hydrantTypeLabel(typeValue) {",
+    "function buildIssueTitle(report) {",
     "function yamlValue(v) {",
     "function buildReportYAML(report) {",
     "function buildIssueBody(report) {",
@@ -119,7 +120,7 @@ BASE_OPTIONAL = ("const FEEDBACK_KINDS = [",
 
 EXPORTS = ["typeFieldsHTML", "FEEDBACK_KINDS", "feedbackKind", "maskFeedbackQuery",
            "buildFeedbackContext", "renderFeedbackContext", "dedupHash",
-           "labelsForType", "buildReportYAML", "buildIssueBody"]
+           "labelsForType", "buildIssueTitle", "buildReportYAML", "buildIssueBody"]
 
 # The source lines this lot pins by hand, with the shape the base carries.
 FEEDBACK_OPTION_HEAD = u"const feedbackOption = hydrant ? '' :"
@@ -144,6 +145,14 @@ LAST_ERROR = u"__fvLastError"
 LAST_SEARCH = u"__fvLastSearch"
 WATCHER = u"function watchLastSearch() {"
 SEARCH_IIFE = u"(function initAddressSearch() {"
+
+# К4 — the title, the name of the type and the guarded recorder of the picker.
+TITLE_ADDRESS = u"[app_feedback] " + KIND_LABELS["address"]
+TITLE_UNKNOWN_KIND = u"[app_feedback] ?"
+TITLE_AT_BASE = u"[app_feedback] unknown"
+TYPE_NAME = u"Проблем или идея за приложението"
+LAST_REPORT_TYPE = u"__fvLastReportType = t"
+PICKER_RECORDER = u"        if (t !== 'app_feedback') window.__fvLastReportType = t;"
 
 # What the four halves hunt for: the text of the assertion, never a method name.
 NEEDLE_LABELS = u"етикетите на обратната връзка"
@@ -539,6 +548,47 @@ class AppFeedbackFormTest(unittest.TestCase):
                              u"%s не е условна за този вид" % what)
             self.assertEqual(text.count(old), 0,
                              u"%s стои и в стария си безусловен вид" % what)
+
+    def test_the_title_carries_the_kind_and_not_the_hydrant_fallback(self):
+        u"""К4 — the issue is titled by the kind's label; the base, which had no
+        branch for this type, fell through to the hydrant fallback."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        asks = [call("buildIssueTitle", [feedback_report(kind="address")]),
+                call("buildIssueTitle", [feedback_report(kind="no_such_kind")])]
+        titled, unknown = ask(self, text, asks)
+        self.assertEqual(titled, TITLE_ADDRESS,
+                         u"заглавието не носи името на вида: %r" % titled)
+        self.assertEqual(unknown, TITLE_UNKNOWN_KIND,
+                         u"непознат вид не дава „?“: %r" % unknown)
+        # The pin is alive only because the base answers otherwise.
+        at_base = ask(self, base, [asks[0]], base=True)[0]
+        self.assertEqual(at_base, TITLE_AT_BASE,
+                         u"мъртъв пин: базата %s вече заглавява %r" % (BASE, at_base))
+
+    def test_the_markdown_names_the_sixth_type_in_bulgarian(self):
+        u"""К4 — „Тип“ prints the Bulgarian name of the type, like the other
+        five, and the raw identifier never reaches the markdown."""
+        text = lot1.index_text(self)
+        body = ask(self, text, [call("buildIssueBody", [feedback_report()])])[0]
+        markdown = markdown_of(body)
+        line = u"**Тип:** " + TYPE_NAME
+        self.assertEqual(markdown.count(line), 1,
+                         u"редът „Тип“ с името на вида стои %d пъти, не веднъж"
+                         % markdown.count(line))
+        self.assertNotIn(TYPE, markdown,
+                         u"markdown-ът печата суровия вид %s вместо името му" % TYPE)
+
+    def test_the_picker_recorder_skips_the_feedback_form_itself(self):
+        u"""К4 — the „Доклад за хидрант“ kind has to carry the report the
+        colleague came from, never the feedback form he is standing in."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        self.assertEqual(base.count(LAST_REPORT_TYPE), 0,
+                         u"мъртъв пин: базата %s вече записва вида на формата" % BASE)
+        self.assertEqual(one_line(self, text, LAST_REPORT_TYPE, u"записвачът на пикера"),
+                         PICKER_RECORDER,
+                         u"записвачът не е предпазен — формата за обратна връзка записва сама себе си")
 
 
 # --------------------------------------------------------------------------
