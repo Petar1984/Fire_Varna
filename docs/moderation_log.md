@@ -412,8 +412,9 @@ provenance следа `derive_type_from_free_text`, резолвано през 
 **🐛 Оплакването му е основателно и е потвърдено в кода.** Записът е сив с `type=None`, а
 той е написал „Надземен хидрант" в свободния текст, защото **формата за `wrong_location`
 няма избор на тип**:
-- `index.html:2806` — `typeFieldsHTML` покрива `exists_confirmed`, `missing`, `new_hydrant`
-- `index.html:3110` — `type` се изпраща само за `exists_confirmed` и `new_hydrant`
+- `index.html` · `typeFieldsHTML` — покриваше `exists_confirmed`, `missing`, `new_hydrant`
+- `index.html` · `buildReportObject` — `type` се изпращаше само за `exists_confirmed` и `new_hydrant`
+- **Поправено в `a3042ed` (13.09, „Проблемите“ лот 1):** и трите форми при хидрант носят блока „Тип + Работи ли?“; условието живее в `buildReportObject`.
 
 Тоест структурният път е бил затворен за докладчика. Това е **същият клас като първата
 поправка в този проект** (скритият избор на тип при вече попълнени сиви хидранти), само в
