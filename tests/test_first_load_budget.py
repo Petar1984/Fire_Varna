@@ -41,6 +41,9 @@ hand out a green verdict.
 Two invariants, ZERO pinned byte counts (О57): the eager set is EXACTLY
 `{data/hydrants.json}` and the sum of its delivered blobs is `≤ 5 242 880`. The
 numbers before and after go into Д6, never into this file.
+H-10 (лот 6): that sum also carries `index.html`, because `AGENTS.md:53` defines
+the first load as the shell PLUS the payload — a gate that measured half of what
+it claimed to measure.
 
 Червено по конструкция до К9 (ИНТЕРВАЛ А): rule 2 needs `ADDRESS_QUARTERS_URL` to
 exist, and Т2 writes it in К9. Until then this gate is RED, by design.
@@ -49,6 +52,8 @@ Negative halves (план §5 Г11): an eager `fetch('data/address_quarters.json
 `fetchCachedJson(ADDRESS_QUARTERS_URL)` at init → 1; the same test with a budget of
 1 000 000 → 1. The first two are fed in through **FIRE_VARNA_INDEX_HTML_PATH**, the
 third through **FIRE_VARNA_FIRST_LOAD_BUDGET**.
+H-10 (лот 6): a budget of 1 500 000 is the half that proves the shell is really
+inside the sum — the payload alone would have walked past it.
 
 Run: python -m unittest discover -s tests
 """
@@ -68,6 +73,11 @@ HARD_CAP = int(os.environ.get("FIRE_VARNA_FIRST_LOAD_BUDGET") or 5242880)
 
 # The one payload the app is allowed to fetch before the map draws.
 EXPECTED_EAGER = {"data/hydrants.json"}
+
+# The other half of the first load. `AGENTS.md:53` defines it as `index.html` +
+# `data/hydrants.json`, and the shell is NOT in EXPECTED_EAGER on purpose: it is
+# not fetched, it is the page the browser downloads before any script runs.
+SHELL_REL = "index.html"
 
 # The CLOSED lazy list (план §3.А Ф7, М): six constants measured in HEAD plus the
 # one Т2 adds. Anything else that names a `data/` url is eager by rule 2.
@@ -261,10 +271,13 @@ class FirstLoadBudgetTest(unittest.TestCase):
 
     def test_first_load_is_under_the_hard_cap(self):
         urls, _ = eager_set(self.html)
-        total = sum(delivered_size(rel) for rel in sorted(urls))
+        shell = delivered_size(SHELL_REL)
+        payload = sum(delivered_size(rel) for rel in sorted(urls))
+        total = shell + payload
         self.assertLessEqual(total, HARD_CAP,
-                             u"първото зареждане е %d B при таван %d B (STOP 16)"
-                             % (total, HARD_CAP))
+                             u"първото зареждане е %d B при таван %d B (STOP 16): "
+                             u"обвивка %s %d B + нетърпеливи товари %d B"
+                             % (total, HARD_CAP, SHELL_REL, shell, payload))
 
 
 if __name__ == "__main__":
