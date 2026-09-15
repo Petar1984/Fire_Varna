@@ -1475,6 +1475,19 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .type-picker .type-btn.missing { border-color: #c41e3a; color: #c41e3a; }
   .type-picker .type-btn.wrong { border-color: #ef6c00; color: #ef6c00; }
   .type-picker .type-btn.damaged { border-color: #d32f2f; color: #d32f2f; }
+  .type-picker .type-btn.feedback {
+    grid-column: 1 / -1; min-height: 48px; border-style: dashed;
+    border-color: #607d8b; color: #455a64; background: #f5f7f9; font-weight: 600;
+  }
+  .fb-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .fb-tiles .radio-chip.fb-tile { min-height: 52px; font-size: 14px; text-align: center; }
+  .fb-ctx {
+    background: #f4f6f8; border: 1px solid #e0e4e8; border-radius: 8px;
+    padding: 8px 10px; font-size: 12.5px; color: #37474f; line-height: 1.45;
+  }
+  .fb-ctx b { color: #1c3d6c; }
+  .fb-ctx .muted { color: #90a4ae; }
+  .field.hidden { display: none; }
   .field input[type="text"] {
     width: 100%; padding: 10px 12px; border: 1px solid #ccc;
     border-radius: 8px; font-size: 14px; font-family: inherit;
@@ -2763,6 +2776,141 @@ window._hydrantDataReady = (async function loadHydrantData() {
     });
   }
 
+  // ----- App feedback: the sixth report type (лот О, амандамент 15.09) -----
+  // A report about the APP, not about a hydrant: same modal, same Worker, but
+  // labels app-feedback / fb-<kind> / pending-review and never "report", so the
+  // map pipe (which fetches labels=report) cannot see it.
+  const FEEDBACK_KINDS = [
+    { id: 'address', icon: '🔎', label: 'Адрес / търсене', text: 'напр. „бл. 5 Аспарухово“ дава друг блок', required: false },
+    { id: 'report', icon: '📝', label: 'Доклад за хидрант', text: 'напр. „Изпрати“ не реагира', required: false },
+    { id: 'map', icon: '🗺️', label: 'Картата', text: 'напр. хидрантът е на грешно място', required: false },
+    { id: 'freeze', icon: '🧊', label: 'Замръзва / не се отваря', text: 'напр. при отваряне на панела', required: false },
+    { id: 'idea', icon: '💡', label: 'Предложение', text: 'Какво да добавим или променим?', required: true },
+    { id: 'other', icon: '❓', label: 'Друго', text: 'Опиши накратко', required: true },
+  ];
+  function feedbackKind(id) { return FEEDBACK_KINDS.find(k => k.id === id) || null; }
+  // The search query is the only free text the app collects by itself, and a
+  // colleague can paste a coordinate into the search box. A PAIR collapses into
+  // one marker first, so "lon, lat" does not become two, then any lone
+  // high-precision decimal follows it.
+  function maskFeedbackQuery(q) {
+    const s = String(q == null ? '' : q).trim();
+    if (!s) return '';
+    return s.replace(/[-+]?\d{1,3}[.,]\d{3,}\s*[,;]?\s*[-+]?\d{1,3}[.,]\d{3,}/g, '[координати]')
+            .replace(/[-+]?\d{1,3}[.,]\d{3,}/g, '[координати]');
+  }
+  // Н7 — the ONLY place of the lot that touches the browser, and the reason the
+  // builder below is pure: the gate raises a slice with no navigator and with a
+  // document whose getElementById returns null, so every read here is guarded
+  // and a miss is null, never a throw.
+  function feedbackEnvSnapshot() {
+    const nav = (typeof navigator !== 'undefined' && navigator) ? navigator : null;
+    const ua = (nav && typeof nav.userAgent === 'string') ? nav.userAgent : '';
+    const platform = (ua.match(/(Android|iPhone|iPad|Windows|Mac OS)/) || [null])[0];
+    const browser = (ua.match(/(Edg|Chrome|Firefox|Safari)/) || [null])[0];
+    const win = (typeof window !== 'undefined' && window) ? window : {};
+    const doc = (typeof document !== 'undefined' && document) ? document : null;
+    const worked = (doc && doc.querySelector)
+      ? doc.querySelector('[data-radio="worked_before"] .radio-chip.selected') : null;
+    const sheet = (doc && doc.querySelector) ? doc.querySelector('.detail-sheet') : null;
+    const results = (doc && doc.getElementById) ? doc.getElementById('addrSearchResults') : null;
+    return {
+      app_version: (typeof APP_VERSION !== 'undefined') ? APP_VERSION : null,
+      online: (nav && typeof nav.onLine === 'boolean') ? nav.onLine : null,
+      device: (platform || browser)
+        ? ((platform || '?') + ' / ' + (browser === 'Edg' ? 'Edge' : (browser || '?'))) : null,
+      screen: (typeof win.innerWidth === 'number' && typeof win.innerHeight === 'number')
+        ? (win.innerWidth + 'x' + win.innerHeight) : null,
+      mode: (typeof mode !== 'undefined') ? mode : null,
+      basemap: (typeof basemapMode !== 'undefined')
+        ? (basemapMode + ((typeof satelliteOn !== 'undefined' && satelliteOn) ? ' + сателит' : '')) : null,
+      // Н6 — the page never reads the generation manifest, so the release is the
+      // first twelve characters of the index the two gate mirrors already pin.
+      release: (typeof ADDRESS_QUARTERS_SHA256 !== 'undefined')
+        ? String(ADDRESS_QUARTERS_SHA256).slice(0, 12) : null,
+      worked_before: (worked && worked.dataset) ? worked.dataset.val : null,
+      last_search: win.__fvLastSearch || null,
+      last_error: win.__fvLastError || null,
+      last_report_type: win.__fvLastReportType || null,
+      queued: (typeof LS_PENDING !== 'undefined') ? (lsGet(LS_PENDING, []) || []).length : null,
+      hydrant_id: (typeof activeTargetId !== 'undefined') ? activeTargetId : null,
+      zoom: (typeof map !== 'undefined' && map && map.getZoom) ? map.getZoom() : null,
+      points: (typeof HYDRANTS !== 'undefined' && HYDRANTS) ? HYDRANTS.length : null,
+      sw: (nav && nav.serviceWorker && nav.serviceWorker.controller) ? 'active' : 'none',
+      memory_gb: (nav && typeof nav.deviceMemory === 'number') ? nav.deviceMemory : null,
+      where: (sheet && !sheet.hidden) ? 'панел на сграда'
+        : ((results && results.classList && results.classList.contains('visible')) ? 'търсачка' : 'карта')
+    };
+  }
+  // Р2 — a FLAT dictionary per kind, and pure: it reads nothing but its two
+  // arguments. Never a GPS fix, never a name, never a stack, never a coordinate.
+  function buildFeedbackContext(kind, env) {
+    const e = env || {};
+    const ctx = {
+      app_version: e.app_version || null,
+      online: (typeof e.online === 'boolean') ? e.online : null,
+      device: e.device || null,
+      screen: e.screen || null,
+      mode: e.mode || null,
+      basemap: e.basemap || null,
+      release: e.release || null
+    };
+    // Р4 — по желание, и без смисъл за предложение.
+    if (kind !== 'idea' && e.worked_before) ctx.worked_before = e.worked_before;
+    if (kind === 'address') {
+      const search = e.last_search || {};
+      ctx.query = maskFeedbackQuery(search.query);
+      ctx.rows_shown = (typeof search.rows_shown === 'number') ? search.rows_shown : null;
+      ctx.first_row = search.first_row || null;
+      ctx.selected_row = search.selected_row || null;
+    }
+    if (kind === 'report') {
+      ctx.last_report_type = e.last_report_type || null;
+      ctx.last_error = e.last_error || null;
+      ctx.queued = (typeof e.queued === 'number') ? e.queued : null;
+    }
+    if (kind === 'map') {
+      ctx.hydrant_id = e.hydrant_id || null;
+      ctx.zoom = (typeof e.zoom === 'number') ? e.zoom : null;
+      ctx.points = (typeof e.points === 'number') ? e.points : null;
+    }
+    if (kind === 'freeze') {
+      ctx.last_error = e.last_error || null;
+      ctx.sw = e.sw || null;
+      ctx.memory_gb = (typeof e.memory_gb === 'number') ? e.memory_gb : null;
+    }
+    if (kind === 'idea' || kind === 'other') {
+      ctx.where = e.where || null;
+    }
+    return ctx;
+  }
+  const FB_CTX_LABELS = {
+    app_version: 'версия', online: 'онлайн', device: 'устройство', screen: 'екран',
+    mode: 'режим', basemap: 'фон', release: 'издание', worked_before: 'работеше ли преди',
+    query: 'заявка', rows_shown: 'показани реда', first_row: 'първи ред', selected_row: 'избран ред',
+    last_report_type: 'последен доклад', last_error: 'последна грешка', queued: 'в опашката',
+    hydrant_id: 'хидрант', zoom: 'приближение', points: 'точки',
+    sw: 'кеш', memory_gb: 'памет GB', where: 'къде'
+  };
+  // The colleague reads this box BEFORE tapping "Изпрати" — it is the promise
+  // that nothing else travels, so it is rebuilt from the same builder the
+  // payload uses and never from a second, prettier list.
+  function renderFeedbackContext(kind, env) {
+    if (!feedbackKind(kind)) {
+      return '<span class="muted">Избери вид — приложението само попълва контекста. Без GPS.</span>';
+    }
+    const ctx = buildFeedbackContext(kind, env);
+    return Object.keys(ctx).map(function (key) {
+      const value = ctx[key];
+      let shown;
+      if (value === null || value === undefined || value === '') shown = '—';
+      else if (value === true) shown = 'да';
+      else if (value === false) shown = 'не';
+      else shown = String(value);
+      return '<b>' + escapeHtml(FB_CTX_LABELS[key] || key) + ':</b> ' + escapeHtml(shown);
+    }).join(' · ');
+  }
+
   // ----- Type picker -----
   // hydrant === null  → global "+" entry, shows all 5 types incl. new_hydrant
   // hydrant === <obj> → per-hydrant 🚨 entry, shows the 4 existing-hydrant types
@@ -2773,6 +2921,9 @@ window._hydrantDataReady = (async function loadHydrantData() {
     openModal(hydrant ? '🚨 Сигнал за хидрант' : 'Какво да докладваш?');
     const newOption = hydrant ? '' :
       '<button type="button" class="type-btn new" data-type="new_hydrant">Нов хидрант</button>';
+    // The sixth entry exists only where there is no hydrant: the crew at a
+    // hydrant keeps its four types (амандамент 15.09 §4).
+    const feedbackOption = hydrant ? '' : '<button type="button" class="type-btn feedback" data-type="app_feedback">💬 Проблем или идея за приложението</button>';
     modalBody.innerHTML =
       reporterBarHTML(getReporterName()) +
       targetCardHTML(null, hydrant, null) +
@@ -2783,6 +2934,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
           '<button type="button" class="type-btn missing" data-type="missing">Хидрант липсва</button>' +
           '<button type="button" class="type-btn wrong"   data-type="wrong_location">Грешна локация</button>' +
           '<button type="button" class="type-btn damaged" data-type="damaged">Повреден</button>' +
+          feedbackOption +
         '</div>' +
       '</div>';
     modalFooter.innerHTML =
@@ -2791,6 +2943,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     modalBody.querySelectorAll('.type-btn').forEach(b => {
       b.addEventListener('click', () => {
         const t = b.dataset.type;
+        // The context of the „Доклад за хидрант“ kind: which form was opened last.
+        window.__fvLastReportType = t;
         if (hydrant) {
           if (t === 'wrong_location') {
             closeReportModal();
@@ -2809,6 +2963,12 @@ window._hydrantDataReady = (async function loadHydrantData() {
             draft.placedCoord = coord;
             showReportModal(null, 'new_hydrant', draft);
           });
+        } else if (t === 'app_feedback') {
+          // App feedback is a form, not a pre-pick: there is nothing to tap on
+          // the map. Н2 — an empty reporter makes reporterBarHTML return '' by
+          // itself, so the „Докладва“ bar disappears for the one type that
+          // sends no name.
+          showReportModal(null, 'app_feedback', { reporter: '' });
         } else {
           // Pre-pick: remember the chosen type, show banner, wait for the
           // user's next hydrant tap to consume and route into the flow.
@@ -2828,6 +2988,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       case 'wrong_location':   return '⚠ Грешна локация';
       case 'damaged':          return '⚠ Повреден';
       case 'new_hydrant':      return '➕ Нов хидрант';
+      case 'app_feedback':     return '💬 Проблем или идея';
       default:                 return '🚨 Сигнал за хидрант';
     }
   }
@@ -2895,6 +3056,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // one standard for every form (Petar, 13.09; issue #769: "on this one, and
   // before moving the location, it would not let me mark whether it works").
   const AT_HYDRANT_TYPES = new Set(['exists_confirmed', 'wrong_location', 'damaged']);
+  // The five types that are ABOUT a hydrant — the allowlist of applyReports and
+  // the third guard of the амандамент (15.09 §2): a type outside it never
+  // writes a free text into a live record's note.
+  const APPLY_TYPES = new Set(['exists_confirmed', 'missing', 'wrong_location', 'damaged', 'new_hydrant']);
 
   // The type picker is pre-selected from the record, because the record stores
   // the picker's own vocabulary (надземен/подземен), so confirming is one tap.
@@ -2980,6 +3145,34 @@ window._hydrantDataReady = (async function loadHydrantData() {
         '<div class="err">Моля опиши повредата.</div>' +
       '</div>';
     }
+    if (t === 'app_feedback') {
+      const kind = d.feedback_kind || '';
+      const k = feedbackKind(kind);
+      return '<div class="field" id="fld_fb_kind">' +
+        '<label>Какъв е проблемът? <span class="req">*</span></label>' +
+        '<div class="radio-row fb-tiles" data-radio="feedback_kind">' +
+          FEEDBACK_KINDS.map(x =>
+            '<button type="button" class="radio-chip fb-tile' + (x.id === kind ? ' selected' : '') +
+            '" data-val="' + x.id + '">' + x.icon + ' ' + escapeHtml(x.label) + '</button>'
+          ).join('') +
+        '</div>' +
+        '<div class="err">Моля избери вид.</div>' +
+      '</div>' +
+      '<div class="field" id="fld_fb_ctx">' +
+        '<label>Какво ще изпратим автоматично</label>' +
+        '<div class="fb-ctx" id="fbCtx">' + renderFeedbackContext(kind, feedbackEnvSnapshot()) + '</div>' +
+      '</div>' +
+      '<div class="field' + (kind === 'idea' ? ' hidden' : '') + '" id="fld_worked_before">' +
+        '<label>Работеше ли преди? (по желание)</label>' +
+        radioRowHTML('worked_before', ['работеше преди','никога не е работело','не знам'], d.worked_before) +
+      '</div>' +
+      '<div class="field" id="fld_feedback">' +
+        '<label>Едно изречение <span class="req" id="fbReq">' + (k && k.required ? '*' : '(по желание)') + '</span></label>' +
+        '<textarea data-field="description" maxlength="500" placeholder="' + escapeHtml(k ? k.text : '') + '">' + escapeHtml(d.description || '') + '</textarea>' +
+        '<div class="hint">Без имена и лични данни — хранилището е публично.</div>' +
+        '<div class="err">Моля опиши с едно изречение.</div>' +
+      '</div>';
+    }
     return '';
   }
   function locationFieldHTML(t, placedCoord) {
@@ -3025,7 +3218,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     modalBody.innerHTML =
       reporterBarHTML(reportDraft.reporter) +
       targetCardHTML(reportType, hydrant, reportDraft.placedCoord) +
-      nameFieldHTML(reportDraft.reporter) +
+      (reportType === 'app_feedback' ? '' : nameFieldHTML(reportDraft.reporter)) +
       typeFieldsHTML(reportType, reportDraft) +
       locationFieldHTML(reportType, reportDraft.placedCoord) +
       '<input type="text" class="honeypot" name="website" id="hp_website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
@@ -3036,6 +3229,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
     wireReporterBar();
     wireFormHandlers(reportType);
+    wireFeedbackHandlers(reportType);
     startCooldownUi();   // show any running wait before the first tap, not after it
   }
 
@@ -3090,6 +3284,37 @@ window._hydrantDataReady = (async function loadHydrantData() {
     });
   }
 
+  // The tiles of the feedback form live in their own wiring: `wireFormHandlers`
+  // and `readDraftFromForm` are pinned byte-equal to their base by the gate of
+  // лот 1, so this lot adds a listener beside them instead of inside them. The
+  // generic .radio-chip handler above already moves the `selected` class; this
+  // one rebuilds what the chosen kind changes.
+  function wireFeedbackHandlers(reportType) {
+    if (reportType !== 'app_feedback') return;
+    modalBody.querySelectorAll('[data-radio="feedback_kind"] .radio-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const kind = chip.dataset.val;
+        const k = feedbackKind(kind);
+        reportDraft.feedback_kind = kind;
+        const box = document.getElementById('fbCtx');
+        if (box) box.innerHTML = renderFeedbackContext(kind, feedbackEnvSnapshot());
+        const area = modalBody.querySelector('textarea[data-field="description"]');
+        if (area && k) area.placeholder = k.text;
+        const star = document.getElementById('fbReq');
+        if (star && k) star.textContent = k.required ? '*' : '(по желание)';
+        const worked = document.getElementById('fld_worked_before');
+        if (worked) worked.classList.toggle('hidden', kind === 'idea');
+      });
+    });
+    modalBody.querySelectorAll('[data-radio="worked_before"] .radio-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        reportDraft.worked_before = chip.dataset.val;
+        const box = document.getElementById('fbCtx');
+        if (box) box.innerHTML = renderFeedbackContext(reportDraft.feedback_kind || '', feedbackEnvSnapshot());
+      });
+    });
+  }
+
   function onSubmitClicked(reportType) {
     if (!reportDraft) return;
     readDraftFromForm();
@@ -3100,13 +3325,26 @@ window._hydrantDataReady = (async function loadHydrantData() {
     modalBody.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
 
     const r = reportDraft.reporter;
-    if (!r || r.length < MIN_NAME_LEN || r.length > MAX_NAME_LEN) {
+    if (reportType !== 'app_feedback' && (!r || r.length < MIN_NAME_LEN || r.length > MAX_NAME_LEN)) {
       const f = document.getElementById('fld_reporter'); if (f) f.classList.add('invalid');
       invalid = true;
     }
     if (reportType === 'damaged' && !reportDraft.damage_description) {
       const f = document.getElementById('fld_damage'); if (f) f.classList.add('invalid');
       invalid = true;
+    }
+    if (reportType === 'app_feedback') {
+      const k = feedbackKind(reportDraft.feedback_kind);
+      if (!k) {
+        const f = document.getElementById('fld_fb_kind'); if (f) f.classList.add('invalid');
+        invalid = true;
+      }
+      // Р6 — a sentence is the CONTENT of an idea and of „Друго“; for the four
+      // problem kinds the context the app collected is already the report.
+      if (k && k.required && !reportDraft.description) {
+        const f = document.getElementById('fld_feedback'); if (f) f.classList.add('invalid');
+        invalid = true;
+      }
     }
     if ((reportType === 'wrong_location' || reportType === 'new_hydrant') && !reportDraft.placedCoord) {
       const f = document.getElementById('fld_location'); if (f) f.classList.add('invalid');
@@ -3166,7 +3404,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
       report_id: uuidv4(),
       report_type: reportType,
       timestamp: localISOString(),
-      reporter: d.reporter,
+      // Р1 — on a public repository a name adds nothing to an app bug.
+      reporter: reportType === 'app_feedback' ? null : d.reporter,
       hydrant_ref: h ? h.id : null,
       expected_coord: expected,
       reported_coord: placed,
@@ -3174,7 +3413,11 @@ window._hydrantDataReady = (async function loadHydrantData() {
       app_version: APP_VERSION,
       free_text: reportType === 'exists_confirmed' && d.free_text ? d.free_text : null,
       terrain_description: reportType === 'missing' && d.terrain_description ? d.terrain_description : null,
-      description: ((reportType === 'wrong_location' || reportType === 'new_hydrant') && d.description) ? d.description : null,
+      description: ((reportType === 'wrong_location' || reportType === 'new_hydrant' || reportType === 'app_feedback') && d.description) ? d.description : null,
+      feedback_kind: reportType === 'app_feedback' ? (d.feedback_kind || null) : null,
+      // A flat JSON STRING on ONE line: the Worker parses the head line by line.
+      feedback_context: reportType === 'app_feedback'
+        ? JSON.stringify(buildFeedbackContext(d.feedback_kind, feedbackEnvSnapshot())) : null,
       damage_description: reportType === 'damaged' && d.damage_description ? d.damage_description : null,
       hydrant_type_at_location: reportType === 'missing' ? d.hydrant_type_at_location : null,
       // Canonical fields per Section B of
@@ -3195,7 +3438,19 @@ window._hydrantDataReady = (async function loadHydrantData() {
 
   function dedupHash(report) {
     const coord = report.reported_coord ? report.reported_coord.join(',') : '';
-    return [report.report_type, report.hydrant_ref || '', report.reporter || '', coord].join('|');
+    // Р5 — two different sentences from one person are two reports. App feedback
+    // carries no hydrant and no coordinate, so the kind, the text and the query
+    // the app collected are what separate one report from the next.
+    let extra = '';
+    if (report.report_type === 'app_feedback') {
+      let query = '';
+      try {
+        const ctx = JSON.parse(report.feedback_context || '{}') || {};
+        query = String(ctx.query || '');
+      } catch (_) { query = ''; }
+      extra = '|' + (report.feedback_kind || '') + '|' + (report.description || '') + '|' + query;
+    }
+    return [report.report_type, report.hydrant_ref || '', report.reporter || '', coord].join('|') + extra;
   }
   function pruneDedup(now) {
     for (const [k, ts] of dedupMap.entries()) {
@@ -3224,7 +3479,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const order = [
       'report_id','report_type','timestamp','reporter','hydrant_ref',
       'expected_coord','reported_coord','location_method','app_version',
-      'free_text','terrain_description','description','damage_description',
+      'free_text','terrain_description','description','feedback_kind','feedback_context','damage_description',
       'hydrant_type_at_location','type','operational_status'
     ];
     const lines = ['---'];
@@ -3245,7 +3500,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     md.push('## Доклад');
     md.push('');
     md.push('**Тип:** ' + (typeNames[report.report_type] || report.report_type));
-    md.push('**Подател:** ' + report.reporter);
+    if (report.reporter) md.push('**Подател:** ' + report.reporter);
     md.push('**Време:** ' + report.timestamp);
     if (report.hydrant_ref) md.push('**Хидрант ID:** ' + report.hydrant_ref);
     if (report.expected_coord) {
@@ -3272,7 +3527,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
     md.push('— App: ' + report.app_version);
     return yaml + '\n\n' + md.join('\n');
   }
-  function labelsForType(t) {
+  // Н3 — the REPORT, not just its type: app feedback carries its kind into the
+  // labels, and the offline queue builds its payload through this same call.
+  function labelsForType(report) {
+    const t = report.report_type;
     const m = {
       exists_confirmed: 'exists-confirmed',
       missing: 'missing',
@@ -3280,6 +3538,10 @@ window._hydrantDataReady = (async function loadHydrantData() {
       damaged: 'damaged',
       new_hydrant: 'new-hydrant',
     };
+    if (t === 'app_feedback') {
+      const kind = feedbackKind(report.feedback_kind) ? report.feedback_kind : 'other';
+      return ['app-feedback', 'fb-' + kind, 'pending-review'];
+    }
     return ['report', m[t] || t.replace(/_/g, '-'), 'pending-review'];
   }
 
@@ -3305,7 +3567,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
     const payload = {
       title: buildIssueTitle(report),
       body: buildIssueBody(report),
-      labels: labelsForType(report.report_type),
+      labels: labelsForType(report),
     };
     if (isPlaceholderConfig()) {
       flashStatus('Системата още не е конфигурирана. Свържи се с Петър.', 5000);
@@ -3343,6 +3605,14 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const msg = res.json && (res.json.message || (res.json.errors && JSON.stringify(res.json.errors)));
       console.warn('[report] 422', msg);
       if (msg && /label/i.test(msg)) {
+        if (report.report_type === 'app_feedback') {
+          // Н4 — the labels ARE the channel: an unlabelled feedback issue would
+          // land in the map's pipe. The report waits locally instead.
+          queueReport(report);
+          flashStatus('Етикетите още не са създадени — докладът е запазен локално, кажи на Петър', 6000);
+          closeReportModal();
+          return;
+        }
         postIssue(url, payload, true).then(res2 => {
           if (res2.status === 201) {
             const num = res2.json && res2.json.number;
@@ -3398,7 +3668,7 @@ window._hydrantDataReady = (async function loadHydrantData() {
       const payload = {
         title: buildIssueTitle(item.report),
         body: buildIssueBody(item.report),
-        labels: labelsForType(item.report.report_type),
+        labels: labelsForType(item.report),
       };
       postIssue(url, payload, false).then(res => {
         if (res.status === 201) {
@@ -3969,6 +4239,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     for (const report of reports) {
       const type = report && report.report_type;
       if (!type) continue;
+      // Амандамент 15.09 §2 — the third guard, before any note is written.
+      if (!APPLY_TYPES.has(type)) continue;
 
       if (type === 'new_hydrant' && !report.hydrant_id) {
         if (!report.id || !Array.isArray(report.coords) || report.coords.length !== 2) continue;
