@@ -205,6 +205,7 @@ def main(parent, cached=False):
         try: doc = json.loads(raw.decode("utf-8"))
         except (ValueError, UnicodeDecodeError) as exc: unread.append((f, str(exc))); continue
         hits = []; walk(doc, "", hits); named_ring(doc, "", hits)
+        hits = list(dict.fromkeys(hits))      # a ring under a GEO key: both judges see it
         bad += [(f, ptr, typ.__name__) for ptr, typ in hits
                 if (f, ptr, typ) not in LEGACY]
     stray = sorted(set(new) - ALLOWED_NEW)

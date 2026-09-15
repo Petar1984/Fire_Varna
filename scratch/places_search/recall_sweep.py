@@ -255,14 +255,16 @@ def key_of(s):
 
 
 # ------------------------------------------------------------------ T2 / K2
-# WHY `with`: a test suite IMPORTS this engine (the places gate, the granitsi
-# fixtures, gates.release), so a handle leaked here warns on every suite run.
-with open(CATS, encoding="utf-8") as handle:
-    cats = json.load(handle)
-with open(HOTELS, encoding="utf-8") as handle:
-    hotels = json.load(handle)["hotels"]
-with open(PLACES2, encoding="utf-8") as handle:
-    places2 = json.load(handle)["places"]
+# WHY a helper: a test suite IMPORTS this engine (the places gate, the granitsi
+# fixtures, gates.release) - no handle leaked on import, no `handle` left global.
+def _read_json(path):
+    with open(path, encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+cats = _read_json(CATS)
+hotels = _read_json(HOTELS)["hotels"]
+places2 = _read_json(PLACES2)["places"]
 
 # --- A2: chip -> head  (place_categories.json chips[] carries "head")
 CHIP_HEAD = {}
