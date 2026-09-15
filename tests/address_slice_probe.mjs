@@ -43,7 +43,7 @@
 //   {ask:"search", q}                      -> {n, deduped, rows:[{kind,en,d,_ord}…]}
 //   {ask:"render", q, limit}               -> [{title, meta, html}] — the dropdown ROW
 //   {ask:"renderList", q, limit, open}   -> {header, rows:[{cls, title, meta,
-//                                            badge, open, chips, arrows, html}…]}
+//                                            badge, open, chips, strangers, html}…]}
 //   {ask:"panel", q, pick}                 -> {panel, popup, sheet} — the panel + popup
 //   {ask:"coord", q}                       -> {title, meta, popup} — the GPS row
 //   {ask:"collisions", queries:[…]}        -> [{q, ranked, shown, merged}]
@@ -484,15 +484,14 @@ function readDropdown(container, limit) {
     }
     if (hasClassWord(child, 'asr-ent-strip')) {
       const chips = [];
-      let arrows = 0;
+      let strangers = 0;
       for (const node of (child.children || [])) {
-        if (hasClassWord(node, 'asr-ent-arrow')) { arrows += 1; continue; }
-        if (!hasClassWord(node, 'asr-ent-chip')) continue;
+        if (!hasClassWord(node, 'asr-ent-chip')) { strangers += 1; continue; }
         chips.push({ text: node.textContent || '', ord: node.dataset ? node.dataset.ord : null });
       }
       if (out.rows.length) {
         out.rows[out.rows.length - 1].chips = chips;
-        out.rows[out.rows.length - 1].arrows = arrows;
+        out.rows[out.rows.length - 1].strangers = strangers;
       }
       continue;
     }
@@ -506,7 +505,7 @@ function readDropdown(container, limit) {
       badge: badge ? badge.text() : null,
       open: badge ? (attrOf(badge, 'aria-expanded') === 'true') : false,
       chips: [],
-      arrows: 0,
+      strangers: 0,
       html: child.outerHTML
     });
   }

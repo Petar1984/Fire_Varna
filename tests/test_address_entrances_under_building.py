@@ -117,13 +117,14 @@ NEW_SIGNATURES = (u"function typedEntranceQuery", u"function entrancesByGroup",
 UNTOUCHED_SIGNATURES = (u"function dedupeDisplayRows", u"function buildExactItem",
                         u"function renderResults(rows) {")
 # The new selector family, counted on the delivered file (plan §5, gate G2b).
-ENT_MENTIONS = 14
-# The two declared deviations from the specimen (plan §4, anchor 1): the constant
-# carries the name of the F0.9 measurement and the dead `.active` rule never shipped.
-ARROWS_CONST = u"ENT_STRIP_ARROWS_AFTER"
-ARROWS_MENTIONS = 2
-# Absent from the WHOLE file: neither name nor rule ever shipped.
-BANNED_IN_FILE = (u"ENT_STRIP_FADE_AFTER", u".asr-ent-chip.active")
+ENT_MENTIONS = 8
+# Absent from the WHOLE file, not from the inserted lines alone. The first two are
+# the declared deviations from the specimen (plan §4, anchor 1): neither the name
+# nor the rule ever shipped. The last two are the two scroll arrows of ADR 012 v1.1:
+# they came OUT in lot 5в on Petar's word (plan §11), because on his phone an arrow
+# lay over a chip - a silent return of either name has to fail here.
+BANNED_IN_FILE = (u"ENT_STRIP_FADE_AFTER", u".asr-ent-chip.active",
+                  u"ENT_STRIP_ARROWS_AFTER", u"asr-ent-arrow")
 # Absent from the lot's OWN inserted lines. The whole file cannot be judged here: the
 # two vendored minified bundles carry "prototype" of their own, and they stand in the
 # base as well - an added line is one that the base does not carry at all.
@@ -170,10 +171,6 @@ BLOCK_ROWS_AT_BASE = 10
 BLOCK_ENTRANCE_ROWS_AT_BASE = 9
 # Its strip, measured chip by chip: twenty-three numbered entrances, 1 to 23.
 BLOCK_CHIPS = tuple(u"вх. %d" % number for number in range(1, BLOCK_ENTRANCES + 1))
-# Above four chips the strip carries its two arrows: at 375 px a fifth chip is already
-# cut off (5 x 64 px + 4 x 6 px + a 44 px arrow needs 400 px, the strip is 354 px).
-ARROWS_THRESHOLD = 4
-ARROWS_WHEN_SCROLLABLE = 2
 
 # The counter comes from the INDEX, never from the drawn rows (ADR 012 D4): these two
 # are the measured witnesses of the lie - five drawn against ten, six against nine.
@@ -375,20 +372,19 @@ class EntranceFoldTest(unittest.TestCase):
                          u"бутоните не са двайсет и трите входа по реда си")
         self.assertEqual(sorted(int(chip["ord"]) for chip in chips), sorted(ords),
                          u"бутоните не сочат входовете, които индексът дава за групата")
-        # the arrows: above four chips they are drawn, at four or fewer they are not
-        self.assertEqual(now["rows"][0]["arrows"], ARROWS_WHEN_SCROLLABLE,
-                         u"лента с %d бутона носи %d стрелки, не %d"
-                         % (len(chips), now["rows"][0]["arrows"], ARROWS_WHEN_SCROLLABLE))
+        # the strip carries chips and NOTHING else (lot 5в: the arrows came out)
+        self.assertEqual(now["rows"][0]["strangers"], 0,
+                         u"лентата носи %d елемента извън бутоните-входове"
+                         % now["rows"][0]["strangers"])
         short = ask_candidate(self, [drawn(PRICE_QUERY, entries[PRICE_ORD]["g"]),
                                      drawn(SINGULAR_QUERY, entries[SINGULAR_ORD]["g"])])
         priced, single = short[0]["rows"][0], short[1]["rows"][0]
-        self.assertEqual((len(priced["chips"]), priced["arrows"]),
-                         (5, ARROWS_WHEN_SCROLLABLE),
-                         u"лента с 5 бутона трябва да носи стрелки: %d бутона, %d стрелки"
-                         % (len(priced["chips"]), priced["arrows"]))
-        self.assertEqual((len(single["chips"]), single["arrows"]), (1, 0),
-                         u"лента под прага носи стрелки: %d бутона, %d стрелки"
-                         % (len(single["chips"]), single["arrows"]))
+        self.assertEqual((len(priced["chips"]), priced["strangers"]), (5, 0),
+                         u"лентата с пет входа носи %d бутона и %d елемента извън тях"
+                         % (len(priced["chips"]), priced["strangers"]))
+        self.assertEqual((len(single["chips"]), single["strangers"]), (1, 0),
+                         u"лентата с един вход носи %d бутона и %d елемента извън тях"
+                         % (len(single["chips"]), single["strangers"]))
 
     def test_the_counter_and_the_strip_come_from_the_index(self):
         """The rows lie: five children drawn against ten in the index (ADR 012 D4)."""
@@ -666,9 +662,6 @@ class PerimeterTest(unittest.TestCase):
         self.assertEqual(candidate.count(u"asr-ent-"), ENT_MENTIONS,
                          u"новото селекторно семейство се споменава %d пъти, не %d"
                          % (candidate.count(u"asr-ent-"), ENT_MENTIONS))
-        self.assertEqual(candidate.count(ARROWS_CONST), ARROWS_MENTIONS,
-                         u"%r стои %d пъти, не %d"
-                         % (ARROWS_CONST, candidate.count(ARROWS_CONST), ARROWS_MENTIONS))
         for text in BANNED_IN_FILE:
             self.assertEqual(candidate.count(text), 0,
                              u"доставеният файл още носи %r — обявеното отклонение не е "

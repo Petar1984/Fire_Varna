@@ -1087,10 +1087,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .asr-status { padding: 10px 12px; color: #777; font-size: 13px; }
   /* --- Lot 5 / ADR 012: a building is ONE row with an entrance counter;
      tapping the counter opens its entrances as chips on ONE horizontally
-     scrollable strip directly under the row. Badge, chips and the two scroll
-     arrows are native <button>s, so the reset below is what keeps them looking
-     like chips. A phone swipes the strip; a MOUSE cannot drag an overflow-x box,
-     so the strip also carries the arrows, a wheel handler and a drag handler. */
+     scrollable strip directly under the row. Badge and chips are native <button>s,
+     so the reset below is what keeps them looking like chips. A phone swipes the strip;
+     a MOUSE cannot drag an overflow-x box, so it carries a wheel and a drag handler. */
   .asr-ent-badge {
     margin-left: auto; align-self: center; flex: none; min-height: 44px;
     display: inline-flex; align-items: center; padding: 0 10px;
@@ -1104,7 +1103,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     position: relative; display: flex; gap: 6px;
     overflow-x: auto; -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity; overscroll-behavior-x: contain;
-    padding: 6px 12px 8px 44px; background: #f4f7fb;
+    padding: 6px 12px 8px; background: #f4f7fb;
     border-bottom: 1px solid #f0f0f0; scrollbar-width: thin;
     -webkit-user-select: none; user-select: none;
   }
@@ -1116,26 +1115,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     font-family: inherit; font-size: 13px; font-weight: 600;
     scroll-snap-align: start; cursor: pointer; white-space: nowrap;
     -webkit-appearance: none; appearance: none;
-  }
-  /* The two scroll arrows. They stick to the scrollport edges and are pulled back
-     over the chips by a negative margin, so they never move a chip. */
-  .asr-ent-arrow {
-    position: sticky; z-index: 1; flex: none;
-    align-self: stretch; width: 44px; min-width: 44px; min-height: 44px;
-    border: 0; padding: 0; display: flex; align-items: center;
-    font-family: inherit; font-size: 18px; line-height: 1;
-    color: #3a4a5c; cursor: pointer; pointer-events: auto;
-    -webkit-appearance: none; appearance: none;
-  }
-  /* `display:flex` above outranks the UA `[hidden]` rule, so say it here. */
-  .asr-ent-arrow[hidden] { display: none; }
-  .asr-ent-arrow-left {
-    left: 0; margin-right: -44px; justify-content: flex-start;
-    background: linear-gradient(270deg, rgba(244,247,251,0), #f4f7fb 70%);
-  }
-  .asr-ent-arrow-right {
-    right: 0; margin-left: -44px; justify-content: flex-end;
-    background: linear-gradient(90deg, rgba(244,247,251,0), #f4f7fb 70%);
   }
   /* Result marker (one at a time) — teal dot, distinct from the red/numbered
      hydrant pins and the blue user dot. className replaces leaflet-div-icon so
@@ -5770,13 +5749,8 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // and `runGeocoderSearch` are untouched, so ranking and row html cannot move.
     // Nothing on this path calls `.closest(` or `querySelector` - the headless DOM
     // stub has neither; attaching a listener is fine (there it is a no-op), and
-    // every scrollBy / setPointerCapture / requestAnimationFrame call is guarded.
+    // every setPointerCapture call is guarded.
     // ===================================================================
-    // Above this many chips the strip gets its two scroll arrows. Measured at 375 px:
-    // the strip is 354 px wide and a chip is 64 px plus a 6 px gap, so FOUR fit and a
-    // fifth is already cut off (5 x 64 + 4 x 6 = 344 px of chips plus the 44 px arrow
-    // needs 400 px). Above four the crew gets the arrows instead of a hidden chip.
-    const ENT_STRIP_ARROWS_AFTER = 4;
 
     // An EXPLICITLY typed entrance query ("bl 408 vh 12") is never folded: the
     // crew asked for a single entrance, so that entrance stays a row of its own.
@@ -5846,36 +5820,13 @@ window._hydrantDataReady = (async function loadHydrantData() {
     // The horizontally scrollable strip of entrance chips for one building group.
     // It lists EVERY entrance the index knows for `g` - including one that was
     // already drawn as a row of its own above. Everything a MOUSE needs to move it
-    // (arrows, wheel, drag) is wired here, on the strip itself.
+    // (wheel, drag) is wired here, on the strip itself.
     function buildEntranceStrip(index, g) {
       const strip = document.createElement('div');
       strip.className = 'asr-ent-strip';
       const entries = (index && Array.isArray(index.entries)) ? index.entries : [];
       const ords = entrancesByGroup(index).get(String(g)) || [];
-      // ---- how far one arrow press moves the strip, and how to move it -------
-      const pageStep = function () { return Math.round((strip.clientWidth || 0) * 0.8); };
-      const scrollByX = function (dx) {
-        if (typeof strip.scrollBy === 'function') strip.scrollBy({ left: dx, behavior: 'smooth' });
-        else strip.scrollLeft = (strip.scrollLeft || 0) + dx;   // headless / no smooth scroll
-      };
       const maxScroll = function () { return (strip.scrollWidth || 0) - (strip.clientWidth || 0); };
-      const makeArrow = function (side, glyph, label) {
-        const b = document.createElement('button');
-        b.setAttribute('type', 'button');
-        b.className = 'asr-ent-arrow asr-ent-arrow-' + side;
-        b.setAttribute('aria-label', label);
-        b.textContent = glyph;
-        return b;
-      };
-      // The arrows are appended around the chips, so DOM order IS visual order:
-      // left first (sticky to the left edge), right last (sticky to the right).
-      // "\u043f\u0440\u0435\u0434\u0438\u0448\u043d\u0438 \u0432\u0445\u043e\u0434\u043e\u0432\u0435" / "\u043e\u0449\u0435 \u0432\u0445\u043e\u0434\u043e\u0432\u0435"
-      const withArrows = ords.length > ENT_STRIP_ARROWS_AFTER;
-      const leftArrow = withArrows ? makeArrow('left', '\u2039',
-        '\u043f\u0440\u0435\u0434\u0438\u0448\u043d\u0438 \u0432\u0445\u043e\u0434\u043e\u0432\u0435') : null;
-      const rightArrow = withArrows ? makeArrow('right', '\u203a',
-        '\u043e\u0449\u0435 \u0432\u0445\u043e\u0434\u043e\u0432\u0435') : null;
-      if (leftArrow) strip.appendChild(leftArrow);
       for (let i = 0; i < ords.length; i++) {
         const e = entries[ords[i]];
         if (!e) continue;
@@ -5885,30 +5836,6 @@ window._hydrantDataReady = (async function loadHydrantData() {
         chip.dataset.ord = String(ords[i]);
         chip.textContent = '\u0432\u0445. ' + e.en;
         strip.appendChild(chip);
-      }
-      if (rightArrow) {
-        strip.appendChild(rightArrow);
-        const updateArrows = function () {
-          const sl = strip.scrollLeft || 0;
-          leftArrow.hidden = (sl <= 0);
-          rightArrow.hidden = (sl + (strip.clientWidth || 0) >= (strip.scrollWidth || 0) - 1);
-        };
-        leftArrow.addEventListener('click', function (ev) {
-          ev.stopPropagation(); scrollByX(-pageStep());
-        });
-        rightArrow.addEventListener('click', function (ev) {
-          ev.stopPropagation(); scrollByX(pageStep());
-        });
-        strip.addEventListener('scroll', updateArrows, { passive: true });
-        // the first state needs a LAID-OUT strip: after insertion, not before
-        if (typeof requestAnimationFrame === 'function') requestAnimationFrame(updateArrows);
-        else updateArrows();
-        // a web font swaps in AFTER that first layout and changes every chip's width,
-        // so the arrows are asked once more when the fonts have settled
-        if (typeof document !== 'undefined' && document.fonts && document.fonts.ready &&
-            typeof document.fonts.ready.then === 'function') {
-          document.fonts.ready.then(updateArrows);
-        }
       }
       // ---- the wheel: a vertical wheel over the strip moves it SIDEWAYS ------
       strip.addEventListener('wheel', function (ev) {
