@@ -137,6 +137,14 @@ NOTE_CALL = u"extractReportNote"
 RETRY_WITHOUT_LABELS = u"postIssue(url, payload, true)"
 RELEASE_FINGERPRINT = u"String(ADDRESS_QUARTERS_SHA256).slice(0, 12)"
 
+# К3 — the two always-on recorders.
+ERROR_LISTENERS = (u"window.addEventListener('error', function (e) {",
+                   u"window.addEventListener('unhandledrejection', function (e) {")
+LAST_ERROR = u"__fvLastError"
+LAST_SEARCH = u"__fvLastSearch"
+WATCHER = u"function watchLastSearch() {"
+SEARCH_IIFE = u"(function initAddressSearch() {"
+
 # What the four halves hunt for: the text of the assertion, never a method name.
 NEEDLE_LABELS = u"етикетите на обратната връзка"
 NEEDLE_MASK = u"маската на заявката"
@@ -531,6 +539,58 @@ class AppFeedbackFormTest(unittest.TestCase):
                              u"%s не е условна за този вид" % what)
             self.assertEqual(text.count(old), 0,
                              u"%s стои и в стария си безусловен вид" % what)
+
+
+# --------------------------------------------------------------------------
+# К3 · the two always-on recorders, pinned in the source
+# --------------------------------------------------------------------------
+
+class RecorderTest(unittest.TestCase):
+
+    def test_the_error_recorder_keeps_one_line_and_no_stack(self):
+        u"""Р3 — message plus file basename and line, the LAST one only."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        self.assertEqual(base.count(LAST_ERROR), 0,
+                         u"мъртъв пин: базата %s вече записва грешки" % BASE)
+        for anchor in ERROR_LISTENERS:
+            self.assertEqual(text.count(anchor), 1,
+                             u"слушателят %r не стои точно веднъж" % anchor[:40])
+            block = lot1.block(self, text, anchor)
+            self.assertEqual(block.count(LAST_ERROR), 1,
+                             u"слушателят не записва в %s" % LAST_ERROR)
+            for forbidden in ("stack", "Stack"):
+                self.assertNotIn(forbidden, block,
+                                 u"записвачът на грешки носи стек — %r" % forbidden)
+
+    def test_the_search_recorder_watches_the_container_from_outside(self):
+        u"""Н5 — the observer hangs on the CONTAINER, never on a function of
+        initAddressSearch (ADR 006 D12)."""
+        text = lot1.index_text(self)
+        base = base_text(self)
+        self.assertEqual(base.count(LAST_SEARCH), 0,
+                         u"мъртъв пин: базата %s вече записва търсения" % BASE)
+        block = lot1.block(self, text, WATCHER)
+        self.assertIn(u"document.getElementById('addrSearchResults')", block,
+                      u"наблюдателят не виси на контейнера на резултатите")
+        self.assertIn(u"new MutationObserver(", block, u"няма наблюдател")
+        for needed in (u"'.asr-item'", u"'.asr-title'", u"rows_shown", u"first_row",
+                       u"selected_row"):
+            self.assertIn(needed, block, u"записвачът на търсенето губи %s" % needed)
+        for forbidden in ("renderResults", "selectResult"):
+            self.assertNotIn(forbidden, block,
+                             u"записвачът пипа %s — функция на initAddressSearch (D12)"
+                             % forbidden)
+        # The block itself has to stand OUTSIDE the IIFE of the address search.
+        watcher = lot1.span(self, text, WATCHER)
+        search = lot1.span(self, text, SEARCH_IIFE)
+        self.assertTrue(watcher[1] < search[0] or watcher[0] > search[1],
+                        u"записвачът е ВЪТРЕ в initAddressSearch (редове %s срещу %s)"
+                        % (watcher, search))
+        self.assertEqual(text.count(u"document.addEventListener('DOMContentLoaded', watchLastSearch);"), 1,
+                         u"записвачът не се закача, ако документът още се чете")
+        self.assertEqual(text.count(u"    watchLastSearch();"), 1,
+                         u"записвачът не се закача, ако документът вече е прочетен")
 
 
 # --------------------------------------------------------------------------

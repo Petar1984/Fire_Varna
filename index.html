@@ -2911,6 +2911,49 @@ window._hydrantDataReady = (async function loadHydrantData() {
     }).join(' · ');
   }
 
+  // ----- The two always-on recorders (лот О) -----
+  // The only part of the lot that costs anything when nobody opens the form.
+  // ONE line and only the LAST one: a stack carries paths and helps nobody who
+  // reads these issues, so it is never kept.
+  window.addEventListener('error', function (e) {
+    const file = String((e && e.filename) || '').split('/').pop();
+    window.__fvLastError = String((e && e.message) || 'error') +
+      (file ? ' @' + file + ':' + ((e && e.lineno) || 0) : '');
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    const reason = e && e.reason;
+    window.__fvLastError = 'promise: ' +
+      String((reason && reason.message) || reason || '').slice(0, 200);
+  });
+  // The dropdown is gone by the time the report form opens, so the last search is
+  // remembered AS IT IS DRAWN. ADR 006 D12 makes every function inside
+  // initAddressSearch untouchable, so the list is watched from OUTSIDE it — the
+  // container is the contract, not the function that fills it (Н5).
+  // Declared gap: a row chosen with Enter is not recorded.
+  function watchLastSearch() {
+    const results = document.getElementById('addrSearchResults');
+    const input = document.getElementById('addrSearchInput');
+    if (!results || !input || typeof MutationObserver === 'undefined') return;
+    const titleOf = (row) => ((row.querySelector('.asr-title') || row).textContent || '').trim();
+    new MutationObserver(function () {
+      const rows = results.querySelectorAll('.asr-item');
+      if (!rows.length) return;
+      window.__fvLastSearch = { query: input.value, rows_shown: rows.length,
+                                first_row: titleOf(rows[0]) };
+    }).observe(results, { childList: true, subtree: true });
+    results.addEventListener('click', function (ev) {
+      const row = (ev.target && ev.target.closest) ? ev.target.closest('.asr-item') : null;
+      if (!row || !window.__fvLastSearch) return;
+      window.__fvLastSearch.selected_row = titleOf(row);
+    });
+  }
+  // Registered whether or not the document has already been parsed.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', watchLastSearch);
+  } else {
+    watchLastSearch();
+  }
+
   // ----- Type picker -----
   // hydrant === null  → global "+" entry, shows all 5 types incl. new_hydrant
   // hydrant === <obj> → per-hydrant 🚨 entry, shows the 4 existing-hydrant types
