@@ -580,7 +580,9 @@ def process(reports, records, provenance, *, timestamp, approver_id):
     for report in reports:
         rtype = report.get("report_type")
         if rtype not in KNOWN_REPORT_TYPES:
-            result_records.append(_skip(report, "parse_error"))
+            # Nothing failed to parse here: the report is simply not about a
+            # hydrant, and the old name sent a moderator hunting for a bad payload.
+            result_records.append(_skip(report, "not_a_hydrant_report"))
             continue
         try:
             res = DISPATCH[rtype](state, report, timestamp, approver_id)

@@ -11,6 +11,7 @@ from __future__ import annotations
 import contextlib
 import copy
 import hashlib
+import importlib.util
 import io
 import json
 import math
@@ -627,6 +628,83 @@ class VerifierNoteTest(unittest.TestCase):
         golden.apply_exists_confirmed(g_state, report, TIMESTAMP, APPROVER)
         self.assertEqual(json.dumps(c_state["records"], ensure_ascii=False, sort_keys=True),
                          json.dumps(g_state["records"], ensure_ascii=False, sort_keys=True))
+
+
+# --------------------------------------------------------------------------
+# F-7 — an unknown report type is not a parse error
+# --------------------------------------------------------------------------
+
+# The module under test is loaded from a PATH, not imported by name, so the
+# negative half of плана §2 К3 can run the assertions below against
+# tests/golden_apply_v0.py — the frozen pre-refactor copy that still calls this
+# skip "parse_error" (:362-363) — and be seen to fail.
+INGEST_MODULE = (os.environ.get("FIRE_VARNA_INGEST_MODULE")
+                 or os.path.join(REPO, "scripts", "lib", "hydrant_core.py"))
+
+
+def load_ingest_module():
+    spec = importlib.util.spec_from_file_location("ingest_under_test", INGEST_MODULE)
+    module = importlib.util.module_from_spec(spec)
+    # @dataclass resolves its own class through sys.modules[cls.__module__], so a
+    # module executed before it is registered there dies on hydrant_core's
+    # SpatialMatch. Register first, execute second.
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+class UnknownReportTypeIsNotAParseError(unittest.TestCase):
+    """A report whose report_type is outside KNOWN_REPORT_TYPES (:26-28) is
+    skipped — rightly — but the reason a moderator reads must name the real
+    cause. "parse_error" sends him hunting for a broken report that does not
+    exist; the payload simply is not about a hydrant. The guard's BEHAVIOUR may
+    not move a byte, so the two tests pin both halves: the honest name, and the
+    data and the run summary staying exactly where they were.
+
+    The coordinates below are deliberately fake (1.0 / 2.0) — плана §0.6."""
+
+    RECORDS = [{"id": "coord_1.00000_2.00000", "coords": [1.0, 2.0],
+                "origin": "vik", "legacy_ids": []}]
+    REPORT = {"issue_number": 900, "report_type": "app_feedback",
+              "comment": "приложението се върти трудно с ръкавици"}
+
+    def setUp(self):
+        self.module = load_ingest_module()
+        self.records = copy.deepcopy(self.RECORDS)
+        self.provenance = {r["id"]: {"source_refs": []} for r in self.records}
+        self.records_before = json.dumps(self.records, ensure_ascii=False, sort_keys=True)
+        self.provenance_before = json.dumps(self.provenance, ensure_ascii=False,
+                                            sort_keys=True)
+        self.state, self.results = self.module.process(
+            [copy.deepcopy(self.REPORT)], self.records, self.provenance,
+            timestamp=TIMESTAMP, approver_id=APPROVER)
+
+    def test_skip_reason_names_the_real_cause_and_no_data_moves(self):
+        self.assertEqual(1, len(self.results))
+        result = self.results[0]
+        self.assertEqual("skipped", result["action"])
+        self.assertEqual(
+            "not_a_hydrant_report", result["skip_reason"],
+            "%s calls an unknown report_type a parse error; nothing failed to "
+            "parse" % INGEST_MODULE)
+        self.assertEqual(
+            self.records_before,
+            json.dumps(self.state["records"], ensure_ascii=False, sort_keys=True),
+            "the skip moved a record")
+        self.assertEqual(
+            self.provenance_before,
+            json.dumps(self.state["provenance"], ensure_ascii=False, sort_keys=True),
+            "the skip moved the provenance")
+
+    def test_the_run_summary_counts_the_foreign_type(self):
+        summary = self.module.build_report(
+            [copy.deepcopy(self.REPORT)], self.results, approver_id=APPROVER,
+            timestamp=TIMESTAMP, input_count=len(self.RECORDS),
+            output_count=len(self.state["records"]))["summary"]
+        self.assertEqual(summary["input_count"], summary["output_count"],
+                         "a skipped report may not change the record count")
+        self.assertEqual({"app_feedback": 1}, summary["by_report_type"])
+        self.assertEqual({"not_a_hydrant_report": 1}, summary["skipped_reasons"])
 
 
 if __name__ == "__main__":
