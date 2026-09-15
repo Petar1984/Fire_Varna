@@ -3,7 +3,7 @@
 
 Usage: python gates/probe/b3_g11.py <parent> [--cached]
 
-The body below is the script of амандамент №1 S29-4 with TWO declared extensions:
+The body below is the script of амандамент №1 S29-4 with THREE declared extensions:
 
 1. `--cached` (амандамент №2 А2-4) makes `changed()` diff <parent> against the INDEX
    (`git diff --cached --name-status -z --find-renames --diff-filter=AMR <parent>`)
@@ -28,6 +28,20 @@ The body below is the script of амандамент №1 S29-4 with TWO declare
      first and the pathspec is anchored with `:(top)`; an EMPTY inventory is an
      infrastructure failure → message · exit 2, never a silently smaller scope.
 
+3. D-25 (лот 6 „Проблемите“) — `named_ring()`, a SECOND judge beside `walk()`:
+   a list of `RING_MIN` or more dicts whose keys are a subset of the lat/lon
+   vocabulary is geometry too. Measured at 37db9ca (план §1 редове 10-12): the
+   rule the backlog calls "a list of >= 4 numbers" was never delivered — it stands
+   in `docs/plans/ПЛАН_Картата_imot_08.09.md:122,:130,:273` and nowhere in the
+   code, so `walk()` judged by three key NAMES alone and a polygon serialised as
+   `[{"lat": …, "lon": …}, …]` under a harmless key walked straight through.
+   The rule judges the SHAPE of the list and not the NAME of the key on purpose:
+   `data/places.json`, `data/hotels.json` and `data/removed_hydrants.json` carry
+   `lat`/`lon` lawfully, so widening `GEO` would make the gate red over the live
+   tree, and a row with a `name` key is not a vertex. The BARE numeric ring stays
+   out — it fires on `data/address_rows.json` and `data/approx_addresses_v1.json`,
+   i.e. red by construction; that is its own backlog row (D-25b).
+
 `GEO`, `LEGACY`, `ALLOWED_NEW`, `walk` and the printed JSON keep the signed shape byte
 for byte; in `changed` the PARSE is kept verbatim and only its pipe to git goes through
 the checked `git()` helper (S30-2). `pathlib` is gone because nothing reads the working
@@ -35,6 +49,10 @@ tree any more.
 """
 import json, os, subprocess, sys
 GEO = {"coordinates", "geometry", "geometries"}
+# D-25: the vocabulary of a NAMED point and how many of them make a ring.
+RING_MIN = 4
+LAT_NAMES = {"lat", "latitude", "y"}
+LON_NAMES = {"lon", "lng", "longitude", "x"}
 # ТОЧНИТЕ наследени изключения: (път, JSON-указател, тип на стойността).
 LEGACY = {("scratch/places_search/granitsi_fixtures_07.09.json", "/_meta/geometry", str)}
 ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
@@ -96,11 +114,13 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "tests/test_address_entrances_under_building.py",
                "docs/plans/ПЛАН_Проблемите_лот5_входовете_14.09.md",
                "docs/decisions/012_entrances_under_the_building.md",
-               # Лот 6 „Проблемите“ (петте дребни реда на беклога): планът (К1) и
-               # гейтът на чистия импорт на машината за места (К2). Двата се раждат
-               # СЛЕД базата на лота 37db9ca; лотът няма амандамент.
+               # Лот 6 „Проблемите“ (петте дребни реда на беклога): планът (К1),
+               # гейтът на чистия импорт на машината за места (К2) и гейтът на
+               # именувания пръстен (К6). И трите се раждат СЛЕД базата на лота
+               # 37db9ca; лотът няма амандамент.
                "docs/plans/ПЛАН_Проблемите_лот6_дребните_15.09.md",
                "tests/test_recall_sweep_import_clean.py",
+               "tests/test_b3_g11_named_ring.py",
                # чужд: модерация #38, 20c1efe
                "scratch/apply_c38.py",
                # запис на Архитекта: Кими К45 (О46), Кими К46 (О52)
@@ -129,6 +149,18 @@ def walk(o, path, hits):
             walk(v, path + "/" + k, hits)
     elif isinstance(o, list):
         for i, v in enumerate(o): walk(v, path + "[%d]" % i, hits)
+def named_point(v):
+    """D-25: a dict that is a vertex and NOTHING else — subset of the vocabulary."""
+    if not isinstance(v, dict): return False
+    keys = set(v)
+    return keys <= LAT_NAMES | LON_NAMES and bool(keys & LAT_NAMES) and bool(keys & LON_NAMES)
+def named_ring(o, path, hits):
+    """D-25: a list of >= RING_MIN named points is geometry, whatever it is called."""
+    if isinstance(o, dict):
+        for k, v in o.items(): named_ring(v, path + "/" + k, hits)
+    elif isinstance(o, list):
+        if len(o) >= RING_MIN and all(named_point(v) for v in o): hits.append((path, type(o)))
+        for i, v in enumerate(o): named_ring(v, path + "[%d]" % i, hits)
 def changed(parent, cached=False):
     cmd = ["diff", "--name-status", "-z", "--find-renames",
            "--diff-filter=AMR", parent, "HEAD"]
@@ -172,7 +204,7 @@ def main(parent, cached=False):
         if raw is None: unread.append((f, err)); continue
         try: doc = json.loads(raw.decode("utf-8"))
         except (ValueError, UnicodeDecodeError) as exc: unread.append((f, str(exc))); continue
-        hits = []; walk(doc, "", hits)
+        hits = []; walk(doc, "", hits); named_ring(doc, "", hits)
         bad += [(f, ptr, typ.__name__) for ptr, typ in hits
                 if (f, ptr, typ) not in LEGACY]
     stray = sorted(set(new) - ALLOWED_NEW)
