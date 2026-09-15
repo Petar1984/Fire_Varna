@@ -161,6 +161,15 @@ def named_ring(o, path, hits):
     elif isinstance(o, list):
         if len(o) >= RING_MIN and all(named_point(v) for v in o): hits.append((path, type(o)))
         for i, v in enumerate(o): named_ring(v, path + "[%d]" % i, hits)
+def judged_hits(doc):
+    """The ONE path main() judges a document by, so a test can pin it.
+
+    Both judges run over the same document and the duplicates are dropped IN
+    ORDER, which is a property of the GATE and not of the caller: a test that
+    de-duplicated the hits itself would pin the standard library instead.
+    """
+    hits = []; walk(doc, "", hits); named_ring(doc, "", hits)
+    return list(dict.fromkeys(hits))          # a ring under a GEO key: both judges see it
 def changed(parent, cached=False):
     cmd = ["diff", "--name-status", "-z", "--find-renames",
            "--diff-filter=AMR", parent, "HEAD"]
@@ -204,8 +213,7 @@ def main(parent, cached=False):
         if raw is None: unread.append((f, err)); continue
         try: doc = json.loads(raw.decode("utf-8"))
         except (ValueError, UnicodeDecodeError) as exc: unread.append((f, str(exc))); continue
-        hits = []; walk(doc, "", hits); named_ring(doc, "", hits)
-        hits = list(dict.fromkeys(hits))      # a ring under a GEO key: both judges see it
+        hits = judged_hits(doc)
         bad += [(f, ptr, typ.__name__) for ptr, typ in hits
                 if (f, ptr, typ) not in LEGACY]
     stray = sorted(set(new) - ALLOWED_NEW)

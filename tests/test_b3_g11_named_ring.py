@@ -21,8 +21,10 @@ What the four tests pin, and why each one is needed:
      the test that would go red if somebody widened the rule to the key names;
   4. the extension is ADDITIVE — `walk()` and `GEO` still flag what they flagged,
      `named_ring()` adds nothing of its own to that verdict, and a ring that sits
-     UNDER a GEO key, which both judges see, is reported ONCE: `main()` drops the
-     duplicate hits in order and this test pins the single hit.
+     UNDER a GEO key, which both judges see, is reported ONCE. That last half
+     runs `judged_hits()`, the gate's own path: the de-duplication belongs to the
+     gate, and a test that dropped the duplicate itself would pin the standard
+     library instead.
 
 `FIRE_VARNA_B3_G11_PATH` points the assertions at another copy of the gate and
 defaults to the tree's file; the negative half of плана §2 К6 runs them against a
@@ -84,6 +86,8 @@ class NamedRingIsGeometry(unittest.TestCase):
             % (hits,))
 
     def test_the_extension_is_additive(self):
+        """The last half goes through `judged_hits()`, the gate's own path: the
+        de-duplication is pinned where it lives, not in this file."""
         doc = {"_meta": {"geometry": "заявена форма"}}
         walk_hits = []
         self.gate.walk(doc, "", walk_hits)
@@ -93,16 +97,15 @@ class NamedRingIsGeometry(unittest.TestCase):
         self.gate.named_ring(doc, "", ring_hits)
         self.assertEqual([], ring_hits,
                          "named_ring invented a hit of its own: %r" % (ring_hits,))
-        # A ring UNDER a GEO key is the one shape both judges flag; main() keeps
-        # the first of the duplicates, so the reader is sent there exactly once.
+        # A ring UNDER a GEO key is the one shape both judges flag; the path
+        # main() judges by keeps the first of the duplicates, so the reader is
+        # sent there exactly once.
         under_geo = {"geometry": [fake_vertex(i) for i in range(4)]}
-        both = []
-        self.gate.walk(under_geo, "", both)
-        self.gate.named_ring(under_geo, "", both)
+        judged = self.gate.judged_hits(under_geo)
         self.assertEqual(
-            [("/geometry", list)], list(dict.fromkeys(both)),
+            [("/geometry", list)], judged,
             "a ring under a GEO key must be reported once, not twice: %r"
-            % (both,))
+            % (judged,))
 
 
 if __name__ == "__main__":

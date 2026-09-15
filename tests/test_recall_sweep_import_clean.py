@@ -15,13 +15,21 @@ things: exit 0, an `IMPORTED` sentinel on stdout, a `STDERR_ALIVE` sentinel the
 child writes to stderr as its LAST action, and not one stderr line carrying the
 category form Python prints for an unclosed file, `: ResourceWarning: unclosed
 file`. Neither sentinel is decoration: a child that died early prints no warning
-either, and a module that replaces `sys.stderr` at import time hands the gate an
-empty stream, so without them a crash or a swallowed stream would pass for a
-clean import. The needle is that category form and not the bare word, because
-under `-X dev` every warning prints a second line — the "Enable tracemalloc"
-hint, which names the class too, so three handles were counted as six — and
-because a foreign warning whose TEXT merely mentions ResourceWarning is not a
-leaked file.
+either, so without `IMPORTED` a crash would pass for a clean import.
+
+What `STDERR_ALIVE` proves, and no more: at the END of the import the stream
+this gate reads is the real one, i.e. the module did not replace `sys.stderr`
+PERMANENTLY at import time and hand the gate an empty stream. It says nothing
+about a redirection that was put in place and taken back DURING the import — a
+warning printed into such a detour would be lost and this gate would not know.
+
+The needle is that category form and not the bare word, because under `-X dev`
+every warning prints a second line — the "Enable tracemalloc" hint, which names
+the class too, so three handles were counted as six — and because a foreign
+warning whose TEXT merely mentions ResourceWarning is not a leaked file. The
+form is the unclosed-FILE one on purpose: this gate is about the three payloads
+the engine reads at import. Other leaked resources — a socket, a subprocess —
+print their own category and are not its subject.
 
 `FIRE_VARNA_RECALL_SWEEP_PATH` points these assertions at another copy of the
 engine and defaults to the tree's file. It exists for one reason: the negative
