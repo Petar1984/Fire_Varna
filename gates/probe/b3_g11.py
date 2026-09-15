@@ -96,6 +96,11 @@ ALLOWED_NEW = {"tests/granitsi_client_probe.mjs",
                "tests/test_address_entrances_under_building.py",
                "docs/plans/ПЛАН_Проблемите_лот5_входовете_14.09.md",
                "docs/decisions/012_entrances_under_the_building.md",
+               # Лот 6 „Проблемите“ (петте дребни реда на беклога): планът (К1) и
+               # гейтът на чистия импорт на машината за места (К2). Двата се раждат
+               # СЛЕД базата на лота 37db9ca; лотът няма амандамент.
+               "docs/plans/ПЛАН_Проблемите_лот6_дребните_15.09.md",
+               "tests/test_recall_sweep_import_clean.py",
                # чужд: модерация #38, 20c1efe
                "scratch/apply_c38.py",
                # запис на Архитекта: Кими К45 (О46), Кими К46 (О52)

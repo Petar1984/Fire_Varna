@@ -255,9 +255,14 @@ def key_of(s):
 
 
 # ------------------------------------------------------------------ T2 / K2
-cats = json.load(open(CATS, encoding="utf-8"))
-hotels = json.load(open(HOTELS, encoding="utf-8"))["hotels"]
-places2 = json.load(open(PLACES2, encoding="utf-8"))["places"]
+# WHY `with`: a test suite IMPORTS this engine (the places gate, the granitsi
+# fixtures, gates.release), so a handle leaked here warns on every suite run.
+with open(CATS, encoding="utf-8") as handle:
+    cats = json.load(handle)
+with open(HOTELS, encoding="utf-8") as handle:
+    hotels = json.load(handle)["hotels"]
+with open(PLACES2, encoding="utf-8") as handle:
+    places2 = json.load(handle)["places"]
 
 # --- A2: chip -> head  (place_categories.json chips[] carries "head")
 CHIP_HEAD = {}
