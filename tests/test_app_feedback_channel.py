@@ -55,6 +55,14 @@ first; ONE function reads a 422 for both the live submit and the queue, so only 
 LABEL error parks a feedback report; and the error line loses a query string only
 where a query string can live, on a URL-like token, never at a bare „?“.
 
+К7 (the final audit) takes two edges off the mask itself. An ASCII quote is not a
+seconds mark: 16 of the 150 place names — a number and a patron in quotes — came back
+as the marker and the context box hid the very row the colleague meant, so a real
+degree or prime sign, or a hemisphere letter right after the quote, is what makes a
+coordinate. And a map link is a position whether or not it carries a digit — the OSM
+short link carries none and used to travel verbatim — so every http(s) token is
+`[линк]`.
+
 No coordinate stands in this file in any shape: every coordinate-looking string the
 mask is measured against is built out of repeated digits.
 """
@@ -78,7 +86,7 @@ import test_report_form_operational as lot1   # noqa: E402 - the path has to com
 BASE_LITERAL = "758f35e"
 BASE = os.environ.get("FIRE_VARNA_LOTO_BASE") or BASE_LITERAL
 
-# The doctored copies of the four halves live here - never in the tree (план §0.6).
+# The doctored copies of the eight halves live here - never in the tree (план §0.6).
 FIXTURES = pathlib.Path(tempfile.gettempdir()) / "fv_lotO"
 
 MODULE = "tests.test_app_feedback_channel"
@@ -236,6 +244,8 @@ NEEDLE_DASHBOARD = u"дневникът брои"
 NEEDLE_BARE = u"правилото за четири голи числа"
 NEEDLE_EVERY_ROW = u"ключалката гледа само първия ред"
 NEEDLE_ONE_READING = u"четенето на 422"
+NEEDLE_QUOTE = u"кавичката на името"
+NEEDLE_LINK = u"линкът в заявката"
 
 
 # --------------------------------------------------------------------------
@@ -330,7 +340,6 @@ COORD_SHAPE_QUERIES = (
     A + u"," + A + u" " + B + u"," + B,                    # the Bulgarian comma pair
     A + u"°12'50.8\"N " + B + u"°54'52.9\"E",   # degrees-minutes-seconds
     u"geo:" + A + u"." + A + u"," + B + u"." + B,          # the geo: URI of a phone
-    u"https://maps.google.com/?q=" + A + u"." + A + u"," + B + u"." + B,
     GPS_ROW_TITLE,                                         # what the GPS row SHOWS
 )
 PLAIN_QUERIES = (PLAIN_QUERY, u"бл 5 аспарухово", u"ул. Струга 12")
@@ -344,8 +353,40 @@ BARE_NUMBER_QUERIES = (
 )
 # What a colleague really types: three numbers, and four whole ones.
 ADDRESS_QUERIES = (u"ул. Струга 12 вх. 2 ет. 3", u"бл 5 вх 2 ап 12 ет 4")
+# К7 (а) — a number and a patron in quotes is a NAME. Both shapes stand in the
+# delivered payload; the mask used to read the quote after them as a seconds mark.
+QUOTED_NAME_QUERIES = (u'ОУ 5 "Проф. Марин Дринов"', u"ДГ 12 'Слънце'")
+# ... while degrees-minutes(-seconds) written WITHOUT a degree sign stays a
+# coordinate: the quote counts when a hemisphere letter stands right after it.
+QUOTE_DMS_QUERIES = (
+    A + u" 12'50.8\"N " + B + u" 54'52.9\"E",    # the seconds mark, no degree sign
+    A + u" 12'N " + B + u" 54'E",                # four whole numbers - the letters name them
+)
+# К7 (б) — every http(s) token, with or without a digit in it.
+LINK_MARK = u"[линк]"
+MAP_LINK = u"https://maps.google.com/?q=" + A + u"." + A + u"," + B + u"." + B
+LINK_QUERIES = (u"https://osm.org/go/xcXbHf", MAP_LINK)
+LINK_IN_TEXT = (u"виж " + MAP_LINK + u" тук", u"виж " + LINK_MARK + u" тук")
+# The two delivered payloads whose names the mask meets in the search box.
+PAYLOAD_FILES = ((u"data/places.json", u"places"), (u"data/hotels.json", u"hotels"))
 # A value that carries two decimal numbers is a position whatever its key is.
 COORD_VALUE_RE = r"\d[.,]\d[\s\S]*?\d[.,]\d"
+
+
+def payload_names(test):
+    u"""Every `name` the two delivered payloads carry (375 today). Read inside a
+    method, from the repository's own files - a missing one is a failure."""
+    names = []
+    for relative, key in PAYLOAD_FILES:
+        path = REPO / relative
+        if not path.is_file():
+            test.fail(u"липсва %s — пробата на имената няма върху какво да тича" % relative)
+        rows = json.loads(path.read_text(encoding="utf-8")).get(key) or []
+        names += [row.get("name") or u"" for row in rows if isinstance(row, dict)]
+    names = [name for name in names if name]
+    if len(names) < 300:
+        test.fail(u"пробата на имената е празна: %d имена" % len(names))
+    return names
 
 
 def env_fixture(query=PLAIN_QUERY, **over):
@@ -702,9 +743,10 @@ class AppFeedbackFormTest(unittest.TestCase):
     def test_every_shape_the_parser_accepts_is_masked(self):
         u"""К5 (а) — Б2 на одита: the mask was measured against ONE six-decimal
         pair while `parseCoordQuery` accepts a pair with a single decimal, the
-        Bulgarian comma pair, degrees-minutes-seconds, a `geo:` URI and a map
-        link. Each of them, and the title the GPS row shows, is the whole query
-        now; a normal address goes through untouched."""
+        Bulgarian comma pair, degrees-minutes-seconds and a `geo:` URI. Each of
+        them, and the title the GPS row shows, is the whole query now; a normal
+        address goes through untouched. The map link left this list in К7: it is
+        marked as a LINK now, with or without a digit (the pin below)."""
         text = lot1.index_text(self)
         asks = [call("maskFeedbackQuery", [q])
                 for q in COORD_SHAPE_QUERIES + PLAIN_QUERIES]
@@ -735,6 +777,55 @@ class AppFeedbackFormTest(unittest.TestCase):
         for q, got in zip(ADDRESS_QUERIES, answers[len(BARE_NUMBER_QUERIES):]):
             self.assertEqual(got, q,
                              u"%s изяде адрес %r: %r" % (NEEDLE_BARE, q, got))
+
+    def test_a_name_in_quotes_is_not_a_coordinate(self):
+        u"""К7 (а) — дефект 2 на финалния одит: the degrees shape read the ASCII
+        quote as a seconds mark, so 16 of the 150 place names came back as the
+        marker and the context box hid the very row the colleague meant. A real
+        degree or prime sign, or a hemisphere letter right after the quote, is
+        what makes a coordinate now: the two names stay as they were typed,
+        degrees-minutes(-seconds) written without a degree sign stays masked, and
+        not one name of the two delivered payloads is touched."""
+        text = lot1.index_text(self)
+        names = payload_names(self)
+        kept, dms = len(QUOTED_NAME_QUERIES), len(QUOTE_DMS_QUERIES)
+        asks = [call("maskFeedbackQuery", [q])
+                for q in QUOTED_NAME_QUERIES + QUOTE_DMS_QUERIES + tuple(names)]
+        answers = ask(self, text, asks)
+        for q, got in zip(QUOTED_NAME_QUERIES, answers[:kept]):
+            self.assertEqual(got, q,
+                             u"%s изяде име в кавички %r: %r" % (NEEDLE_QUOTE, q, got))
+        for q, got in zip(QUOTE_DMS_QUERIES, answers[kept:kept + dms]):
+            self.assertEqual(got, COORD_MARK,
+                             u"%s пропуска %r: %r" % (NEEDLE_QUOTE, q, got))
+        eaten = [name for name, got in zip(names, answers[kept + dms:]) if got != name]
+        self.assertEqual(eaten, [],
+                         u"%s: %d от %d доставени имена са маскирани — %s"
+                         % (NEEDLE_QUOTE, len(eaten), len(names), u"; ".join(eaten[:5])))
+
+    def test_a_map_link_is_marked_whatever_it_carries(self):
+        u"""К7 (б) — дефект 3 на финалния одит: the shape hunted for a DIGIT
+        inside the link, so an OSM short link — which carries none — went into
+        the record of a search that drew no GPS row, verbatim. A link is a
+        position whatever it is written with: every http(s) token is the link
+        marker now, with its query string and its fragment, wherever it stands in
+        the query; a query without a link is not touched."""
+        text = lot1.index_text(self)
+        asks = [call("maskFeedbackQuery", [q])
+                for q in LINK_QUERIES + (LINK_IN_TEXT[0],) + PLAIN_QUERIES]
+        answers = ask(self, text, asks)
+        for q, got in zip(LINK_QUERIES, answers):
+            self.assertEqual(got, LINK_MARK,
+                             u"%s пропуска %r: %r" % (NEEDLE_LINK, q, got))
+        in_text = answers[len(LINK_QUERIES)]
+        self.assertEqual(in_text, LINK_IN_TEXT[1],
+                         u"%s не маркира линка в изречение: %r" % (NEEDLE_LINK, in_text))
+        for got in answers[:len(LINK_QUERIES) + 1]:
+            self.assertIsNone(re.search(r"\d", got),
+                              u"%s оставя цифра от линка: %r" % (NEEDLE_LINK, got))
+        for q, got in zip(PLAIN_QUERIES, answers[len(LINK_QUERIES) + 1:]):
+            self.assertEqual(got, q,
+                             u"%s изяде заявка без линк %r: %r" % (NEEDLE_LINK, q, got))
 
     def test_one_reading_of_the_422_serves_both_paths(self):
         u"""К6 (в) — дефект 1 на повторния одит: the queue kept an `app_feedback`
@@ -1055,6 +1146,8 @@ class RecorderTest(unittest.TestCase):
                          u"мъртъв пин: базата %s вече строи %s" % (BASE, NEEDLE_ERRLINE))
         # К6 (г) — the query string is cut where a query string can live: on the
         # URL in the message and on the file, never at a bare „?“ of a sentence.
+        # К7 (б) — and the mask the line goes through marks the URL itself, so
+        # what reaches the issue is the marker, never the address of the script.
         asks = [call("feedbackErrorLine", [u"първи ред\nвтори ред\nтрети", u"index.html", 12]),
                 call("feedbackErrorLine", [u"boom https://example.org/a.js?token=CANARY",
                                            u"https://example.org/app.js?token=CANARY", 7]),
@@ -1065,7 +1158,7 @@ class RecorderTest(unittest.TestCase):
                          u"%s носи повече от първия ред: %r" % (NEEDLE_ERRLINE, one))
         self.assertNotIn(u"CANARY", token,
                          u"%s носи query string: %r" % (NEEDLE_ERRLINE, token))
-        self.assertEqual(token, u"boom https://example.org/a.js @app.js:7",
+        self.assertEqual(token, u"boom " + LINK_MARK + u" @app.js:7",
                          u"%s: %r" % (NEEDLE_ERRLINE, token))
         self.assertEqual(coord, COORD_MARK + u" @index.html:3",
                          u"%s носи координата: %r" % (NEEDLE_ERRLINE, coord))

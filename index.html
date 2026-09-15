@@ -2802,27 +2802,38 @@ window._hydrantDataReady = (async function loadHydrantData() {
   // The search query is the only free text the app collects by itself, and a
   // colleague can paste a coordinate into the search box.
   const COORD_MARK = '[координати]';
-  // К5 (а) + К6 (а) — the mask has to accept everything `parseCoordQuery`
+  // К5 (а) + К6 (а) + К7 (а) — the mask has to accept everything `parseCoordQuery`
   // accepts, or it is weaker than the parser that drew the GPS row (Gate 2, Б2
-  // and Б-1). It covers TWO families and nothing is left over: the SHAPES below
-  // — a pair with a single decimal, the Bulgarian comma pair,
-  // degrees-minutes-seconds, a geo: URI, a map link — and the BARE numbers the
-  // parser takes just as happily, four or six of them (degrees-minutes with or
-  // without seconds, written without a single symbol), which the count after the
-  // shapes catches with or without words standing beside them. Such a text IS a
-  // position, so the WHOLE query becomes the marker; a lone high-precision
-  // number keeps the narrower, in-place rule, which leaves an address carrying a
-  // dotted number readable.
+  // and Б-1). It covers TWO families: the SHAPES below — a pair with a single
+  // decimal, the Bulgarian comma pair, degrees-minutes-seconds — and the BARE
+  // numbers the parser takes just as happily, four or six of them
+  // (degrees-minutes with or without seconds, written without a single symbol),
+  // which the count after the shapes catches with or without words standing
+  // beside them. Such a text IS a position, so the WHOLE query becomes the
+  // marker; a lone high-precision number keeps the narrower, in-place rule,
+  // which leaves an address carrying a dotted number readable.
+  // What is left over is bounded and known (финален одит, дефекти 1 и 2): a pair
+  // with at most two fraction digits behind an unusual separator (`11.11/22.22`,
+  // `|`, `_`), and degrees with minutes written with plain quotes and no letter
+  // — about a kilometre at worst. Both are shapes `parseCoordQuery` reads, so on
+  // the live path the query draws a GPS row and the lock in `watchLastSearch`
+  // marks it; what the parser refuses never reached a dispatcher either.
   const COORD_SHAPES = [
     /[-+]?\d{1,3}[.,]\d+\s*[,;]?\s*[-+]?\d{1,3}[.,]\d+/,   // 11.11, 22.22 · 11,11 22,22
-    /\d\s*[°º'′"″]/,                                        // degrees-minutes-seconds
+    /\d\s*[°º′″]/,                                          // a real degree or prime sign
+    /\d\s*['"][NSEWnsewСЮИЗсюиз](?![\wА-Яа-я])/,             // …'50.8"N — the quote counts only before a hemisphere letter
     /\d\s*[NSEWnsew](?![\wА-Яа-я])/,                        // hemisphere letters
-    /^\s*geo:/i,                                            // the geo: URI a phone hands over
-    /https?:\/\/\S*\d/i                                     // a map link with numbers in it
+    /^\s*geo:/i                                             // the geo: URI a phone hands over
   ];
   function maskFeedbackQuery(q) {
-    const s = String(q == null ? '' : q).trim();
-    if (!s) return '';
+    const raw = String(q == null ? '' : q).trim();
+    if (!raw) return '';
+    // К7 (б) — a map link is a position whether or not it carries a digit: the
+    // OSM short link has none, so the shape that hunted for one let it through
+    // verbatim into the empty-search record (финален одит, дефект 3). Every
+    // http(s) token goes first and whole — with its query string and fragment —
+    // so what the shapes below weigh is the text written around it.
+    const s = raw.replace(/https?:\/\/\S+/gi, '[линк]');
     for (let i = 0; i < COORD_SHAPES.length; i++) {
       if (COORD_SHAPES[i].test(s)) return COORD_MARK;
     }
