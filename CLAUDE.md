@@ -104,11 +104,14 @@ See [AGENTS.md § Report Flow](AGENTS.md#report-flow) and [docs/activeContext.md
 
 ## Verification
 
-No CI yet, but tests exist (`tests/`, Python `unittest`). When ingest or shared-core (`scripts/lib/hydrant_core.py`) behavior is relevant, run the suite:
+No CI yet, but tests exist (`tests/`, Python `unittest`) and the release gates do (`gates/`). Petar's pre-push hook (`scripts/hooks/pre-push`, installed by hand into `.git/hooks/`) runs both, so run both before reporting done — a red gate blocks his push:
 
 ```powershell
 python -m unittest discover -s tests
+python -m gates.run_gates
 ```
+
+The address probes (`tests/address_slice_probe.mjs`) need `node`; Windows is the reference environment — on a Linux pipe two probe-backed tests go red for an unrelated reason (see `docs/activeContext.md` § The red tests).
 
 For frontend / deployable changes, before reporting done:
 

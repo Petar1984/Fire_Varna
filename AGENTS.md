@@ -10,7 +10,7 @@
 
 ## What This Project Is
 
-Mobile-first **PWA for Varna fire department and a volunteer rescue squad** - locates the nearest fire hydrant via GPS.
+Mobile-first **web app for Varna fire department and a volunteer rescue squad** - locates the nearest fire hydrant via GPS. „PWA“ only in the add-to-home-screen sense: there is no web manifest (§ Known Tech Debt 6).
 
 <!-- сверка 01.09.2026: спорно, виж C:\git\plan.md приложение Е ред 13 -->
 
@@ -126,6 +126,8 @@ Reports are submitted via `fetch` POST to Cloudflare Worker `varna-hydrants-prox
 
 Worker source now lives in the `worker/` directory in this repo (extracted in `914dc2a`); see `worker/README.md` for deploy notes. The Cloudflare deployment remains manual; the Worker deploy version is repo-declared as `5accc88e`.
 
+Since 2026-09-15 (лот О) the same `POST /` also carries **app feedback** — the sixth entry of the „+“ menu (`report_type: app_feedback`). It becomes an issue labelled `app-feedback` + `fb-<kind>` + `pending-review`, never `report`; `GET /issues` filters `labels=report`, the ingest skips the kind, `applyReports` runs only the five hydrant kinds, and the reports dashboard counts only them — so feedback never reaches the map. Contract: `docs/audits/амандамент_подаване_15.09.md`.
+
 ---
 
 ## Hard Constraints
@@ -151,10 +153,10 @@ All planning, execution, and audit run in **Claude Code** (Planner read-only / E
 
 | Role | Agent | What it can do | What it cannot do |
 |---|---|---|---|
-| **Planner** | Claude Code (Opus, read-only) | Read the repo, measure, draft plans, architect, audit | Edit tracked files, commit, push |
-| **Researcher** | Claude Code (Opus, read-only) | Planner sub-phase: gather evidence and measurements | Edit files, decide architecture |
-| **Executor** | Claude Code (Opus) | Implement the Petar-signed plan, edit files, create local commits | Architect, expand scope, push |
-| **Auditor** | Claude Code (Opus, read-only, adversarial) | Independently verify the Executor's diff against the plan | Edit files, push |
+| **Planner** | Claude Code (read-only; model per `~/.claude/agents`) | Read the repo, measure, draft plans, architect, audit | Edit tracked files, commit, push |
+| **Researcher** | Claude Code (read-only; model per `~/.claude/agents`) | Planner sub-phase: gather evidence and measurements | Edit files, decide architecture |
+| **Executor** | Claude Code (model per `~/.claude/agents`) | Implement the Petar-signed plan, edit files, create local commits | Architect, expand scope, push |
+| **Auditor** | Claude Code (read-only, adversarial; model per `~/.claude/agents`) | Independently verify the Executor's diff against the plan | Edit files, push |
 | **Orchestrator** | Petar | Sign plans (Gate 1), review diffs (Gate 2), push to remote | — |
 
 **Petar = orchestrator and sole push authority.** All architectural and data decisions go through him. Chain: `Planner → GATE 1 (Petar signs) → Executor (local commit) → Auditor → GATE 2 (Petar reviews diff) → Petar pushes`.
@@ -256,25 +258,35 @@ Working directory: `C:\git\Fire_Varna`. Tracked top-level entries, as `git ls-fi
 ```text
 C:\git\Fire_Varna\
 ├── index.html                     <- current app shell
-├── data/                          <- runtime hydrant data (hydrants.json — record count in
-│                                     docs/activeContext.md; hydrants_provenance.json;
-│                                     search_index.json + address_rows.json, built in Varna_buildings)
+├── data/                          <- runtime data: hydrants.json (record count in docs/activeContext.md)
+│                                     + hydrants_provenance.json; places.json / hotels.json /
+│                                     place_categories.json (the places search, delivered from varna_3d);
+│                                     search_index.json + address_rows.json + address_quarters.json
+│                                     (the address search, built in Varna_buildings; lazy);
+│                                     basemaps/ (the PMTiles release, off by default); signed_facts.json,
+│                                     removed_hydrants.json, approx_addresses_v1.json, generation_manifest.json
+├── gates/                         <- release gates: run_gates.py (one exit code for all), release.py,
+│                                     sign.py, coverage.py, probe/ (per-lot probes), baseline/, allow/
 ├── scripts/                       <- ingest / migration / backfill tooling
-│   ├── apply_approved_reports.py
+│   ├── apply_approved_reports.py / build_reports_dashboard.py
 │   ├── migrate_to_verbose_schema.py
 │   ├── backfill_addresses_20260511.py / backfill_verified_type_20260509.py
 │   ├── import_etr_kmz.py          <- ЕТР KMZ register adapter
 │   ├── copy_basemap_release.py / vendor_basemap_deps.mjs
+│   ├── hooks/pre-push             <- tracked source of .git/hooks/pre-push (human + suite + gates)
 │   └── lib/hydrant_core.py        <- H1 shared core (spatial dedup)
-├── tests/                         <- unittest suite (test_hydrant_core.py,
-│                                     test_apply_approved_reports_parity.py, golden fixtures);
+├── tests/                         <- unittest suite (test_*.py, golden fixtures, negative_halves_manifest.json)
+│                                     + the node probes address_slice_probe.mjs / granitsi_client_probe.mjs;
 │                                     verify_apply.py / verify_h4.py — one-off checkers (Р-21 of the 01.09 plan)
-├── worker/                        <- Cloudflare Worker source + README (deploy version 5accc88e)
+├── worker/                        <- Cloudflare Worker source + README (deploy version 5accc88e) + E2 runbook
 ├── sw.js                          <- service worker; index.html registers it only in PMTiles mode
 ├── vendor/                        <- vendored basemap runtime deps (pmtiles, protomaps-leaflet)
-├── scratch/                       <- working material: boards, frames, apply reports, probes
-├── audit/                         <- historical audit snapshots / plans
-├── docs/                          <- activeContext, decisions, plans, audits, architecture roadmap
+├── scratch/                       <- working material: boards, frames, apply reports, probes;
+│                                     scratch/places_search/ holds the reference engine and the
+│                                     signed manifests the release gate pins
+├── audit/                         <- May 2026 audit snapshots / plans / one-off checkers
+├── docs/                          <- activeContext, decisions (ADRs), plans, audits, sessions,
+│                                     archive (frozen chronicles), architecture roadmap, moderation_log
 ├── AGENTS.md / CLAUDE.md / README.md
 └── .gitignore / .gitattributes
 ```
@@ -295,10 +307,10 @@ All working, tested on mobile.
    - "Всички" - full clustered overlay of every record in the dataset (count in `docs/activeContext.md`)
 4. **Bottom sheet.** The hydrant bottom sheet was removed in the popup pivot (`tr '\n' ' ' < index.html | grep -c 'bottom sheet *was removed in the popup pivot'` → 1); the building-detail bottom sheet of the C4 search result (`.detail-sheet`, built by `ensureDetailSheet()` in `index.html`) exists and works — CLAUDE.md § Verification says exactly that.
 5. **Compass arrow + heading cone** on user marker.
-6. **Hybrid navigation** - distance >100m opens Google Maps, <=100m uses in-app compass target.
+6. **External navigation** - four links under the hydrant card, built by `buildNavActions()`: Waze (driving), Google Maps walking, Google map, Street View. There is no in-app compass target; `NEAR_THRESHOLD_M` only filters the "Близо" mode.
 7. **Follow mode** - centers on user; user pan exits follow mode.
 8. **Manual position mode** - next map click sets user position manually.
-9. **Report flow** - `🚨`, long-press, or `+` opens structured report flow; submit goes to Cloudflare Worker.
+9. **Report flow** - `🚨`, long-press, or `+` opens structured report flow; submit goes to Cloudflare Worker. Five hydrant kinds (`exists_confirmed`, `damaged`, `missing`, `wrong_location`, `new_hydrant`) plus, from the `+` menu only, the sixth entry `app_feedback` — a problem or an idea about the app, which never enters the map pipe (§ Report Flow).
 10. **Real-time report polling** - reports auto-refresh every 15 seconds via Cloudflare Worker `GET /issues`. Status changes (`exists_confirmed`, `damaged`, `missing`, `wrong_location`) update existing pins in place via `marker.setIcon` / `marker.setLatLng`; `new_hydrant` reports are appended to the in-memory dataset. Polling pauses while the tab is hidden and resumes with an immediate catch-up on return.
 
 Tap on a pin selects/activates it. Long-press on a pin opens the report menu. This is intentional and verified on the live site.
@@ -318,7 +330,7 @@ Tap on a pin selects/activates it. Long-press on a pin opens the report menu. Th
 
 ## Known Tech Debt
 
-1. **HTML has accumulated patches.** `updateCard()` rebuilds full HTML on every refresh and rewires buttons after `innerHTML`.
+1. **HTML has accumulated patches.** `targetCardHTML()` rebuilds the card HTML into `modalBody.innerHTML` at two call sites and the handlers are rewired after it (`wireReporterBar()`, `wireFormHandlers()`, the inline `.type-btn` handlers) — CLAUDE.md § Specific Gotchas.
 2. **No build system.** Diffs are hard to read. Refactoring is post-launch.
 3. **Data is static JSON.** Updating hydrants requires regenerating/reviewing `data/hydrants.json`.
 4. **Worker source lives in `worker/`** (extracted in `914dc2a`); Cloudflare deploy is manual, deploy version repo-declared `5accc88e`.
