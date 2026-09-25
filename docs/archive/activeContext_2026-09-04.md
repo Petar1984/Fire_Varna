@@ -4,7 +4,7 @@
 
 **Date:** 2026-09-04 · **last verified against commit** F11-х = this commit (its parent — the hash the two commit-count rows reconcile against — is 24c84a6, `main`, F11-м, the ЛОТ 1в-В manifest for signature; under it the ЛОТ 1в-В delivery f5d7c4c and the ЛОТ 1в-Б pair F8 4a2bfb2 + F9 86b394d — the reference and the reachable anchors of ЛОТ 1в-Б; the delivery under it is F8 4a2bfb2, under that the ЛОТ 1в-А pair F5-а 8d3af13 + F6-а 3e169c2, and the ЛОТ 1 half under those was rebased onto `origin/main` and pushed by Petar on 2026-09-04 as a58010e — the hash table below translates the pre-rebase hashes of the reports; the source side is varna_3d `rezhimi` P3-а 1d5ec9a + P3-б 859dbe5 + P5 25a6d79 + P6 756d166 + P6-б c1fc541; `main` is ahead of `origin/main` by the ЛОТ 1в commits until Petar's next push) · verified by: Opus (executor), audited by: Opus (auditor, C6, C14, C14b, C14c and the ЛОТ 1 client audit) · signed: __
 > Every number here is the output of the command next to it, run on the date above (`verify_numbers.py` checks it). A number without a command does not enter.
-> The previous chronicle (state as of 2026-07-04) is frozen in [archive/activeContext_2026-07-04.md](archive/activeContext_2026-07-04.md).
+> The previous chronicle (state as of 2026-07-04) is frozen in [activeContext_2026-07-04.md](activeContext_2026-07-04.md).
 
 ## What this repo is
 Public mobile-first web app (README calls it a PWA; there is no web manifest — see the table row below and В-12): the nearest fire hydrant for Varna-oblast firefighters, with field reports moderated by Petar before they change data. Live: https://petar1984.github.io/Fire_Varna/ (GitHub Pages, branch `main`, path `/`).
