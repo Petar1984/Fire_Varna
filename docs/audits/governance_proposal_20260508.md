@@ -23,7 +23,7 @@ Diff-style proposals:
 
 # CLAUDE.md § Windows Dev Environment
 - Defender exclusions applied (2026-05-06): ...
-+ See [AGENTS.md § Windows Dev Environment](AGENTS.md#windows-dev-environment).
++ See [AGENTS.md § Windows Dev Environment](../../AGENTS.md#windows-dev-environment).
 ```
 
 Rationale: `AGENTS.md` and `CLAUDE.md` duplicate this section nearly verbatim; `activeContext.md` already uses the better pointer pattern.
@@ -37,8 +37,8 @@ Rationale: `AGENTS.md` and `CLAUDE.md` duplicate this section nearly verbatim; `
 
 # CLAUDE.md § Report Flow
 - Reports are submitted via `fetch` POST...
-+ See [AGENTS.md § Report Flow](AGENTS.md#report-flow) and
-+ [activeContext current state](docs/activeContext.md#current-state).
++ See [AGENTS.md § Report Flow](../../AGENTS.md#report-flow) and
++ [activeContext current state](../activeContext.md#current-state).
 
 # README.md
 - Signal is sent by Viber / Telegram / SMS.
@@ -51,12 +51,12 @@ Rationale: README currently contains a factually wrong report transport; Worker 
 # AGENTS.md § Hard Constraints
 - Current exact byte counts for `index.html`, `data/hydrants.json`, or first load.
 + Keep only size policy: first load <= 1 MB ideal, 2 MB hard cap.
-+ Current byte counts are canonical in [docs/activeContext.md](docs/activeContext.md#current-state).
++ Current byte counts are canonical in [docs/activeContext.md](../activeContext.md#current-state).
 
 # CLAUDE.md § Hard Rules
 - Duplicate static hosting / size / UI wording / dependency rules.
 + Project-wide constraints are canonical in
-+ [AGENTS.md § Hard Constraints](AGENTS.md#hard-constraints).
++ [AGENTS.md § Hard Constraints](../../AGENTS.md#hard-constraints).
 + Claude Code must stop if an approved plan violates them.
 ```
 
@@ -71,7 +71,7 @@ Rationale: exact byte counts drift. Petar decided current-state byte counts belo
 
 # Future plan docs
 + Approval gates: follow
-+ [AGENTS.md § Tri-Agent Workflow](AGENTS.md#tri-agent-workflow)
++ [AGENTS.md § Tri-Agent Workflow](../../AGENTS.md#dual-claude-code-workflow)
 + unless this plan explicitly adds narrower gates.
 ```
 
@@ -83,7 +83,7 @@ Rationale: approval gates are repeated in README, CLAUDE, and plan docs; one can
 
 # CLAUDE.md § Field Report Ingest Rules
 - Duplicate wrong_location/new_hydrant bullets.
-+ See [AGENTS.md § Wrong-Location Ingest Rule](AGENTS.md#wrong-location-ingest-rule).
++ See [AGENTS.md § Wrong-Location Ingest Rule](../../AGENTS.md#wrong-location-ingest-rule).
 + Claude Code must stop before data edits unless the approved plan names affected report IDs.
 ```
 
@@ -97,7 +97,7 @@ Rationale: this rule is safety-critical and should not have multiple near-copies
 + App is static, but local testing must use HTTP because `data/hydrants.json`
 + is fetched at runtime.
 + Current technical counts/sizes live in
-+ [docs/activeContext.md](docs/activeContext.md#current-state).
++ [docs/activeContext.md](../activeContext.md#current-state).
 ```
 
 Rationale: README conflicts with current fetch architecture and 6,079-record runtime dataset. These diff lines are illustrative of meaning; final README edits must preserve Bulgarian prose.
@@ -219,20 +219,20 @@ Move/cross-reference:
 
 ```diff
 - Hard Rules duplicated from AGENTS.md
-+ See [AGENTS.md § Hard Constraints](AGENTS.md#hard-constraints).
++ See [AGENTS.md § Hard Constraints](../../AGENTS.md#hard-constraints).
 
 - Field Report Ingest Rules
-+ See [AGENTS.md § Wrong-Location Ingest Rule](AGENTS.md#wrong-location-ingest-rule).
++ See [AGENTS.md § Wrong-Location Ingest Rule](../../AGENTS.md#wrong-location-ingest-rule).
 
 - Report Flow
-+ See [AGENTS.md § Report Flow](AGENTS.md#report-flow) and
-+ [activeContext](docs/activeContext.md#current-state).
++ See [AGENTS.md § Report Flow](../../AGENTS.md#report-flow) and
++ [activeContext](../activeContext.md#current-state).
 
 - Windows Dev Environment
-+ See [AGENTS.md § Windows Dev Environment](AGENTS.md#windows-dev-environment).
++ See [AGENTS.md § Windows Dev Environment](../../AGENTS.md#windows-dev-environment).
 
 - What Requires Going Back To Humans
-+ See [AGENTS.md § Tri-Agent Workflow](AGENTS.md#tri-agent-workflow).
++ See [AGENTS.md § Tri-Agent Workflow](../../AGENTS.md#dual-claude-code-workflow).
 ```
 
 Add linkrot rule:
