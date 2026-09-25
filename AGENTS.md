@@ -66,7 +66,7 @@ python -m http.server 8000
 
 ## Data Model
 
-`data/hydrants.json` is the runtime dataset. The original KMZ-derived `hydrants_varna.json` remains as a reference/source artifact, not the full runtime dataset.
+`data/hydrants.json` is the runtime dataset. The original KMZ-derived reference file (`hydrants_varna.json`, compact schema, 3 934 records) and the May 2026 pre-migration snapshots (`data/*.pre_*.json`) were retired on 2026-09-25; they remain in history (last present at `8b80a20`).
 
 Runtime verbose schema (compact-schema compatibility was removed in `142a494`):
 
@@ -263,7 +263,6 @@ C:\git\Fire_Varna\
 │   ├── apply_approved_reports.py
 │   ├── migrate_to_verbose_schema.py
 │   ├── backfill_addresses_20260511.py / backfill_verified_type_20260509.py
-│   ├── replay_historical_new_hydrant.py
 │   ├── import_etr_kmz.py          <- ЕТР KMZ register adapter
 │   ├── copy_basemap_release.py / vendor_basemap_deps.mjs
 │   └── lib/hydrant_core.py        <- H1 shared core (spatial dedup)
@@ -271,8 +270,6 @@ C:\git\Fire_Varna\
 │                                     test_apply_approved_reports_parity.py, golden fixtures);
 │                                     verify_apply.py / verify_h4.py — one-off checkers (Р-21 of the 01.09 plan)
 ├── worker/                        <- Cloudflare Worker source + README (deploy version 5accc88e)
-├── extract_hydrants.py            <- extracts embedded hydrant JSON from older index builds
-├── hydrants_varna.json            <- original KMZ-derived reference dataset
 ├── sw.js                          <- service worker; index.html registers it only in PMTiles mode
 ├── vendor/                        <- vendored basemap runtime deps (pmtiles, protomaps-leaflet)
 ├── scratch/                       <- working material: boards, frames, apply reports, probes

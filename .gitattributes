@@ -18,8 +18,3 @@
 *.shx -text -diff -merge
 *.prj -text -diff -merge
 *.cpg -text -diff -merge
-
-# Dead snapshots: frozen, never re-normalized (live data/*.json stay text).
-data/hydrants.json.pre_address_backfill.json -text
-data/hydrants.json.pre_cleanup_snapshot.json -text
-data/hydrants_provenance.json.pre_address_backfill.json -text
