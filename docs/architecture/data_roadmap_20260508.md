@@ -245,6 +245,8 @@ These records cluster geographically in settlements south/southeast of Varna tow
 
 **Future scope expansion:** If Varna oblast scope is later redefined (e.g., to include some Obzor-side records), revisit this exclusion list. Document reasoning and update list. Not anticipated pre-launch.
 
+**Revised 2026-10-16 — [ADR 013](../decisions/013_burgas_side_under_varna_units.md):** the 38 IDs above are all registered to a Varna oblast unit ("към У ПБЗН – Бяла"), and Petar decided they belong on the map. 37 are added as grey national records; NAT-7385 is a 1.96 m duplicate of NAT-7227 in the source and is not added. The exclusion list is kept above as the historical record of the May import.
+
 ### 2.5 Wrong-Location Correction Preservation
 
 **Decision:** Preserve existing wrong_location corrections during rebuild.

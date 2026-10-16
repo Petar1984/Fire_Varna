@@ -138,7 +138,7 @@ Worker source now lives in the `worker/` directory in this repo (extracted in `9
 | Bulgarian UI labels preserved verbatim | Users speak Bulgarian only; wording is reviewed |
 | Mobile-first: touch targets >= 44px, no hover-dependent UX | Field use, gloves, sweat |
 | HTTPS-required APIs must work: Geolocation, DeviceOrientation, Worker `fetch` | Core features depend on these |
-| **Scope: Varna oblast only** | National scope explicitly out of v1 |
+| **Scope: Varna oblast, plus the hydrants outside it that the national registry assigns to a Varna oblast fire unit** ([ADR 013](docs/decisions/013_burgas_side_under_varna_units.md)) | National scope explicitly out of v1 |
 | No new runtime or build-time dependencies without Petar approval | Keep static architecture simple |
 | No secrets in the repo — Cloudflare/Worker credentials, `wrangler` secrets, `.dev.vars`, `.env` are gitignored and never committed | Public GitHub Pages repo |
 | No automated commits, no automated pushes — agents commit locally with explicit paths; **Petar alone pushes** | Reversibility & release control |
